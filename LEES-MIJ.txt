@@ -1,0 +1,4 @@
+﻿WERKENDE VERSIE — open deze map in Cursor.
+Pad: C:\Users\mholt\Dev\Mholt\Uculi-App
+GitHub: MartinusHH/Uculi-App
+Backup-export (niet openen als main): Dev\Mholt\BACKUP-Grok-exports\

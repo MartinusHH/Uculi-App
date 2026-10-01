@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "mholt-uculi"
+  },
+  "targets": {
+    "mholt-uculi": {
+      "hosting": {
+        "default": [
+          "mholt-uculi"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

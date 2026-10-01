@@ -1,0 +1,5 @@
+Lees de volledige handleiding hier:
+  C:\Users\mholt\Dev\LEES-MIJ-MHOLT.txt
+  of op het bureaublad: LEES-MIJ-MHOLT.txt
+
+Workspace voor Cursor: C:\Users\mholt\Desktop\MHolt-apps.code-workspace
