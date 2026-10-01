@@ -99,11 +99,29 @@
             align-items: center;
             justify-content: center;
             width: 2.85rem;
+            height: 2.85rem;
             flex-shrink: 0;
+            overflow: hidden;
             border-radius: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            background: linear-gradient(160deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 10px 18px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(28, 20, 16, 0.12);
+            background: #fbf8f3;
+            box-shadow: 0 10px 18px rgba(28, 20, 16, 0.12);
+        }
+
+        .app-header-mark img,
+        .brand-boekje {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .brand-apple {
+            width: 1rem;
+            height: 1rem;
+            flex-shrink: 0;
+            border-radius: 999px;
+            object-fit: cover;
         }
 
         .app-header-copy {
@@ -119,6 +137,9 @@
         }
 
         .app-header-subtitle {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
             margin-top: 0.18rem;
             font-size: 0.78rem;
             font-weight: 600;
@@ -1823,13 +1844,13 @@
         
         <header id="main-header" class="text-forest transition-all" translate="no">
             <div class="app-header-brand">
-                <div class="app-header-mark bg-forest text-white">
-                    <i data-lucide="book-open" class="w-5 h-5"></i>
+                <div class="app-header-mark">
+                    <img src="assets/uculi-boekje.jpg" alt="Uculi" />
                 </div>
                 <div class="app-header-copy">
                     <p class="text-[9px] font-bold uppercase tracking-[0.2em] text-sage opacity-80 mb-0.5">Recipe notebook</p>
                     <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
-                    <p class="app-header-subtitle">Created by Mholt</p>
+                    <p class="app-header-subtitle"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -1898,8 +1919,8 @@
         <!-- Auth loading screen: visible until Firebase resolves session -->
         <div id="auth-loading-screen" class="fixed inset-0 z-[160] flex flex-col items-center justify-center bg-[#FBF8F1]">
             <div class="flex flex-col items-center gap-5">
-                <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-forest text-white shadow-lg">
-                    <i data-lucide="book-open" class="h-7 w-7"></i>
+                <div class="h-14 w-14 overflow-hidden rounded-2xl bg-paper shadow-lg">
+                    <img src="assets/uculi-boekje.jpg" alt="Uculi" class="brand-boekje" />
                 </div>
                 <span class="font-fantasy text-2xl font-bold text-forest tracking-wide">Uculi</span>
                 <div class="flex gap-1.5 mt-2">
@@ -5659,8 +5680,8 @@
                         <section class="relative overflow-hidden bg-[linear-gradient(135deg,#f6f1e8,#fbf8f3)] px-6 py-8 md:px-10 md:py-12">
                             <div class="absolute inset-0 pointer-events-none opacity-50" style="background-image: radial-gradient(circle at 10% 0%, rgba(200,144,80,0.18) 0%, transparent 40%), radial-gradient(circle at 90% 100%, rgba(144,152,112,0.16) 0%, transparent 38%);"></div>
                             <div class="relative">
-                                <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-forest text-white shadow-lg shadow-forest/20">
-                                    <i data-lucide="book-open" class="h-6 w-6"></i>
+                                <div class="h-12 w-12 overflow-hidden rounded-2xl bg-paper shadow-lg shadow-forest/20">
+                                    <img src="assets/uculi-boekje.jpg" alt="Uculi" class="brand-boekje" />
                                 </div>
                                 <p class="mt-6 text-[11px] font-bold uppercase tracking-[0.28em] text-sage">Private recipe archive</p>
                                 <h1 class="mt-4 font-fantasy text-4xl font-bold leading-[1.02] text-forest md:text-5xl">${authText.heroTitle}</h1>
@@ -7820,8 +7841,8 @@
                         <!-- Header -->
                         <div class="mx-auto w-full max-w-6xl flex items-center justify-between mb-12 md:mb-20">
                             <div class="flex items-center gap-3">
-                                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-forest text-white shadow-lg shadow-forest/20">
-                                    <i data-lucide="book-open" class="h-5 w-5"></i>
+                                <div class="h-10 w-10 overflow-hidden rounded-xl bg-paper shadow-lg shadow-forest/20">
+                                    <img src="assets/uculi-boekje.jpg" alt="Uculi" class="brand-boekje" />
                                 </div>
                                 <span class="font-fantasy text-2xl font-bold tracking-wide text-forest">Uculi</span>
                             </div>
@@ -7920,8 +7941,8 @@
                         <div class="mx-auto w-full max-w-6xl mt-auto border-t border-sage/20 pt-8 pb-4">
                             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                                 <div class="flex items-center gap-2 opacity-60">
-                                    <i data-lucide="book-open" class="h-4 w-4 text-forest"></i>
-                                    <span class="text-xs font-bold uppercase tracking-[0.2em] text-forest">© 2026 Uculi · Created by Mholt</span>
+                                    <img src="assets/uculi-boekje.jpg" alt="" class="h-5 w-5 rounded-md object-cover" />
+                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.2em] text-forest">© 2026 Uculi · <img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</span>
                                 </div>
                                 <div class="flex gap-6 text-[10px] font-bold uppercase tracking-[0.2em] text-sage">
                                     <a href="#" class="hover:text-gold transition-colors">Privacy</a>
@@ -9762,7 +9783,7 @@
                 <div class="space-y-4 text-inkDark p-4 max-h-[70vh] overflow-y-auto w-[650px] max-w-[90vw]">
                     <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
                         <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">Brand</p>
-                        <h3 class="mt-2 font-serif text-lg font-bold text-forest">Created by Mholt</h3>
+                        <h3 class="mt-2 flex items-center gap-2 font-serif text-lg font-bold text-forest"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</h3>
                         <p class="mt-2 text-sm font-semibold text-sage">Built for calm recipe keeping, clean exports, and a personal archive that still feels warm.</p>
                     </div>
                     <h3 class="font-serif font-bold text-lg mb-2">Family Recipe Books</h3>
