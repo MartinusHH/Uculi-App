@@ -20,12 +20,12 @@
             theme: {
                 extend: {
                     colors: {
-                        parchment: '#FAFAFA',
-                        parchmentDark: '#EFEFEF',
+                        parchment: '#F6F0E4',
+                        parchmentDark: '#E4D7C4',
                         sage: '#7A8B76',
                         forest: '#2C3D2E',
                         gold: '#C5A059',
-                        accent: '#F4EFE6'
+                        accent: '#F3E6D0'
                     },
                     fontFamily: {
                         fantasy: ['"Cormorant Garamond"', 'serif'],
@@ -37,14 +37,14 @@
     </script>
     <style>
         :root {
-            --shell-bg: #FFFFFF;
-            --shell-border: #EFEFEF;
-            --body-bg: #FFFFFF;
+            --shell-bg: #F7F1E6;
+            --shell-border: #E4D7C4;
+            --body-bg: #F3EADF;
             --text-primary: #2C3D2E;
             --text-muted: #7A8B76;
-            --surface-main: #FFFFFF;
-            --surface-soft: #F4EFE6;
-            --surface-muted: #EFEFEF;
+            --surface-main: #FFF9F0;
+            --surface-soft: #F3E6D0;
+            --surface-muted: #E7DCC8;
         }
 
         body {
@@ -416,7 +416,10 @@
             }
 
             .app-nav-label {
-                display: none;
+                display: block;
+                margin-top: 0.15rem;
+                font-size: 0.58rem;
+                line-height: 1;
             }
         }
 
@@ -1183,7 +1186,7 @@
                 ),
                 linear-gradient(to bottom, transparent 0, transparent 31px, rgba(122, 139, 118, 0.14) 31px, rgba(122, 139, 118, 0.14) 32px, transparent 32px) 0 0 / 100% 34px,
                 linear-gradient(90deg, rgba(197, 160, 89, 0.22) 0, rgba(197, 160, 89, 0.22) 1px, transparent 1px) 38px 0 / 100% 100%,
-                linear-gradient(160deg, #fffdf7 0%, #faf5eb 60%, #f7f1e4 100%);
+                linear-gradient(160deg, #fff6e8 0%, #f6ead4 58%, #eddcc0 100%);
             box-shadow:
                 inset 0 0 0 1px rgba(122, 139, 118, 0.08),
                 inset 0 -4px 14px rgba(44, 61, 46, 0.05);
@@ -1543,7 +1546,7 @@
             position: relative;
             transform-origin: left center;
             transform-style: preserve-3d;
-            background: var(--cover-surface, linear-gradient(135deg, #ddd0b9 0%, #c5b18d 48%, #aa9065 100%));
+            background: var(--cover-surface, linear-gradient(145deg, #f4e7d2 0%, #e4cfae 42%, #c4a57a 100%));
             color: var(--cover-ink, #2b241a);
             box-shadow:
                 0 32px 60px rgba(44, 61, 46, 0.24),
@@ -1813,7 +1816,7 @@
     </style>
 </head>
 <body class="font-body text-forest min-h-screen selection:bg-gold selection:text-white transition-all duration-300" id="body">
-    <div id="app-shell" class="w-full max-w-6xl mx-auto flex flex-col h-[100dvh] max-h-[100dvh] relative shadow-2xl bg-white overflow-hidden border-x border-parchmentDark">
+    <div id="app-shell" class="w-full max-w-6xl mx-auto flex flex-col h-[100dvh] max-h-[100dvh] relative shadow-2xl bg-parchment overflow-hidden border-x border-parchmentDark">
         
         <header id="main-header" class="text-forest transition-all" translate="no">
             <div class="app-header-brand">
@@ -1823,7 +1826,7 @@
                 <div class="app-header-copy">
                     <p class="text-[9px] font-bold uppercase tracking-[0.2em] text-sage opacity-80 mb-0.5">Recipe notebook</p>
                     <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
-                    <p class="app-header-subtitle">A Sneezing Donkey product</p>
+                    <p class="app-header-subtitle">Created by Mholt</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -1918,13 +1921,13 @@
                     <i data-lucide="compass" class="w-6 h-6 mb-1"></i>
                     <span class="app-nav-label text-[10px] font-bold uppercase tracking-wider">Browse</span>
                 </button>
-                <button data-nav-view="profile" onclick="renderProfile()" class="app-nav-button" aria-label="Profile" title="Profile">
+                <button data-nav-view="profile" onclick="renderProfile()" class="app-nav-button" aria-label="Profiel" title="Profiel">
                     <i data-lucide="user-round" class="w-6 h-6 mb-1"></i>
-                    <span class="app-nav-label text-[10px] font-bold uppercase tracking-wider">Profile</span>
+                    <span class="app-nav-label text-[10px] font-bold uppercase tracking-wider">Profiel</span>
                 </button>
-                <button data-nav-view="settings" onclick="renderSettings()" class="app-nav-button" aria-label="Settings" title="Settings">
+                <button data-nav-view="settings" onclick="renderSettings()" class="app-nav-button" aria-label="Opties" title="Opties">
                     <i data-lucide="settings-2" class="w-6 h-6 mb-1"></i>
-                    <span class="app-nav-label text-[10px] font-bold uppercase tracking-wider">Settings</span>
+                    <span class="app-nav-label text-[10px] font-bold uppercase tracking-wider">Opties</span>
                 </button>
             </div>
         </nav>
@@ -3461,12 +3464,12 @@
         function getNotebookCoverPalette(palette) {
             const palettes = {
                 oat: {
-                    surface: 'radial-gradient(circle at top left, rgba(255,255,255,0.42), transparent 28%), linear-gradient(135deg, #ddd0b9 0%, #c5b18d 48%, #aa9065 100%)',
-                    border: '#b59f79',
-                    spine: 'linear-gradient(180deg, rgba(102,74,33,0.72), rgba(72,54,29,0.92))',
-                    plate: 'rgba(255,255,255,0.58)',
+                    surface: 'radial-gradient(circle at top left, rgba(255,248,236,0.72), transparent 32%), linear-gradient(145deg, #f6ead6 0%, #e7d3b0 46%, #c9a77a 100%)',
+                    border: '#c4a67c',
+                    spine: 'linear-gradient(180deg, rgba(122,86,42,0.78), rgba(78,54,28,0.94))',
+                    plate: 'rgba(255,249,240,0.72)',
                     plateBorder: 'rgba(88,62,31,0.16)',
-                    ink: '#2b241a'
+                    ink: '#3a2c1c'
                 },
                 sage: {
                     surface: 'radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 28%), linear-gradient(135deg, #91a392 0%, #70856f 50%, #57695a 100%)',
@@ -5707,6 +5710,14 @@
                                     </div>
 
                                     <div class="mt-6 space-y-3">
+                                        <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
+                                            <input id="auth-read-privacy" type="checkbox" class="mt-1 h-4 w-4">
+                                            <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().readPrivacy} <button type="button" onclick="showLegalDocument('privacy')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().privacyName}</button>.</span>
+                                        </label>
+                                        <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
+                                            <input id="auth-agree-terms" type="checkbox" class="mt-1 h-4 w-4">
+                                            <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().agreeTerms} <button type="button" onclick="showLegalDocument('terms')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().termsName}</button>.</span>
+                                        </label>
                                         <button type="button" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
                                             <i data-lucide="${showRegister ? 'user-plus' : 'log-in'}" class="h-4 w-4"></i>${showRegister ? authText.submitRegister : authText.submitLogin}
                                         </button>
@@ -5736,12 +5747,152 @@
             return false;
         }
 
-        function initializeFirebase() {
-            const firebaseConfig = window.UCULI_FIREBASE_CONFIG || {};
+        function getAgreementCopy() {
+            const lang = getActiveUiLanguage();
+            const copy = {
+                nl: {
+                    readPrivacy: 'Ik heb het',
+                    privacyName: 'privacybeleid',
+                    agreeTerms: 'Ik ga akkoord met de',
+                    termsName: 'voorwaarden',
+                    needAgreements: 'Lees het privacybeleid en ga akkoord met de voorwaarden voordat je verdergaat.'
+                },
+                en: {
+                    readPrivacy: 'I have read the',
+                    privacyName: 'Privacy Policy',
+                    agreeTerms: 'I agree to the',
+                    termsName: 'Terms of Use',
+                    needAgreements: 'Read the Privacy Policy and agree to the Terms before you continue.'
+                }
+            };
+            return copy[lang] || copy.en;
+        }
 
-            if (!firebaseConfig.apiKey || firebaseConfig.apiKey === 'YOUR_API_KEY') {
+        function authAgreementsAccepted() {
+            const privacyChecked = Boolean(document.getElementById('auth-read-privacy')?.checked);
+            const termsChecked = Boolean(document.getElementById('auth-agree-terms')?.checked);
+            if (privacyChecked && termsChecked) return true;
+            showToast(getAgreementCopy().needAgreements, 'alert-circle');
+            return false;
+        }
+
+        function isCloudAuthConfigured() {
+            const config = window.UCULI_FIREBASE_CONFIG || {};
+            const key = String(config.apiKey || '');
+            return Boolean(key) && key !== 'YOUR_API_KEY' && key !== 'local-dev-not-a-real-key';
+        }
+
+        function hashLocalSecret(email, secret) {
+            let hash = 2166136261;
+            const input = `${String(email || '').toLowerCase()}::${secret}`;
+            for (let index = 0; index < input.length; index += 1) {
+                hash ^= input.charCodeAt(index);
+                hash = Math.imul(hash, 16777619);
+            }
+            return (hash >>> 0).toString(16);
+        }
+
+        function readLocalAccounts() {
+            try {
+                const parsed = JSON.parse(localStorage.getItem('uculiLocalAccounts') || '[]');
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function writeLocalAccounts(accounts) {
+            localStorage.setItem('uculiLocalAccounts', JSON.stringify(accounts));
+        }
+
+        function activateLocalAccountSession(account) {
+            currentUser = {
+                uid: account.uid,
+                email: account.email,
+                displayName: `${account.firstName || ''} ${account.lastName || ''}`.trim() || account.email
+            };
+            isAuthenticated = true;
+            localStorage.setItem('uculiLocalSession', account.uid);
+            migrateLegacyStorageToCurrentAccount();
+            loadData();
+            userSettings.name = userSettings.name || currentUser.displayName;
+            userSettings.email = account.email;
+            userSettings.termsAccepted = true;
+            userSettings.termsAcceptedAt = userSettings.termsAcceptedAt || new Date().toISOString();
+            userSettings.termsAcceptedVersion = userSettings.termsAcceptedVersion || 'v2026-04';
+            saveData();
+            syncAuthenticatedAppChrome();
+            document.getElementById('app-landing')?.remove();
+            sessionStorage.setItem(landingSessionKey, '1');
+            dismissAuthLoadingScreen();
+            renderList();
+        }
+
+        function restoreLocalAccountSession() {
+            const uid = localStorage.getItem('uculiLocalSession');
+            if (!uid) return false;
+            const account = readLocalAccounts().find(entry => entry.uid === uid);
+            if (!account) return false;
+            activateLocalAccountSession(account);
+            return true;
+        }
+
+        function registerLocalAccount({ firstName, lastName, email, password }) {
+            const accounts = readLocalAccounts();
+            const normalized = email.toLowerCase();
+            if (accounts.some(entry => entry.email === normalized)) {
+                showToast('This email address already has an account.', 'alert-circle');
+                return false;
+            }
+            const account = {
+                uid: `local-${hashLocalSecret(normalized, 'account')}`,
+                email: normalized,
+                firstName,
+                lastName,
+                passwordHash: hashLocalSecret(normalized, password)
+            };
+            accounts.push(account);
+            writeLocalAccounts(accounts);
+            activateLocalAccountSession(account);
+            showToast('Account saved on this device.', 'check-circle');
+            return true;
+        }
+
+        function signInLocalAccount(email, password) {
+            const normalized = email.toLowerCase();
+            const account = readLocalAccounts().find(entry => entry.email === normalized);
+            if (!account || account.passwordHash !== hashLocalSecret(normalized, password)) {
+                showToast('Your email or password is incorrect.', 'alert-circle');
+                return false;
+            }
+            activateLocalAccountSession(account);
+            return true;
+        }
+
+        function finishLocalBoot() {
+            dismissAuthLoadingScreen();
+            if (restoreLocalAccountSession()) return;
+            if (activateDeveloperBypassSession()) {
+                renderList();
                 return;
             }
+            const requestedAuthMode = getRequestedAuthViewMode();
+            if (requestedAuthMode) authViewMode = requestedAuthMode;
+            renderAuthGate();
+        }
+
+        function openRequestedLegalDocument() {
+            const kind = new URLSearchParams(window.location.search || '').get('legal');
+            if (kind === 'privacy' || kind === 'terms') showLegalDocument(kind);
+        }
+
+        function initializeFirebase() {
+            if (!isCloudAuthConfigured()) {
+                finishLocalBoot();
+                return;
+            }
+
+            const firebaseConfig = window.UCULI_FIREBASE_CONFIG || {};
 
             try {
                 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
@@ -5814,16 +5965,18 @@
         }
 
         async function signInWithEmailPassword() {
-            if (!firebaseInitialized) {
-                showToast('Even geduld — authenticatie is nog aan het laden.', 'alert-circle');
-                return;
-            }
+            if (!authAgreementsAccepted()) return;
 
             const email = document.getElementById('auth-email')?.value?.trim();
             const password = document.getElementById('auth-password')?.value || '';
 
             if (!email || !password) {
                 showToast('Vul je e-mailadres en wachtwoord in.', 'alert-circle');
+                return;
+            }
+
+            if (!isCloudAuthConfigured() || !firebaseInitialized) {
+                signInLocalAccount(email, password);
                 return;
             }
 
@@ -5841,10 +5994,7 @@
         }
 
         async function registerWithEmailPassword() {
-            if (!firebaseInitialized) {
-                showToast('Authentication is still loading. Please try again in a moment.', 'alert-circle');
-                return;
-            }
+            if (!authAgreementsAccepted()) return;
 
             const firstName = document.getElementById('auth-first-name')?.value?.trim() || '';
             const lastName = document.getElementById('auth-last-name')?.value?.trim() || '';
@@ -5853,6 +6003,16 @@
 
             if (!firstName || !lastName || !email || !password) {
                 showToast('Enter your first name, last name, email address, and password.', 'alert-circle');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('Choose a stronger password with at least 6 characters.', 'alert-circle');
+                return;
+            }
+
+            if (!isCloudAuthConfigured() || !firebaseInitialized) {
+                registerLocalAccount({ firstName, lastName, email, password });
                 return;
             }
 
@@ -5953,19 +6113,22 @@
                 return;
             }
 
-            if (!firebaseInitialized) return;
-
-            try {
-                await firebase.auth().signOut();
-                currentUser = null;
-                isAuthenticated = false;
-                resetAuthenticatedUserState();
-                syncAuthenticatedAppChrome();
-                showToast('Signed out successfully', 'check-circle');
-                renderAuthGate();
-            } catch (error) {
-                showToast(`Sign out error: ${error.message}`, 'alert-circle');
+            localStorage.removeItem('uculiLocalSession');
+            if (firebaseInitialized) {
+                try {
+                    await firebase.auth().signOut();
+                } catch (error) {
+                    showToast(`Sign out error: ${error.message}`, 'alert-circle');
+                    return;
+                }
             }
+
+            currentUser = null;
+            isAuthenticated = false;
+            resetAuthenticatedUserState();
+            syncAuthenticatedAppChrome();
+            showToast('Signed out successfully', 'check-circle');
+            renderAuthGate();
         }
 
         async function syncToFirestore() {
@@ -7522,15 +7685,9 @@
             }
         }
 
-        function scheduleDesktopNavHide(delay = 1700) {
+        function scheduleDesktopNavHide() {
             clearDesktopNavHideTimer();
-            if (!isDesktopNavAutoHideEnabled() || shouldKeepDesktopNavVisible() || !bodySurface) return;
-
-            desktopNavHideTimer = window.setTimeout(() => {
-                if (!shouldKeepDesktopNavVisible()) {
-                    bodySurface.classList.add('desktop-nav-hidden');
-                }
-            }, delay);
+            if (bodySurface) bodySurface.classList.remove('desktop-nav-hidden');
         }
 
         function configureDesktopNavAutoHide() {
@@ -7771,7 +7928,7 @@
                             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                                 <div class="flex items-center gap-2 opacity-60">
                                     <i data-lucide="book-open" class="h-4 w-4 text-forest"></i>
-                                    <span class="text-xs font-bold uppercase tracking-[0.2em] text-forest">© 2026 Uculi, by SneezingDonkey.org</span>
+                                    <span class="text-xs font-bold uppercase tracking-[0.2em] text-forest">© 2026 Uculi · Created by Mholt</span>
                                 </div>
                                 <div class="flex gap-6 text-[10px] font-bold uppercase tracking-[0.2em] text-sage">
                                     <a href="#" class="hover:text-gold transition-colors">Privacy</a>
@@ -7791,7 +7948,14 @@
             sessionStorage.setItem(landingSessionKey, '1');
             document.getElementById('app-landing')?.remove();
             trackLaunchEvent('appEntered');
-            renderList();
+            if (isAuthenticated && currentUser) {
+                renderList();
+                return;
+            }
+            if (origin === 'hero-enter' || origin === 'landing-enter') {
+                authViewMode = 'register';
+            }
+            renderAuthGate();
         }
 
         const familyColorOptions = [
@@ -8935,6 +9099,7 @@
 
         // --- VIEWS ---
         function renderProfile() {
+            if (!ensureAuthenticatedAccess()) return;
             activeDetailRecipeId = null;
             isCookingMode = false;
             document.getElementById('body').classList.remove('cooking-mode-active');
@@ -9002,7 +9167,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="self-start md:self-end rounded-2xl border border-white/70 bg-white/75 p-1.5 shadow-lg backdrop-blur-sm">
+                                <div class="self-start md:self-end flex flex-wrap gap-2 rounded-2xl border border-white/70 bg-white/75 p-1.5 shadow-lg backdrop-blur-sm">
+                                    <button onclick="renderSettings()" class="${getAppButtonClasses('secondary')}">
+                                        <i data-lucide="settings-2" class="h-4 w-4 text-gold"></i>Opties
+                                    </button>
                                     <button onclick="renderProfileEditor()" class="${getAppButtonClasses('secondary')}">
                                         <i data-lucide="pencil-line" class="h-4 w-4 text-gold"></i>${t.editProfile}
                                     </button>
@@ -9263,6 +9431,7 @@
         }
 
         function renderSettings() {
+            if (!ensureAuthenticatedAccess()) return;
             activeDetailRecipeId = null;
             isCookingMode = false;
             document.getElementById('body').classList.remove('cooking-mode-active');
@@ -9526,10 +9695,13 @@
                     <div class="border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment px-5 py-5">
                         <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                             <div>
-                                <h2 class="font-fantasy text-3xl font-bold text-forest">App Settings</h2>
-                                <p class="mt-1 text-sm font-semibold text-sage opacity-80">Manage your profile, preferences, and account setup.</p>
+                                <h2 class="font-fantasy text-3xl font-bold text-forest">Opties</h2>
+                                <p class="mt-1 text-sm font-semibold text-sage opacity-80">Profile, preferences, privacy, and terms.</p>
                             </div>
                             <div class="flex flex-wrap gap-3">
+                                <button onclick="renderProfile()" class="${getAppButtonClasses('secondary', { size: 'lg' })}">
+                                    <i data-lucide="user-round" class="w-4 h-4"></i> Profiel
+                                </button>
                                 <button onclick="renderList()" class="${getAppButtonClasses('secondary', { size: 'lg' })}">
                                     <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Archive
                                 </button>
@@ -9597,7 +9769,7 @@
                 <div class="space-y-4 text-inkDark p-4 max-h-[70vh] overflow-y-auto w-[650px] max-w-[90vw]">
                     <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
                         <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">Brand</p>
-                        <h3 class="mt-2 font-serif text-lg font-bold text-forest">Uculi is a Sneezing Donkey product</h3>
+                        <h3 class="mt-2 font-serif text-lg font-bold text-forest">Created by Mholt</h3>
                         <p class="mt-2 text-sm font-semibold text-sage">Built for calm recipe keeping, clean exports, and a personal archive that still feels warm.</p>
                     </div>
                     <h3 class="font-serif font-bold text-lg mb-2">Family Recipe Books</h3>
@@ -9796,42 +9968,77 @@
             `, [{ text: 'Close', primary: true, onClick: () => closeModal() }]);
         }
 
-        function showPrivacyPolicy() {
-            createModal('Privacy Policy', `
-                <div class="space-y-4 text-inkDark p-4 max-h-[70vh] overflow-y-auto w-[680px] max-w-[90vw]">
-                    <p class="text-sm font-semibold text-sage">This policy summary is written for in-app transparency and aligned with EU/GDPR principles. It does not replace your full legal publication package.</p>
-                    <div class="rounded-md border border-parchmentDark bg-parchment p-4 space-y-3 text-sm">
-                        <p><strong>Controller scope:</strong> Uculi processes personal data strictly for account access, recipe archiving, collaboration, and reliability operations.</p>
-                        <p><strong>Data categories:</strong> profile identifiers, recipe content, collaboration metadata, and security-relevant operational logs.</p>
-                        <p><strong>Legal basis:</strong> contract performance for core features, legitimate interest for service integrity, and explicit consent where required.</p>
-                        <p><strong>Storage model:</strong> local browser storage is primary; optional cloud storage is used for authenticated sync and shared family records.</p>
-                        <p><strong>Data subject rights:</strong> users can request access, correction, deletion, export, and objection according to applicable EU and local law.</p>
-                        <p><strong>Retention:</strong> only the minimum data needed for product operation is retained, with periodic cleanup of obsolete operational records.</p>
-                        <p><strong>International handling:</strong> where providers process data outside the EEA, safeguards such as contractual protections are expected.</p>
+        function getLegalDocument(kind) {
+            if (kind === 'terms') {
+                return {
+                    id: 'terms',
+                    kicker: 'Voorwaarden',
+                    title: 'Terms of Use',
+                    intro: 'These terms explain how you use Uculi on this device.',
+                    sections: [
+                        ['Acceptable use', 'Do not add harmful, hateful, explicit, illegal, or abusive material.'],
+                        ['Your recipes', 'You keep ownership of recipes and notes you write. Uculi stores them locally for your account on this device.'],
+                        ['Account', 'You are responsible for the name, email, and recipes saved under your login.'],
+                        ['No medical advice', 'Uculi is a recipe notebook. It does not give medical, nutrition, or allergy advice.'],
+                        ['Changes', 'The notebook can change to stay reliable and safe. These terms are version v2026-04.']
+                    ]
+                };
+            }
+            return {
+                id: 'privacy',
+                kicker: 'Privacy',
+                title: 'Privacy Policy',
+                intro: 'This policy explains what Uculi keeps on this device.',
+                sections: [
+                    ['What is stored', 'Your name, email, recipes, notes, and settings stay in this browser for your account.'],
+                    ['Why', 'So you can open, edit, and delete your own recipes without sending them to a live cloud service.'],
+                    ['Your choices', 'You can edit or delete recipes, sign out, and clear this browser’s saved data.'],
+                    ['Cloud', 'Live sync, publishing, and shared families are not part of this local notebook.'],
+                    ['Rights', 'You can ask for access, correction, export, or deletion of the data stored for your account.']
+                ]
+            };
+        }
+
+        function renderLegalDocumentMarkup(kind) {
+            const doc = getLegalDocument(kind);
+            const otherKind = kind === 'privacy' ? 'terms' : 'privacy';
+            const other = getLegalDocument(otherKind);
+            return `
+                <article class="mx-auto w-full max-w-2xl space-y-4 text-forest">
+                    <div class="rounded-[28px] border border-[#e4d3b6] bg-[#fff8ee] p-5 md:p-6">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${doc.kicker}</p>
+                        <h3 class="mt-2 font-fantasy text-3xl font-bold text-forest">${doc.title}</h3>
+                        <p class="mt-3 text-sm font-semibold leading-relaxed text-sage">${doc.intro}</p>
                     </div>
-                    <p class="text-xs font-semibold text-sage">Final production legal pages should include legal entity identity, support contacts, DPO route (if applicable), and jurisdiction-specific annexes.</p>
-                </div>
-            `, [{ text: 'Close', primary: true, onClick: () => closeModal() }]);
+                    <div class="space-y-3">
+                        ${doc.sections.map(([heading, body]) => `
+                            <section class="rounded-2xl border border-parchmentDark bg-[#fffaf2] p-4">
+                                <h4 class="text-sm font-bold text-forest">${heading}</h4>
+                                <p class="mt-2 text-sm font-semibold leading-relaxed text-sage">${body}</p>
+                            </section>
+                        `).join('')}
+                    </div>
+                    <p class="text-sm font-semibold text-forest">
+                        <button type="button" onclick="showLegalDocument('${otherKind}')" class="font-bold underline decoration-gold underline-offset-4">${other.title}</button>
+                    </p>
+                </article>
+            `;
+        }
+
+        function showLegalDocument(kind) {
+            document.querySelectorAll('[id^="dynamic-modal-"]').forEach(node => node.remove());
+            const doc = getLegalDocument(kind === 'terms' ? 'terms' : 'privacy');
+            createModal(doc.title, renderLegalDocumentMarkup(doc.id), [
+                { text: 'Close', primary: true, onClick: () => closeModal() }
+            ]);
+        }
+
+        function showPrivacyPolicy() {
+            showLegalDocument('privacy');
         }
 
         function showTermsOfUse() {
-            createModal('Terms of Use', `
-                <div class="space-y-4 text-inkDark p-4 max-h-[70vh] overflow-y-auto w-[680px] max-w-[90vw]">
-                    <p class="text-sm font-semibold text-sage">These terms summarize product use obligations and family-safe standards for the app experience.</p>
-                    <div class="rounded-md border border-parchmentDark bg-parchment p-4 space-y-3 text-sm">
-                        <p><strong>1. Acceptable use:</strong> users may not upload harmful, hateful, explicit, illegal, or abusive material. Family-safe moderation rules apply.</p>
-                        <p><strong>2. User responsibility:</strong> account owners are responsible for recipe content, profile information, and collaboration actions performed under their login.</p>
-                        <p><strong>3. Content ownership:</strong> users retain ownership of submitted recipes; by publishing content, users grant Uculi a non-exclusive display license within product surfaces.</p>
-                        <p><strong>4. Collaboration model:</strong> family books allow shared edits. Members should coordinate changes and may be subject to creator-managed membership controls.</p>
-                        <p><strong>5. Service availability:</strong> uptime and third-party dependencies are provided on a best-effort basis; functionality may evolve for safety, quality, or legal reasons.</p>
-                        <p><strong>6. AI and translation disclaimer:</strong> assistive outputs can contain errors and must be reviewed by users before relying on them.</p>
-                        <p><strong>7. Liability boundary:</strong> Uculi is a recipe-management service and does not provide medical, nutrition, allergy, or clinical guidance.</p>
-                        <p><strong>8. Termination:</strong> severe or repeated policy violations may result in account restrictions or removal from collaboration spaces.</p>
-                        <p><strong>9. Governing framework:</strong> terms are intended to align with Dutch and broader EU consumer/data expectations.</p>
-                    </div>
-                    <p class="text-xs font-semibold text-sage">Final legal publication should still include governing law, dispute venue, business identity, and support contact obligations.</p>
-                </div>
-            `, [{ text: 'Close', primary: true, onClick: () => closeModal() }]);
+            showLegalDocument('terms');
         }
 
         function showTermsAcceptanceModal() {
@@ -11323,8 +11530,17 @@
             ` : '';
 
             if (filteredRecipes.length === 0) {
-                html += `
-                    <div class="text-center mt-10 p-8 glass-panel rounded-sm border border-parchmentDark">
+                const notebookIsEmpty = recipes.length === 0 && !hasActiveListFilters && !searchQuery.trim();
+                html += notebookIsEmpty ? `
+                    <div class="mx-auto mt-10 max-w-xl rounded-[28px] border border-[#e4d3b6] bg-[#fff8ee] p-8 text-center shadow-[0_18px_40px_rgba(90,64,32,0.08)]">
+                        <i data-lucide="book-open" class="mx-auto mb-4 h-16 w-16 text-gold"></i>
+                        <p class="mb-2 font-fantasy text-3xl font-bold text-forest">Your notebook is empty.</p>
+                        <p class="text-sm font-semibold text-sage">Add the first recipe. It stays on this device.</p>
+                        <button type="button" onclick="renderAddForm()" class="${getAppButtonClasses('primary', { size: 'lg' })} mt-6">
+                            <i data-lucide="plus" class="h-4 w-4"></i> Add Recipe
+                        </button>
+                    </div>` : `
+                    <div class="text-center mt-10 p-8 rounded-[28px] border border-parchmentDark bg-[#fff8ee]">
                         <i data-lucide="package-open" class="w-16 h-16 mx-auto mb-4 text-sage opacity-50"></i>
                         <p class="font-fantasy text-2xl text-forest font-bold mb-2">No recipes found.</p>
                         <p class="text-sm opacity-80 font-semibold">Try adjusting your search or add a new one!</p>
@@ -11338,7 +11554,7 @@
                     const recipeVersionLabel = getPublishedVersionLabel(recipe);
                     const familyChipMarkup = getRecipeFamilyChipMarkup(recipe, 'inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em]');
                     html += `
-                        <div onclick="renderDetail(${recipe.id})" class="relative h-[120px] bg-white rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex items-stretch">
+                        <div onclick="renderDetail(${recipe.id})" class="relative h-[120px] bg-[#fff8ee] rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex items-stretch">
                             ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-gold bg-white text-gold shadow-md transition-all hover:scale-105 hover:text-forest"><i data-lucide="alert-circle" class="h-5 w-5"></i></button>` : ''}
                             <div class="h-full w-24 sm:w-32 bg-cover bg-center flex-shrink-0" style="background-image: url('${recipe.profile || defaultPlaceholderProfile}')"></div>
                             <div class="flex-1 flex flex-col justify-center p-4 min-w-0 pr-16">
@@ -11367,7 +11583,7 @@
                     const recipeSourceLabel = getRecipeCardSourceLabel(recipe);
                     const familyChipMarkup = getRecipeFamilyChipMarkup(recipe, 'inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em]');
                     html += `
-                        <div onclick="renderDetail(${recipe.id})" class="relative h-[24rem] bg-white rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex flex-col">
+                        <div onclick="renderDetail(${recipe.id})" class="relative h-[24rem] bg-[#fff8ee] rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex flex-col">
                             ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-gold bg-white text-gold shadow-md transition-all hover:scale-105 hover:text-forest"><i data-lucide="alert-circle" class="h-5 w-5"></i></button>` : ''}
                             <div class="w-full h-48 bg-cover bg-center" style="background-image: url('${recipe.profile || defaultPlaceholderProfile}')"></div>
                             <div class="flex flex-1 flex-col p-5">
@@ -12196,8 +12412,11 @@
         }
 
         function closeModal(modalId) {
-            const modals = document.querySelectorAll('[id^="dynamic-modal-"]');
-            const targetModal = modalId ? document.getElementById(modalId) : modals[modals.length - 1];
+            const modals = document.querySelectorAll('.app-overlay[id^="dynamic-modal-"]');
+            const requested = modalId ? document.getElementById(modalId) : null;
+            const targetModal = requested?.classList?.contains('app-overlay')
+                ? requested
+                : (requested?.closest?.('.app-overlay[id^="dynamic-modal-"]') || modals[modals.length - 1]);
             
             if (targetModal) {
                 const content = document.getElementById(`${targetModal.id}-content`);
@@ -12869,7 +13088,7 @@
             createModal('Delete Recipe', `
                 <div class="space-y-4">
                     <p class="text-sm font-semibold leading-relaxed text-forest">Are you sure you want to permanently delete <strong>${escapeHTML(recipe.title)}</strong>?</p>
-                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-red-500">This cannot be undone.</p>
+                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-red-500">Confirm to remove it from this device. Undo stays available for 5 minutes.</p>
                 </div>
             `, [
                 { text: 'Cancel', onClick: () => closeModal() },
@@ -14411,14 +14630,12 @@
                     initializeFirebase();
                 } catch (error) {
                     console.log("Firebase SDK not loaded - local mode only");
-                    dismissAuthLoadingScreen();
-                    renderAuthGate();
+                    finishLocalBoot();
                 }
             } else {
-                // Firebase SDK not available: show auth gate directly
-                dismissAuthLoadingScreen();
-                renderAuthGate();
+                finishLocalBoot();
             }
+            openRequestedLegalDocument();
 
             // Safety net: if Firebase never calls onAuthStateChanged within 6 seconds, dismiss loading
             setTimeout(() => {
