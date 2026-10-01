@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uculi — Your recipe book, forever</title>
     <meta name="description" content="Uculi is a personal recipe notebook you share with family. Save recipes, cook together, and make sure grandma's apple pie is never lost again.">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script>
@@ -12,19 +13,20 @@
             theme: {
                 extend: {
                     colors: {
-                        forest:       '#2D4A3E',
-                        forestLight:  '#3D6050',
-                        sage:         '#7A9E7E',
-                        gold:         '#C9A84C',
-                        goldLight:    '#E8C96B',
-                        parchment:    '#F5F0E8',
-                        parchmentDark:'#E8DFD0',
+                        forest:       '#1c1410',
+                        forestLight:  '#c89050',
+                        sage:         '#909870',
+                        gold:         '#c89050',
+                        goldLight:    '#c89050',
+                        parchment:    '#f6f1e8',
+                        paper:        '#fbf8f3',
+                        parchmentDark:'#E4D7C4',
                         coral:        '#E07A5F',
                     },
                     fontFamily: {
-                        serif:   ['Georgia', 'Cambria', 'serif'],
-                        sans:    ['system-ui', '-apple-system', 'sans-serif'],
-                        fantasy: ['Palatino Linotype', 'Palatino', 'Book Antiqua', 'Georgia', 'serif'],
+                        serif:   ['Fraunces', 'serif'],
+                        sans:    ['Outfit', 'sans-serif'],
+                        fantasy: ['Fraunces', 'serif'],
                     },
                     animation: {
                         'fade-up': 'fadeUp 0.6s ease both',
@@ -44,7 +46,7 @@
 
         .hero-grain {
             background-image:
-                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(200, 144, 80,0.18) 0%, transparent 60%),
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
         }
 
@@ -59,7 +61,7 @@
             transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
         .card-hover:hover {
-            box-shadow: 0 8px 32px rgba(45,74,62,0.10);
+            box-shadow: 0 8px 32px rgba(28, 20, 16,0.10);
             transform: translateY(-2px);
         }
 
@@ -455,7 +457,7 @@
                 <p class="font-serif text-3xl font-bold text-forest">€0 <span class="text-base font-normal text-sage">/ forever</span></p>
                 <p class="mt-2 mb-5 text-xs font-semibold text-sage">Everything you need to get started.</p>
                 <ul class="space-y-2.5 flex-1">
-                    <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Up to 8 recipes</li>
+                    <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Up to 3 recipes</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Notebook mode</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Cloud sync</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>5 display languages</li>
@@ -561,9 +563,9 @@
             <div class="flex items-center gap-5 text-xs font-semibold text-sage">
                 <a href="app.html?auth=login" class="hover:text-forest transition-colors">Open app</a>
                 <span class="opacity-30">·</span>
-                <a href="app.html?legal=privacy" class="hover:text-forest transition-colors">Privacy</a>
+                <a href="app.html?legal=privacy" class="hover:text-forest transition-colors">Privacybeleid</a>
                 <span class="opacity-30">·</span>
-                <a href="app.html?legal=terms" class="hover:text-forest transition-colors">Voorwaarden</a>
+                <a href="app.html?legal=terms" class="hover:text-forest transition-colors">Gebruiksvoorwaarden</a>
             </div>
             <p class="text-xs font-semibold text-sage opacity-50">
                 © 2026 Uculi · Created by Mholt

@@ -6,7 +6,7 @@
     <title>Uculi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
         <!-- Firebase -->
         <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js" defer></script>
@@ -20,16 +20,19 @@
             theme: {
                 extend: {
                     colors: {
-                        parchment: '#F6F0E4',
+                        parchment: '#f6f1e8',
+                        paper: '#fbf8f3',
                         parchmentDark: '#E4D7C4',
-                        sage: '#7A8B76',
-                        forest: '#2C3D2E',
-                        gold: '#C5A059',
-                        accent: '#F3E6D0'
+                        sage: '#909870',
+                        forest: '#1c1410',
+                        gold: '#c89050',
+                        accent: '#fbf8f3'
                     },
                     fontFamily: {
-                        fantasy: ['"Cormorant Garamond"', 'serif'],
-                        body: ['"Nunito"', 'sans-serif'],
+                        fantasy: ['"Fraunces"', 'serif'],
+                        serif: ['"Fraunces"', 'serif'],
+                        body: ['"Outfit"', 'sans-serif'],
+                        sans: ['"Outfit"', 'sans-serif'],
                     }
                 }
             }
@@ -37,14 +40,14 @@
     </script>
     <style>
         :root {
-            --shell-bg: #F7F1E6;
+            --shell-bg: #f6f1e8;
             --shell-border: #E4D7C4;
-            --body-bg: #F3EADF;
-            --text-primary: #2C3D2E;
-            --text-muted: #7A8B76;
-            --surface-main: #FFF9F0;
-            --surface-soft: #F3E6D0;
-            --surface-muted: #E7DCC8;
+            --body-bg: #f6f1e8;
+            --text-primary: #1c1410;
+            --text-muted: #909870;
+            --surface-main: #fbf8f3;
+            --surface-soft: #f6f1e8;
+            --surface-muted: #f6f1e8;
         }
 
         body {
@@ -77,8 +80,8 @@
             justify-content: space-between;
             gap: 1rem;
             padding: 1rem 1.5rem;
-            background: rgba(251, 248, 241, 0.85); /* parchment but slightly transparent */
-            border-bottom: 1px solid rgba(90, 118, 95, 0.1);
+            background: rgba(251, 248, 243, 0.85); /* parchment but slightly transparent */
+            border-bottom: 1px solid rgba(144, 152, 112, 0.28);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -112,14 +115,14 @@
             font-weight: 700;
             letter-spacing: 0.26em;
             text-transform: uppercase;
-            color: rgba(244, 239, 230, 0.78);
+            color: #909870;
         }
 
         .app-header-subtitle {
             margin-top: 0.18rem;
             font-size: 0.78rem;
             font-weight: 600;
-            color: rgba(244, 239, 230, 0.82);
+            color: #909870;
         }
 
         #main-nav {
@@ -129,11 +132,11 @@
             width: min(calc(100vw - 1.5rem), 54rem);
             margin: 0;
             transform: translateX(-50%);
-            border: 1px solid rgba(122, 139, 118, 0.18);
+            border: 1px solid rgba(144, 152, 112, 0.18);
             border-radius: 1.25rem;
             background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(16px);
-            box-shadow: 0 16px 34px rgba(44, 61, 46, 0.16);
+            box-shadow: 0 16px 34px rgba(28, 20, 16, 0.16);
             z-index: 40;
         }
 
@@ -147,10 +150,10 @@
             align-items: center;
             justify-content: center;
             border-radius: 0.9rem;
-            border: 1px solid rgba(122, 139, 118, 0.28);
+            border: 1px solid rgba(144, 152, 112, 0.28);
             background: rgba(255, 255, 255, 0.96);
-            color: #2C3D2E;
-            box-shadow: 0 10px 22px rgba(44, 61, 46, 0.16);
+            color: #1c1410;
+            box-shadow: 0 10px 22px rgba(28, 20, 16, 0.16);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             z-index: 46;
@@ -167,9 +170,9 @@
         }
 
         .floating-back-button:hover {
-            border-color: rgba(197, 160, 89, 0.55);
-            color: #8c6a22;
-            box-shadow: 0 12px 24px rgba(44, 61, 46, 0.2);
+            border-color: rgba(200, 144, 80, 0.55);
+            color: #c89050;
+            box-shadow: 0 12px 24px rgba(28, 20, 16, 0.2);
         }
 
         .floating-back-button:active {
@@ -209,12 +212,12 @@
 
         .app-nav-button.is-active {
             color: var(--text-primary);
-            background: linear-gradient(180deg, rgba(244, 239, 230, 0.95), rgba(239, 239, 239, 0.88));
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 10px 18px rgba(44, 61, 46, 0.08);
+            background: linear-gradient(180deg, rgba(251, 248, 243, 0.95), rgba(246, 241, 232, 0.92));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 10px 18px rgba(28, 20, 16, 0.08);
         }
 
         .app-nav-button.is-active i {
-            color: #8c6a22;
+            color: #c89050;
             transform: translateY(-1px);
         }
 
@@ -240,9 +243,9 @@
 
         .settings-disclosure[open] .settings-disclosure-chevron {
             transform: rotate(180deg);
-            color: #8c6a22;
-            border-color: rgba(197, 160, 89, 0.45);
-            background-color: rgba(197, 160, 89, 0.12);
+            color: #c89050;
+            border-color: rgba(200, 144, 80, 0.45);
+            background-color: rgba(200, 144, 80, 0.12);
         }
 
         @media (min-width: 768px) {
@@ -289,7 +292,7 @@
             border: 1px solid var(--shell-border);
             border-radius: 1rem;
             background: var(--surface-main);
-            box-shadow: 0 24px 44px rgba(44, 61, 46, 0.2);
+            box-shadow: 0 24px 44px rgba(28, 20, 16, 0.2);
         }
 
         .app-modal-panel--wide {
@@ -425,7 +428,7 @@
 
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #7A8B76; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb { background: #909870; border-radius: 2px; }
 
         button:not(:disabled),
         .custom-file-upload {
@@ -450,13 +453,13 @@
         textarea:focus-visible,
         .custom-file-upload:focus-within {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.24);
+            box-shadow: 0 0 0 3px rgba(200, 144, 80, 0.24);
         }
 
         .cooking-step-highlight {
-            background: rgba(197, 160, 89, 0.12) !important;
-            box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.38);
-            border-color: rgba(197, 160, 89, 0.28) !important;
+            background: rgba(200, 144, 80, 0.12) !important;
+            box-shadow: 0 0 0 2px rgba(200, 144, 80, 0.38);
+            border-color: rgba(200, 144, 80, 0.28) !important;
         }
 
         .notebook-spread {
@@ -496,11 +499,11 @@
             justify-items: center;
             padding: clamp(1rem, 2vw, 1.75rem);
             border-radius: 2rem;
-            border: 1px solid rgba(122, 139, 118, 0.18);
+            border: 1px solid rgba(144, 152, 112, 0.18);
             background:
                 radial-gradient(circle at top left, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 34%),
                 linear-gradient(135deg, rgba(255, 253, 246, 0.96) 0%, rgba(249, 243, 232, 0.92) 48%, rgba(238, 229, 211, 0.9) 100%);
-            box-shadow: 0 24px 44px rgba(44, 61, 46, 0.12);
+            box-shadow: 0 24px 44px rgba(28, 20, 16, 0.12);
             overflow: hidden;
             isolation: isolate;
         }
@@ -513,7 +516,7 @@
             width: 16rem;
             height: 16rem;
             border-radius: 999px;
-            background: radial-gradient(circle, rgba(197, 160, 89, 0.22) 0%, rgba(197, 160, 89, 0) 70%);
+            background: radial-gradient(circle, rgba(200, 144, 80, 0.22) 0%, rgba(200, 144, 80, 0) 70%);
             z-index: -1;
         }
 
@@ -561,10 +564,10 @@
         .notebook-landing-stat,
         .notebook-landing-section {
             border-radius: 1.35rem;
-            border: 1px solid rgba(122, 139, 118, 0.18);
+            border: 1px solid rgba(144, 152, 112, 0.18);
             background: rgba(255, 255, 255, 0.72);
             padding: 0.95rem 1rem;
-            box-shadow: 0 10px 22px rgba(44, 61, 46, 0.07);
+            box-shadow: 0 10px 22px rgba(28, 20, 16, 0.07);
             backdrop-filter: blur(8px);
         }
 
@@ -603,10 +606,10 @@
             display: grid;
             gap: 0.35rem;
             border-radius: 1.2rem;
-            border: 1px solid rgba(122, 139, 118, 0.18);
+            border: 1px solid rgba(144, 152, 112, 0.18);
             background: rgba(255, 255, 255, 0.76);
             padding: 0.95rem 1rem;
-            box-shadow: 0 12px 24px rgba(44, 61, 46, 0.07);
+            box-shadow: 0 12px 24px rgba(28, 20, 16, 0.07);
             text-align: left;
         }
 
@@ -622,10 +625,10 @@
             gap: 0.55rem;
             width: 100%;
             border-radius: 1.35rem;
-            border: 1px solid rgba(122, 139, 118, 0.18);
+            border: 1px solid rgba(144, 152, 112, 0.18);
             background: rgba(255, 255, 255, 0.72);
             padding: 1rem 1.05rem;
-            box-shadow: 0 14px 28px rgba(44, 61, 46, 0.08);
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.08);
             backdrop-filter: blur(8px);
             text-align: left;
         }
@@ -651,7 +654,7 @@
             min-height: 2rem;
             padding: 0.35rem 0.8rem;
             border-radius: 999px;
-            border: 1px solid rgba(122, 139, 118, 0.18);
+            border: 1px solid rgba(144, 152, 112, 0.18);
             background: rgba(255, 255, 255, 0.86);
             font-size: 0.7rem;
             font-weight: 800;
@@ -731,7 +734,7 @@
             box-shadow:
                 0 0 0 4px rgba(255, 253, 246, 0.9),
                 0 0 0 7px rgba(45, 77, 52, 0.28),
-                0 32px 60px rgba(44, 61, 46, 0.24),
+                0 32px 60px rgba(28, 20, 16, 0.24),
                 inset 0 0 0 1px rgba(255, 255, 255, 0.2);
         }
 
@@ -808,7 +811,7 @@
                 var(--sticky-note-bg, #f5de87);
             color: var(--sticky-note-ink, #5d4516);
             box-shadow:
-                0 12px 22px rgba(44, 61, 46, 0.12),
+                0 12px 22px rgba(28, 20, 16, 0.12),
                 0 1px 0 rgba(121, 91, 34, 0.14),
                 inset 0 0 0 1px rgba(255, 255, 255, 0.18),
                 inset 0 -10px 18px rgba(121, 91, 34, 0.06);
@@ -818,7 +821,7 @@
 
         .notebook-sticky-note-anchor.is-active .notebook-sticky-note {
             box-shadow:
-                0 18px 32px rgba(44, 61, 46, 0.16),
+                0 18px 32px rgba(28, 20, 16, 0.16),
                 0 1px 0 rgba(121, 91, 34, 0.14),
                 inset 0 0 0 1px rgba(255, 255, 255, 0.18),
                 inset 0 -10px 18px rgba(121, 91, 34, 0.06);
@@ -975,9 +978,9 @@
             transform: translateX(-50%);
             --notebook-note-menu-pointer-x: 50%;
             border-radius: 1rem;
-            border: 1px solid rgba(122, 139, 118, 0.18);
+            border: 1px solid rgba(144, 152, 112, 0.18);
             background: rgba(255, 255, 255, 0.97);
-            box-shadow: 0 20px 34px rgba(44, 61, 46, 0.14);
+            box-shadow: 0 20px 34px rgba(28, 20, 16, 0.14);
             padding: 0.9rem;
             backdrop-filter: blur(10px);
             z-index: 12;
@@ -990,8 +993,8 @@
             width: 0.95rem;
             height: 0.95rem;
             background: rgba(255, 255, 255, 0.96);
-            border-left: 1px solid rgba(122, 139, 118, 0.18);
-            border-top: 1px solid rgba(122, 139, 118, 0.18);
+            border-left: 1px solid rgba(144, 152, 112, 0.18);
+            border-top: 1px solid rgba(144, 152, 112, 0.18);
             transform: translateX(-50%) rotate(45deg);
         }
 
@@ -1029,7 +1032,7 @@
             width: 1.35rem;
             height: 1.35rem;
             border-radius: 999px;
-            border: 1px solid rgba(122, 139, 118, 0.18);
+            border: 1px solid rgba(144, 152, 112, 0.18);
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
             transition: transform 160ms ease, border-color 160ms ease;
             flex: 0 0 auto;
@@ -1083,10 +1086,10 @@
 
         .notebook-note-control--manage {
             min-width: 10.5rem;
-            border: 1px solid rgba(197, 160, 89, 0.68);
+            border: 1px solid rgba(200, 144, 80, 0.68);
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 244, 231, 0.94) 100%);
             color: #2f4a35;
-            box-shadow: 0 12px 24px rgba(44, 61, 46, 0.1);
+            box-shadow: 0 12px 24px rgba(28, 20, 16, 0.1);
         }
 
         .notebook-note-control--manage.notebook-note-control--icon {
@@ -1094,29 +1097,29 @@
         }
 
         .notebook-note-control--manage:hover {
-            border-color: rgba(197, 160, 89, 0.98);
+            border-color: rgba(200, 144, 80, 0.98);
             background: linear-gradient(135deg, rgba(236, 210, 118, 0.96) 0%, rgba(219, 177, 77, 0.96) 100%);
             color: #fffdf6;
         }
 
         .notebook-note-control--toggle {
-            border: 1px solid rgba(122, 139, 118, 0.22);
+            border: 1px solid rgba(144, 152, 112, 0.22);
             background: rgba(255, 255, 255, 0.9);
             color: #4a5f4d;
-            box-shadow: 0 10px 20px rgba(44, 61, 46, 0.08);
+            box-shadow: 0 10px 20px rgba(28, 20, 16, 0.08);
         }
 
         .notebook-note-control--toggle:hover {
-            border-color: rgba(197, 160, 89, 0.72);
+            border-color: rgba(200, 144, 80, 0.72);
             color: #26422b;
         }
 
         .notebook-note-control--cook {
             min-width: 6.25rem;
-            border: 1px solid rgba(197, 160, 89, 0.92);
+            border: 1px solid rgba(200, 144, 80, 0.92);
             background: linear-gradient(135deg, rgba(236, 210, 118, 0.96) 0%, rgba(219, 177, 77, 0.96) 100%);
             color: #fffdf6;
-            box-shadow: 0 14px 28px rgba(197, 160, 89, 0.24);
+            box-shadow: 0 14px 28px rgba(200, 144, 80, 0.24);
         }
 
         .notebook-note-control--cook:hover {
@@ -1184,12 +1187,12 @@
                     rgba(0, 0, 0, 0.011) 3px,
                     rgba(0, 0, 0, 0.011) 4px
                 ),
-                linear-gradient(to bottom, transparent 0, transparent 31px, rgba(122, 139, 118, 0.14) 31px, rgba(122, 139, 118, 0.14) 32px, transparent 32px) 0 0 / 100% 34px,
-                linear-gradient(90deg, rgba(197, 160, 89, 0.22) 0, rgba(197, 160, 89, 0.22) 1px, transparent 1px) 38px 0 / 100% 100%,
-                linear-gradient(160deg, #fff6e8 0%, #f6ead4 58%, #eddcc0 100%);
+                linear-gradient(to bottom, transparent 0, transparent 31px, rgba(144, 152, 112, 0.14) 31px, rgba(144, 152, 112, 0.14) 32px, transparent 32px) 0 0 / 100% 34px,
+                linear-gradient(90deg, rgba(200, 144, 80, 0.22) 0, rgba(200, 144, 80, 0.22) 1px, transparent 1px) 38px 0 / 100% 100%,
+                linear-gradient(160deg, #fbf8f3 0%, #f6f1e8 100%);
             box-shadow:
-                inset 0 0 0 1px rgba(122, 139, 118, 0.08),
-                inset 0 -4px 14px rgba(44, 61, 46, 0.05);
+                inset 0 0 0 1px rgba(144, 152, 112, 0.08),
+                inset 0 -4px 14px rgba(28, 20, 16, 0.05);
         }
 
         .notebook-paper__body {
@@ -1242,9 +1245,9 @@
             width: 100%;
             padding: 0.34rem 0.34rem 0.65rem;
             border-radius: 0.72rem;
-            border: 1px solid rgba(197, 160, 89, 0.24);
+            border: 1px solid rgba(200, 144, 80, 0.24);
             background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,243,234,0.96));
-            box-shadow: 0 10px 20px rgba(44, 61, 46, 0.14);
+            box-shadow: 0 10px 20px rgba(28, 20, 16, 0.14);
             transform: rotate(4.2deg);
         }
 
@@ -1253,7 +1256,7 @@
             position: absolute;
             inset: 0.45rem 0.45rem 0.9rem;
             border-radius: 0.6rem;
-            box-shadow: inset 0 0 0 1px rgba(122, 139, 118, 0.1);
+            box-shadow: inset 0 0 0 1px rgba(144, 152, 112, 0.1);
             pointer-events: none;
         }
 
@@ -1262,11 +1265,11 @@
             overflow: hidden;
             aspect-ratio: 1.06 / 1;
             border-radius: 0.55rem;
-            background-color: rgba(244, 239, 230, 0.68);
+            background-color: rgba(251, 248, 243, 0.68);
             background-position: center;
             background-repeat: no-repeat;
             background-size: cover;
-            box-shadow: inset 0 0 0 1px rgba(122, 139, 118, 0.08), 0 8px 16px rgba(44, 61, 46, 0.08);
+            box-shadow: inset 0 0 0 1px rgba(144, 152, 112, 0.08), 0 8px 16px rgba(28, 20, 16, 0.08);
         }
 
         .notebook-page-photo-card::after {
@@ -1285,7 +1288,7 @@
             height: 2.5rem;
             border-radius: 0.35rem;
             background: linear-gradient(180deg, #d7bb92 0%, #b88d52 38%, #8b6336 100%);
-            box-shadow: 0 10px 16px rgba(44, 61, 46, 0.18);
+            box-shadow: 0 10px 16px rgba(28, 20, 16, 0.18);
             transform: rotate(6deg);
         }
 
@@ -1321,7 +1324,7 @@
 
         .notebook-page-summary-card {
             border-radius: 1rem;
-            border: 1px solid rgba(122, 139, 118, 0.18);
+            border: 1px solid rgba(144, 152, 112, 0.18);
             background: rgba(255, 255, 255, 0.58);
             padding: 0.8rem 0.85rem;
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
@@ -1336,18 +1339,18 @@
             justify-content: center;
             gap: 0;
             border-radius: 0.9rem;
-            border: 1px solid rgba(122, 139, 118, 0.22);
+            border: 1px solid rgba(144, 152, 112, 0.22);
             background: rgba(255, 255, 255, 0.92);
             padding: 0;
             color: #5f7261;
-            box-shadow: 0 10px 24px rgba(44, 61, 46, 0.12);
+            box-shadow: 0 10px 24px rgba(28, 20, 16, 0.12);
             transition: all 180ms ease;
         }
 
         .notebook-page-nav:hover:not(:disabled) {
-            border-color: rgba(197, 160, 89, 0.7);
+            border-color: rgba(200, 144, 80, 0.7);
             color: #26422b;
-            box-shadow: 0 12px 26px rgba(44, 61, 46, 0.16);
+            box-shadow: 0 12px 26px rgba(28, 20, 16, 0.16);
         }
 
         .notebook-page-nav:disabled {
@@ -1369,7 +1372,7 @@
         }
 
         .notebook-page-nav--primary:hover:not(:disabled) {
-            border-color: rgba(197, 160, 89, 0.9);
+            border-color: rgba(200, 144, 80, 0.9);
             background: #45624a;
             color: #fffdf6;
         }
@@ -1455,7 +1458,7 @@
                 height: clamp(23.75rem, 98vw, 35rem);
                 min-height: clamp(23.75rem, 98vw, 35rem);
                 aspect-ratio: auto;
-                box-shadow: 0 16px 30px rgba(44, 61, 46, 0.12);
+                box-shadow: 0 16px 30px rgba(28, 20, 16, 0.12);
             }
 
             .notebook-paper {
@@ -1547,9 +1550,9 @@
             transform-origin: left center;
             transform-style: preserve-3d;
             background: var(--cover-surface, linear-gradient(145deg, #f4e7d2 0%, #e4cfae 42%, #c4a57a 100%));
-            color: var(--cover-ink, #2b241a);
+            color: var(--cover-ink, #1c1410);
             box-shadow:
-                0 32px 60px rgba(44, 61, 46, 0.24),
+                0 32px 60px rgba(28, 20, 16, 0.24),
                 inset 0 0 0 1px rgba(255, 255, 255, 0.2);
             transition: transform 320ms cubic-bezier(0.2, 0.72, 0.18, 1), box-shadow 220ms ease;
         }
@@ -1568,7 +1571,7 @@
 
         .notebook-cover-panel:hover {
             box-shadow:
-                0 40px 74px rgba(44, 61, 46, 0.26),
+                0 40px 74px rgba(28, 20, 16, 0.26),
                 inset 0 0 0 1px rgba(255, 255, 255, 0.22);
         }
 
@@ -1613,14 +1616,14 @@
         .notebook-cover-plate {
             background: var(--cover-plate, rgba(255, 255, 255, 0.5));
             border: 1px solid var(--cover-plate-border, rgba(88, 62, 31, 0.16));
-            color: var(--cover-ink, #2b241a);
-            box-shadow: 0 14px 24px rgba(44, 61, 46, 0.12);
+            color: var(--cover-ink, #1c1410);
+            box-shadow: 0 14px 24px rgba(28, 20, 16, 0.12);
             backdrop-filter: blur(8px);
         }
 
         .notebook-cover-sticker {
             border: 1px solid rgba(255, 255, 255, 0.45);
-            box-shadow: 0 14px 24px rgba(44, 61, 46, 0.16);
+            box-shadow: 0 14px 24px rgba(28, 20, 16, 0.16);
             backdrop-filter: blur(4px);
         }
 
@@ -1675,7 +1678,7 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            border-bottom: 1px solid rgba(122, 139, 118, 0.1);
+            border-bottom: 1px solid rgba(144, 152, 112, 0.1);
         }
 
         .notebook-line-row--top {
@@ -1749,7 +1752,7 @@
             z-index: 30;
             margin-bottom: 1rem;
             border-color: rgba(212, 160, 23, 0.24);
-            box-shadow: 0 18px 40px rgba(44, 61, 46, 0.12);
+            box-shadow: 0 18px 40px rgba(28, 20, 16, 0.12);
         }
 
         .cooking-mode-active .detail-layout-grid {
@@ -1762,8 +1765,8 @@
             top: auto;
             z-index: 1;
             margin-bottom: 0.5rem;
-            border-color: rgba(122, 139, 118, 0.18);
-            box-shadow: 0 14px 26px rgba(44, 61, 46, 0.08);
+            border-color: rgba(144, 152, 112, 0.18);
+            box-shadow: 0 14px 26px rgba(28, 20, 16, 0.08);
         }
 
         .cooking-mode-active .detail-instructions-panel {
@@ -1781,9 +1784,9 @@
 
         .cooking-mode-active .detail-instructions-panel li {
             background: rgba(255, 255, 255, 0.92);
-            border-color: rgba(122, 139, 118, 0.14);
+            border-color: rgba(144, 152, 112, 0.14);
             padding: 1.1rem 1.15rem;
-            box-shadow: 0 10px 20px rgba(44, 61, 46, 0.05);
+            box-shadow: 0 10px 20px rgba(28, 20, 16, 0.05);
         }
 
         .cooking-mode-active .detail-instructions-panel p {
@@ -2638,6 +2641,7 @@
         const publicationQuickRetractionWindowMs = 60 * 60 * 1000;
         const publicationRetractionDelayMs = 24 * 60 * 60 * 1000;
         const recipeDeleteUndoWindowMs = 5 * 60 * 1000;
+        const freeLocalRecipeLimit = 3;
         const supportedAppLanguages = ['en', 'nl', 'fr', 'de', 'es'];
         const globalUiLanguageStorageKey = 'uculiPreferredUiLanguage';
         const uiLanguageQueryParam = 'lang';
@@ -3069,7 +3073,7 @@
             return {
                 state: 'free',
                 badge: 'Free Plan',
-                summary: 'Free stays local-only with up to 8 recipes on this device and 1 image upload/15m. Premium unlocks notebook mode, 15 uploads/day, sharing, downloads, cloud sync, publishing, and families.',
+                summary: 'Free stays local-only with up to 3 recipes on this device and 1 image upload/15m. Premium unlocks notebook mode, 15 uploads/day, sharing, downloads, cloud sync, publishing, and families.',
                 sourceLabel: 'Local free tier',
                 actionLabel: 'Unlock Local Premium Preview'
             };
@@ -3464,12 +3468,12 @@
         function getNotebookCoverPalette(palette) {
             const palettes = {
                 oat: {
-                    surface: 'radial-gradient(circle at top left, rgba(255,248,236,0.72), transparent 32%), linear-gradient(145deg, #f6ead6 0%, #e7d3b0 46%, #c9a77a 100%)',
-                    border: '#c4a67c',
+                    surface: 'radial-gradient(circle at top left, rgba(251,248,243,0.72), transparent 32%), linear-gradient(145deg, #f6f1e8 0%, #fbf8f3 42%, #c89050 100%)',
+                    border: '#c89050',
                     spine: 'linear-gradient(180deg, rgba(122,86,42,0.78), rgba(78,54,28,0.94))',
                     plate: 'rgba(255,249,240,0.72)',
                     plateBorder: 'rgba(88,62,31,0.16)',
-                    ink: '#3a2c1c'
+                    ink: '#1c1410'
                 },
                 sage: {
                     surface: 'radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 28%), linear-gradient(135deg, #91a392 0%, #70856f 50%, #57695a 100%)',
@@ -4007,7 +4011,7 @@
                     <div class="rounded-[28px] border border-parchmentDark bg-accent bg-opacity-40 p-5 md:p-6">
                         <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Live preview</p>
                         <div class="notebook-cover-shell notebook-book-cover-frame mt-5">
-                            <div id="cover-editor-preview-surface" class="notebook-book-cover-surface notebook-cover-panel overflow-hidden rounded-[32px] border px-7 py-7 text-[#2b241a] md:px-10 md:py-10" style="${getNotebookCoverPanelStyle(draftNotebookCover)}">
+                            <div id="cover-editor-preview-surface" class="notebook-book-cover-surface notebook-cover-panel overflow-hidden rounded-[32px] border px-7 py-7 text-[#1c1410] md:px-10 md:py-10" style="${getNotebookCoverPanelStyle(draftNotebookCover)}">
                                 ${renderNotebookCoverFace(draftNotebookCover, previewRecipe, totalPages, true)}
                             </div>
                         </div>
@@ -4111,7 +4115,7 @@
                                             </div>
                                             <div>
                                                 <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Rotation</label>
-                                                <input type="range" min="-18" max="18" step="3" value="${Number(sticker.rotation) || 0}" oninput="updateDraftCoverSticker(${index}, 'rotation', this.value)" class="w-full accent-[#C5A059] mt-3">
+                                                <input type="range" min="-18" max="18" step="3" value="${Number(sticker.rotation) || 0}" oninput="updateDraftCoverSticker(${index}, 'rotation', this.value)" class="w-full accent-[#c89050] mt-3">
                                                 <p class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-sage">${Number(sticker.rotation) || 0}°</p>
                                             </div>
                                         </div>
@@ -5651,9 +5655,9 @@
             const authText = getAuthI18n();
             contentDiv.innerHTML = `
                 <div class="mx-auto flex min-h-full w-full max-w-5xl items-center justify-center py-8 md:py-12">
-                    <div class="grid w-full overflow-hidden rounded-[32px] border border-parchmentDark bg-white shadow-[0_30px_80px_rgba(44,61,46,0.12)] lg:grid-cols-[minmax(0,1.05fr)_28rem]">
-                        <section class="relative overflow-hidden bg-[linear-gradient(135deg,rgba(244,239,230,0.98),rgba(255,255,255,0.94))] px-6 py-8 md:px-10 md:py-12">
-                            <div class="absolute inset-0 pointer-events-none opacity-50" style="background-image: radial-gradient(circle at 10% 0%, rgba(212,167,98,0.18) 0%, transparent 40%), radial-gradient(circle at 90% 100%, rgba(90,118,95,0.16) 0%, transparent 38%);"></div>
+                    <div class="grid w-full overflow-hidden rounded-[32px] border border-parchmentDark bg-paper shadow-[0_30px_80px_rgba(28,20,16,0.12)] lg:grid-cols-[minmax(0,1.05fr)_28rem]">
+                        <section class="relative overflow-hidden bg-[linear-gradient(135deg,#f6f1e8,#fbf8f3)] px-6 py-8 md:px-10 md:py-12">
+                            <div class="absolute inset-0 pointer-events-none opacity-50" style="background-image: radial-gradient(circle at 10% 0%, rgba(200,144,80,0.18) 0%, transparent 40%), radial-gradient(circle at 90% 100%, rgba(144,152,112,0.16) 0%, transparent 38%);"></div>
                             <div class="relative">
                                 <div class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-forest text-white shadow-lg shadow-forest/20">
                                     <i data-lucide="book-open" class="h-6 w-6"></i>
@@ -5681,7 +5685,7 @@
                                     <button type="button" onclick="setAuthViewMode('register')" class="flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${showRegister ? 'bg-white text-forest shadow-sm' : 'text-sage hover:text-forest'}">${authText.tabRegister}</button>
                                 </div>
 
-                                <div class="mt-8 rounded-[28px] border border-parchmentDark bg-[#fffdf8] p-5 shadow-sm md:p-6">
+                                <div class="mt-8 rounded-[28px] border border-parchmentDark bg-[#fbf8f3] p-5 shadow-sm md:p-6">
                                     <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${showRegister ? authText.newAccount : authText.welcomeBack}</p>
                                     <h2 class="mt-3 font-fantasy text-3xl font-bold text-forest">${showRegister ? authText.titleRegister : authText.titleLogin}</h2>
                                     <p class="mt-2 text-sm font-semibold leading-relaxed text-sage">${showRegister ? authText.introRegister : authText.introLogin}</p>
@@ -5748,24 +5752,13 @@
         }
 
         function getAgreementCopy() {
-            const lang = getActiveUiLanguage();
-            const copy = {
-                nl: {
-                    readPrivacy: 'Ik heb het',
-                    privacyName: 'privacybeleid',
-                    agreeTerms: 'Ik ga akkoord met de',
-                    termsName: 'voorwaarden',
-                    needAgreements: 'Lees het privacybeleid en ga akkoord met de voorwaarden voordat je verdergaat.'
-                },
-                en: {
-                    readPrivacy: 'I have read the',
-                    privacyName: 'Privacy Policy',
-                    agreeTerms: 'I agree to the',
-                    termsName: 'Terms of Use',
-                    needAgreements: 'Read the Privacy Policy and agree to the Terms before you continue.'
-                }
+            return {
+                readPrivacy: 'Ik heb het',
+                privacyName: 'privacybeleid',
+                agreeTerms: 'Ik ga akkoord met de',
+                termsName: 'voorwaarden',
+                needAgreements: 'Lees het privacybeleid en ga akkoord met de voorwaarden voordat je verdergaat.'
             };
-            return copy[lang] || copy.en;
         }
 
         function authAgreementsAccepted() {
@@ -7153,15 +7146,15 @@
                         box-sizing: border-box;
                         padding: 40px 44px 54px;
                         background: #ffffff;
-                        color: #2C3D2E;
-                        font-family: "Nunito", Arial, sans-serif;
+                        color: #1c1410;
+                        font-family: "Outfit", Arial, sans-serif;
                     }
                     .pdf-hero {
                         border: 1px solid #EFEFEF;
                         border-radius: 28px;
                         overflow: hidden;
                         background: linear-gradient(135deg, #ffffff 0%, #faf6ee 52%, #f3ece0 100%);
-                        box-shadow: 0 18px 34px rgba(44, 61, 46, 0.08);
+                        box-shadow: 0 18px 34px rgba(28, 20, 16, 0.08);
                     }
                     .pdf-brand {
                         display: flex;
@@ -7180,10 +7173,10 @@
                         width: 52px;
                         height: 52px;
                         border-radius: 16px;
-                        background: #2C3D2E;
+                        background: #1c1410;
                         color: #ffffff;
                         position: relative;
-                        box-shadow: 0 10px 22px rgba(44, 61, 46, 0.16);
+                        box-shadow: 0 10px 22px rgba(28, 20, 16, 0.16);
                     }
                     .pdf-brand-book,
                     .pdf-brand-book::before,
@@ -7221,14 +7214,14 @@
                         font-weight: 700;
                         letter-spacing: 0.28em;
                         text-transform: uppercase;
-                        color: #7A8B76;
+                        color: #909870;
                     }
                     .pdf-brand-title {
                         margin: 6px 0 0;
-                        font-family: "Cormorant Garamond", Georgia, serif;
+                        font-family: "Fraunces", serif;
                         font-size: 40px;
                         line-height: 0.95;
-                        color: #2C3D2E;
+                        color: #1c1410;
                     }
                     .pdf-brand-subtitle {
                         margin: 6px 0 0;
@@ -7236,7 +7229,7 @@
                         font-weight: 700;
                         letter-spacing: 0.14em;
                         text-transform: uppercase;
-                        color: #7A8B76;
+                        color: #909870;
                     }
                     .pdf-brand-meta {
                         text-align: right;
@@ -7251,23 +7244,23 @@
                         font-weight: 800;
                         letter-spacing: 0.18em;
                         text-transform: uppercase;
-                        color: #2C3D2E;
+                        color: #1c1410;
                     }
                     .pdf-brand-meta p {
                         margin: 10px 0 0;
                         font-size: 12px;
                         font-weight: 700;
-                        color: #7A8B76;
+                        color: #909870;
                     }
                     .pdf-hero-body {
                         padding: 28px;
                     }
                     .pdf-recipe-title {
                         margin: 0;
-                        font-family: "Cormorant Garamond", Georgia, serif;
+                        font-family: "Fraunces", serif;
                         font-size: 44px;
                         line-height: 0.94;
-                        color: #2C3D2E;
+                        color: #1c1410;
                     }
                     .pdf-metadata {
                         margin: 14px 0 0;
@@ -7275,7 +7268,7 @@
                         font-weight: 700;
                         letter-spacing: 0.08em;
                         text-transform: uppercase;
-                        color: #7A8B76;
+                        color: #909870;
                     }
                     .pdf-stat-grid {
                         display: grid;
@@ -7297,14 +7290,14 @@
                         font-weight: 800;
                         letter-spacing: 0.2em;
                         text-transform: uppercase;
-                        color: #7A8B76;
+                        color: #909870;
                     }
                     .pdf-stat-value {
                         margin-top: 8px;
                         font-size: 24px;
-                        font-family: "Cormorant Garamond", Georgia, serif;
+                        font-family: "Fraunces", serif;
                         font-weight: 700;
-                        color: #2C3D2E;
+                        color: #1c1410;
                     }
                     .pdf-section {
                         margin-top: 24px;
@@ -7318,21 +7311,21 @@
                     }
                     .pdf-section-title {
                         margin: 0;
-                        font-family: "Cormorant Garamond", Georgia, serif;
+                        font-family: "Fraunces", serif;
                         font-size: 30px;
-                        color: #2C3D2E;
+                        color: #1c1410;
                     }
                     .pdf-section-rule {
                         flex: 1;
                         height: 1px;
-                        background: linear-gradient(90deg, rgba(197,160,89,0.8), rgba(197,160,89,0.25));
+                        background: linear-gradient(90deg, rgba(200, 144, 80,0.8), rgba(200, 144, 80,0.25));
                     }
                     .pdf-card {
                         border-radius: 22px;
                         border: 1px solid #EFEFEF;
                         background: #ffffff;
                         padding: 20px 22px;
-                        box-shadow: 0 12px 24px rgba(44, 61, 46, 0.05);
+                        box-shadow: 0 12px 24px rgba(28, 20, 16, 0.05);
                     }
                     .pdf-ingredients,
                     .pdf-instructions {
@@ -7349,7 +7342,7 @@
                         border-bottom: 1px solid #EFEFEF;
                         font-size: 16px;
                         line-height: 1.55;
-                        color: #2C3D2E;
+                        color: #1c1410;
                     }
                     .pdf-ingredient-item:last-child,
                     .pdf-instruction-item:last-child {
@@ -7363,7 +7356,7 @@
                         margin: 0;
                         font-size: 16px;
                         line-height: 1.65;
-                        color: #2C3D2E;
+                        color: #1c1410;
                     }
                 </style>
                 <div class="pdf-shell">
@@ -7497,7 +7490,7 @@
                     pdf.line(margin, footerY - 4, pageWidth - margin, footerY - 4);
                     pdf.setFont('helvetica', 'normal');
                     pdf.setFontSize(8);
-                    pdf.setTextColor(122, 139, 118);
+                    pdf.setTextColor(144, 152, 112);
                     pdf.text('Uculi · A Sneezing Donkey product', margin, footerY);
                     pdf.text(`Page ${pageNumber} of ${totalPages}`, pageWidth - margin, footerY, { align: 'right' });
                 };
@@ -7821,7 +7814,7 @@
             const landingAuthActionIcon = firebaseInitialized ? 'log-in' : 'chef-hat';
             document.body.insertAdjacentHTML('beforeend', `
                 <div id="app-landing" class="fixed inset-0 z-[140] overflow-y-auto bg-[#FBF8F1] text-forest selection:bg-gold selection:text-white">
-                    <div class="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply" style="background-image: radial-gradient(circle at 10% 0%, rgba(212,167,98,0.15) 0%, transparent 40%), radial-gradient(circle at 90% 100%, rgba(90,118,95,0.15) 0%, transparent 40%);"></div>
+                    <div class="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply" style="background-image: radial-gradient(circle at 10% 0%, rgba(200,144,80,0.15) 0%, transparent 40%), radial-gradient(circle at 90% 100%, rgba(144,152,112,0.15) 0%, transparent 40%);"></div>
                     <div class="relative min-h-full px-5 py-8 md:px-8 md:py-12 flex flex-col">
                         
                         <!-- Header -->
@@ -7898,7 +7891,7 @@
                             </div>
 
                             <!-- Feature 3: Notebook View -->
-                            <div class="group relative overflow-hidden rounded-[2rem] border border-parchmentDark bg-[#2C3D2E] text-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
+                            <div class="group relative overflow-hidden rounded-[2rem] border border-parchmentDark bg-[#1c1410] text-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
                                 <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px); background-size: 20px 20px;"></div>
                                 <div class="relative z-10">
                                     <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-gold shadow-sm backdrop-blur-sm">
@@ -9004,16 +8997,16 @@
             const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320'>
                 <defs>
                     <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-                        <stop offset='0%' stop-color='#c5a059'/>
+                        <stop offset='0%' stop-color='#c89050'/>
                         <stop offset='55%' stop-color='#a47a41'/>
                         <stop offset='100%' stop-color='#7f5a33'/>
                     </linearGradient>
                 </defs>
                 <rect width='320' height='320' fill='url(#g)'/>
                 <circle cx='72' cy='82' r='58' fill='rgba(255,255,255,0.14)'/>
-                <circle cx='268' cy='262' r='86' fill='rgba(44,61,46,0.18)'/>
+                <circle cx='268' cy='262' r='86' fill='rgba(28, 20, 16,0.18)'/>
                 <circle cx='166' cy='166' r='114' fill='rgba(255,255,255,0.1)'/>
-                <text x='160' y='190' text-anchor='middle' fill='rgba(255,255,255,0.95)' font-family='Cormorant Garamond, serif' font-size='132' font-weight='700'>${initial}</text>
+                <text x='160' y='190' text-anchor='middle' fill='rgba(255,255,255,0.95)' font-family='Fraunces, serif' font-size='132' font-weight='700'>${initial}</text>
             </svg>`;
             return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
         }
@@ -9527,10 +9520,10 @@
                         <i data-lucide="book-text" class="w-4 h-4"></i> Usage Guide / Q&A
                     </button>
                     <button onclick="showPrivacyPolicy()" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i> Privacy Policy
+                        <i data-lucide="shield-check" class="w-4 h-4"></i> Privacybeleid
                     </button>
                     <button onclick="showTermsOfUse()" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}">
-                        <i data-lucide="scroll-text" class="w-4 h-4"></i> Terms of Use
+                        <i data-lucide="scroll-text" class="w-4 h-4"></i> Gebruiksvoorwaarden
                     </button>
                 </div>
             `;
@@ -9863,14 +9856,14 @@
             }
 
             const dots = tourSteps.map((_, i) =>
-                `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${i === safeStep ? '#2C3D2E' : 'rgba(0,0,0,0.18)'}"></span>`
+                `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${i === safeStep ? '#1c1410' : 'rgba(0,0,0,0.18)'}"></span>`
             ).join('');
 
             const nextBtn = isLast
-                ? `<button onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:flex;align-items:center;gap:6px;background:#2C3D2E;color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
+                ? `<button onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:flex;align-items:center;gap:6px;background:#1c1410;color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
                         <i data-lucide="check" style="width:16px;height:16px;"></i> Klaar
                    </button>`
-                : `<button onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:flex;align-items:center;gap:6px;background:#2C3D2E;color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
+                : `<button onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:flex;align-items:center;gap:6px;background:#1c1410;color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
                         Volgende <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
                    </button>`;
 
@@ -9880,11 +9873,11 @@
                     <div style="position:fixed;${tooltipPosStyle}pointer-events:all;width:min(340px,calc(100vw - 16px));background:#fff;border:1px solid #E5DDD0;border-radius:20px;box-shadow:0 24px 48px rgba(0,0,0,0.18);overflow:hidden;z-index:302;">
                         <div style="background:#F7F1E8;padding:14px 16px;border-bottom:1px solid #E5DDD0;display:flex;align-items:center;gap:10px;">
                             <i data-lucide="${current.icon}" style="width:20px;height:20px;color:#C8972A;flex-shrink:0;"></i>
-                            <span style="font-family:serif;font-weight:700;font-size:17px;color:#2C3D2E;flex:1;">${current.title}</span>
+                            <span style="font-family:serif;font-weight:700;font-size:17px;color:#1c1410;flex:1;">${current.title}</span>
                             <span style="font-size:11px;font-weight:700;color:#7A8C6E;white-space:nowrap;">${safeStep + 1} / ${numSteps}</span>
                         </div>
                         <div style="padding:14px 16px;">
-                            <p style="font-size:14px;font-weight:600;color:#2C3D2E;line-height:1.55;margin:0;">${current.body}</p>
+                            <p style="font-size:14px;font-weight:600;color:#1c1410;line-height:1.55;margin:0;">${current.body}</p>
                         </div>
                         <div style="padding:0 16px 14px;display:flex;align-items:center;gap:8px;">
                             <div style="display:flex;gap:5px;align-items:center;">${dots}</div>
@@ -9973,28 +9966,28 @@
                 return {
                     id: 'terms',
                     kicker: 'Voorwaarden',
-                    title: 'Terms of Use',
-                    intro: 'These terms explain how you use Uculi on this device.',
+                    title: 'Gebruiksvoorwaarden',
+                    intro: 'Deze voorwaarden leggen uit hoe je Uculi op dit apparaat gebruikt.',
                     sections: [
-                        ['Acceptable use', 'Do not add harmful, hateful, explicit, illegal, or abusive material.'],
-                        ['Your recipes', 'You keep ownership of recipes and notes you write. Uculi stores them locally for your account on this device.'],
-                        ['Account', 'You are responsible for the name, email, and recipes saved under your login.'],
-                        ['No medical advice', 'Uculi is a recipe notebook. It does not give medical, nutrition, or allergy advice.'],
-                        ['Changes', 'The notebook can change to stay reliable and safe. These terms are version v2026-04.']
+                        ['Toegestaan gebruik', 'Voeg geen schadelijk, haatdragend, expliciet, illegaal of beledigend materiaal toe.'],
+                        ['Jouw recepten', 'Jij blijft eigenaar van recepten en notities die je schrijft. Uculi bewaart ze lokaal voor je account op dit apparaat.'],
+                        ['Account', 'Jij bent verantwoordelijk voor de naam, het e-mailadres en de recepten onder je login.'],
+                        ['Geen medisch advies', 'Uculi is een receptenschrift. Het geeft geen medisch, voedings- of allergieadvies.'],
+                        ['Wijzigingen', 'Het schrift kan veranderen om betrouwbaar en veilig te blijven. Deze voorwaarden zijn versie v2026-04.']
                     ]
                 };
             }
             return {
                 id: 'privacy',
                 kicker: 'Privacy',
-                title: 'Privacy Policy',
-                intro: 'This policy explains what Uculi keeps on this device.',
+                title: 'Privacybeleid',
+                intro: 'Dit beleid legt uit wat Uculi op dit apparaat bewaart.',
                 sections: [
-                    ['What is stored', 'Your name, email, recipes, notes, and settings stay in this browser for your account.'],
-                    ['Why', 'So you can open, edit, and delete your own recipes without sending them to a live cloud service.'],
-                    ['Your choices', 'You can edit or delete recipes, sign out, and clear this browser’s saved data.'],
-                    ['Cloud', 'Live sync, publishing, and shared families are not part of this local notebook.'],
-                    ['Rights', 'You can ask for access, correction, export, or deletion of the data stored for your account.']
+                    ['Wat wordt bewaard', 'Je naam, e-mail, recepten, notities en instellingen blijven in deze browser bij je account.'],
+                    ['Waarom', 'Zodat je je eigen recepten kunt openen, bewerken en verwijderen zonder ze naar een live clouddienst te sturen.'],
+                    ['Jouw keuzes', 'Je kunt recepten bewerken of verwijderen, uitloggen en de opgeslagen gegevens van deze browser wissen.'],
+                    ['Cloud', 'Live synchronisatie, publiceren en gedeelde families horen niet bij dit lokale schrift.'],
+                    ['Rechten', 'Je kunt inzage, correctie, export of verwijdering vragen van de gegevens die voor je account zijn opgeslagen.']
                 ]
             };
         }
@@ -10005,14 +9998,14 @@
             const other = getLegalDocument(otherKind);
             return `
                 <article class="mx-auto w-full max-w-2xl space-y-4 text-forest">
-                    <div class="rounded-[28px] border border-[#e4d3b6] bg-[#fff8ee] p-5 md:p-6">
+                    <div class="rounded-[28px] border border-[#e4d3b6] bg-[#fbf8f3] p-5 md:p-6">
                         <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${doc.kicker}</p>
                         <h3 class="mt-2 font-fantasy text-3xl font-bold text-forest">${doc.title}</h3>
                         <p class="mt-3 text-sm font-semibold leading-relaxed text-sage">${doc.intro}</p>
                     </div>
                     <div class="space-y-3">
                         ${doc.sections.map(([heading, body]) => `
-                            <section class="rounded-2xl border border-parchmentDark bg-[#fffaf2] p-4">
+                            <section class="rounded-2xl border border-parchmentDark bg-[#fbf8f3] p-4">
                                 <h4 class="text-sm font-bold text-forest">${heading}</h4>
                                 <p class="mt-2 text-sm font-semibold leading-relaxed text-sage">${body}</p>
                             </section>
@@ -10026,11 +10019,13 @@
         }
 
         function showLegalDocument(kind) {
-            document.querySelectorAll('[id^="dynamic-modal-"]').forEach(node => node.remove());
+            document.querySelectorAll('.app-overlay[id^="dynamic-modal-"]').forEach(node => node.remove());
             const doc = getLegalDocument(kind === 'terms' ? 'terms' : 'privacy');
-            createModal(doc.title, renderLegalDocumentMarkup(doc.id), [
-                { text: 'Close', primary: true, onClick: () => closeModal() }
+            const modalId = createModal(doc.title, renderLegalDocumentMarkup(doc.id), [
+                { text: 'Sluiten', primary: true, onClick: () => closeModal() }
             ]);
+            const modal = document.getElementById(modalId);
+            if (modal) modal.style.zIndex = '240';
         }
 
         function showPrivacyPolicy() {
@@ -10049,28 +10044,25 @@
                 <div id="terms-accept-modal" class="app-overlay fixed inset-0 bg-black bg-opacity-70 z-[220] flex">
                     <div class="app-modal-panel max-w-3xl w-full" id="terms-accept-modal-content">
                         <div class="p-4 md:p-6 border-b border-parchmentDark bg-parchment shrink-0">
-                            <h2 class="font-serif font-bold text-xl md:text-2xl text-forest">Terms & Conditions</h2>
-                            <p class="mt-2 text-sm font-semibold text-sage">Please accept these terms before using Uculi with your account.</p>
+                            <h2 class="font-serif font-bold text-xl md:text-2xl text-forest">Voorwaarden</h2>
+                            <p class="mt-2 text-sm font-semibold text-sage">Lees het privacybeleid en de gebruiksvoorwaarden en vink beide vakjes aan voordat je verdergaat.</p>
                         </div>
                         <div class="app-modal-body p-4 md:p-6 max-h-[60vh] overflow-y-auto">
-                            <div class="space-y-3 text-sm font-semibold text-forest leading-relaxed">
-                                <p><strong>Family-friendly policy:</strong> No hateful, explicit, illegal, or harmful content is allowed.</p>
-                                <p><strong>Your content:</strong> You keep ownership of your recipes and notes. Published recipes may be shown in app discovery areas.</p>
-                                <p><strong>Privacy:</strong> Uculi follows Dutch and EU-aligned privacy principles, including GDPR-style handling and data minimization.</p>
-                                <p><strong>AI and translation disclaimer:</strong> AI and translation outputs are assistive only and can be inaccurate.</p>
-                                <p><strong>No medical advice:</strong> Uculi does not provide medical, nutritional, or allergy-safe guarantees.</p>
-                                <p><strong>Service updates:</strong> Features can change to improve reliability, safety, and legal compliance.</p>
-                                <p><strong>Governing standards:</strong> Terms are designed for Dutch, European, and international family-safe app standards.</p>
-                                <p><strong>Version:</strong> These acceptance terms are tracked as v2026-04.</p>
+                            ${renderLegalDocumentMarkup('terms')}
+                            <div class="mt-6 space-y-3">
+                                <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
+                                    <input id="terms-accept-privacy" type="checkbox" class="mt-1 h-4 w-4" onchange="syncTermsAcceptButton()">
+                                    <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().readPrivacy} <button type="button" onclick="showLegalDocument('privacy')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().privacyName}</button>.</span>
+                                </label>
+                                <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
+                                    <input id="terms-accept-terms" type="checkbox" class="mt-1 h-4 w-4" onchange="syncTermsAcceptButton()">
+                                    <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().agreeTerms} <button type="button" onclick="showLegalDocument('terms')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().termsName}</button>.</span>
+                                </label>
                             </div>
-                            <label class="mt-6 flex items-start gap-3 rounded-xl border border-sage border-opacity-20 bg-parchment p-4">
-                                <input type="checkbox" id="terms-accept-checkbox" class="mt-1 h-4 w-4" onchange="document.getElementById('terms-accept-confirm-btn').disabled = !this.checked;" />
-                                <span class="text-sm font-semibold text-forest">I have read and agree to the Terms of Use and Privacy Policy.</span>
-                            </label>
                         </div>
                         <div class="app-modal-footer p-4 md:p-6 border-t border-parchmentDark bg-parchment shrink-0">
                             <button id="terms-accept-confirm-btn" disabled onclick="confirmTermsAcceptance()" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} disabled:opacity-50 disabled:cursor-not-allowed">
-                                <i data-lucide="check-circle" class="w-4 h-4"></i> I Agree And Continue
+                                <i data-lucide="check-circle" class="w-4 h-4"></i> Akkoord en verder
                             </button>
                         </div>
                     </div>
@@ -10081,7 +10073,18 @@
             lucide.createIcons();
         }
 
+        function syncTermsAcceptButton() {
+            const privacyChecked = Boolean(document.getElementById('terms-accept-privacy')?.checked);
+            const termsChecked = Boolean(document.getElementById('terms-accept-terms')?.checked);
+            const button = document.getElementById('terms-accept-confirm-btn');
+            if (button) button.disabled = !(privacyChecked && termsChecked);
+        }
+
         function confirmTermsAcceptance() {
+            if (!document.getElementById('terms-accept-privacy')?.checked || !document.getElementById('terms-accept-terms')?.checked) {
+                showToast(getAgreementCopy().needAgreements, 'alert-circle');
+                return;
+            }
             userSettings.termsAccepted = true;
             userSettings.termsAcceptedAt = new Date().toISOString();
             userSettings.termsAcceptedVersion = 'v2026-04';
@@ -11116,7 +11119,7 @@
                             <div class="notebook-landing-stack">
                                 <div class="notebook-landing-cover-column">
                                     <div class="notebook-cover-shell notebook-book-cover-frame notebook-landing-cover-frame">
-                                        <div id="notebook-cover-surface" class="notebook-book-cover-surface notebook-cover-panel notebook-landing-cover-surface overflow-hidden rounded-[32px] border px-6 py-6 text-[#2b241a] md:px-8 md:py-8" style="${getNotebookCoverPanelStyle(coverConfig)}" role="button" tabindex="0" aria-label="Open notebook" data-cover-openable="true" onclick="openNotebookCover()" onkeydown="if (event.target !== event.currentTarget) return; if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openNotebookCover(); }">
+                                        <div id="notebook-cover-surface" class="notebook-book-cover-surface notebook-cover-panel notebook-landing-cover-surface overflow-hidden rounded-[32px] border px-6 py-6 text-[#1c1410] md:px-8 md:py-8" style="${getNotebookCoverPanelStyle(coverConfig)}" role="button" tabindex="0" aria-label="Open notebook" data-cover-openable="true" onclick="openNotebookCover()" onkeydown="if (event.target !== event.currentTarget) return; if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openNotebookCover(); }">
                                             ${renderNotebookCoverFace(coverConfig, recipe, totalPages, false)}
                                         </div>
                                     </div>
@@ -11214,7 +11217,7 @@
                     </div>
 
                     <div class="notebook-book-frame relative" data-notebook-frame="true">
-                        <div id="notebook-swipe-surface" data-recipe-id="${recipe.id}" class="notebook-book-spread-surface notebook-swipe-surface notebook-spread relative overflow-hidden rounded-[28px] border border-sage border-opacity-20 px-4 py-4 shadow-[0_30px_60px_rgba(44,61,46,0.16)] md:px-7 md:py-7 ${pageTurnClass}">
+                        <div id="notebook-swipe-surface" data-recipe-id="${recipe.id}" class="notebook-book-spread-surface notebook-swipe-surface notebook-spread relative overflow-hidden rounded-[28px] border border-sage border-opacity-20 px-4 py-4 shadow-[0_30px_60px_rgba(28, 20, 16,0.16)] md:px-7 md:py-7 ${pageTurnClass}">
                             <div class="pointer-events-none absolute inset-y-6 left-7 hidden w-8 rounded-full border-x border-parchmentDark bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.95)_0,rgba(255,255,255,0.7)_58%,rgba(239,239,239,0.88)_100%)] md:block"></div>
                             <div class="pointer-events-none absolute inset-y-8 left-[3.65rem] hidden w-px bg-gradient-to-b from-transparent via-sage/20 to-transparent md:block"></div>
                             <div class="grid h-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-0">
@@ -11312,7 +11315,7 @@
             const resultLabel = `${filteredRecipes.length} recipe${filteredRecipes.length === 1 ? '' : 's'}`;
             const hasActiveListFilters = Boolean(collectionScopeFilter !== 'all' || categoryFilter || difficultyFilter || cuisineFilter || mealTypeFilter.length || showFavoritesOnly || dietFilter.length);
             const localRecipeCount = collectionScopeCounts.mine;
-            const freeRecipeSlotsRemaining = Math.max(0, 8 - localRecipeCount);
+            const freeRecipeSlotsRemaining = Math.max(0, freeLocalRecipeLimit - localRecipeCount);
             const premiumActive = hasPremiumAccess();
             const billingMeta = getBillingStatusMeta();
             const notebookModeLocked = !premiumActive;
@@ -11371,7 +11374,7 @@
                                         <i data-lucide="book-copy" class="h-4 w-4"></i>${resultLabel}
                                     </p>
                                     <div class="mt-4 rounded-2xl border border-parchmentDark bg-white/90 px-4 py-3 shadow-sm max-w-xl">
-                                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${premiumActive ? billingMeta.badge : `Free plan: ${localRecipeCount}/8 local recipes used`}</p>
+                                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${premiumActive ? billingMeta.badge : `Free plan: ${localRecipeCount}/${freeLocalRecipeLimit} local recipes used`}</p>
                                         <p class="mt-1 text-sm font-semibold leading-relaxed text-forest">${premiumActive ? billingMeta.summary : `${freeRecipeSlotsRemaining} free slot${freeRecipeSlotsRemaining === 1 ? '' : 's'} left on this device. Premium unlocks notebook mode, sharing, downloads, cloud sync, and families.`}</p>
                                     </div>
                                 `}
@@ -11532,7 +11535,7 @@
             if (filteredRecipes.length === 0) {
                 const notebookIsEmpty = recipes.length === 0 && !hasActiveListFilters && !searchQuery.trim();
                 html += notebookIsEmpty ? `
-                    <div class="mx-auto mt-10 max-w-xl rounded-[28px] border border-[#e4d3b6] bg-[#fff8ee] p-8 text-center shadow-[0_18px_40px_rgba(90,64,32,0.08)]">
+                    <div class="mx-auto mt-10 max-w-xl rounded-[28px] border border-[#e4d3b6] bg-[#fbf8f3] p-8 text-center shadow-[0_18px_40px_rgba(90,64,32,0.08)]">
                         <i data-lucide="book-open" class="mx-auto mb-4 h-16 w-16 text-gold"></i>
                         <p class="mb-2 font-fantasy text-3xl font-bold text-forest">Your notebook is empty.</p>
                         <p class="text-sm font-semibold text-sage">Add the first recipe. It stays on this device.</p>
@@ -11540,7 +11543,7 @@
                             <i data-lucide="plus" class="h-4 w-4"></i> Add Recipe
                         </button>
                     </div>` : `
-                    <div class="text-center mt-10 p-8 rounded-[28px] border border-parchmentDark bg-[#fff8ee]">
+                    <div class="text-center mt-10 p-8 rounded-[28px] border border-parchmentDark bg-[#fbf8f3]">
                         <i data-lucide="package-open" class="w-16 h-16 mx-auto mb-4 text-sage opacity-50"></i>
                         <p class="font-fantasy text-2xl text-forest font-bold mb-2">No recipes found.</p>
                         <p class="text-sm opacity-80 font-semibold">Try adjusting your search or add a new one!</p>
@@ -11554,7 +11557,7 @@
                     const recipeVersionLabel = getPublishedVersionLabel(recipe);
                     const familyChipMarkup = getRecipeFamilyChipMarkup(recipe, 'inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em]');
                     html += `
-                        <div onclick="renderDetail(${recipe.id})" class="relative h-[120px] bg-[#fff8ee] rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex items-stretch">
+                        <div onclick="renderDetail(${recipe.id})" class="relative h-[120px] bg-[#fbf8f3] rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex items-stretch">
                             ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-gold bg-white text-gold shadow-md transition-all hover:scale-105 hover:text-forest"><i data-lucide="alert-circle" class="h-5 w-5"></i></button>` : ''}
                             <div class="h-full w-24 sm:w-32 bg-cover bg-center flex-shrink-0" style="background-image: url('${recipe.profile || defaultPlaceholderProfile}')"></div>
                             <div class="flex-1 flex flex-col justify-center p-4 min-w-0 pr-16">
@@ -11583,7 +11586,7 @@
                     const recipeSourceLabel = getRecipeCardSourceLabel(recipe);
                     const familyChipMarkup = getRecipeFamilyChipMarkup(recipe, 'inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em]');
                     html += `
-                        <div onclick="renderDetail(${recipe.id})" class="relative h-[24rem] bg-[#fff8ee] rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex flex-col">
+                        <div onclick="renderDetail(${recipe.id})" class="relative h-[24rem] bg-[#fbf8f3] rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex flex-col">
                             ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-gold bg-white text-gold shadow-md transition-all hover:scale-105 hover:text-forest"><i data-lucide="alert-circle" class="h-5 w-5"></i></button>` : ''}
                             <div class="w-full h-48 bg-cover bg-center" style="background-image: url('${recipe.profile || defaultPlaceholderProfile}')"></div>
                             <div class="flex flex-1 flex-col p-5">
@@ -12267,7 +12270,7 @@
                             <p class="font-fantasy text-2xl font-bold text-forest mt-1">€0 <span class="text-base font-normal text-sage">/ forever</span></p>
                         </div>
                         <ul class="space-y-2">
-                            ${featureRow(checkIcon, 'Up to 8 recipes')}
+                            ${featureRow(checkIcon, 'Up to 3 recipes')}
                             ${featureRow(checkIcon, 'Notebook mode')}
                             ${featureRow(checkIcon, 'Cloud sync (read)')}
                             ${featureRow(lockIcon, 'Unlimited recipes')}
@@ -13405,8 +13408,8 @@
         function renderAddForm(recipeId = null) {
             activeDetailRecipeId = null;
             const localRecipesCount = recipes.filter(recipe => recipe.source === 'local').length;
-            if (!recipeId && !hasPremiumAccess() && localRecipesCount >= 8) {
-                showPremiumModal('add more than 8 recipes');
+            if (!recipeId && !hasPremiumAccess() && localRecipesCount >= freeLocalRecipeLimit) {
+                showPremiumModal('add more than 3 recipes');
                 renderList();
                 return;
             }
@@ -14437,8 +14440,8 @@
             const existingRecipe = editingRecipeId ? recipes.find(recipe => recipe.id === editingRecipeId) : null;
             const shouldPublishAfterSave = explicitPublishAfterSave || (userSettings.autoPublish === true && (!existingRecipe || existingRecipe.source !== 'published'));
             const localRecipesCount = recipes.filter(recipe => recipe.source === 'local').length;
-            if (!existingRecipe && !hasPremiumAccess() && localRecipesCount >= 8) {
-                showPremiumModal('add more than 8 recipes');
+            if (!existingRecipe && !hasPremiumAccess() && localRecipesCount >= freeLocalRecipeLimit) {
+                showPremiumModal('add more than 3 recipes');
                 return;
             }
 
