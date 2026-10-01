@@ -114,6 +114,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center;
         }
 
         .brand-apple {
@@ -398,8 +399,8 @@
             }
 
             .app-header-mark {
-                width: 2.55rem;
-                height: 2.55rem;
+                width: 2.75rem;
+                height: 2.75rem;
                 border-radius: 0.9rem;
             }
 
@@ -411,7 +412,8 @@
             .app-header-subtitle {
                 font-size: 0.64rem;
                 line-height: 1.2;
-                max-width: 7.5rem;
+                max-width: none;
+                white-space: nowrap;
             }
 
             #main-nav {
@@ -1845,7 +1847,7 @@
         <header id="main-header" class="text-forest transition-all" translate="no">
             <div class="app-header-brand">
                 <div class="app-header-mark">
-                    <img src="assets/uculi-boekje.jpg" alt="Uculi" />
+                    <img src="assets/uculi-boekje.jpg" alt="Uculi" width="46" height="46" />
                 </div>
                 <div class="app-header-copy">
                     <p class="text-[9px] font-bold uppercase tracking-[0.2em] text-sage opacity-80 mb-0.5">Recipe notebook</p>
@@ -7915,9 +7917,7 @@
                             <div class="group relative overflow-hidden rounded-[2rem] border border-parchmentDark bg-[#1c1410] text-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
                                 <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px); background-size: 20px 20px;"></div>
                                 <div class="relative z-10">
-                                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-gold shadow-sm backdrop-blur-sm">
-                                        <i data-lucide="book-open" class="h-6 w-6"></i>
-                                    </div>
+                                    <img src="assets/uculi-boekje.jpg" alt="" width="48" height="48" class="mb-4 h-12 w-12 rounded-2xl object-cover shadow-sm" />
                                     <h3 class="font-fantasy text-2xl font-bold text-white md:text-3xl">Notebook Layout</h3>
                                     <p class="mt-3 text-base font-semibold leading-relaxed text-white/80">Flip through your recipes just like a physical cookbook with our beautiful spread design.</p>
                                 </div>
