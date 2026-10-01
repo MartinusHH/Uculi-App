@@ -5775,10 +5775,49 @@
             return `Authentication failed [${displayCode}]: ${error?.message || 'Please try again.'}`;
         }
 
-        function isLocalDeveloperPreviewContext() {
+        // uculi.com en elk subdomein daarvan is de echte site. Testmodus mag daar nooit aan.
+        function isProductionUculiHost() {
             if (typeof window === 'undefined') return false;
             const hostname = String(window.location.hostname || '').toLowerCase();
-            return window.location.protocol === 'file:' || hostname === 'localhost' || hostname === '127.0.0.1';
+            return hostname === 'uculi.com' || hostname.endsWith('.uculi.com');
+        }
+
+        function isFourPartLanAddress(hostname) {
+            const parts = String(hostname || '').split('.');
+            if (parts.length !== 4) return null;
+            const numbers = parts.map(part => (/^\d{1,3}$/.test(part) ? Number(part) : NaN));
+            if (numbers.some(part => !Number.isInteger(part) || part > 255)) return null;
+            return numbers;
+        }
+
+        // Thuisnetwerk: 192.168.*, 10.* en 172.16 tot en met 172.31.
+        function isPrivateLanHostname(hostname) {
+            const parts = isFourPartLanAddress(hostname);
+            if (!parts) return false;
+            const [first, second] = parts;
+            if (first === 192 && second === 168) return true;
+            if (first === 10) return true;
+            return first === 172 && second >= 16 && second <= 31;
+        }
+
+        // Tijdelijke tunnels zodat een telefoon de lokale app kan openen zolang Firebase nog niet live is.
+        function isTemporaryPreviewTunnelHost(hostname) {
+            const host = String(hostname || '').toLowerCase();
+            return host.endsWith('.loca.lt')
+                || host.endsWith('.ngrok-free.app')
+                || host.endsWith('.ngrok.io')
+                || host.endsWith('.trycloudflare.com');
+        }
+
+        // Preview is dit apparaat: een bestand, localhost, een thuisnetwerk of een tijdelijke tunnel.
+        // Op uculi.com blijft dit altijd uit.
+        function isLocalDeveloperPreviewContext() {
+            if (typeof window === 'undefined' || isProductionUculiHost()) return false;
+            const hostname = String(window.location.hostname || '').toLowerCase();
+            if (window.location.protocol === 'file:') return true;
+            if (hostname === 'localhost' || hostname === '127.0.0.1') return true;
+            if (isPrivateLanHostname(hostname)) return true;
+            return isTemporaryPreviewTunnelHost(hostname);
         }
 
         function isDeveloperBypassRequested() {
@@ -5802,16 +5841,50 @@
             currentUser = {
                 uid: developerBypassUserId,
                 email: '',
-                displayName: 'Developer Preview'
+                displayName: 'Testmodus'
             };
             isAuthenticated = true;
             migrateLegacyStorageToCurrentAccount();
             loadData();
-            userSettings.name = userSettings.name || 'Developer Preview';
+            const previousName = String(userSettings.name || '').trim();
+            if (!previousName || previousName === 'Developer Preview') {
+                userSettings.name = 'Testmodus';
+            }
             userSettings.email = '';
+            // saveData schrijft alleen lokaal. Firebase-sync slaat een testmodus-sessie over.
             saveData();
             syncAuthenticatedAppChrome();
             return true;
+        }
+
+        // Zonder account toch naar binnen, alleen op een preview-adres. Nooit op uculi.com.
+        function startLocalTestModeFromGate() {
+            if (isProductionUculiHost() || !isLocalDeveloperPreviewContext()) {
+                showToast('Testmodus is hier niet beschikbaar. Log in om verder te gaan.', 'shield-off');
+                return false;
+            }
+
+            localStorage.setItem(developerBypassStorageKey, '1');
+            if (!activateDeveloperBypassSession()) {
+                showToast('Testmodus kon niet starten. Log in om verder te gaan.', 'alert-circle');
+                return false;
+            }
+
+            showToast('Testmodus staat aan. Alles blijft lokaal op dit apparaat, zonder login.', 'shield');
+            enterAppFromLanding('local-test-mode');
+            return true;
+        }
+
+        function localTestModeButtonMarkup(buttonId) {
+            if (!isLocalDeveloperPreviewContext()) return '';
+            return `
+                <div class="flex w-full flex-col items-center gap-2 sm:w-auto">
+                    <button type="button" id="${buttonId}" onclick="startLocalTestModeFromGate()" class="flex h-14 w-full items-center justify-center gap-2 rounded-2xl border border-gold bg-paper px-6 text-base font-bold text-forest shadow-sm transition-all hover:-translate-y-0.5 hover:border-sage sm:w-auto">
+                        Doorgaan zonder inloggen (test)
+                    </button>
+                    <p class="max-w-xs text-center text-xs font-semibold leading-relaxed text-sage">Recepten blijven alleen op dit apparaat.</p>
+                </div>
+            `;
         }
 
         function clearDeveloperBypassPreference() {
@@ -5904,20 +5977,23 @@
                                     </div>
 
                                     <div class="mt-6 space-y-3">
-                                        <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
-                                            <input id="auth-read-privacy" type="checkbox" class="mt-1 h-4 w-4">
-                                            <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().readPrivacy} <button type="button" onclick="showLegalDocument('privacy')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().privacyName}</button>.</span>
-                                        </label>
-                                        <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
-                                            <input id="auth-agree-terms" type="checkbox" class="mt-1 h-4 w-4">
-                                            <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().agreeTerms} <button type="button" onclick="showLegalDocument('terms')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().termsName}</button>.</span>
-                                        </label>
+                                        ${showRegister ? `
+                                            <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
+                                                <input id="auth-read-privacy" type="checkbox" class="mt-1 h-4 w-4">
+                                                <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().readPrivacy} <button type="button" onclick="showLegalDocument('privacy')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().privacyName}</button>.</span>
+                                            </label>
+                                            <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
+                                                <input id="auth-agree-terms" type="checkbox" class="mt-1 h-4 w-4">
+                                                <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().agreeTerms} <button type="button" onclick="showLegalDocument('terms')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().termsName}</button>.</span>
+                                            </label>
+                                        ` : ''}
                                         <button type="button" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
                                             <i data-lucide="${showRegister ? 'user-plus' : 'log-in'}" class="h-4 w-4"></i>${showRegister ? authText.submitRegister : authText.submitLogin}
                                         </button>
                                         <button type="button" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses(firebaseInitialized ? 'secondary' : 'muted', { fullWidth: true, size: 'lg' })}" ${firebaseInitialized ? '' : 'disabled'}>
                                             <i data-lucide="globe-2" class="h-4 w-4"></i>${authText.continueGoogle}
                                         </button>
+                                        ${localTestModeButtonMarkup('local-test-mode-auth')}
                                     </div>
 
                                     <p class="mt-4 text-xs font-semibold leading-relaxed text-sage">${firebaseInitialized ? authText.googleReady : authText.googleLoading}</p>
@@ -6148,8 +6224,7 @@
         }
 
         async function signInWithEmailPassword() {
-            if (!authAgreementsAccepted()) return;
-
+            // Inloggen vraagt geen privacy- of voorwaardenvinkjes. Die horen alleen bij een nieuw account.
             const email = document.getElementById('auth-email')?.value?.trim();
             const password = document.getElementById('auth-password')?.value || '';
 
@@ -8031,13 +8106,14 @@
                             <p class="mx-auto mt-8 max-w-2xl text-lg font-semibold leading-relaxed text-sage md:text-xl">
                                 No clutter, no pop-ups, just cooking. Uculi turns your scattered notes and internet finds into a calm, focused digital cookbook.
                             </p>
-                            <div class="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+                            <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap">
                                 <button type="button" onclick="enterAppFromLanding('hero-enter')" class="flex h-14 items-center justify-center gap-2 rounded-2xl bg-forest px-8 text-base font-bold text-white shadow-xl shadow-forest/20 transition-all hover:-translate-y-0.5 hover:bg-inkDark hover:shadow-2xl">
                                     <i data-lucide="${landingAuthActionIcon}" class="h-5 w-5"></i> ${landingAuthActionLabel}
                                 </button>
                                 <button type="button" onclick="signInFromLanding()" class="md:hidden flex h-14 items-center justify-center gap-2 rounded-2xl border border-parchmentDark bg-white px-8 text-base font-bold text-forest shadow-sm transition-all hover:-translate-y-0.5 hover:border-gold hover:text-gold hover:shadow-md">
                                     <i data-lucide="log-in" class="h-5 w-5"></i> ${authText.legacyMobileLogin}
                                 </button>
+                                ${localTestModeButtonMarkup('local-test-mode-landing')}
                             </div>
                         </div>
 
