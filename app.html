@@ -432,6 +432,25 @@
             gap: 0.5rem;
         }
 
+        button.app-btn-primary,
+        label.app-btn-primary {
+            background-color: #62724c;
+            border-color: #556340;
+            color: #fbf8f3;
+        }
+
+        button.app-btn-primary:hover,
+        label.app-btn-primary:hover {
+            background-color: #909870;
+            border-color: #7d8a62;
+            color: #fbf8f3;
+        }
+
+        button.notebook-view-toggle.is-active {
+            background-color: #62724c;
+            color: #fbf8f3;
+        }
+
         #header-add-recipe {
             display: inline-flex;
             align-items: center;
@@ -440,7 +459,7 @@
             height: 2.75rem;
             padding: 0 0.9rem;
             border-radius: 0.85rem;
-            background: #1c1410;
+            background: #62724c;
             color: #fbf8f3;
             font-family: Outfit, sans-serif;
             font-size: 0.82rem;
@@ -852,6 +871,17 @@
                 letter-spacing: 0.03em;
                 font-size: 0.68rem;
                 box-shadow: none;
+            }
+
+            #app-content .settings-actions > button.phone-save-icon,
+            #app-content .settings-actions > label.phone-save-icon {
+                flex: 0 0 2.75rem;
+                width: 2.75rem;
+                min-width: 2.75rem;
+                max-width: 2.75rem;
+                gap: 0;
+                padding-left: 0;
+                padding-right: 0;
             }
 
             #app-content .profile-identity {
@@ -1845,6 +1875,69 @@
             color: #fffdf6;
         }
 
+        .notebook-chrome {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            margin-bottom: 1.35rem;
+        }
+
+        .notebook-chrome-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.85rem;
+            width: 100%;
+            padding: 0.35rem;
+            border: 1px solid rgba(228, 215, 196, 0.95);
+            border-radius: 1rem;
+            background: rgba(251, 248, 243, 0.9);
+        }
+
+        .notebook-chrome-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            min-width: 0;
+            padding: 0.15rem;
+            border-radius: 0.8rem;
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .notebook-chrome-page {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .notebook-chrome {
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1.25rem;
+                margin-bottom: 1.6rem;
+            }
+
+            .notebook-chrome-bar {
+                width: auto;
+                margin-left: auto;
+                padding: 0.4rem 0.5rem;
+                gap: 1rem;
+                background: #fff;
+            }
+
+            .notebook-chrome-page {
+                display: inline-flex;
+                align-items: center;
+                min-height: 2.5rem;
+                padding: 0 0.35rem;
+                color: #909870;
+                font-size: 0.68rem;
+                font-weight: 800;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+            }
+        }
+
         @media (min-width: 960px) {
             .notebook-landing-hero {
                 grid-template-columns: minmax(0, 25rem) minmax(0, 1fr);
@@ -2082,10 +2175,10 @@
         }
 
         .notebook-page-nav--primary {
-            border-color: rgba(45, 77, 52, 0.88);
-            background: #2f4a35;
+            border-color: #556340;
+            background: #62724c;
             color: #fffdf6;
-            box-shadow: 0 14px 28px rgba(45, 77, 52, 0.24);
+            box-shadow: 0 14px 28px rgba(98, 114, 76, 0.24);
         }
 
         .notebook-page-nav--primary:hover:not(:disabled) {
@@ -2098,7 +2191,7 @@
             position: absolute;
             top: 42%;
             z-index: 8;
-            display: inline-flex;
+            display: none;
             width: 2.75rem;
             height: 2.75rem;
             align-items: center;
@@ -2276,7 +2369,7 @@
                 width: min(4.6rem, 28%);
             }
 
-            .notebook-tool-row button {
+            .notebook-chrome-bar button {
                 width: 2.75rem;
                 min-width: 2.75rem;
                 height: 2.75rem;
@@ -2284,12 +2377,25 @@
                 box-shadow: none;
             }
 
-            .notebook-note-control--cook {
-                min-width: 0;
+            .notebook-cook-label {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+
+            .notebook-chrome-bar .notebook-note-control--cook {
+                min-width: 2.75rem;
+                width: 2.75rem;
                 min-height: 2.75rem;
                 height: 2.75rem;
-                padding-inline: 0.7rem;
-                letter-spacing: 0.06em;
+                padding: 0;
+                letter-spacing: 0;
                 box-shadow: none;
                 background: #c89050;
             }
@@ -8604,7 +8710,7 @@
                     : 'h-11 rounded-xl px-3 text-xs tracking-[0.04em]');
             const widthClass = fullWidth ? ' w-full' : '';
             const variantClasses = {
-                primary: 'border-forest bg-forest text-white hover:border-sage hover:bg-sage',
+                primary: 'app-btn-primary text-white',
                 accent: 'border-gold bg-gold text-white hover:border-yellow-600 hover:bg-yellow-600',
                 secondary: 'border-parchmentDark bg-white text-forest hover:border-gold hover:text-sage',
                 subtle: 'border-sage border-opacity-20 bg-accent bg-opacity-60 text-forest hover:border-gold hover:bg-white hover:text-sage',
@@ -11461,6 +11567,10 @@
 
             const accountStatus = currentUser?.email || userSettings.email || userSettings.name || 'Lokaal';
             const backupStatus = premiumActive ? 'Ready' : 'Premium';
+            const settingsNl = userSettings.language === 'nl';
+            const purchaseRestoreLabel = settingsNl ? 'Herstel aankoop' : 'Restore purchase';
+            const backupRestoreLabel = settingsNl ? 'Herstel backup' : 'Restore backup';
+            const backupDownloadLabel = settingsNl ? 'Backup downloaden' : 'Download backup';
             contentDiv.innerHTML = `
                 <div class="settings-sheet push-sheet">
                     <h2 class="px-1 pb-1 font-fantasy text-2xl font-bold text-forest">Opties</h2>
@@ -11472,7 +11582,7 @@
                         <button type="button" onclick="showPlansModal()" class="${getAppButtonClasses('accent', { size: 'sm' })}">View Plans</button>
                         ${billingMeta.state === 'preview'
                             ? `<button type="button" onclick="resetPremiumPreviewAccess()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">Reset</button>`
-                            : `<button type="button" onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { size: 'sm' })}">Restore</button>`}
+                            : `<button type="button" onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${purchaseRestoreLabel}" title="${purchaseRestoreLabel}">${purchaseRestoreLabel}</button>`}
                     </div>
                     <div class="settings-divider"></div>
                     <div class="settings-row">
@@ -11517,10 +11627,12 @@
                         <span class="settings-status">${backupStatus}</span>
                     </div>
                     <div class="settings-actions">
-                        <button type="button" onclick="${backupDownloadLocked ? "showPremiumModal('download backups')" : 'exportAllAsJSON()'}" class="${getAppButtonClasses(backupDownloadLocked ? 'locked' : 'secondary', { size: 'sm' })}">Download</button>
+                        <button type="button" onclick="${backupDownloadLocked ? "showPremiumModal('download backups')" : 'exportAllAsJSON()'}" class="${getAppButtonClasses(backupDownloadLocked ? 'locked' : 'secondary', { size: 'sm' })} phone-save-icon" aria-label="${backupDownloadLabel}" title="${backupDownloadLabel}">
+                            <i data-lucide="download" class="w-4 h-4"></i><span class="phone-icon-label">Download</span>
+                        </button>
                         ${backupRestoreLocked
-                            ? `<button type="button" onclick="showPremiumModal('restore backups')" class="${getAppButtonClasses('locked', { size: 'sm' })}">Restore</button>`
-                            : `<label class="${getAppButtonClasses('secondary', { size: 'sm' })} cursor-pointer">Restore<input type="file" accept=".json" onchange="importFromJSON(event)" style="display: none;"></label>`}
+                            ? `<button type="button" onclick="showPremiumModal('restore backups')" class="${getAppButtonClasses('locked', { size: 'sm' })} phone-save-icon" aria-label="${backupRestoreLabel}" title="${backupRestoreLabel}"><i data-lucide="upload" class="w-4 h-4"></i><span class="phone-icon-label">${backupRestoreLabel}</span></button>`
+                            : `<label class="${getAppButtonClasses('secondary', { size: 'sm' })} phone-save-icon cursor-pointer" aria-label="${backupRestoreLabel}" title="${backupRestoreLabel}"><i data-lucide="upload" class="w-4 h-4"></i><span class="phone-icon-label">${backupRestoreLabel}</span><input type="file" accept=".json" onchange="importFromJSON(event)" style="display: none;"></label>`}
                     </div>
                     <div class="settings-divider"></div>
                     <button type="button" onclick="showPrivacyPolicy()" class="settings-row">Privacybeleid</button>
@@ -13029,53 +13141,41 @@
 
             return `
                 <div>
-                    <div class="notebook-chrome mb-1.5 flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="notebook-chrome">
                         <div class="min-w-0">
                             <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-80">Notebook mode</p>
                             ${hasActiveFilters ? `<p class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}</p>` : ''}
                         </div>
-                        <div class="w-full lg:w-auto">
-                            <div class="flex w-full items-center gap-1.5 md:w-auto md:justify-end">
-                                <div class="notebook-tool-row inline-flex min-w-0 flex-1 items-center justify-between gap-0.5 rounded-lg border border-parchmentDark/70 bg-transparent p-0.5 md:w-auto md:flex-none md:justify-start md:bg-white md:flex-wrap lg:flex-nowrap">
-                                <button onclick="setIndexViewMode('cards')" class="inline-flex h-9 w-10 items-center justify-center rounded-lg transition-all text-sage hover:text-forest hover:bg-surface-muted md:h-10 md:w-12" title="Cards view">
+                        <div class="notebook-chrome-bar">
+                            <div class="notebook-chrome-group" role="group" aria-label="View">
+                                <button type="button" onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex h-11 w-11 items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest md:h-10 md:w-12" title="Cards view" aria-label="Cards view">
                                     <i data-lucide="layout-grid" class="h-4 w-4"></i>
                                 </button>
-                                <button onclick="setIndexViewMode('list')" class="inline-flex h-9 w-10 items-center justify-center rounded-lg transition-all text-sage hover:text-forest hover:bg-surface-muted md:h-10 md:w-12" title="List view">
+                                <button type="button" onclick="setIndexViewMode('list')" class="notebook-view-toggle inline-flex h-11 w-11 items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest md:h-10 md:w-12" title="List view" aria-label="List view">
                                     <i data-lucide="list" class="h-4 w-4"></i>
                                 </button>
-                                <button onclick="setIndexViewMode('book')" class="inline-flex h-9 w-10 items-center justify-center rounded-lg transition-all bg-forest text-white shadow-sm md:h-10 md:w-12" title="Notebook view">
+                                <button type="button" onclick="setIndexViewMode('book')" class="notebook-view-toggle is-active inline-flex h-11 w-11 items-center justify-center rounded-lg text-white transition-all md:h-10 md:w-12" title="Notebook view" aria-label="Notebook view">
                                     <i data-lucide="book-open" class="h-4 w-4"></i>
                                 </button>
-                                <div class="hidden h-6 w-px bg-parchmentDark mx-1 md:block"></div>
-                                <button type="button" title="${notebookNoteActionLabel}" aria-label="${notebookNoteActionLabel}" onclick="openNotebookStickyNotesEditor(${recipe.id})" class="inline-flex h-9 w-10 items-center justify-center rounded-lg transition-all text-gold hover:text-forest hover:bg-surface-muted notebook-note-control notebook-note-control--manage notebook-note-control--icon md:h-10 md:w-12" data-notebook-note-control="manage-notes">
+                            </div>
+                            <div class="notebook-chrome-group" role="group" aria-label="Notes">
+                                <button type="button" title="${notebookNoteActionLabel}" aria-label="${notebookNoteActionLabel}" onclick="openNotebookStickyNotesEditor(${recipe.id})" class="notebook-view-toggle inline-flex h-11 w-11 items-center justify-center rounded-lg text-gold transition-all hover:bg-surface-muted hover:text-forest notebook-note-control notebook-note-control--manage notebook-note-control--icon md:h-10 md:w-12" data-notebook-note-control="manage-notes">
                                     <i data-lucide="sticky-note" class="h-4 w-4"></i>
                                 </button>
-                                <button type="button" title="${notebookVisibilityActionLabel}" aria-label="${notebookVisibilityActionLabel}" onclick="toggleNotebookStickyNotesVisibility()" class="inline-flex h-9 w-10 items-center justify-center rounded-lg transition-all ${showNotebookStickyNotes ? 'text-sage' : 'text-gold'} hover:text-forest hover:bg-surface-muted notebook-note-control notebook-note-control--toggle notebook-note-control--icon md:h-10 md:w-12" data-notebook-note-control="toggle-visibility">
+                                <button type="button" title="${notebookVisibilityActionLabel}" aria-label="${notebookVisibilityActionLabel}" onclick="toggleNotebookStickyNotesVisibility()" class="notebook-view-toggle inline-flex h-11 w-11 items-center justify-center rounded-lg transition-all ${showNotebookStickyNotes ? 'text-sage' : 'text-gold'} hover:bg-surface-muted hover:text-forest notebook-note-control notebook-note-control--toggle notebook-note-control--icon md:h-10 md:w-12" data-notebook-note-control="toggle-visibility">
                                     <i data-lucide="${showNotebookStickyNotes ? 'eye-off' : 'eye'}" class="h-4 w-4"></i>
                                 </button>
-                                <div class="hidden h-6 w-px bg-parchmentDark mx-1 md:block"></div>
-                                <span class="hidden md:inline-flex h-10 min-w-[7rem] items-center justify-center rounded-lg px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-sage">Page ${notebookPageLabel}</span>
-                                </div>
-                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="hidden h-10 px-4 items-center justify-center gap-2 rounded-lg transition-all bg-gold text-white font-bold text-xs uppercase tracking-wider hover:bg-opacity-90 shadow-sm notebook-note-control notebook-note-control--cook md:inline-flex" data-notebook-note-control="open-cook">
+                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook relative inline-flex h-11 items-center justify-center gap-2 rounded-lg px-4 text-xs font-bold uppercase tracking-wider text-white md:h-10" data-notebook-note-control="open-cook">
                                     <i data-lucide="chef-hat" class="h-4 w-4"></i>
-                                    <span>Cook</span>
-                                </button>
-                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-gold px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-white transition-colors hover:bg-opacity-90 notebook-note-control notebook-note-control--cook md:hidden" data-notebook-note-control="open-cook">
-                                    <i data-lucide="chef-hat" class="h-4 w-4"></i>
-                                    <span>Cook</span>
+                                    <span class="notebook-cook-label">Cook</span>
                                 </button>
                             </div>
+                            <span class="notebook-chrome-page">Page ${notebookPageLabel}</span>
                         </div>
                     </div>
 
                     <div class="notebook-book-frame relative" data-notebook-frame="true">
                         <div id="notebook-swipe-surface" data-recipe-id="${recipe.id}" data-notebook-leaf="${mobileLeafIndex}" data-notebook-side="${notebookMobileSide}" class="notebook-book-spread-surface notebook-swipe-surface notebook-spread relative overflow-hidden rounded-lg border border-sage border-opacity-15 px-2 py-2 shadow-none md:rounded-[28px] md:px-7 md:py-7 md:shadow-[0_30px_60px_rgba(28,20,16,0.16)] ${pageTurnClass}">
-                            <button type="button" title="Previous page" aria-label="Previous page" onclick="event.stopPropagation(); goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-edge-hit notebook-edge-hit--prev">
-                                <i data-lucide="chevron-left" class="h-5 w-5"></i>
-                            </button>
-                            <button type="button" title="Next page" aria-label="Next page" onclick="event.stopPropagation(); goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-edge-hit notebook-edge-hit--next">
-                                <i data-lucide="chevron-right" class="h-5 w-5"></i>
-                            </button>
                             <div class="pointer-events-none absolute inset-y-6 left-7 hidden w-8 rounded-full border-x border-parchmentDark bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.95)_0,rgba(255,255,255,0.7)_58%,rgba(239,239,239,0.88)_100%)] md:block"></div>
                             <div class="pointer-events-none absolute inset-y-8 left-[3.65rem] hidden w-px bg-gradient-to-b from-transparent via-sage/20 to-transparent md:block"></div>
                             <div class="grid h-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-0">
@@ -13241,13 +13341,13 @@
                             </div>
                             <div class="index-toolbar">
                                 <div class="inline-flex h-11 items-center rounded-xl border border-parchmentDark bg-white p-0.5">
-                                    <button onclick="setIndexViewMode('cards')" class="inline-flex h-10 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'cards' ? 'bg-forest text-white' : 'text-sage hover:text-forest'}" title="Cards view">
+                                    <button onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex h-10 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'cards' ? 'is-active text-white' : 'text-sage hover:text-forest'}" title="Cards view">
                                         <i data-lucide="layout-grid" class="h-4 w-4"></i>
                                     </button>
-                                    <button onclick="setIndexViewMode('list')" class="inline-flex h-10 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'list' ? 'bg-forest text-white' : 'text-sage hover:text-forest'}" title="List view">
+                                    <button onclick="setIndexViewMode('list')" class="notebook-view-toggle inline-flex h-10 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'list' ? 'is-active text-white' : 'text-sage hover:text-forest'}" title="List view">
                                         <i data-lucide="list" class="h-4 w-4"></i>
                                     </button>
-                                    <button onclick="setIndexViewMode('book')" class="inline-flex h-10 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'book' ? 'bg-forest text-white' : 'text-sage hover:text-forest'}" title="${notebookModeLocked ? 'Premium notebook mode' : 'Notebook view'}">
+                                    <button onclick="setIndexViewMode('book')" class="notebook-view-toggle inline-flex h-10 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'book' ? 'is-active text-white' : 'text-sage hover:text-forest'}" title="${notebookModeLocked ? 'Premium notebook mode' : 'Notebook view'}">
                                         <i data-lucide="${notebookModeLocked ? 'crown' : 'book-open'}" class="h-4 w-4 ${notebookModeLocked ? 'text-gold' : ''}"></i>
                                     </button>
                                 </div>
