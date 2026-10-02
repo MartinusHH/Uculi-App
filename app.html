@@ -286,39 +286,12 @@
                 min-width: 5.2rem;
                 padding: 0.85rem 0.95rem 0.75rem;
             }
-
-            .profile-banner {
-                height: 10.5rem;
-            }
-
-            .profile-identity {
-                flex-direction: row;
-                align-items: flex-end;
-                gap: 1.25rem;
-                margin-top: -3rem;
-                padding: 0 2rem 1.5rem;
-                text-align: left;
-            }
-
-            .profile-avatar {
-                width: 7.25rem;
-                height: 7.25rem;
-            }
-
-            .profile-name {
-                font-size: 2.6rem;
-            }
-
-            .profile-chips,
-            .profile-actions {
-                justify-content: flex-start;
-            }
         }
 
         @media (min-width: 1024px) {
             .floating-back-button {
                 left: 1.25rem;
-                top: 5.25rem;
+                top: calc(6.6rem + env(safe-area-inset-top, 0px));
                 bottom: auto;
             }
         }
@@ -433,6 +406,42 @@
 
         .profile-actions {
             margin-top: 0.85rem;
+        }
+
+        @media (min-width: 768px) {
+            .profile-banner {
+                height: 10.5rem;
+            }
+
+            .profile-identity {
+                display: grid;
+                grid-template-columns: 7.25rem minmax(0, 1fr);
+                align-items: start;
+                gap: 1.25rem;
+                margin-top: 0;
+                padding: 0 2rem 1.5rem;
+                text-align: left;
+            }
+
+            .profile-avatar {
+                width: 7.25rem;
+                height: 7.25rem;
+                margin-top: -3rem;
+            }
+
+            .profile-copy {
+                flex: 1 1 auto;
+                width: auto;
+            }
+
+            .profile-name {
+                font-size: 2.6rem;
+            }
+
+            .profile-chips,
+            .profile-actions {
+                justify-content: flex-start;
+            }
         }
 
         .app-overlay {
