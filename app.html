@@ -660,8 +660,12 @@
 
         @media (max-width: 767px) {
             #main-header {
-                gap: 0.7rem;
-                padding: calc(0.75rem + env(safe-area-inset-top, 0px)) 0.85rem 0.75rem;
+                gap: 0.45rem;
+                padding: calc(0.4rem + env(safe-area-inset-top, 0px)) 0.7rem 0.35rem;
+            }
+
+            #main-header h1 {
+                font-size: 1.2rem;
             }
 
             #main-header > button {
@@ -696,7 +700,7 @@
             }
 
             .index-overview .index-overview-title {
-                font-size: 1.35rem;
+                font-size: 1.15rem;
                 line-height: 1.15;
             }
 
@@ -718,9 +722,9 @@
             }
 
             .app-header-mark {
-                width: 2.75rem;
-                height: 2.75rem;
-                border-radius: 0.9rem;
+                width: 2.15rem;
+                height: 2.15rem;
+                border-radius: 0.55rem;
             }
 
             .app-header-kicker {
@@ -819,7 +823,35 @@
             }
 
             body.chrome-push .settings-sheet {
-                padding: 0.25rem 1rem 1.25rem;
+                padding: 0.15rem 0.75rem 0.75rem;
+            }
+
+            .settings-sheet > h2 {
+                font-size: 1.2rem;
+                padding-bottom: 0;
+            }
+
+            .settings-row {
+                min-height: 2.15rem;
+                padding: 0.1rem 0;
+                font-size: 0.82rem;
+                gap: 0.4rem;
+            }
+
+            .settings-actions {
+                padding: 0 0 0.15rem;
+                gap: 0.35rem;
+            }
+
+            #app-content .settings-actions > button,
+            #app-content .settings-actions > label {
+                min-height: 2.75rem;
+                height: 2.75rem;
+                padding-left: 0.65rem;
+                padding-right: 0.65rem;
+                letter-spacing: 0.03em;
+                font-size: 0.68rem;
+                box-shadow: none;
             }
 
             #app-content .profile-identity {
@@ -933,6 +965,181 @@
         .custom-file-upload:hover {
             transform: translateY(-1px);
             filter: saturate(1.03);
+        }
+
+        @media (max-width: 767px) {
+            button:not(:disabled):hover,
+            .custom-file-upload:hover {
+                transform: none;
+            }
+
+            #app-content {
+                padding: 0.45rem 0.7rem calc(4.35rem + env(safe-area-inset-bottom, 0px));
+            }
+
+            #app-content h2,
+            #app-content h3.font-fantasy {
+                font-size: 1.2rem;
+                line-height: 1.15;
+            }
+
+            #app-content .recipe-tile h3 {
+                min-height: 0;
+                font-size: 1.12rem;
+            }
+
+            #app-content .recipe-tile .h-48 {
+                height: 7.25rem;
+            }
+
+            #app-content .recipe-tile .p-5 {
+                padding: 0.7rem 0.75rem;
+            }
+
+            #app-content input.h-11,
+            #app-content select.h-11,
+            #app-content button.h-11,
+            #app-content .index-toolbar button,
+            #app-content .profile-actions > button,
+            #app-content .detail-actions button,
+            #app-content .detail-cook-toggle-btn {
+                min-height: 2.75rem;
+                height: 2.75rem;
+                letter-spacing: 0.03em;
+                box-shadow: none;
+            }
+
+            .detail-hero-frame {
+                gap: 0.45rem;
+                padding: 0.7rem 0.75rem 0.75rem;
+            }
+
+            .detail-hero-portrait {
+                width: 3.6rem;
+                height: 3.6rem;
+            }
+
+            .detail-hero-title {
+                font-size: 1.3rem;
+            }
+
+            .detail-hero-spacer {
+                height: 0.4rem;
+            }
+
+            .profile-banner {
+                height: 4.25rem;
+            }
+
+            .profile-avatar {
+                width: 3.6rem;
+                height: 3.6rem;
+            }
+
+            .profile-name {
+                font-size: 1.35rem;
+            }
+
+            .profile-identity {
+                margin-top: -1.5rem;
+                gap: 0.4rem;
+                padding-bottom: 0.7rem;
+            }
+
+            #app-landing {
+                font-size: 0.95rem;
+            }
+
+            #app-landing h1 {
+                font-size: 1.85rem;
+                line-height: 1.08;
+            }
+
+            #app-landing h3 {
+                font-size: 1.3rem;
+            }
+
+            #app-landing .mb-12 {
+                margin-bottom: 0.85rem;
+            }
+
+            #app-landing .mb-20,
+            #app-landing .md\:mb-32 {
+                margin-bottom: 1.35rem;
+            }
+
+            #app-landing .mb-8,
+            #app-landing .mt-8 {
+                margin-top: 0.55rem;
+                margin-bottom: 0.55rem;
+            }
+
+            #app-landing .landing-auth-row {
+                margin-top: 0.75rem;
+                gap: 0.4rem;
+            }
+
+            #app-landing .p-8 {
+                padding: 0.9rem;
+            }
+
+            #app-landing .text-lg {
+                font-size: 0.92rem;
+            }
+
+            .app-modal-panel .app-modal-footer {
+                flex-direction: row;
+                align-items: stretch;
+                justify-content: stretch;
+                gap: 0.4rem;
+                padding: 0.5rem 0.7rem;
+            }
+
+            .app-modal-panel .app-modal-footer > button {
+                flex: 1 1 0;
+                width: auto;
+                min-width: 0;
+                min-height: 2.75rem;
+                height: 2.75rem;
+            }
+
+            #cover-editor-modal h2 {
+                font-size: 1.15rem;
+            }
+
+            #cover-editor-preview-surface {
+                height: 8.25rem;
+                min-height: 0;
+                max-height: 8.25rem;
+                aspect-ratio: auto;
+                padding: 0.65rem 0.8rem;
+                border-radius: 0.7rem;
+            }
+
+            .notebook-line-row,
+            .notebook-ruled-block {
+                min-height: 28px;
+            }
+
+            .notebook-line-text {
+                line-height: 28px;
+                font-size: 0.82rem;
+            }
+
+            .notebook-landing-cover-surface {
+                height: 12.5rem;
+                min-height: 0;
+                aspect-ratio: auto;
+            }
+
+            .notebook-landing-action-row button {
+                min-height: 2.75rem;
+                height: 2.75rem;
+            }
+
+            #cover-editor-body > .grid {
+                gap: 0.65rem;
+            }
         }
 
         button:not(:disabled):active,
@@ -1921,7 +2128,8 @@
             }
 
             .notebook-landing-cover-surface {
-                min-height: clamp(14.5rem, 64vw, 19rem);
+                min-height: 11.5rem;
+                aspect-ratio: 0.9 / 1;
             }
 
             .notebook-sticky-note--sm {
@@ -1948,15 +2156,74 @@
             }
 
             .notebook-book-spread-surface {
-                height: clamp(23.75rem, 98vw, 35rem);
-                min-height: clamp(23.75rem, 98vw, 35rem);
+                height: auto;
+                min-height: 0;
                 aspect-ratio: auto;
-                box-shadow: 0 16px 30px rgba(28, 20, 16, 0.12);
+                box-shadow: none;
             }
 
             .notebook-paper {
-                height: clamp(21.3rem, 88vw, 27.5rem);
-                min-height: clamp(21.3rem, 88vw, 27.5rem);
+                height: auto;
+                min-height: 16rem;
+                border-radius: 0.45rem;
+                padding: 0.45rem 0.6rem 0.7rem;
+                background:
+                    repeating-linear-gradient(-48deg, transparent, transparent 3px, rgba(0, 0, 0, 0.01) 3px, rgba(0, 0, 0, 0.01) 4px),
+                    linear-gradient(to bottom, transparent 0, transparent 25px, rgba(144, 152, 112, 0.2) 25px, rgba(144, 152, 112, 0.2) 26px, transparent 26px) 0 0 / 100% 28px,
+                    linear-gradient(90deg, rgba(196, 92, 92, 0.28) 0, rgba(196, 92, 92, 0.28) 1px, transparent 1px) 1.35rem 0 / 100% 100%,
+                    linear-gradient(180deg, #fbf8f3 0%, #f7f2e8 100%);
+                box-shadow: none;
+            }
+
+            .notebook-paper h3 {
+                font-size: 1.3rem;
+                line-height: 1.15;
+            }
+
+            .notebook-line-row,
+            .notebook-ruled-block {
+                min-height: 28px;
+                gap: 0.4rem;
+            }
+
+            .notebook-line-text {
+                line-height: 28px;
+                padding-top: 0;
+                font-size: 0.82rem;
+            }
+
+            .notebook-page-summary-card {
+                border: 0;
+                background: transparent;
+                box-shadow: none;
+                padding: 0;
+                border-radius: 0;
+            }
+
+            .notebook-page-summary-card .text-2xl {
+                font-size: 0.95rem;
+            }
+
+            .notebook-page-photo-cluster {
+                width: min(4.6rem, 28%);
+            }
+
+            .notebook-tool-row button {
+                width: 2.75rem;
+                min-width: 2.75rem;
+                height: 2.75rem;
+                min-height: 2.75rem;
+                box-shadow: none;
+            }
+
+            .notebook-note-control--cook {
+                min-width: 0;
+                min-height: 2.75rem;
+                height: 2.75rem;
+                padding-inline: 0.7rem;
+                letter-spacing: 0.06em;
+                box-shadow: none;
+                background: #c89050;
             }
 
             .notebook-paper__body {
@@ -1970,9 +2237,15 @@
             }
 
             .notebook-page-photo-cluster {
-                width: min(6.25rem, 34%);
+                width: min(4.6rem, 28%);
                 padding-right: 0;
-                margin: 0 0 0.55rem 0.7rem;
+                margin: 0 0 0.4rem 0.45rem;
+            }
+
+            .notebook-spread .notebook-paper {
+                padding: 0.4rem 0.55rem 0.6rem;
+                border-radius: 0.4rem;
+                border-color: transparent;
             }
 
             .notebook-page-photo-clothespin {
@@ -2184,6 +2457,38 @@
             line-height: 34px;
         }
 
+        @media (min-width: 768px) {
+            .notebook-paper h3 {
+                font-size: 2rem;
+            }
+
+            #cover-editor-preview-surface {
+                height: 14rem;
+                min-height: 0;
+                max-height: 14rem;
+                aspect-ratio: auto;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .notebook-line-row,
+            .notebook-ruled-block {
+                min-height: 28px;
+            }
+
+            .notebook-line-text {
+                line-height: 28px;
+                font-size: 0.82rem;
+                padding-top: 0;
+            }
+
+            .notebook-landing-cover-surface {
+                height: 12.5rem;
+                min-height: 0;
+                aspect-ratio: auto;
+            }
+        }
+
         /* Receptfoto, terugknop en titel blijven aparte lagen. De foto zakt niet over de tekst. */
         .detail-back-row {
             position: relative;
@@ -2296,23 +2601,23 @@
             }
 
             .detail-hero-frame {
-                min-height: 15rem;
+                min-height: 11rem;
                 flex-direction: row;
                 align-items: flex-end;
-                gap: 1.5rem;
-                padding: 3.25rem 2.5rem 1.15rem;
+                gap: 1.1rem;
+                padding: 1.6rem 1.75rem 0.9rem;
                 text-align: left;
             }
 
             .detail-hero-portrait {
-                width: 9.5rem;
-                height: 9.5rem;
-                margin-bottom: -2.6rem;
-                border-width: 4px;
+                width: 7rem;
+                height: 7rem;
+                margin-bottom: -1.8rem;
+                border-width: 3px;
             }
 
             .detail-hero-title {
-                font-size: clamp(2.35rem, 4vw, 3rem);
+                font-size: clamp(1.8rem, 2.6vw, 2.35rem);
             }
 
             .detail-hero-meta {
@@ -2321,7 +2626,7 @@
             }
 
             .detail-hero-spacer {
-                height: 3.15rem;
+                height: 2.15rem;
             }
         }
 
@@ -2668,27 +2973,27 @@
 
                     <div id="cover-editor-modal" class="app-overlay fixed inset-0 bg-black bg-opacity-50 hidden opacity-0 transition-all duration-300 flex z-50">
                         <div class="app-modal-panel app-modal-panel--wide scale-95 transition-transform duration-300">
-                            <div class="flex items-center justify-between gap-4 border-b border-parchmentDark bg-parchment p-6 md:p-8">
+                            <div class="flex items-center justify-between gap-3 border-b border-parchmentDark bg-parchment p-3 md:p-4">
                                 <div>
-                                    <h2 class="font-fantasy font-bold text-3xl text-forest">Edit Notebook Cover</h2>
-                                    <p class="text-sm font-semibold text-sage mt-1">Personalize your cover with color, title, and stickers. This stays private to your own archive.</p>
+                                    <h2 class="font-fantasy font-bold text-xl text-forest md:text-2xl">Edit Notebook Cover</h2>
+                                    <p class="mt-0.5 text-xs font-semibold text-sage md:text-sm">Personalize your cover with color, title, and stickers. This stays private to your own archive.</p>
                                 </div>
-                                <button onclick="closeCoverEditor()" class="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-parchmentDark bg-white text-forest shadow-sm transition-all hover:border-gold hover:text-sage" aria-label="Close cover editor">
+                                <button onclick="closeCoverEditor()" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-parchmentDark bg-white text-forest transition-colors hover:border-gold hover:text-sage" aria-label="Close cover editor">
                                     <i data-lucide="x" class="w-5 h-5"></i>
                                 </button>
                             </div>
 
-                            <div id="cover-editor-body" class="app-modal-body p-6 md:p-8"></div>
+                            <div id="cover-editor-body" class="app-modal-body p-3 md:p-5"></div>
 
-                            <div class="app-modal-footer border-t border-parchmentDark bg-parchment p-6 md:p-8">
-                                <button onclick="closeCoverEditor()" data-app-button="secondary" data-app-button-size="lg" data-app-button-full-width="true">Cancel</button>
-                                <button onclick="saveCoverEditor()" data-app-button="primary" data-app-button-size="lg" data-app-button-full-width="true">
+                            <div class="app-modal-footer border-t border-parchmentDark bg-parchment p-3 md:p-4">
+                                <button onclick="closeCoverEditor()" data-app-button="secondary" data-app-button-size="md">Cancel</button>
+                                <button onclick="saveCoverEditor()" data-app-button="primary" data-app-button-size="md">
                                     <i data-lucide="save" class="w-4 h-4"></i> Save Cover
                                 </button>
                             </div>
                         </div>
                     </div>
-        <main id="app-content" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-4 transition-all relative"></main>
+        <main id="app-content" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 transition-all relative"></main>
 
         <!-- Auth loading screen: visible until Firebase resolves session -->
         <div id="auth-loading-screen" class="fixed inset-0 z-[160] flex flex-col items-center justify-center bg-[#FBF8F1]">
@@ -6510,8 +6815,8 @@
         function localTestModeButtonMarkup(buttonId) {
             if (!isLocalDeveloperPreviewContext()) return '';
             return `
-                <div class="flex w-full flex-col items-center gap-2 sm:w-auto">
-                    <button type="button" id="${buttonId}" onclick="startLocalTestModeFromGate()" class="flex h-14 w-full items-center justify-center gap-2 rounded-2xl border border-gold bg-paper px-6 text-base font-bold text-forest shadow-sm transition-all hover:-translate-y-0.5 hover:border-sage sm:w-auto">
+                <div class="flex w-full flex-col items-center gap-1 sm:w-auto">
+                    <button type="button" id="${buttonId}" onclick="startLocalTestModeFromGate()" class="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-gold bg-paper px-4 text-sm font-bold text-forest transition-colors hover:border-sage sm:w-auto">
                         Doorgaan zonder inloggen (test)
                     </button>
                     <p class="max-w-xs text-center text-xs font-semibold leading-relaxed text-sage">Recepten blijven alleen op dit apparaat.</p>
@@ -7730,8 +8035,8 @@
                     ? 'h-12 w-12 rounded-xl text-sm'
                     : 'h-11 w-11 rounded-xl text-xs')
                     : (size === 'lg'
-                    ? 'h-12 rounded-xl px-6 text-sm tracking-[0.18em]'
-                    : 'h-11 rounded-xl px-4 text-xs tracking-[0.16em]');
+                    ? 'h-12 rounded-xl px-5 text-sm tracking-[0.08em]'
+                    : 'h-11 rounded-xl px-3 text-xs tracking-[0.04em]');
             const widthClass = fullWidth ? ' w-full' : '';
             const variantClasses = {
                 primary: 'border-forest bg-forest text-white hover:border-sage hover:bg-sage',
@@ -8755,12 +9060,12 @@
                             <p class="mx-auto mt-8 max-w-2xl text-lg font-semibold leading-relaxed text-sage md:text-xl">
                                 No clutter, no pop-ups, just cooking. Uculi turns your scattered notes and internet finds into a calm, focused digital cookbook.
                             </p>
-                            <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:flex-wrap">
-                                <button type="button" onclick="enterAppFromLanding('hero-enter')" class="flex h-14 items-center justify-center gap-2 rounded-2xl bg-forest px-8 text-base font-bold text-white shadow-xl shadow-forest/20 transition-all hover:-translate-y-0.5 hover:bg-inkDark hover:shadow-2xl">
-                                    <i data-lucide="${landingAuthActionIcon}" class="h-5 w-5"></i> ${landingAuthActionLabel}
+                            <div class="landing-auth-row mt-6 flex flex-col items-center justify-center gap-2 sm:flex-row sm:flex-wrap">
+                                <button type="button" onclick="enterAppFromLanding('hero-enter')" class="flex h-11 items-center justify-center gap-2 rounded-xl bg-forest px-5 text-sm font-bold text-white transition-colors hover:bg-inkDark">
+                                    <i data-lucide="${landingAuthActionIcon}" class="h-4 w-4"></i> ${landingAuthActionLabel}
                                 </button>
-                                <button type="button" onclick="signInFromLanding()" class="md:hidden flex h-14 items-center justify-center gap-2 rounded-2xl border border-parchmentDark bg-white px-8 text-base font-bold text-forest shadow-sm transition-all hover:-translate-y-0.5 hover:border-gold hover:text-gold hover:shadow-md">
-                                    <i data-lucide="log-in" class="h-5 w-5"></i> ${authText.legacyMobileLogin}
+                                <button type="button" onclick="signInFromLanding()" class="md:hidden flex h-11 items-center justify-center gap-2 rounded-xl border border-parchmentDark bg-white px-5 text-sm font-bold text-forest transition-colors hover:border-gold hover:text-gold">
+                                    <i data-lucide="log-in" class="h-4 w-4"></i> ${authText.legacyMobileLogin}
                                 </button>
                                 ${localTestModeButtonMarkup('local-test-mode-landing')}
                             </div>
@@ -12081,14 +12386,14 @@
 
             return `
                 <div>
-                    <div class="mb-3 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                    <div class="notebook-chrome mb-1.5 flex flex-col gap-1 lg:flex-row lg:items-center lg:justify-between">
                         <div class="min-w-0">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Notebook mode</p>
-                            ${hasActiveFilters ? `<p class="mt-2 text-[11px] font-bold uppercase tracking-[0.24em] text-gold">Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}</p>` : ''}
+                            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-80">Notebook mode</p>
+                            ${hasActiveFilters ? `<p class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}</p>` : ''}
                         </div>
                         <div class="w-full lg:w-auto">
-                            <div class="flex w-full flex-col gap-2 md:w-auto md:flex-row md:items-center md:justify-end">
-                                <div class="inline-flex w-full items-center justify-between gap-1 rounded-xl border border-parchmentDark bg-white p-1 shadow-sm md:w-auto md:justify-start md:flex-wrap lg:flex-nowrap">
+                            <div class="flex w-full items-center gap-1.5 md:w-auto md:justify-end">
+                                <div class="notebook-tool-row inline-flex min-w-0 flex-1 items-center justify-between gap-0.5 rounded-lg border border-parchmentDark/70 bg-transparent p-0.5 md:w-auto md:flex-none md:justify-start md:bg-white md:flex-wrap lg:flex-nowrap">
                                 <button onclick="setIndexViewMode('cards')" class="inline-flex h-9 w-10 items-center justify-center rounded-lg transition-all text-sage hover:text-forest hover:bg-surface-muted md:h-10 md:w-12" title="Cards view">
                                     <i data-lucide="layout-grid" class="h-4 w-4"></i>
                                 </button>
@@ -12112,7 +12417,7 @@
                                     <i data-lucide="chef-hat" class="h-4 w-4"></i>
                                     <span>Cook</span>
                                 </button>
-                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-xl transition-all bg-gold text-white font-bold text-xs uppercase tracking-[0.2em] hover:bg-opacity-90 shadow-sm notebook-note-control notebook-note-control--cook md:hidden" data-notebook-note-control="open-cook">
+                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-gold px-3 text-[11px] font-bold uppercase tracking-[0.08em] text-white transition-colors hover:bg-opacity-90 notebook-note-control notebook-note-control--cook md:hidden" data-notebook-note-control="open-cook">
                                     <i data-lucide="chef-hat" class="h-4 w-4"></i>
                                     <span>Cook</span>
                                 </button>
@@ -12121,7 +12426,7 @@
                     </div>
 
                     <div class="notebook-book-frame relative" data-notebook-frame="true">
-                        <div id="notebook-swipe-surface" data-recipe-id="${recipe.id}" class="notebook-book-spread-surface notebook-swipe-surface notebook-spread relative overflow-hidden rounded-[28px] border border-sage border-opacity-20 px-4 py-4 shadow-[0_30px_60px_rgba(28, 20, 16,0.16)] md:px-7 md:py-7 ${pageTurnClass}">
+                        <div id="notebook-swipe-surface" data-recipe-id="${recipe.id}" class="notebook-book-spread-surface notebook-swipe-surface notebook-spread relative overflow-hidden rounded-lg border border-sage border-opacity-15 px-2 py-2 shadow-none md:rounded-[28px] md:px-7 md:py-7 md:shadow-[0_30px_60px_rgba(28,20,16,0.16)] ${pageTurnClass}">
                             <div class="pointer-events-none absolute inset-y-6 left-7 hidden w-8 rounded-full border-x border-parchmentDark bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.95)_0,rgba(255,255,255,0.7)_58%,rgba(239,239,239,0.88)_100%)] md:block"></div>
                             <div class="pointer-events-none absolute inset-y-8 left-[3.65rem] hidden w-px bg-gradient-to-b from-transparent via-sage/20 to-transparent md:block"></div>
                             <div class="grid h-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-0">
@@ -12314,7 +12619,7 @@
                             ${isSearchVisible ? `
                                 <div class="relative">
                                     <i data-lucide="search" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-sage opacity-70"></i>
-                                    <input type="text" placeholder="Search by title, ingredient, or occasion..." value="${searchQuery}" oninput="searchQuery = this.value; renderList()" class="w-full h-14 rounded-xl border border-accent bg-parchment px-12 text-base font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:bg-white">
+                                    <input type="text" placeholder="Search by title, ingredient, or occasion..." value="${searchQuery}" oninput="searchQuery = this.value; renderList()" class="w-full h-11 rounded-xl border border-accent bg-parchment px-12 text-base font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:bg-white">
                                 </div>
                             ` : ''}
 
@@ -12335,7 +12640,7 @@
                                         <div class="space-y-2">
                                             <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Category</label>
                                             <div class="relative">
-                                                <select onchange="categoryFilter = this.value; renderList()" class="h-14 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
+                                                <select onchange="categoryFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
                                                     <option value="">All categories</option>
                                                     <option value="Baking" ${categoryFilter === 'Baking' ? 'selected' : ''}>Baking</option>
                                                     <option value="Cooking" ${categoryFilter === 'Cooking' ? 'selected' : ''}>Cooking</option>
@@ -12349,7 +12654,7 @@
                                         <div class="space-y-2">
                                             <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Difficulty</label>
                                             <div class="relative">
-                                                <select onchange="difficultyFilter = this.value; renderList()" class="h-14 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
+                                                <select onchange="difficultyFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
                                                     <option value="">All levels</option>
                                                     <option value="Easy" ${difficultyFilter === 'Easy' ? 'selected' : ''}>Easy</option>
                                                     <option value="Medium" ${difficultyFilter === 'Medium' ? 'selected' : ''}>Medium</option>
@@ -12362,7 +12667,7 @@
                                         <div class="space-y-2">
                                             <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Cuisine</label>
                                             <div class="relative">
-                                                <select onchange="cuisineFilter = this.value; renderList()" class="h-14 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
+                                                <select onchange="cuisineFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
                                                     <option value="">All cuisines</option>
                                                     <option value="European" ${cuisineFilter === 'European' ? 'selected' : ''}>European</option>
                                                     <option value="Asian" ${cuisineFilter === 'Asian' ? 'selected' : ''}>Asian</option>
@@ -12378,7 +12683,7 @@
                                         <div class="space-y-2">
                                             <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Meal type</label>
                                             <div class="relative">
-                                                <select onchange="mealTypeFilter = this.value ? [this.value] : []; renderList()" class="h-14 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
+                                                <select onchange="mealTypeFilter = this.value ? [this.value] : []; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
                                                     <option value="">All meal types</option>
                                                     ${mealTypeOptions.map(opt => `<option value="${opt}" ${mealTypeFilter.includes(opt) ? 'selected' : ''}>${opt}</option>`).join('')}
                                                 </select>
@@ -12388,7 +12693,7 @@
 
                                         <div class="space-y-2">
                                             <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Quick view</label>
-                                            <button onclick="showFavoritesOnly = !showFavoritesOnly; renderList()" class="flex h-14 w-full items-center justify-between rounded-xl border px-4 text-sm font-semibold shadow-sm transition-all ${showFavoritesOnly ? 'border-forest bg-forest text-white shadow-md' : 'border-sage border-opacity-20 bg-white text-forest hover:border-gold hover:shadow-md'}">
+                                            <button onclick="showFavoritesOnly = !showFavoritesOnly; renderList()" class="flex h-11 w-full items-center justify-between rounded-xl border px-4 text-sm font-semibold shadow-sm transition-all ${showFavoritesOnly ? 'border-forest bg-forest text-white shadow-md' : 'border-sage border-opacity-20 bg-white text-forest hover:border-gold hover:shadow-md'}">
                                                 <span class="flex items-center gap-2">
                                                     <i data-lucide="heart" class="h-4 w-4 ${showFavoritesOnly ? 'fill-current' : ''}"></i>
                                                     ${showFavoritesOnly ? 'Favorites only' : 'Show favorites'}
@@ -12893,7 +13198,7 @@
                     <div class="space-y-5 p-5">
                         <div class="relative">
                             <i data-lucide="search" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-sage opacity-70"></i>
-                            <input type="text" placeholder="Search by title, author, ingredient, or cuisine..." value="${browseQuery}" oninput="browseQuery = this.value; renderBrowse()" class="w-full h-14 rounded-xl border border-accent bg-parchment px-12 text-base font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:bg-white">
+                            <input type="text" placeholder="Search by title, author, ingredient, or cuisine..." value="${browseQuery}" oninput="browseQuery = this.value; renderBrowse()" class="w-full h-11 rounded-xl border border-accent bg-parchment px-12 text-base font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:bg-white">
                         </div>
                     </div>
                 </div>
