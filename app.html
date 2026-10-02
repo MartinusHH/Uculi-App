@@ -363,9 +363,6 @@
         }
 
         .settings-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
             padding: 0.15rem 0 0.45rem;
         }
 
@@ -424,12 +421,23 @@
             }
         }
 
+        .action-row,
+        .index-toolbar,
+        .profile-actions,
+        .settings-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.5rem;
+        }
+
         #header-add-recipe {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.4rem;
-            height: 2.5rem;
+            height: 2.75rem;
             padding: 0 0.9rem;
             border-radius: 0.85rem;
             background: #1c1410;
@@ -520,8 +528,7 @@
             line-height: 1.4;
         }
 
-        .profile-chips,
-        .profile-actions {
+        .profile-chips {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -566,8 +573,7 @@
                 font-size: 2.6rem;
             }
 
-            .profile-chips,
-            .profile-actions {
+            .profile-chips {
                 justify-content: flex-start;
             }
         }
@@ -653,17 +659,13 @@
         }
 
         @media (max-width: 767px) {
-            #app-content {
-                padding-bottom: calc(8rem + env(safe-area-inset-bottom, 0px));
-            }
-
             #main-header {
                 gap: 0.7rem;
                 padding: calc(0.75rem + env(safe-area-inset-top, 0px)) 0.85rem 0.75rem;
             }
 
             #main-header > button {
-                height: 3rem;
+                height: 2.75rem;
                 gap: 0.35rem;
                 padding-left: 0.9rem;
                 padding-right: 0.9rem;
@@ -690,7 +692,7 @@
             }
 
             .index-overview .index-overview-head {
-                padding: 0.75rem 0.8rem !important;
+                padding: 0.2rem 0 0.75rem !important;
             }
 
             .index-overview .index-overview-title {
@@ -704,7 +706,7 @@
 
             .index-overview .index-plan-note {
                 margin-top: 0.5rem !important;
-                padding: 0.5rem 0.7rem !important;
+                padding: 0.15rem 0 0 !important;
             }
 
             .index-overview .index-plan-detail {
@@ -727,36 +729,162 @@
             }
 
             .app-header-subtitle {
-                font-size: 0.64rem;
+                font-size: 0.68rem;
                 line-height: 1.2;
                 max-width: none;
                 white-space: nowrap;
             }
 
+            .app-header-subtitle .brand-apple {
+                width: 0.85rem;
+                height: 0.85rem;
+            }
+
+            .app-header-mark {
+                box-shadow: none;
+            }
+
+            #app-shell {
+                border-width: 0;
+                box-shadow: none;
+            }
+
+            #app-content {
+                padding-bottom: calc(4.35rem + env(safe-area-inset-bottom, 0px));
+            }
+
+            #app-content .screen-sheet,
+            #app-content .profile-sheet > .bg-white,
+            #app-content .profile-sheet > .grid > div,
+            body.chrome-push:not(.cooking-mode-active) .push-sheet,
+            body.chrome-push:not(.cooking-mode-active) .detail-shell {
+                background-color: transparent;
+                background-image: none;
+                border-width: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            #app-content .screen-sheet > div,
+            #app-content .index-overview-head {
+                background-color: transparent;
+                background-image: none;
+            }
+
+            #app-content .index-plan-note,
+            #app-content .quiet-panel {
+                background-color: transparent;
+                border-width: 0;
+                border-radius: 0;
+                box-shadow: none;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            #app-content .screen-sheet > .border-b,
+            #app-content .screen-sheet > [class*="p-"],
+            #app-content .screen-sheet > [class*="px-"] {
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            #app-content .recipe-tile,
+            #app-content .shop-sheet article {
+                border-radius: 0;
+                border-left-width: 0;
+                border-right-width: 0;
+                border-top-width: 0;
+                box-shadow: none;
+                background-color: transparent;
+            }
+
+            #app-content .recipe-tile.h-\[24rem\] {
+                height: auto;
+            }
+
+            #app-content .profile-sheet > .grid {
+                gap: 0;
+            }
+
+            #app-content .profile-sheet > .grid > div + div,
+            #app-content .shop-sheet article + article {
+                border-top: 1px solid rgba(144, 152, 112, 0.28);
+            }
+
+            body.chrome-push:not(.cooking-mode-active) .detail-meta-grid,
+            body.chrome-push:not(.cooking-mode-active) .detail-ingredients-panel {
+                background-color: transparent;
+                border-width: 0;
+                box-shadow: none;
+            }
+
+            body.chrome-push .settings-sheet {
+                padding: 0.25rem 1rem 1.25rem;
+            }
+
+            #app-content .profile-identity {
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            #app-content .index-toolbar {
+                justify-content: flex-start;
+                width: 100%;
+            }
+
+            #app-content .profile-actions,
+            #app-content .detail-actions,
+            #app-content .settings-actions {
+                width: 100%;
+            }
+
+            #app-content .profile-actions > button {
+                flex: 1 1 calc(50% - 0.5rem);
+            }
+
             #main-nav {
                 position: fixed;
-                left: 0.5rem;
-                right: 0.5rem;
-                bottom: 0.5rem;
+                left: 0;
+                right: 0;
+                bottom: 0;
                 width: auto;
                 transform: none;
-                padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+                border-radius: 0;
+                border-left: 0;
+                border-right: 0;
+                border-bottom: 0;
+                background: rgba(246, 241, 232, 0.97);
+                box-shadow: none;
+                padding-bottom: env(safe-area-inset-bottom, 0px);
             }
 
-            .app-nav-inner {
-                gap: 0.25rem;
-                padding: 0.35rem;
+            #main-nav .app-nav-inner {
+                gap: 0.1rem;
+                padding: 0.12rem 0.35rem 0.08rem;
             }
 
-            .app-nav-button {
+            #main-nav .app-nav-button {
                 gap: 0;
-                padding: 0.8rem 0.25rem;
+                min-height: 2.75rem;
+                padding: 0.28rem 0.15rem 0.34rem;
+                border-radius: 0.65rem;
+                background: transparent;
+                box-shadow: none;
             }
 
-            .app-nav-button i,
-            .app-nav-button svg {
-                width: 1.5rem;
-                height: 1.5rem;
+            #main-nav .app-nav-button.is-active {
+                background: transparent;
+                box-shadow: none;
+            }
+
+            #main-nav .app-nav-button.is-active::after {
+                bottom: 0.1rem;
+            }
+
+            #main-nav .app-nav-button i,
+            #main-nav .app-nav-button svg {
+                width: 1.3rem;
+                height: 1.3rem;
             }
 
             body.chrome-push #app-content {
@@ -2488,7 +2616,10 @@
                 <div class="app-header-mark">
                     <img src="assets/uculi-boekje.jpg" alt="Uculi" width="46" height="46" />
                 </div>
-                <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
+                <div class="app-header-copy">
+                    <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
+                    <p class="app-header-subtitle"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
+                </div>
             </div>
             <div class="flex items-center gap-2">
                 <button id="notifications-button" onclick="showNotificationsModal()" class="header-icon-button relative hidden" title="Notifications" aria-label="Notifications">
@@ -5366,7 +5497,7 @@
 
                         <div class="flex items-center gap-2 pl-2 border-l border-parchmentDark">
                             ${assignees.length > 0 ? `<div class="flex -space-x-1 mr-1">${assigneesHtml}</div>` : ''}
-                            <button type="button" onclick="removeShoppingListItem('${item.id}')" class="flex h-8 w-8 items-center justify-center rounded-lg text-sage hover:bg-coral hover:text-white transition-colors" title="Remove">
+                            <button type="button" onclick="removeShoppingListItem('${item.id}')" class="flex h-11 w-11 items-center justify-center rounded-xl text-sage hover:bg-coral hover:text-white transition-colors" title="Remove">
                                 <i data-lucide="trash-2" class="h-4 w-4"></i>
                             </button>
                         </div>
@@ -7598,11 +7729,9 @@
                 ? (size === 'lg'
                     ? 'h-12 w-12 rounded-xl text-sm'
                     : 'h-11 w-11 rounded-xl text-xs')
-                : (size === 'lg'
+                    : (size === 'lg'
                     ? 'h-12 rounded-xl px-6 text-sm tracking-[0.18em]'
-                    : size === 'sm'
-                        ? 'h-10 rounded-xl px-4 text-[11px] tracking-[0.16em]'
-                        : 'h-11 rounded-xl px-4 text-xs tracking-[0.18em]');
+                    : 'h-11 rounded-xl px-4 text-xs tracking-[0.16em]');
             const widthClass = fullWidth ? ' w-full' : '';
             const variantClasses = {
                 primary: 'border-forest bg-forest text-white hover:border-sage hover:bg-sage',
@@ -7635,7 +7764,7 @@
             const safeLabel = escapeHTML(label);
             return `
                 <div class="flex" translate="no">
-                    <button onclick="${onClick}" aria-label="${safeLabel}" title="${safeLabel}" class="${getAppButtonClasses(variant, { size: 'lg', iconOnly })}${iconOnly ? '' : ' min-w-[8.75rem]'} hover:-translate-y-0.5 ${extraClasses}">
+                    <button onclick="${onClick}" aria-label="${safeLabel}" title="${safeLabel}" class="${getAppButtonClasses(variant, { size: 'md', iconOnly })}${iconOnly ? '' : ' min-w-[8.75rem]'} ${extraClasses}">
                         <i data-lucide="${iconName}" class="h-5 w-5"></i>${iconOnly ? '' : `<span class="text-[11px] font-bold uppercase tracking-[0.16em]">${safeLabel}</span>`}
                     </button>
                 </div>
@@ -9913,7 +10042,7 @@
             const familySummaryText = t.familySummary(activeFamilyCount, archivedFamilyCount);
 
             contentDiv.innerHTML = `
-                <div class="max-w-4xl mx-auto space-y-6">
+                <div class="profile-sheet max-w-4xl mx-auto space-y-6">
                     <div class="bg-white rounded-sm shadow-sm border border-parchmentDark overflow-hidden">
                         <div class="profile-banner" style="background-image: url('${bannerBg}')"></div>
                         <div class="profile-identity">
@@ -12135,7 +12264,7 @@
             </div>`).join('');
 
             let html = showNotebookOverviewCard ? `
-                <div class="${isNotebookMode ? 'mb-3 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg' : 'index-overview mb-8 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg'}">
+                <div class="screen-sheet ${isNotebookMode ? 'mb-3 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg' : 'index-overview mb-8 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg'}">
                     <div class="index-overview-head border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment ${isNotebookMode ? 'px-4 py-3 md:px-5 md:py-3' : 'px-5 py-5'}">
                         <div class="${isNotebookMode ? 'flex flex-wrap items-center justify-between gap-3' : 'flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'}">
                             <div>
@@ -12150,21 +12279,21 @@
                                     <p class="index-overview-count mt-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-sage opacity-80">
                                         <i data-lucide="book-copy" class="h-4 w-4"></i>${resultLabel}
                                     </p>
-                                    <div class="index-plan-note mt-4 rounded-2xl border border-parchmentDark bg-white/90 px-4 py-3 shadow-sm max-w-xl">
+                                    <div class="index-plan-note quiet-panel mt-4 rounded-2xl border border-parchmentDark bg-white/90 px-4 py-3 shadow-sm max-w-xl">
                                         <p class="index-plan-kicker text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${premiumActive ? billingMeta.badge : `Free plan: ${localRecipeCount}/${freeLocalRecipeLimit} local recipes used`}</p>
                                         <p class="index-plan-detail mt-1 text-sm font-semibold leading-relaxed text-forest">${premiumActive ? billingMeta.summary : `${freeRecipeSlotsRemaining} free slot${freeRecipeSlotsRemaining === 1 ? '' : 's'} left on this device. Premium unlocks notebook mode, sharing, downloads, cloud sync, and families.`}</p>
                                     </div>
                                 `}
                             </div>
-                            <div class="flex flex-wrap items-center justify-end gap-2">
-                                <div class="inline-flex rounded-xl border border-parchmentDark bg-white p-1 shadow-sm">
-                                    <button onclick="setIndexViewMode('cards')" class="inline-flex h-9 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'cards' ? 'bg-forest text-white shadow-sm' : 'text-sage hover:text-forest'}" title="Cards view">
+                            <div class="index-toolbar">
+                                <div class="inline-flex h-11 items-center rounded-xl border border-parchmentDark bg-white p-0.5">
+                                    <button onclick="setIndexViewMode('cards')" class="inline-flex h-10 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'cards' ? 'bg-forest text-white' : 'text-sage hover:text-forest'}" title="Cards view">
                                         <i data-lucide="layout-grid" class="h-4 w-4"></i>
                                     </button>
-                                    <button onclick="setIndexViewMode('list')" class="inline-flex h-9 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'list' ? 'bg-forest text-white shadow-sm' : 'text-sage hover:text-forest'}" title="List view">
+                                    <button onclick="setIndexViewMode('list')" class="inline-flex h-10 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'list' ? 'bg-forest text-white' : 'text-sage hover:text-forest'}" title="List view">
                                         <i data-lucide="list" class="h-4 w-4"></i>
                                     </button>
-                                    <button onclick="setIndexViewMode('book')" class="inline-flex h-9 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'book' ? 'bg-forest text-white shadow-sm' : 'text-sage hover:text-forest'}" title="${notebookModeLocked ? 'Premium notebook mode' : 'Notebook view'}">
+                                    <button onclick="setIndexViewMode('book')" class="inline-flex h-10 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'book' ? 'bg-forest text-white' : 'text-sage hover:text-forest'}" title="${notebookModeLocked ? 'Premium notebook mode' : 'Notebook view'}">
                                         <i data-lucide="${notebookModeLocked ? 'crown' : 'book-open'}" class="h-4 w-4 ${notebookModeLocked ? 'text-gold' : ''}"></i>
                                     </button>
                                 </div>
@@ -12334,7 +12463,7 @@
                     const recipeVersionLabel = getPublishedVersionLabel(recipe);
                     const familyChipMarkup = getRecipeFamilyChipMarkup(recipe, 'inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em]');
                     html += `
-                        <div onclick="renderDetail(${recipe.id})" class="relative h-[120px] bg-[#fbf8f3] rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex items-stretch">
+                        <div onclick="renderDetail(${recipe.id})" class="recipe-tile relative h-[120px] bg-[#fbf8f3] rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex items-stretch">
                             ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-gold bg-white text-gold shadow-md transition-all hover:scale-105 hover:text-forest"><i data-lucide="alert-circle" class="h-5 w-5"></i></button>` : ''}
                             <div class="h-full w-24 sm:w-32 bg-cover bg-center flex-shrink-0" style="background-image: url('${recipe.profile || defaultPlaceholderProfile}')"></div>
                             <div class="flex-1 flex flex-col justify-center p-4 min-w-0 pr-16">
@@ -12363,7 +12492,7 @@
                     const recipeSourceLabel = getRecipeCardSourceLabel(recipe);
                     const familyChipMarkup = getRecipeFamilyChipMarkup(recipe, 'inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em]');
                     html += `
-                        <div onclick="renderDetail(${recipe.id})" class="relative h-[24rem] bg-[#fbf8f3] rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex flex-col">
+                        <div onclick="renderDetail(${recipe.id})" class="recipe-tile relative h-[24rem] bg-[#fbf8f3] rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden flex flex-col">
                             ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-gold bg-white text-gold shadow-md transition-all hover:scale-105 hover:text-forest"><i data-lucide="alert-circle" class="h-5 w-5"></i></button>` : ''}
                             <div class="w-full h-48 bg-cover bg-center" style="background-image: url('${recipe.profile || defaultPlaceholderProfile}')"></div>
                             <div class="flex flex-1 flex-col p-5">
@@ -12462,14 +12591,14 @@
                 `;
 
             contentDiv.innerHTML = `
-                <div class="mx-auto mb-8 max-w-6xl overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg">
+                <div class="screen-sheet shop-sheet mx-auto mb-8 max-w-6xl overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg">
                     <div class="border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment px-5 py-5">
                         <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                             <div class="flex flex-wrap items-center gap-3">
                                 <h2 class="font-fantasy text-3xl font-bold text-forest">Shopping list</h2>
                                 ${shoppingList.collaborators.length > 0 ? `<span class="inline-flex items-center rounded-full border border-parchmentDark bg-parchment px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-forest">${shoppingList.collaborators.length} ${shoppingList.collaborators.length === 1 ? 'partner' : 'partners'}</span>` : ''}
                             </div>
-                            <div class="flex flex-wrap items-center gap-2">
+                            <div class="action-row">
                                 <button type="button" onclick="showShoppingListCollaboratorModal()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
                                     <i data-lucide="user-plus" class="h-4 w-4 text-gold"></i>Add partner
                                 </button>
@@ -12483,15 +12612,15 @@
                     <div class="space-y-4 p-4 md:space-y-5 md:p-5">
                         ${collaboratorsMarkup ? `<div class="flex flex-wrap gap-3">${collaboratorsMarkup}</div>` : ''}
 
-                        <div class="rounded-2xl border border-parchmentDark bg-parchment p-4 shadow-sm md:p-5">
+                        <div class="quiet-panel rounded-2xl border border-parchmentDark bg-parchment p-4 shadow-sm md:p-5">
                             <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Quick add</p>
                             <div class="mt-3 md:mt-4">
                                 <div class="relative flex items-center bg-white rounded-xl shadow-sm border border-parchmentDark">
-                                    <input id="shopping-list-custom-name" type="text" class="w-full bg-transparent border-none outline-none px-5 h-14 text-base font-semibold text-forest placeholder-sage placeholder-opacity-60" placeholder="e.g. Sparkling water" />
-                                    <button type="button" onclick="const noteInput = document.getElementById('shopping-list-custom-note'); noteInput.classList.toggle('hidden'); if (!noteInput.classList.contains('hidden')) noteInput.focus();" class="flex-shrink-0 mr-1 flex h-12 w-12 items-center justify-center rounded-xl border border-parchmentDark bg-white text-sage shadow-sm transition-all hover:-translate-y-0.5 hover:border-gold hover:text-gold" title="Add note">
+                                    <input id="shopping-list-custom-name" type="text" class="w-full bg-transparent border-none outline-none px-4 h-11 text-base font-semibold text-forest placeholder-sage placeholder-opacity-60" placeholder="e.g. Sparkling water" />
+                                    <button type="button" onclick="const noteInput = document.getElementById('shopping-list-custom-note'); noteInput.classList.toggle('hidden'); if (!noteInput.classList.contains('hidden')) noteInput.focus();" class="flex-shrink-0 mr-1 flex h-11 w-11 items-center justify-center rounded-xl border border-parchmentDark bg-white text-sage hover:border-gold hover:text-gold" title="Add note">
                                         <i data-lucide="file-text" class="h-4 w-4"></i>
                                     </button>
-                                    <button type="button" onclick="addCustomShoppingListItem()" class="flex-shrink-0 ml-1 mr-1 flex h-12 w-12 items-center justify-center rounded-xl border border-[#111111] bg-[#111111] text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#232323]" title="Add item">
+                                    <button type="button" onclick="addCustomShoppingListItem()" class="flex-shrink-0 ml-1 mr-1 flex h-11 w-11 items-center justify-center rounded-xl border border-[#111111] bg-[#111111] text-white hover:bg-[#232323]" title="Add item">
                                         <i data-lucide="plus" class="h-6 w-6"></i>
                                     </button>
                                 </div>
@@ -12743,7 +12872,7 @@
             });
 
             let html = `
-                <div class="mb-8 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg">
+                <div class="screen-sheet mb-8 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg">
                     <div class="border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment px-5 py-5">
                         <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                             <div>
@@ -14010,15 +14139,15 @@
                 : (nextUnfinishedStepIndex === -1
                     ? `All ${instructionCount} steps are checked off. You can re-read from step 1 or uncheck a step to continue.`
                     : `${remainingStepCount} step${remainingStepCount === 1 ? '' : 's'} left. Next up: ${escapeHTML(nextStepPreview)}`);
-            const primarySupportActionClass = getAppButtonClasses('secondary', { size: 'lg' });
+            const primarySupportActionClass = getAppButtonClasses('secondary', { size: 'md' });
             const primarySupportAction = canEditExistingRecipe
                 ? `<button onclick="renderAddForm(${recipe.id})" class="${primarySupportActionClass}" translate="no"><i data-lucide="pencil-line" class="h-4 w-4 text-gold"></i>Edit recipe</button>`
                 : `<button onclick="renderPublishedRecipeDetail('${recipe.publishedId}')" class="${primarySupportActionClass}"><i data-lucide="external-link" class="h-4 w-4 text-gold"></i>${savedRecipeIsOutdated ? 'Open latest' : 'Browse original'}</button>`;
             const publishDetailVariant = !isSavedCommunityRecipe && recipe.publishedId ? 'accent' : 'secondary';
             const detailActionButtonsMarkup = `
-                <div class="flex flex-wrap items-center gap-2 xl:justify-end">
+                <div class="detail-actions action-row">
                     ${savedRecipeIsOutdated ? renderDetailIconAction('Update warning', 'alert-circle', `toggleSavedRecipeUpdateNotice(${recipe.id})`, 'warning', '', true) : ''}
-                    <button onclick="toggleCookingMode(${recipe.id})" class="detail-cook-toggle-btn inline-flex h-11 items-center justify-center gap-2 rounded-lg transition-all bg-gold text-white font-bold text-xs uppercase tracking-wider px-4 shadow-sm hover:bg-opacity-90">
+                    <button onclick="toggleCookingMode(${recipe.id})" class="detail-cook-toggle-btn inline-flex h-11 items-center justify-center gap-2 rounded-xl transition-all bg-gold text-white font-bold text-xs uppercase tracking-wider px-4 hover:bg-opacity-90">
                         <i id="focus-btn-icon" data-lucide="${isCookingMode ? 'x-circle' : 'chef-hat'}" class="h-4 w-4"></i>
                         <span id="focus-btn-text">${isCookingMode ? 'Exit Cooking' : 'Cook Mode'}</span>
                     </button>
