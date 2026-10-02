@@ -6,7 +6,7 @@
     <title>Uculi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Outfit:wght@400;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
         <!-- Firebase -->
         <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js" defer></script>
@@ -2521,6 +2521,87 @@
             transform: rotate(16deg);
         }
 
+        .cover-face-copy[data-cover-font="fraunces"] {
+            font-family: Fraunces, serif;
+        }
+
+        .cover-face-copy[data-cover-font="cormorant"] {
+            font-family: "Cormorant Garamond", Georgia, serif;
+        }
+
+        .cover-face-copy[data-cover-font="baskerville"] {
+            font-family: "Libre Baskerville", Baskerville, serif;
+        }
+
+        .cover-face-copy[data-cover-font="playfair"] {
+            font-family: "Playfair Display", Georgia, serif;
+        }
+
+        .cover-face-copy h3.cover-face-title {
+            font-size: calc(3rem * var(--title-scale, 1));
+            line-height: 0.95;
+        }
+
+        #cover-editor-preview-surface .cover-face-copy h3.cover-face-title {
+            font-size: calc(1.15rem * var(--title-scale, 1));
+        }
+
+        #cover-editor-preview-surface .cover-emblem-anchor {
+            width: min(30%, 4.75rem);
+        }
+
+        .cover-emblem-anchor {
+            position: absolute;
+            z-index: 5;
+            width: min(34%, 7.25rem);
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            color: var(--cover-ink, currentColor);
+        }
+
+        .cover-emblem-anchor svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .cover-emblem-anchor.has-shadow {
+            filter: drop-shadow(0 3px 2px rgba(28, 20, 16, 0.45));
+        }
+
+        .cover-emblem-choice,
+        .cover-look-choice {
+            min-height: 2.75rem;
+            border-radius: 0.85rem;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            background: #fff;
+            color: #1c1410;
+            padding: 0.35rem 0.4rem;
+        }
+
+        .cover-emblem-choice {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+        }
+
+        .cover-emblem-choice svg {
+            width: 1.35rem;
+            height: 1.35rem;
+        }
+
+        .cover-emblem-choice.is-active,
+        .cover-look-choice.is-active {
+            border-color: #c89050;
+            box-shadow: 0 0 0 1px #c89050;
+        }
+
         .cover-editor-preview-sticker {
             cursor: grab;
             touch-action: none;
@@ -2554,6 +2635,14 @@
         }
 
         @media (min-width: 768px) {
+            .cover-face-copy h3.cover-face-title {
+                font-size: calc(3.75rem * var(--title-scale, 1));
+            }
+
+            #cover-editor-preview-surface .cover-face-copy h3.cover-face-title {
+                font-size: calc(1.7rem * var(--title-scale, 1));
+            }
+
             .notebook-paper h3 {
                 font-size: 2rem;
             }
@@ -4672,8 +4761,22 @@
                 title: '',
                 subtitle: '',
                 spineLabel: '',
-                stickers: []
+                stickers: [],
+                emblem: '',
+                emblemColor: 'default',
+                emblemWeight: 'normal',
+                emblemShadow: false,
+                emblemShift: 0,
+                emblemShiftY: 0,
+                titleScale: 1,
+                titleFont: 'fraunces'
             };
+        }
+
+        function clampNotebookCoverNumber(value, min, max, fallback) {
+            const number = Number(value);
+            if (!Number.isFinite(number)) return fallback;
+            return Math.max(min, Math.min(max, number));
         }
 
         function normalizeNotebookCover(cover) {
@@ -4681,7 +4784,19 @@
             const nextCover = { ...base, ...(cover || {}) };
             const normalizedSpineLabel = String(cover?.spineLabel ?? '').trim();
             const incomingStickers = Array.isArray(cover?.stickers) ? cover.stickers.slice(0, 6) : [];
+            const emblemIds = ['', 'pot', 'whisk', 'leaf', 'spoon', 'carrot', 'egg', 'wheat', 'apple'];
+            const emblemColors = ['default', 'black', 'white', 'bronze', 'silver', 'gold'];
+            const emblemWeights = ['fine', 'normal', 'bold'];
+            const titleFonts = ['fraunces', 'cormorant', 'baskerville', 'playfair'];
             nextCover.spineLabel = normalizedSpineLabel === 'Uculi' ? '' : normalizedSpineLabel;
+            nextCover.emblem = emblemIds.includes(cover?.emblem) ? cover.emblem : '';
+            nextCover.emblemColor = emblemColors.includes(cover?.emblemColor) ? cover.emblemColor : 'default';
+            nextCover.emblemWeight = emblemWeights.includes(cover?.emblemWeight) ? cover.emblemWeight : 'normal';
+            nextCover.emblemShadow = cover?.emblemShadow === true;
+            nextCover.emblemShift = clampNotebookCoverNumber(cover?.emblemShift, -8, 12, 0);
+            nextCover.emblemShiftY = clampNotebookCoverNumber(cover?.emblemShiftY, -10, 10, 0);
+            nextCover.titleScale = clampNotebookCoverNumber(cover?.titleScale, 0.8, 1.4, 1);
+            nextCover.titleFont = titleFonts.includes(cover?.titleFont) ? cover.titleFont : 'fraunces';
             nextCover.stickers = incomingStickers.map((sticker, index) => ({
                 ...getDefaultNotebookCoverSticker(index),
                 ...(sticker || {}),
@@ -5130,11 +5245,51 @@
             }).join('');
         }
 
+        function getNotebookCoverEmblemPaths(emblem) {
+            const paths = {
+                pot: '<path d="M5 10h14"/><path d="M7 10v5.5A3.5 3.5 0 0 0 10.5 19h3A3.5 3.5 0 0 0 17 15.5V10"/><path d="M9 10V8.5"/><path d="M15 10V8.5"/><path d="M9.5 6.5c.4-1.4 1.3-2 2.5-2s2.1.6 2.5 2"/>',
+                whisk: '<path d="M12 13.5V21"/><path d="M12 3v6"/><path d="M8 4c1.6 2.2 2.2 4.4 2.6 6.5"/><path d="M16 4c-1.6 2.2-2.2 4.4-2.6 6.5"/><path d="M6.5 7.5c2 1 4 1.4 5.5 1.4s3.5-.4 5.5-1.4"/><path d="M7.5 11c1.6.7 3 .9 4.5.9s2.9-.2 4.5-.9"/>',
+                leaf: '<path d="M5 19C6 11 11 5 20 4 18 13 13 19 5 19z"/><path d="M9 15c1.6-1.8 3.4-4 6.2-6.4"/>',
+                spoon: '<path d="M12 11.5V21"/><ellipse cx="12" cy="7.2" rx="3.1" ry="4"/>',
+                carrot: '<path d="M12 8.2c1.6 2.4 2.6 5.6 2.2 10.8-1.6-.8-3.2-.8-4.8 0C9.2 14 10.2 10.6 12 8.2z"/><path d="M12 8.2C11.2 6.2 11.6 4.4 13 3.4"/><path d="M12 8.2c.8-1.8 2.4-2.8 4.2-2.6"/>',
+                egg: '<path d="M12 20.5c3.6 0 5.6-3.2 5.6-7.2C17.6 8.2 15.4 4.5 12 4.5S6.4 8.2 6.4 13.3c0 4 2 7.2 5.6 7.2z"/>',
+                wheat: '<path d="M12 21V9"/><path d="M12 16c-2.6-.8-3.8-2.4-3.8-4.2 2 0 3 1 3.8 2.2"/><path d="M12 16c2.6-.8 3.8-2.4 3.8-4.2-2 0-3 1-3.8 2.2"/><path d="M12 12.2c-2.2-.6-3.2-1.8-3.2-3.4 1.6.1 2.6.8 3.2 1.8"/><path d="M12 12.2c2.2-.6 3.2-1.8 3.2-3.4-1.6.1-2.6.8-3.2 1.8"/>',
+                apple: '<path d="M12 8.2c-2.8.2-5.2 2.4-5.2 5.6 0 3.2 2.2 5.7 5.2 5.7s5.2-2.5 5.2-5.7c0-3.2-2.4-5.4-5.2-5.6z"/><path d="M12 8.2c.2-1.8 1.2-3.2 2.8-3.7"/><path d="M13.2 5.2c1.2.2 2.2-.2 3.2-1"/>'
+            };
+            return paths[emblem] || '';
+        }
+
+        function getNotebookCoverEmblemStroke(weight) {
+            if (weight === 'fine') return 1.15;
+            if (weight === 'bold') return 2.45;
+            return 1.7;
+        }
+
+        function getNotebookCoverEmblemInk(color) {
+            const inks = {
+                black: '#1c1410',
+                white: '#fbf8f3',
+                bronze: '#8d5a32',
+                silver: '#8e8e8e',
+                gold: '#c89050'
+            };
+            return inks[color] || '';
+        }
+
+        function renderNotebookCoverEmblemSvg(emblem, strokeWidth) {
+            const paths = getNotebookCoverEmblemPaths(emblem);
+            if (!paths) return '';
+            return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
+        }
+
         function renderNotebookCoverFace(cover, previewRecipe, totalPages, isEditorPreview = false) {
             const safeCover = normalizeNotebookCover(cover);
             const title = escapeHTML((safeCover.title || '').trim());
             const subtitle = escapeHTML((safeCover.subtitle || '').trim());
             const spineLabel = escapeHTML((safeCover.spineLabel || '').trim());
+            const emblemSvg = renderNotebookCoverEmblemSvg(safeCover.emblem, getNotebookCoverEmblemStroke(safeCover.emblemWeight));
+            const emblemInk = getNotebookCoverEmblemInk(safeCover.emblemColor);
+            const emblemStyle = `left:${50 + safeCover.emblemShift}%;top:${46 + safeCover.emblemShiftY}%;${emblemInk ? `color:${emblemInk};` : ''}`;
 
             return `
                 <div class="ml-10 relative h-full md:ml-12">
@@ -5146,9 +5301,11 @@
                         ` : ''}
                     </div>
 
-                    <div class="relative z-0 pr-16 pt-6">
+                    ${emblemSvg ? `<div class="cover-emblem-anchor${safeCover.emblemShadow ? ' has-shadow' : ''}" data-cover-emblem="${safeCover.emblem}" data-emblem-shift="${safeCover.emblemShift}" data-emblem-shift-y="${safeCover.emblemShiftY}" style="${emblemStyle}">${emblemSvg}</div>` : ''}
+
+                    <div class="cover-face-copy relative z-[6] pr-16 pt-6" data-cover-font="${safeCover.titleFont}" style="--title-scale:${safeCover.titleScale};">
                         ${spineLabel ? `<div class="notebook-cover-plate inline-flex items-center rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-[0.3em] shadow-sm">${spineLabel}</div>` : ''}
-                        ${title ? `<h3 class="${spineLabel ? 'mt-8' : 'mt-4'} max-w-xl font-fantasy text-5xl font-bold leading-[0.95] md:text-6xl">${title}</h3>` : ''}
+                        ${title ? `<h3 class="cover-face-title ${spineLabel ? 'mt-8' : 'mt-4'} max-w-xl font-bold">${title}</h3>` : ''}
                         ${subtitle ? `<p class="mt-5 max-w-lg text-sm font-semibold opacity-85 md:text-base">${subtitle}</p>` : ''}
                     </div>
 
@@ -5197,6 +5354,139 @@
             if (!draftNotebookCover) return;
             draftNotebookCover.palette = palette;
             renderCoverEditor();
+        }
+
+        function setDraftCoverLook(field, value) {
+            if (!draftNotebookCover) return;
+            if (field === 'emblemShadow') {
+                draftNotebookCover.emblemShadow = value === true || value === 'true';
+            } else if (field === 'emblemShift' || field === 'emblemShiftY' || field === 'titleScale') {
+                draftNotebookCover[field] = Number(value);
+            } else {
+                draftNotebookCover[field] = value;
+            }
+            draftNotebookCover = normalizeNotebookCover(draftNotebookCover);
+            const readout = document.querySelector(`[data-cover-readout="${field}"]`);
+            if (readout) {
+                readout.textContent = field === 'titleScale'
+                    ? Number(draftNotebookCover.titleScale).toFixed(2)
+                    : String(draftNotebookCover[field]);
+            }
+            refreshCoverEditorPreview();
+        }
+
+        function setDraftCoverChoice(field, value) {
+            setDraftCoverLook(field, value);
+            renderCoverEditor();
+        }
+
+        function renderCoverLookControls() {
+            const cover = draftNotebookCover;
+            const emblems = [
+                { key: '', label: 'Geen' },
+                { key: 'pot', label: 'Pot' },
+                { key: 'whisk', label: 'Klopper' },
+                { key: 'leaf', label: 'Blad' },
+                { key: 'spoon', label: 'Lepel' },
+                { key: 'carrot', label: 'Wortel' },
+                { key: 'egg', label: 'Ei' },
+                { key: 'wheat', label: 'Koren' },
+                { key: 'apple', label: 'Appel' }
+            ];
+            const colors = [
+                { key: 'default', label: 'Standaard', swatch: 'linear-gradient(135deg, #1c1410, #fbf8f3)' },
+                { key: 'black', label: 'Zwart', swatch: '#1c1410' },
+                { key: 'white', label: 'Wit', swatch: '#fbf8f3' },
+                { key: 'bronze', label: 'Brons', swatch: '#8d5a32' },
+                { key: 'silver', label: 'Zilver', swatch: '#c5c5c5' },
+                { key: 'gold', label: 'Goud', swatch: '#c89050' }
+            ];
+            const weights = [
+                { key: 'fine', label: 'Fijn' },
+                { key: 'normal', label: 'Normaal' },
+                { key: 'bold', label: 'Fors' }
+            ];
+            const fonts = [
+                { key: 'fraunces', label: 'Fraunces' },
+                { key: 'cormorant', label: 'Cormorant' },
+                { key: 'baskerville', label: 'Baskerville' },
+                { key: 'playfair', label: 'Playfair' }
+            ];
+
+            return `
+                <div>
+                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2" for="cover-title-font">Lettertype</label>
+                    <select id="cover-title-font" onchange="setDraftCoverChoice('titleFont', this.value)" class="${inputClass}">
+                        ${fonts.map(font => `<option value="${font.key}" ${cover.titleFont === font.key ? 'selected' : ''}>${font.label}</option>`).join('')}
+                    </select>
+                    <p class="mt-1 text-[10px] font-semibold text-sage">Titel, rug en ondertitel gebruiken hetzelfde lettertype.</p>
+                </div>
+                <div class="rounded-xl border border-parchmentDark bg-white p-4">
+                    <div class="flex items-center justify-between gap-3 mb-2">
+                        <p class="text-xs font-bold uppercase tracking-[0.22em] text-sage">Middenembleem</p>
+                    </div>
+                    <p class="mb-3 text-[11px] font-semibold text-sage">Kies één teken voor het midden van de kaft.</p>
+                    <div class="grid grid-cols-3 gap-2 sm:grid-cols-5">
+                        ${emblems.map(option => `
+                            <button type="button" onclick="setDraftCoverChoice('emblem', '${option.key}')" class="cover-emblem-choice ${cover.emblem === option.key ? 'is-active' : ''}" aria-label="${option.label}" aria-pressed="${cover.emblem === option.key ? 'true' : 'false'}">
+                                ${option.key ? renderNotebookCoverEmblemSvg(option.key, 1.6) : '<span class="text-sm font-bold leading-none">—</span>'}
+                                <span class="text-[10px] font-bold uppercase tracking-[0.12em] text-sage">${option.label}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sage mb-2">Kleur</p>
+                        <div class="grid grid-cols-3 gap-2 sm:grid-cols-6">
+                            ${colors.map(option => `
+                                <button type="button" onclick="setDraftCoverChoice('emblemColor', '${option.key}')" class="cover-look-choice ${cover.emblemColor === option.key ? 'is-active' : ''}" aria-label="${option.label}" aria-pressed="${cover.emblemColor === option.key ? 'true' : 'false'}">
+                                    <span class="mx-auto block h-4 w-8 rounded-full border border-parchmentDark" style="background:${option.swatch};"></span>
+                                    <span class="mt-1 block text-[10px] font-bold uppercase tracking-[0.08em] text-sage">${option.label}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sage mb-2">Lijn</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                ${weights.map(option => `
+                                    <button type="button" onclick="setDraftCoverChoice('emblemWeight', '${option.key}')" class="cover-look-choice ${cover.emblemWeight === option.key ? 'is-active' : ''}" aria-label="${option.label}" aria-pressed="${cover.emblemWeight === option.key ? 'true' : 'false'}">${option.label}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sage mb-2">Schaduw</p>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" onclick="setDraftCoverChoice('emblemShadow', false)" class="cover-look-choice ${cover.emblemShadow ? '' : 'is-active'}" aria-pressed="${cover.emblemShadow ? 'false' : 'true'}">Uit</button>
+                                <button type="button" onclick="setDraftCoverChoice('emblemShadow', true)" class="cover-look-choice ${cover.emblemShadow ? 'is-active' : ''}" aria-pressed="${cover.emblemShadow ? 'true' : 'false'}">Aan</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <div class="mb-1 flex items-center justify-between gap-3">
+                                <label class="text-[11px] font-bold uppercase tracking-[0.18em] text-sage" for="cover-emblem-shift">Horizontaal</label>
+                                <span class="text-[11px] font-bold text-forest">H <span data-cover-readout="emblemShift">${cover.emblemShift}</span></span>
+                            </div>
+                            <input id="cover-emblem-shift" type="range" min="-8" max="12" step="1" value="${cover.emblemShift}" oninput="setDraftCoverLook('emblemShift', this.value)" class="w-full accent-[#c89050]">
+                        </div>
+                        <div>
+                            <div class="mb-1 flex items-center justify-between gap-3">
+                                <label class="text-[11px] font-bold uppercase tracking-[0.18em] text-sage" for="cover-emblem-shift-y">Verticaal</label>
+                                <span class="text-[11px] font-bold text-forest">V <span data-cover-readout="emblemShiftY">${cover.emblemShiftY}</span></span>
+                            </div>
+                            <input id="cover-emblem-shift-y" type="range" min="-10" max="10" step="1" value="${cover.emblemShiftY}" oninput="setDraftCoverLook('emblemShiftY', this.value)" class="w-full accent-[#c89050]">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <div class="mb-1 flex items-center justify-between gap-3">
+                                <label class="text-[11px] font-bold uppercase tracking-[0.18em] text-sage" for="cover-title-scale">Titelgrootte</label>
+                                <span class="text-[11px] font-bold text-forest" data-cover-readout="titleScale">${Number(cover.titleScale).toFixed(2)}</span>
+                            </div>
+                            <input id="cover-title-scale" type="range" min="0.8" max="1.4" step="0.05" value="${Number(cover.titleScale).toFixed(2)}" oninput="setDraftCoverLook('titleScale', this.value)" class="w-full accent-[#c89050]">
+                        </div>
+                    </div>
+                </div>
+            `;
         }
 
         function addDraftCoverSticker() {
@@ -5317,6 +5607,9 @@
                             <div class="md:col-span-2">
                                 <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Subtitle</label>
                                 <textarea id="cover-field-subtitle" oninput="setDraftCoverField('subtitle', this.value)" class="${textareaClass}" placeholder="Add a personal line on the cover...">${escapeHTML(draftNotebookCover.subtitle || '')}</textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                ${renderCoverLookControls()}
                             </div>
                         </div>
 
