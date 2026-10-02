@@ -2537,6 +2537,28 @@
             font-family: "Playfair Display", Georgia, serif;
         }
 
+        .notebook-cover-panel .cover-face-copy {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        .notebook-cover-panel .cover-face-title,
+        .notebook-cover-panel .cover-face-copy > p,
+        .notebook-cover-panel .notebook-cover-plate {
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
+            overflow-wrap: anywhere;
+        }
+
+        .notebook-cover-panel .cover-face-title,
+        .notebook-cover-panel .cover-face-copy > p {
+            display: block;
+            width: 100%;
+        }
+
         .cover-face-copy h3.cover-face-title {
             font-size: calc(3rem * var(--title-scale, 1));
             line-height: 0.95;
@@ -2665,6 +2687,20 @@
                 line-height: 28px;
                 font-size: 0.82rem;
                 padding-top: 0;
+            }
+
+            .notebook-landing-hero,
+            .notebook-landing-stack,
+            .notebook-landing-cover-column,
+            .notebook-landing-cover-frame,
+            .notebook-cover-panel,
+            .notebook-cover-panel .cover-face-copy {
+                min-width: 0;
+                max-width: 100%;
+            }
+
+            .notebook-cover-panel .cover-face-copy {
+                padding-right: 0.55rem;
             }
 
             .notebook-landing-cover-frame {
@@ -5316,6 +5352,81 @@
             `;
         }
 
+        function fitCoverTextToBox(el) {
+            if (!(el instanceof HTMLElement)) return;
+            const copy = el.closest('.cover-face-copy');
+            const limit = copy?.clientWidth || el.clientWidth;
+            if (limit < 20) return;
+            el.style.fontSize = '';
+            el.style.whiteSpace = 'nowrap';
+            el.style.overflowWrap = 'normal';
+            const computed = parseFloat(getComputedStyle(el).fontSize) || 16;
+            const inPreview = Boolean(el.closest('#cover-editor-preview-surface'));
+            const min = inPreview ? 13 : 18;
+            let size = computed;
+            let guard = 0;
+            while (el.scrollWidth > limit + 1 && size > min && guard < 80) {
+                size = Math.max(min, size - 1);
+                el.style.fontSize = `${size}px`;
+                guard += 1;
+            }
+            el.style.whiteSpace = 'normal';
+            el.style.overflowWrap = 'break-word';
+            if (el.scrollWidth > limit + 1) {
+                el.style.overflowWrap = 'anywhere';
+            }
+        }
+
+        function fitCoverPlate(plate) {
+            if (!(plate instanceof HTMLElement)) return;
+            const limit = plate.parentElement?.clientWidth || plate.clientWidth;
+            if (limit < 20) return;
+            plate.style.fontSize = '';
+            plate.style.letterSpacing = '';
+            plate.style.maxWidth = '100%';
+            plate.style.whiteSpace = 'nowrap';
+            plate.style.overflowWrap = 'normal';
+            const computed = parseFloat(getComputedStyle(plate).fontSize) || 10;
+            let size = computed;
+            let guard = 0;
+            while (plate.scrollWidth > limit + 1 && size > 8 && guard < 30) {
+                size = Math.max(8, size - 0.5);
+                plate.style.fontSize = `${size}px`;
+                guard += 1;
+            }
+            if (plate.scrollWidth > limit + 1) {
+                plate.style.letterSpacing = '0.06em';
+            }
+            plate.style.whiteSpace = 'normal';
+            plate.style.overflowWrap = plate.scrollWidth > limit + 1 ? 'anywhere' : 'break-word';
+        }
+
+        function fitNotebookCoverText(root) {
+            const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+            scope.querySelectorAll('.cover-face-copy').forEach(copy => {
+                if (!(copy instanceof HTMLElement) || !copy.isConnected) return;
+                fitCoverTextToBox(copy.querySelector('.cover-face-title'));
+                fitCoverTextToBox(copy.querySelector(':scope > p'));
+                fitCoverPlate(copy.querySelector('.notebook-cover-plate'));
+            });
+        }
+
+        function scheduleNotebookCoverTextFit(root) {
+            const scope = root || document;
+            const run = () => fitNotebookCoverText(scope);
+            run();
+            requestAnimationFrame(() => {
+                run();
+                const families = new Set();
+                scope.querySelectorAll?.('.cover-face-copy')?.forEach(copy => {
+                    const family = getComputedStyle(copy).fontFamily.split(',')[0].replaceAll('"', '').trim();
+                    if (family) families.add(family);
+                });
+                const loads = [...families].map(family => document.fonts?.load?.(`700 16px "${family}"`)?.catch(() => undefined));
+                Promise.all(loads).then(() => requestAnimationFrame(run));
+            });
+        }
+
         function openCoverEditor() { if(!hasPremiumAccess()) { showPremiumModal("customize notebook covers"); return; }
             closeCompetingSheets();
             draftNotebookCover = JSON.parse(JSON.stringify(normalizeNotebookCover(userSettings.notebookCover)));
@@ -5348,6 +5459,7 @@
             preview.setAttribute('style', getNotebookCoverPanelStyle(draftNotebookCover));
             preview.innerHTML = renderNotebookCoverFace(draftNotebookCover, previewRecipe, totalPages, true);
             attachCoverEditorInteractions();
+            scheduleNotebookCoverTextFit(preview);
         }
 
         function setDraftCoverPalette(palette) {
@@ -5708,6 +5820,7 @@
 
             lucide.createIcons();
             attachCoverEditorInteractions();
+            scheduleNotebookCoverTextFit(document.getElementById('cover-editor-body'));
         }
 
         function focusNotebookStickyNoteEditor(recipeId, noteIndex) {
@@ -13377,6 +13490,7 @@
             if (indexViewMode === 'book' && filteredRecipes.length > 0) {
                 attachNotebookInteractions();
                 requestAnimationFrame(syncNotebookViewportHeight);
+                scheduleNotebookCoverTextFit(contentDiv);
             }
             notebookPageTurnDirection = 0;
         }
