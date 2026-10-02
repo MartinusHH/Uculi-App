@@ -79,7 +79,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 1rem;
-            padding: 1rem 1.5rem;
+            padding: calc(1rem + env(safe-area-inset-top, 0px)) 1.5rem 1rem;
             background: rgba(251, 248, 243, 0.85); /* parchment but slightly transparent */
             border-bottom: 1px solid rgba(144, 152, 112, 0.28);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
@@ -272,7 +272,7 @@
 
         @media (min-width: 768px) {
             #main-header {
-                padding: 1.1rem 1.6rem;
+                padding: calc(1.1rem + env(safe-area-inset-top, 0px)) 1.6rem 1.1rem;
             }
 
             .app-nav-inner {
@@ -377,7 +377,7 @@
 
             #main-header {
                 gap: 0.7rem;
-                padding: 0.75rem 0.85rem;
+                padding: calc(0.75rem + env(safe-area-inset-top, 0px)) 0.85rem 0.75rem;
             }
 
             #main-header > button {
@@ -1712,6 +1712,147 @@
             display: block;
             padding-top: 2px;
             line-height: 34px;
+        }
+
+        /* Receptfoto, terugknop en titel blijven aparte lagen. De foto zakt niet over de tekst. */
+        .detail-back-row {
+            position: relative;
+            z-index: 3;
+        }
+
+        .detail-hero-shell {
+            position: relative;
+            overflow: hidden;
+            background: #1c1410;
+        }
+
+        .detail-hero-wash,
+        .detail-hero-wash-image,
+        .detail-hero-wash::after {
+            position: absolute;
+            inset: 0;
+        }
+
+        .detail-hero-wash {
+            overflow: hidden;
+            border-radius: inherit;
+            pointer-events: none;
+        }
+
+        .detail-hero-wash-image {
+            background-position: center;
+            background-size: cover;
+            opacity: 0.42;
+            filter: blur(6px);
+            transform: scale(1.08);
+        }
+
+        .detail-hero-wash::after {
+            content: "";
+            background: linear-gradient(to top, rgba(28, 20, 16, 0.94), rgba(28, 20, 16, 0.2));
+        }
+
+        .detail-hero-frame {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 1.15rem 1rem 1.25rem;
+            text-align: center;
+        }
+
+        .detail-hero-portrait {
+            width: 5.25rem;
+            height: 5.25rem;
+            flex: 0 0 auto;
+            border: 3px solid #fbf8f3;
+            border-radius: 1.35rem;
+            background-color: #f6f1e8;
+            background-position: center;
+            background-size: cover;
+            box-shadow: 0 12px 24px rgba(28, 20, 16, 0.28);
+        }
+
+        .detail-hero-copy {
+            min-width: 0;
+            max-width: 100%;
+            color: #fbf8f3;
+        }
+
+        .detail-hero-kicker {
+            margin: 0 0 0.35rem;
+            color: #f6f1e8;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            line-height: 1.35;
+            text-transform: uppercase;
+        }
+
+        .detail-hero-title {
+            margin: 0 0 0.45rem;
+            color: #fbf8f3;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.7rem, 7.2vw, 2.35rem);
+            font-weight: 700;
+            line-height: 1.08;
+            overflow-wrap: anywhere;
+        }
+
+        .detail-hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem 0.7rem;
+            color: rgba(251, 248, 243, 0.92);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            line-height: 1.35;
+            text-transform: uppercase;
+        }
+
+        .detail-hero-spacer {
+            height: 0.85rem;
+            background: #fbf8f3;
+        }
+
+        @media (min-width: 768px) {
+            .detail-hero-shell {
+                overflow: visible;
+            }
+
+            .detail-hero-frame {
+                min-height: 15rem;
+                flex-direction: row;
+                align-items: flex-end;
+                gap: 1.5rem;
+                padding: 3.25rem 2.5rem 1.15rem;
+                text-align: left;
+            }
+
+            .detail-hero-portrait {
+                width: 9.5rem;
+                height: 9.5rem;
+                margin-bottom: -2.6rem;
+                border-width: 4px;
+            }
+
+            .detail-hero-title {
+                font-size: clamp(2.35rem, 4vw, 3rem);
+            }
+
+            .detail-hero-meta {
+                justify-content: flex-start;
+                font-size: 0.82rem;
+            }
+
+            .detail-hero-spacer {
+                height: 3.15rem;
+            }
         }
 
         .cooking-mode-active #main-header,
@@ -13542,17 +13683,16 @@
                     </button>
                 </div>
                 <div class="detail-shell bg-white rounded-sm shadow-sm mb-6 border border-parchmentDark relative w-full">
-                    <div class="detail-hero-shell w-full h-48 md:h-64 relative bg-forest rounded-t-sm">
-                        <div class="absolute inset-0 overflow-hidden rounded-t-sm">
-                            <div class="absolute inset-0 bg-cover bg-center opacity-40 blur-sm scale-110" style="background-image: url('${headerBg}')"></div>
-                            <div class="absolute inset-0 bg-gradient-to-t from-forest to-transparent opacity-80"></div>
+                    <div class="detail-hero-shell rounded-t-sm">
+                        <div class="detail-hero-wash" aria-hidden="true">
+                            <div class="detail-hero-wash-image" style="background-image: url('${headerBg}')"></div>
                         </div>
-                        <div class="absolute bottom-0 left-0 w-full px-6 md:px-10 pb-6 md:pb-10 flex flex-col md:flex-row items-center md:items-end gap-6 text-center md:text-left">
-                            <div class="w-32 h-32 md:w-40 md:h-40 rounded-2xl border-4 border-white shadow-2xl bg-cover bg-center flex-shrink-0 z-10 translate-y-12 md:translate-y-16" style="background-image: url('${headerBg}')"></div>
-                            <div class="text-white z-10 pb-2 md:pb-0">
-                                <p class="text-[11px] font-bold uppercase tracking-[0.32em] opacity-80 drop-shadow-md">${recipeLocationLabel}</p>
-                                <h2 class="font-fantasy font-bold text-4xl md:text-5xl mb-2 text-shadow-sm drop-shadow-md">${recipe.title}</h2>
-                                <div class="flex items-center justify-center md:justify-start gap-4 text-xs md:text-sm font-bold uppercase tracking-wider opacity-90 flex-wrap drop-shadow-md">
+                        <div class="detail-hero-frame">
+                            <div class="detail-hero-portrait" style="background-image: url('${headerBg}')"></div>
+                            <div class="detail-hero-copy">
+                                <p class="detail-hero-kicker">${recipeLocationLabel}</p>
+                                <h2 class="detail-hero-title">${recipe.title}</h2>
+                                <div class="detail-hero-meta">
                                     <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${recipe.author}</span>
                                     <span>|</span>
                                     <span class="flex items-center gap-1"><i data-lucide="map-pinned" class="w-4 h-4"></i> ${recipe.country || 'Unknown'}</span>
@@ -13563,7 +13703,7 @@
                         </div>
                     </div>
 
-                    <div class="h-8 md:h-12 w-full bg-white rounded-b-sm"></div>
+                    <div class="detail-hero-spacer"></div>
 
                     <div class="detail-content-shell p-4 md:p-10">
                         <div class="detail-meta-grid grid grid-cols-1 gap-4 mb-6 rounded-md border border-sage border-opacity-10 bg-accent bg-opacity-30 p-4 sm:grid-cols-2 md:grid-cols-5">
