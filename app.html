@@ -1103,6 +1103,29 @@
                 height: 2.75rem;
             }
 
+            .phone-icon-label {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
+            }
+
+            button.phone-save-icon,
+            .app-modal-panel .app-modal-footer > button.phone-save-icon {
+                flex: 0 0 2.75rem;
+                width: 2.75rem;
+                min-width: 2.75rem;
+                max-width: 2.75rem;
+                gap: 0;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
             #cover-editor-modal h2 {
                 font-size: 1.15rem;
             }
@@ -1124,12 +1147,6 @@
             .notebook-line-text {
                 line-height: 28px;
                 font-size: 0.82rem;
-            }
-
-            .notebook-landing-cover-surface {
-                height: 12.5rem;
-                min-height: 0;
-                aspect-ratio: auto;
             }
 
             .notebook-landing-action-row button {
@@ -1860,11 +1877,11 @@
         }
 
         .notebook-book-spread-surface.is-turning-forward {
-            animation: notebookPageTurnForward 320ms cubic-bezier(0.22, 0.74, 0.22, 1);
+            animation: notebookPageTurnForward 480ms cubic-bezier(0.22, 0.74, 0.22, 1);
         }
 
         .notebook-book-spread-surface.is-turning-backward {
-            animation: notebookPageTurnBackward 320ms cubic-bezier(0.22, 0.74, 0.22, 1);
+            animation: notebookPageTurnBackward 480ms cubic-bezier(0.22, 0.74, 0.22, 1);
         }
 
         .notebook-book-spread-surface.is-turning-forward::after,
@@ -2077,6 +2094,44 @@
             color: #fffdf6;
         }
 
+        .notebook-edge-hit {
+            position: absolute;
+            top: 42%;
+            z-index: 8;
+            display: inline-flex;
+            width: 2.75rem;
+            height: 2.75rem;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            background: rgba(251, 248, 243, 0.94);
+            color: #1c1410;
+            box-shadow: 0 10px 22px rgba(28, 20, 16, 0.16);
+        }
+
+        .notebook-edge-hit--prev {
+            left: 0.4rem;
+        }
+
+        .notebook-edge-hit--next {
+            right: 0.4rem;
+            border-color: rgba(45, 77, 52, 0.88);
+            background: #2f4a35;
+            color: #fbf8f3;
+        }
+
+        .notebook-edge-hit:disabled {
+            opacity: 0.38;
+            box-shadow: none;
+        }
+
+        @media (min-width: 768px) {
+            .notebook-edge-hit {
+                display: none;
+            }
+        }
+
         .notebook-paper::before {
             content: '';
             position: absolute;
@@ -2114,22 +2169,27 @@
 
         @media (max-width: 767px) {
             .notebook-book-frame {
-                padding-inline: 0.1rem;
+                width: 100%;
+                padding-inline: 0;
             }
 
             .notebook-landing-hero {
-                padding: 1rem;
+                padding: 0.65rem 0;
                 border-radius: 1.5rem;
             }
 
             .notebook-landing-cover-frame {
-                width: min(100%, 22rem);
+                width: 100%;
+                max-width: 100%;
                 margin-inline: auto;
             }
 
             .notebook-landing-cover-surface {
-                min-height: 11.5rem;
-                aspect-ratio: 0.9 / 1;
+                width: 100%;
+                height: auto;
+                min-height: 0;
+                max-height: none;
+                aspect-ratio: 1 / 1.414;
             }
 
             .notebook-sticky-note--sm {
@@ -2156,15 +2216,23 @@
             }
 
             .notebook-book-spread-surface {
+                width: 100%;
                 height: auto;
                 min-height: 0;
-                aspect-ratio: auto;
+                max-height: none;
+                aspect-ratio: 1 / 1.414;
                 box-shadow: none;
             }
 
+            .notebook-book-spread-surface > .grid,
+            .notebook-spread .notebook-paper {
+                height: 100%;
+                min-height: 0;
+            }
+
             .notebook-paper {
-                height: auto;
-                min-height: 16rem;
+                height: 100%;
+                min-height: 0;
                 border-radius: 0.45rem;
                 padding: 0.45rem 0.6rem 0.7rem;
                 background:
@@ -2259,10 +2327,22 @@
                 padding-top: 0.8rem;
             }
 
-            .notebook-page-nav {
-                width: 2.5rem;
-                min-width: 2.5rem;
-                min-height: 2.5rem;
+            .notebook-page-nav,
+            .notebook-edge-hit {
+                width: 2.75rem;
+                min-width: 2.75rem;
+                height: 2.75rem;
+                min-height: 2.75rem;
+            }
+
+            .notebook-mobile-pager {
+                position: sticky;
+                bottom: calc(3.2rem + env(safe-area-inset-bottom, 0px));
+                z-index: 7;
+                margin-top: 0.45rem;
+                padding: 0.3rem;
+                border-radius: 0.9rem;
+                background: rgba(246, 241, 232, 0.94);
             }
 
             .notebook-page-summary-grid {
@@ -2343,26 +2423,42 @@
 
         @keyframes notebookPageTurnForward {
             0% {
-                transform: rotateY(0deg) translateX(0);
-            }
-            45% {
-                transform: rotateY(-10deg) translateX(-6px);
+                transform: translateX(22%);
+                opacity: 0.72;
             }
             100% {
-                transform: rotateY(0deg) translateX(0);
+                transform: translateX(0);
+                opacity: 1;
             }
         }
 
         @keyframes notebookPageTurnBackward {
             0% {
-                transform: rotateY(0deg) translateX(0);
-            }
-            45% {
-                transform: rotateY(10deg) translateX(6px);
+                transform: translateX(-22%);
+                opacity: 0.72;
             }
             100% {
-                transform: rotateY(0deg) translateX(0);
+                transform: translateX(0);
+                opacity: 1;
             }
+        }
+
+        .notebook-book-spread-surface.is-turning-blocked-forward {
+            animation: notebookPageTurnBlockedForward 280ms ease;
+        }
+
+        .notebook-book-spread-surface.is-turning-blocked-back {
+            animation: notebookPageTurnBlockedBack 280ms ease;
+        }
+
+        @keyframes notebookPageTurnBlockedForward {
+            0%, 100% { transform: translateX(0); }
+            40% { transform: translateX(-14px); }
+        }
+
+        @keyframes notebookPageTurnBlockedBack {
+            0%, 100% { transform: translateX(0); }
+            40% { transform: translateX(14px); }
         }
 
         @keyframes notebookPageTurnSheen {
@@ -2482,10 +2578,18 @@
                 padding-top: 0;
             }
 
-            .notebook-landing-cover-surface {
-                height: 12.5rem;
+            .notebook-landing-cover-frame {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .notebook-landing-cover-surface,
+            .notebook-book-spread-surface {
+                width: 100%;
+                height: auto;
                 min-height: 0;
-                aspect-ratio: auto;
+                max-height: none;
+                aspect-ratio: 1 / 1.414;
             }
         }
 
@@ -2964,8 +3068,8 @@
                                 <button onclick="closeNotesEditor()" data-app-button="secondary" data-app-button-size="lg" data-app-button-full-width="true">
                                     Cancel
                                 </button>
-                                <button id="notes-save-btn" data-app-button="accent" data-app-button-size="lg" data-app-button-full-width="true">
-                                    <i data-lucide="save" class="w-4 h-4 inline mr-2"></i>Save Notes
+                                <button id="notes-save-btn" data-app-button="accent" data-app-button-size="lg" data-app-button-full-width="true" data-app-button-extra="phone-save-icon" aria-label="Save Notes" title="Save Notes">
+                                    <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Save Notes</span>
                                 </button>
                             </div>
                         </div>
@@ -2987,8 +3091,8 @@
 
                             <div class="app-modal-footer border-t border-parchmentDark bg-parchment p-3 md:p-4">
                                 <button onclick="closeCoverEditor()" data-app-button="secondary" data-app-button-size="md">Cancel</button>
-                                <button onclick="saveCoverEditor()" data-app-button="primary" data-app-button-size="md">
-                                    <i data-lucide="save" class="w-4 h-4"></i> Save Cover
+                                <button onclick="saveCoverEditor()" data-app-button="primary" data-app-button-size="md" data-app-button-extra="phone-save-icon" aria-label="Save Cover" title="Save Cover">
+                                    <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Save Cover</span>
                                 </button>
                             </div>
                         </div>
@@ -4632,6 +4736,46 @@
                     plate: 'rgba(255,252,241,0.44)',
                     plateBorder: 'rgba(115,82,22,0.14)',
                     ink: '#4a3610'
+                },
+                leer: {
+                    surface: 'linear-gradient(165deg, rgba(246,241,232,0.16), rgba(28,20,16,0.28)), url(assets/cover-leer.jpg) center / cover no-repeat',
+                    border: '#6a4a2a',
+                    spine: 'linear-gradient(180deg, rgba(78,54,28,0.9), rgba(42,28,14,0.98))',
+                    plate: 'rgba(251,248,243,0.78)',
+                    plateBorder: 'rgba(88,62,31,0.2)',
+                    ink: '#f6f1e8'
+                },
+                salie: {
+                    surface: 'linear-gradient(165deg, rgba(246,241,232,0.12), rgba(28,20,16,0.22)), url(assets/cover-salie.jpg) center / cover no-repeat',
+                    border: '#5d6b52',
+                    spine: 'linear-gradient(180deg, rgba(58,83,63,0.88), rgba(32,46,36,0.98))',
+                    plate: 'rgba(251,248,243,0.76)',
+                    plateBorder: 'rgba(47,74,53,0.2)',
+                    ink: '#f6f1e8'
+                },
+                schets: {
+                    surface: 'linear-gradient(165deg, rgba(251,248,243,0.08), rgba(200,144,80,0.1)), url(assets/cover-schets.jpg) center / cover no-repeat',
+                    border: '#c89050',
+                    spine: 'linear-gradient(180deg, rgba(122,86,42,0.78), rgba(78,54,28,0.94))',
+                    plate: 'rgba(251,248,243,0.72)',
+                    plateBorder: 'rgba(88,62,31,0.16)',
+                    ink: '#1c1410'
+                },
+                spikkel: {
+                    surface: 'linear-gradient(165deg, rgba(251,248,243,0.06), rgba(200,144,80,0.08)), url(assets/cover-spikkel.jpg) center / cover no-repeat',
+                    border: '#c4a57a',
+                    spine: 'linear-gradient(180deg, rgba(122,86,42,0.72), rgba(78,54,28,0.9))',
+                    plate: 'rgba(251,248,243,0.7)',
+                    plateBorder: 'rgba(88,62,31,0.14)',
+                    ink: '#1c1410'
+                },
+                vlekken: {
+                    surface: 'linear-gradient(165deg, rgba(251,248,243,0.08), rgba(144,152,112,0.12)), url(assets/cover-vlekken.jpg) center / cover no-repeat',
+                    border: '#909870',
+                    spine: 'linear-gradient(180deg, rgba(90,98,70,0.78), rgba(58,66,48,0.94))',
+                    plate: 'rgba(251,248,243,0.74)',
+                    plateBorder: 'rgba(74,82,52,0.16)',
+                    ink: '#1c1410'
                 }
             };
 
@@ -4957,7 +5101,7 @@
 
         function getNotebookCoverPanelStyle(cover) {
             const palette = getNotebookCoverPalette(cover.palette);
-            return `--cover-surface:${palette.surface};--cover-spine:${palette.spine};--cover-plate:${palette.plate};--cover-plate-border:${palette.plateBorder};--cover-ink:${palette.ink};border-color:${palette.border};color:${palette.ink};`;
+            return `--cover-surface:${palette.surface};--cover-spine:${palette.spine};--cover-plate:${palette.plate};--cover-plate-border:${palette.plateBorder};--cover-ink:${palette.ink};border-color:${palette.border};color:${palette.ink};background:${palette.surface};`;
         }
 
         function renderNotebookCoverStickers(cover, isEditorPreview = false) {
@@ -5036,7 +5180,17 @@
         function setDraftCoverField(field, value) {
             if (!draftNotebookCover) return;
             draftNotebookCover[field] = value;
-            renderCoverEditor();
+            refreshCoverEditorPreview();
+        }
+
+        function refreshCoverEditorPreview() {
+            const preview = document.getElementById('cover-editor-preview-surface');
+            if (!preview || !draftNotebookCover) return;
+            const previewRecipe = recipes.find(recipe => recipe.id === currentIndexRecipeIds[notebookPageIndex]) || recipes[0] || null;
+            const totalPages = Math.max(1, currentIndexRecipeIds.length || recipes.length || 1);
+            preview.setAttribute('style', getNotebookCoverPanelStyle(draftNotebookCover));
+            preview.innerHTML = renderNotebookCoverFace(draftNotebookCover, previewRecipe, totalPages, true);
+            attachCoverEditorInteractions();
         }
 
         function setDraftCoverPalette(palette) {
@@ -5126,6 +5280,11 @@
             const totalPages = Math.max(1, currentIndexRecipeIds.length || recipes.length || 1);
             const stickerEmojiOptions = getNotebookCoverStickerEmojiOptions();
             const paletteOptions = [
+                { key: 'leer', label: 'Leer' },
+                { key: 'salie', label: 'Salie' },
+                { key: 'schets', label: 'Schets' },
+                { key: 'spikkel', label: 'Spikkel' },
+                { key: 'vlekken', label: 'Vlekken' },
                 { key: 'oat', label: 'Oat' },
                 { key: 'sage', label: 'Sage' },
                 { key: 'berry', label: 'Berry' },
@@ -5149,15 +5308,15 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Title</label>
-                                <input type="text" maxlength="40" value="${escapeHTML(draftNotebookCover.title || '')}" oninput="setDraftCoverField('title', this.value)" class="${inputClass}" placeholder="Kitchen Notebook">
+                                <input id="cover-field-title" type="text" maxlength="40" value="${escapeHTML(draftNotebookCover.title || '')}" oninput="setDraftCoverField('title', this.value)" class="${inputClass}" placeholder="Kitchen Notebook">
                             </div>
                             <div>
                                 <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Spine Label</label>
-                                <input type="text" maxlength="28" value="${escapeHTML(draftNotebookCover.spineLabel || '')}" oninput="setDraftCoverField('spineLabel', this.value)" class="${inputClass}" placeholder="Uculi">
+                                <input id="cover-field-spine" type="text" maxlength="28" value="${escapeHTML(draftNotebookCover.spineLabel || '')}" oninput="setDraftCoverField('spineLabel', this.value)" class="${inputClass}" placeholder="Uculi">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Subtitle</label>
-                                <textarea oninput="setDraftCoverField('subtitle', this.value)" class="${textareaClass}" placeholder="Add a personal line on the cover...">${escapeHTML(draftNotebookCover.subtitle || '')}</textarea>
+                                <textarea id="cover-field-subtitle" oninput="setDraftCoverField('subtitle', this.value)" class="${textareaClass}" placeholder="Add a personal line on the cover...">${escapeHTML(draftNotebookCover.subtitle || '')}</textarea>
                             </div>
                         </div>
 
@@ -10570,8 +10729,8 @@
                                 <button type="button" onclick="renderProfile()" class="${getAppButtonClasses('secondary')}">
                                     <i data-lucide="arrow-left" class="h-4 w-4"></i>Cancel
                                 </button>
-                                <button type="submit" class="${getAppButtonClasses('primary', { size: 'lg' })} min-w-[150px]">
-                                    <i data-lucide="save" class="w-4 h-4"></i> Save Profile
+                                <button type="submit" class="${getAppButtonClasses('primary', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="Save Profile" title="Save Profile">
+                                    <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Save Profile</span>
                                 </button>
                             </div>
                         </form>
@@ -10880,8 +11039,8 @@
                     </div>
 
                     <div class="pt-4 border-t border-accent flex justify-end">
-                        <button type="submit" class="${getAppButtonClasses('primary', { size: 'lg' })} min-w-[150px]">
-                            <i data-lucide="save" class="w-4 h-4"></i> Save Settings
+                        <button type="submit" class="${getAppButtonClasses('primary', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="Save Settings" title="Save Settings">
+                            <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Save Settings</span>
                         </button>
                     </div>
                 </form>
@@ -11648,11 +11807,34 @@
             return spreads;
         }
 
+        function applyNotebookPhoneFrame(element) {
+            if (!element) return;
+            element.style.width = '100%';
+            element.style.maxWidth = '100%';
+            element.style.height = 'auto';
+            element.style.minHeight = '0';
+            element.style.maxHeight = 'none';
+            element.style.aspectRatio = '1 / 1.414';
+        }
+
         function syncNotebookViewportHeight() {
             if (!contentDiv || currentView !== 'index' || indexViewMode !== 'book') return;
 
             const notebookFrame = contentDiv.querySelector('[data-notebook-frame]');
             const notebookSurface = notebookFrame?.querySelector('.notebook-book-spread-surface');
+            const coverSurface = contentDiv.querySelector('#notebook-cover-surface');
+
+            if (window.innerWidth < 768) {
+                const coverFrame = coverSurface?.closest('.notebook-landing-cover-frame');
+                if (coverFrame) {
+                    coverFrame.style.width = '100%';
+                    coverFrame.style.maxWidth = '100%';
+                }
+                applyNotebookPhoneFrame(notebookSurface);
+                applyNotebookPhoneFrame(coverSurface);
+                return;
+            }
+
             if (!notebookFrame || !notebookSurface) return;
 
             const frameRect = notebookFrame.getBoundingClientRect();
@@ -11660,24 +11842,17 @@
             const navRect = document.getElementById('main-nav')?.getBoundingClientRect();
             const viewportHeight = Math.floor(window.visualViewport?.height || window.innerHeight || 0);
             const bottomLimit = navRect ? Math.min(navRect.top, viewportHeight) : viewportHeight;
-            const bottomReserve = window.innerWidth < 768 ? 14 : 20;
-            const fallbackHeight = window.innerWidth < 768 ? 420 : 560;
-            const minHeight = window.innerWidth < 768 ? 280 : 360;
+            const bottomReserve = 20;
+            const fallbackHeight = 560;
+            const minHeight = 360;
             const availableHeight = Math.max(minHeight, Math.floor(bottomLimit - frameRect.top - bottomReserve));
             let fittedHeight = availableHeight || fallbackHeight;
 
-            const horizontalReserve = window.innerWidth < 768 ? 12 : 26;
+            const horizontalReserve = 26;
             const maxSurfaceWidth = Math.max(320, Math.floor((contentRect.width || window.innerWidth) - horizontalReserve));
             const desktopAspectRatio = 1.414;
 
             notebookFrame.style.setProperty('--notebook-spread-max-height', `${fittedHeight}px`);
-
-            if (window.innerWidth < 768) {
-                notebookFrame.style.setProperty('--notebook-spread-fit-width', '100%');
-                notebookSurface.style.height = `${fittedHeight}px`;
-                notebookSurface.style.minHeight = `${fittedHeight}px`;
-                return;
-            }
 
             let fittedWidth = Math.floor(fittedHeight * desktopAspectRatio);
             if (fittedWidth > maxSurfaceWidth) {
@@ -11690,52 +11865,79 @@
             notebookSurface.style.minHeight = `${fittedHeight}px`;
         }
 
+        function nudgeNotebookPage(direction) {
+            const surface = document.getElementById('notebook-swipe-surface');
+            if (!surface) return;
+            surface.classList.remove('is-turning-blocked-forward', 'is-turning-blocked-back');
+            void surface.offsetWidth;
+            surface.classList.add(direction > 0 ? 'is-turning-blocked-forward' : 'is-turning-blocked-back');
+        }
+
+        function finishNotebookPageTurn() {
+            renderList();
+            if (contentDiv) contentDiv.scrollTop = 0;
+        }
+
         function goToNotebookPage(direction) {
             if (!currentIndexRecipeIds.length) return;
+            const step = direction > 0 ? 1 : -1;
 
             const isMobile = window.innerWidth < 768;
             if (isMobile) {
-                if (direction > 0 && notebookMobileSide === 'left') {
+                if (step > 0 && notebookMobileSide === 'left') {
+                    activeNotebookStickyNoteMenu = null;
+                    notebookPageTurnDirection = 1;
                     notebookMobileSide = 'right';
-                    renderList();
-                    contentDiv.scrollTop = 0;
+                    finishNotebookPageTurn();
                     return;
                 }
-                if (direction < 0 && notebookMobileSide === 'right') {
+                if (step < 0 && notebookMobileSide === 'right') {
+                    activeNotebookStickyNoteMenu = null;
+                    notebookPageTurnDirection = -1;
                     notebookMobileSide = 'left';
-                    renderList();
-                    contentDiv.scrollTop = 0;
+                    finishNotebookPageTurn();
                     return;
                 }
             }
 
             const currentRecipe = recipes.find(item => item.id === currentIndexRecipeIds[notebookPageIndex]);
             const currentRecipeSpreads = getNotebookRecipeSpreads(currentRecipe);
-            const nextSpreadIndex = notebookSpreadPageIndex + direction;
+            const nextSpreadIndex = notebookSpreadPageIndex + step;
 
             if (nextSpreadIndex >= 0 && nextSpreadIndex < currentRecipeSpreads.length) {
                 activeNotebookStickyNoteMenu = null;
-                notebookPageTurnDirection = direction > 0 ? 1 : -1;
+                notebookPageTurnDirection = step;
                 notebookSpreadPageIndex = nextSpreadIndex;
-                notebookMobileSide = direction > 0 ? 'left' : 'right';
-                renderList();
-                contentDiv.scrollTop = 0;
+                notebookMobileSide = step > 0 ? 'left' : 'right';
+                finishNotebookPageTurn();
                 return;
             }
 
-            const nextIndex = Math.max(0, Math.min(notebookPageIndex + direction, currentIndexRecipeIds.length - 1));
-            if (nextIndex === notebookPageIndex) return;
+            const nextIndex = Math.max(0, Math.min(notebookPageIndex + step, currentIndexRecipeIds.length - 1));
+            if (nextIndex === notebookPageIndex) {
+                nudgeNotebookPage(step);
+                return;
+            }
 
             activeNotebookStickyNoteMenu = null;
-            notebookPageTurnDirection = direction > 0 ? 1 : -1;
+            notebookPageTurnDirection = step;
             notebookPageIndex = nextIndex;
             const nextRecipe = recipes.find(item => item.id === currentIndexRecipeIds[nextIndex]);
             const nextRecipeSpreads = getNotebookRecipeSpreads(nextRecipe);
-            notebookSpreadPageIndex = direction > 0 ? 0 : Math.max(0, nextRecipeSpreads.length - 1);
-            notebookMobileSide = direction > 0 ? 'left' : 'right';
-            renderList();
-            contentDiv.scrollTop = 0;
+            notebookSpreadPageIndex = step > 0 ? 0 : Math.max(0, nextRecipeSpreads.length - 1);
+            notebookMobileSide = step > 0 ? 'left' : 'right';
+            finishNotebookPageTurn();
         }
+
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+            if (currentView !== 'index' || indexViewMode !== 'book' || !notebookCoverOpen) return;
+            const activeTag = document.activeElement?.tagName;
+            if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || activeTag === 'SELECT' || document.activeElement?.isContentEditable) return;
+            if (document.querySelector('.app-overlay:not(.hidden)')) return;
+            event.preventDefault();
+            goToNotebookPage(event.key === 'ArrowRight' ? 1 : -1);
+        });
 
         function isNotebookInteractiveTarget(target) {
             return target instanceof Element && Boolean(target.closest('button, a, input, textarea, select, label, [role="button"], [data-notebook-note-index], [data-notebook-note-control]'));
@@ -12034,37 +12236,62 @@
 
             let startX = 0;
             let startY = 0;
+            let lastX = 0;
+            let lastY = 0;
             let pointerId = null;
             let isDragging = false;
+
+            const finishSwipe = (clientX, clientY) => {
+                if (!isDragging) return;
+                isDragging = false;
+                surface.style.transform = '';
+                const deltaX = clientX - startX;
+                const deltaY = clientY - startY;
+                if (Math.abs(deltaX) >= 44 && Math.abs(deltaX) > Math.abs(deltaY) * 0.85) {
+                    goToNotebookPage(deltaX < 0 ? 1 : -1);
+                }
+            };
 
             surface.addEventListener('pointerdown', event => {
                 if (event.pointerType === 'mouse' && event.button !== 0) return;
                 if (isNotebookInteractiveTarget(event.target)) return;
                 startX = event.clientX;
                 startY = event.clientY;
+                lastX = event.clientX;
+                lastY = event.clientY;
                 pointerId = event.pointerId;
                 isDragging = true;
                 surface.setPointerCapture?.(event.pointerId);
             });
 
-            const finishSwipe = event => {
+            surface.addEventListener('pointermove', event => {
                 if (!isDragging || pointerId !== event.pointerId) return;
-
-                isDragging = false;
+                lastX = event.clientX;
+                lastY = event.clientY;
                 const deltaX = event.clientX - startX;
                 const deltaY = event.clientY - startY;
-
-                if (Math.abs(deltaX) > 90 && Math.abs(deltaX) > Math.abs(deltaY)) {
-                    if (deltaX < 0) goToNotebookPage(1);
-                    else goToNotebookPage(-1);
-                    return;
+                if (Math.abs(deltaX) > 12 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                    event.preventDefault();
+                    const shift = Math.max(-56, Math.min(56, deltaX));
+                    surface.style.transform = `translateX(${shift * 0.35}px)`;
                 }
-            };
+            }, { passive: false });
 
-            surface.addEventListener('pointerup', finishSwipe);
-            surface.addEventListener('pointercancel', finishSwipe);
+            surface.addEventListener('pointerup', event => {
+                if (pointerId !== event.pointerId) return;
+                finishSwipe(event.clientX, event.clientY);
+            });
+            surface.addEventListener('pointercancel', event => {
+                if (pointerId !== event.pointerId) return;
+                finishSwipe(lastX, lastY);
+            });
             surface.addEventListener('lostpointercapture', () => {
-                isDragging = false;
+                if (!isDragging) return;
+                const deltaX = lastX - startX;
+                const deltaY = lastY - startY;
+                if (Math.abs(deltaX) >= 44 && Math.abs(deltaX) > Math.abs(deltaY) * 0.85) {
+                    finishSwipe(lastX, lastY);
+                }
             });
 
             attachNotebookStickyNoteInteractions(surface);
@@ -12102,8 +12329,18 @@
             const notebookRecipeSpreads = getNotebookRecipeSpreads(recipe);
             notebookSpreadPageIndex = Math.max(0, Math.min(notebookSpreadPageIndex, notebookRecipeSpreads.length - 1));
             const currentSpread = notebookRecipeSpreads[notebookSpreadPageIndex] || notebookRecipeSpreads[0];
-            const hasPreviousNotebookPage = notebookSpreadPageIndex > 0 || notebookPageIndex > 0;
-            const hasNextNotebookPage = notebookSpreadPageIndex < notebookRecipeSpreads.length - 1 || notebookPageIndex < totalPages - 1;
+            const isMobileNotebook = window.matchMedia('(max-width: 767px)').matches;
+            const mobileLeafIndex = notebookSpreadPageIndex * 2 + (notebookMobileSide === 'right' ? 1 : 0);
+            const mobileLeafCount = Math.max(1, notebookRecipeSpreads.length) * 2;
+            const hasPreviousNotebookPage = isMobileNotebook
+                ? (mobileLeafIndex > 0 || notebookPageIndex > 0)
+                : (notebookSpreadPageIndex > 0 || notebookPageIndex > 0);
+            const hasNextNotebookPage = isMobileNotebook
+                ? (mobileLeafIndex < mobileLeafCount - 1 || notebookPageIndex < totalPages - 1)
+                : (notebookSpreadPageIndex < notebookRecipeSpreads.length - 1 || notebookPageIndex < totalPages - 1);
+            const notebookPageLabel = isMobileNotebook
+                ? `${mobileLeafIndex + 1} / ${mobileLeafCount}`
+                : `${notebookSpreadPageIndex + 1} / ${notebookRecipeSpreads.length}`;
             recipe.notebookStickyNotes = notebookStickyNotes;
 
             const renderNotebookIngredientRows = ingredients => {
@@ -12411,7 +12648,7 @@
                                     <i data-lucide="${showNotebookStickyNotes ? 'eye-off' : 'eye'}" class="h-4 w-4"></i>
                                 </button>
                                 <div class="hidden h-6 w-px bg-parchmentDark mx-1 md:block"></div>
-                                <span class="hidden md:inline-flex h-10 min-w-[7rem] items-center justify-center rounded-lg px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-sage">Page ${notebookSpreadPageIndex + 1} / ${notebookRecipeSpreads.length}</span>
+                                <span class="hidden md:inline-flex h-10 min-w-[7rem] items-center justify-center rounded-lg px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-sage">Page ${notebookPageLabel}</span>
                                 </div>
                                 <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="hidden h-10 px-4 items-center justify-center gap-2 rounded-lg transition-all bg-gold text-white font-bold text-xs uppercase tracking-wider hover:bg-opacity-90 shadow-sm notebook-note-control notebook-note-control--cook md:inline-flex" data-notebook-note-control="open-cook">
                                     <i data-lucide="chef-hat" class="h-4 w-4"></i>
@@ -12426,7 +12663,13 @@
                     </div>
 
                     <div class="notebook-book-frame relative" data-notebook-frame="true">
-                        <div id="notebook-swipe-surface" data-recipe-id="${recipe.id}" class="notebook-book-spread-surface notebook-swipe-surface notebook-spread relative overflow-hidden rounded-lg border border-sage border-opacity-15 px-2 py-2 shadow-none md:rounded-[28px] md:px-7 md:py-7 md:shadow-[0_30px_60px_rgba(28,20,16,0.16)] ${pageTurnClass}">
+                        <div id="notebook-swipe-surface" data-recipe-id="${recipe.id}" data-notebook-leaf="${mobileLeafIndex}" data-notebook-side="${notebookMobileSide}" class="notebook-book-spread-surface notebook-swipe-surface notebook-spread relative overflow-hidden rounded-lg border border-sage border-opacity-15 px-2 py-2 shadow-none md:rounded-[28px] md:px-7 md:py-7 md:shadow-[0_30px_60px_rgba(28,20,16,0.16)] ${pageTurnClass}">
+                            <button type="button" title="Previous page" aria-label="Previous page" onclick="event.stopPropagation(); goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-edge-hit notebook-edge-hit--prev">
+                                <i data-lucide="chevron-left" class="h-5 w-5"></i>
+                            </button>
+                            <button type="button" title="Next page" aria-label="Next page" onclick="event.stopPropagation(); goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-edge-hit notebook-edge-hit--next">
+                                <i data-lucide="chevron-right" class="h-5 w-5"></i>
+                            </button>
                             <div class="pointer-events-none absolute inset-y-6 left-7 hidden w-8 rounded-full border-x border-parchmentDark bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.95)_0,rgba(255,255,255,0.7)_58%,rgba(239,239,239,0.88)_100%)] md:block"></div>
                             <div class="pointer-events-none absolute inset-y-8 left-[3.65rem] hidden w-px bg-gradient-to-b from-transparent via-sage/20 to-transparent md:block"></div>
                             <div class="grid h-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-0">
@@ -12457,11 +12700,11 @@
                         </div>
                     </div>
 
-                    <div class="mt-4 flex items-center justify-between gap-3 md:hidden">
+                    <div class="notebook-mobile-pager flex items-center justify-between gap-3 md:hidden">
                         <button type="button" title="Previous page" aria-label="Previous page" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
                             <i data-lucide="chevron-left" class="h-4 w-4"></i>
                         </button>
-                        <span class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-parchmentDark bg-white/90 px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-sage shadow-sm">Page ${notebookSpreadPageIndex + 1} / ${notebookRecipeSpreads.length}</span>
+                        <span data-notebook-page-label="${notebookPageLabel}" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-parchmentDark bg-white/90 px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-sage shadow-sm">Page ${notebookPageLabel}</span>
                         <button type="button" title="Next page" aria-label="Next page" onclick="goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-page-nav notebook-page-nav--primary">
                             <i data-lucide="chevron-right" class="h-4 w-4"></i>
                         </button>
@@ -14917,7 +15160,7 @@
                         <div class="pt-8 flex flex-col gap-4 border-t border-accent mt-4 sm:flex-row sm:items-center sm:justify-between">
                             <button type="button" onclick="cancelRecipeEditor()" class="${getAppButtonClasses('secondary', { size: 'lg' })}" translate="no">Cancel</button>
                             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-                                <button type="submit" onclick="recipeSubmitAction = 'save'" class="${getAppButtonClasses('accent', { size: 'lg' })} min-w-[150px]" translate="no"><i data-lucide="save" class="w-4 h-4"></i> ${submitLabel}</button>
+                                <button type="submit" onclick="recipeSubmitAction = 'save'" class="${getAppButtonClasses('accent', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="${escapeHTML(submitLabel)}" title="${escapeHTML(submitLabel)}" translate="no"><i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">${submitLabel}</span></button>
                                 <button type="submit" onclick="recipeSubmitAction = 'publish'" class="${getAppButtonClasses('primary', { size: 'lg' })} min-w-[180px]" translate="no"><i data-lucide="cloud-upload" class="w-4 h-4"></i> ${publishSubmitLabel}</button>
                             </div>
                         </div>
