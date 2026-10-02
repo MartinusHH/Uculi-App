@@ -238,13 +238,141 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 10px 18px rgba(28, 20, 16, 0.08);
         }
 
-        .app-nav-button.is-active i {
-            color: #c89050;
-            transform: translateY(-1px);
+        .app-nav-button.is-active i,
+        .app-nav-button.is-active svg {
+            color: #1c1410;
+            fill: #909870;
+            stroke: #1c1410;
+            transform: none;
+        }
+
+        .app-nav-button.is-active::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: 0.28rem;
+            width: 1rem;
+            height: 0.16rem;
+            transform: translateX(-50%);
+            border-radius: 999px;
+            background: #909870;
+        }
+
+        .app-nav-button svg {
+            width: 1.5rem;
+            height: 1.5rem;
         }
 
         .app-nav-label {
-            line-height: 1;
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .header-icon-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            flex: 0 0 2.75rem;
+            border-radius: 0.85rem;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            background: #fbf8f3;
+            color: #1c1410;
+            box-shadow: none;
+        }
+
+        .header-icon-button:hover {
+            border-color: rgba(200, 144, 80, 0.55);
+            color: #c89050;
+        }
+
+        #main-header #header-back,
+        #main-header #header-help,
+        #main-header #header-open-settings {
+            width: 2.75rem;
+            height: 2.75rem;
+            padding: 0;
+        }
+
+        #header-back[hidden],
+        #header-help[hidden],
+        #header-open-settings[hidden],
+        #undo-delete-label {
+            display: none !important;
+        }
+
+        #undo-delete-button {
+            width: 2.75rem;
+            height: 2.75rem;
+            padding: 0;
+            justify-content: center;
+        }
+
+        .floating-back-button {
+            display: none !important;
+        }
+
+        .settings-sheet {
+            max-width: 40rem;
+            margin: 0 auto;
+            background: transparent;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            min-height: 2.75rem;
+            padding: 0.35rem 0.2rem;
+            color: #1c1410;
+            font-size: 0.92rem;
+            font-weight: 700;
+        }
+
+        .settings-status {
+            min-width: 0;
+            color: #909870;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .settings-divider {
+            height: 1px;
+            margin: 0.2rem 0;
+            background: rgba(144, 152, 112, 0.35);
+        }
+
+        .settings-select {
+            max-width: 11.5rem;
+            height: 2.1rem;
+            border: 0;
+            background: transparent;
+            color: #909870;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .settings-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            padding: 0.15rem 0 0.45rem;
+        }
+
+        button.settings-row {
+            width: 100%;
+            background: transparent;
+            text-align: left;
         }
 
         .settings-disclosure {
@@ -625,16 +753,41 @@
                 padding: 0.8rem 0.25rem;
             }
 
-            .app-nav-button i {
-                width: 1.35rem;
-                height: 1.35rem;
+            .app-nav-button i,
+            .app-nav-button svg {
+                width: 1.5rem;
+                height: 1.5rem;
             }
 
-            .app-nav-label {
-                display: block;
-                margin-top: 0.15rem;
-                font-size: 0.58rem;
-                line-height: 1;
+            body.chrome-push #app-content {
+                padding-left: 0;
+                padding-right: 0;
+                padding-top: 0;
+            }
+
+            body.chrome-push .push-sheet,
+            body.chrome-push .detail-shell,
+            body.chrome-push .settings-sheet {
+                max-width: none;
+                margin-left: 0;
+                margin-right: 0;
+                border-left-width: 0;
+                border-right-width: 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .app-overlay {
+                padding: 0;
+                align-items: flex-end;
+            }
+
+            .app-modal-panel {
+                width: 100%;
+                border-radius: 1rem 1rem 0 0;
+                border-left: 0;
+                border-right: 0;
+                border-bottom: 0;
             }
         }
 
@@ -2328,24 +2481,29 @@
     <div id="app-shell" class="w-full max-w-6xl mx-auto flex flex-col h-[100dvh] max-h-[100dvh] relative shadow-2xl bg-parchment overflow-hidden border-x border-parchmentDark">
         
         <header id="main-header" class="text-forest transition-all" translate="no">
+            <button id="header-back" type="button" onclick="handleTopBackAction()" class="header-icon-button" hidden aria-label="Back">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            </button>
             <div class="app-header-brand">
                 <div class="app-header-mark">
                     <img src="assets/uculi-boekje.jpg" alt="Uculi" width="46" height="46" />
                 </div>
-                <div class="app-header-copy">
-                    <p class="text-[9px] font-bold uppercase tracking-[0.2em] text-sage opacity-80 mb-0.5">Recipe notebook</p>
-                    <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
-                    <p class="app-header-subtitle"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
-                </div>
+                <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
             </div>
             <div class="flex items-center gap-2">
-                <button id="notifications-button" onclick="showNotificationsModal()" class="relative hidden h-10 w-10 items-center justify-center rounded-xl border border-parchmentDark bg-white text-forest shadow-sm transition-all hover:border-gold hover:text-sage" title="Notifications" aria-label="Notifications">
+                <button id="notifications-button" onclick="showNotificationsModal()" class="header-icon-button relative hidden" title="Notifications" aria-label="Notifications">
                     <i data-lucide="bell" class="w-5 h-5"></i>
                     <span id="notifications-badge" class="absolute -right-1 -top-1 hidden min-w-[1.15rem] rounded-full bg-coral px-1 text-[10px] font-bold leading-5 text-white"></span>
                 </button>
-                <button id="undo-delete-button" onclick="undoDeletedRecipe()" class="hidden h-10 items-center gap-2 rounded-xl border border-parchmentDark bg-white px-3 text-xs font-bold uppercase tracking-[0.16em] text-forest shadow-sm transition-all hover:border-gold hover:text-sage" title="Undo last delete" aria-label="Undo last delete">
+                <button id="undo-delete-button" onclick="undoDeletedRecipe()" class="header-icon-button hidden" title="Undo last delete" aria-label="Undo last delete">
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                     <span id="undo-delete-label">Undo</span>
+                </button>
+                <button id="header-help" type="button" onclick="showUsageGuide()" class="header-icon-button" hidden aria-label="Help" title="Help">
+                    <i data-lucide="info" class="w-5 h-5"></i>
+                </button>
+                <button id="header-open-settings" type="button" onclick="renderSettings()" class="header-icon-button" aria-label="Opties" title="Opties">
+                    <i data-lucide="settings-2" class="w-5 h-5"></i>
                 </button>
                 <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="flex h-10 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
                     <i data-lucide="plus" class="w-4 h-4"></i> <span class="header-add-label">Add Recipe</span>
@@ -2419,24 +2577,20 @@
         <nav id="main-nav" class="sticky bottom-0 w-full text-sage z-20 transition-all duration-300">
             <div class="app-nav-inner">
                 <button data-nav-view="index" onclick="renderList()" class="app-nav-button" aria-label="Index" title="Index">
-                    <i data-lucide="library" class="w-6 h-6 mb-1"></i>
-                    <span class="app-nav-label text-[10px] font-bold uppercase tracking-wider">Index</span>
+                    <i data-lucide="library" class="w-6 h-6"></i>
+                    <span class="app-nav-label">Index</span>
                 </button>
                 <button data-nav-view="shopping" onclick="renderShoppingList()" class="app-nav-button" aria-label="Shop" title="Shop">
-                    <i data-lucide="shopping-basket" class="w-6 h-6 mb-1"></i>
-                    <span class="app-nav-label text-[10px] font-bold uppercase tracking-wider">Shop</span>
+                    <i data-lucide="shopping-basket" class="w-6 h-6"></i>
+                    <span class="app-nav-label">Shop</span>
                 </button>
                 <button data-nav-view="browse" onclick="renderBrowse()" class="app-nav-button" aria-label="Browse" title="Browse">
-                    <i data-lucide="compass" class="w-6 h-6 mb-1"></i>
-                    <span class="app-nav-label text-[10px] font-bold uppercase tracking-wider">Browse</span>
+                    <i data-lucide="compass" class="w-6 h-6"></i>
+                    <span class="app-nav-label">Browse</span>
                 </button>
                 <button data-nav-view="profile" onclick="renderProfile()" class="app-nav-button" aria-label="Profiel" title="Profiel">
-                    <i data-lucide="user-round" class="w-6 h-6 mb-1"></i>
-                    <span class="app-nav-label text-[10px] font-bold uppercase tracking-wider">Profiel</span>
-                </button>
-                <button data-nav-view="settings" onclick="renderSettings()" class="app-nav-button" aria-label="Opties" title="Opties">
-                    <i data-lucide="settings-2" class="w-6 h-6 mb-1"></i>
-                    <span class="app-nav-label text-[10px] font-bold uppercase tracking-wider">Opties</span>
+                    <i data-lucide="user-round" class="w-6 h-6"></i>
+                    <span class="app-nav-label">Profiel</span>
                 </button>
             </div>
         </nav>
@@ -4410,6 +4564,7 @@
         }
 
         function openCoverEditor() { if(!hasPremiumAccess()) { showPremiumModal("customize notebook covers"); return; }
+            closeCompetingSheets();
             draftNotebookCover = JSON.parse(JSON.stringify(normalizeNotebookCover(userSettings.notebookCover)));
             const modal = document.getElementById('cover-editor-modal');
             if (!modal) return;
@@ -8137,6 +8292,8 @@
         const toastEl = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
         let currentView = 'index';
+        let chromeBackAction = null;
+        let chromePeer = 'index';
         let desktopNavHideTimer = null;
         let desktopNavLastScrollTop = 0;
         let desktopNavLastPointerAt = 0;
@@ -8146,8 +8303,9 @@
             if (contentDiv) {
                 contentDiv.style.overflowY = 'auto';
             }
+            const peerView = view === 'settings' ? chromePeer : (view === 'add' ? 'index' : view);
             document.querySelectorAll('[data-nav-view]').forEach(button => {
-                const isActive = button.dataset.navView === view;
+                const isActive = button.dataset.navView === peerView;
                 button.classList.toggle('is-active', isActive);
                 if (isActive) {
                     button.setAttribute('aria-current', 'page');
@@ -8172,43 +8330,52 @@
         }
 
         function shouldShowTopBackButton() {
-            if (activeDetailRecipeId !== null) return false;
-            return ['add', 'browse', 'shopping', 'profile', 'settings'].includes(currentView);
+            return chromeBackAction != null;
+        }
+
+        function syncHeaderBackButton() {
+            const back = document.getElementById('header-back');
+            const show = chromeBackAction != null;
+            if (back) back.hidden = !show;
+            document.body.classList.toggle('chrome-push', show);
+            const gear = document.getElementById('header-open-settings');
+            const help = document.getElementById('header-help');
+            if (gear) gear.hidden = currentView === 'settings';
+            if (help) help.hidden = currentView !== 'settings';
         }
 
         function syncTopBackButton() {
             const backButton = document.getElementById('floating-back-button');
-            if (!backButton) return;
-
-            const visible = shouldShowTopBackButton();
-            backButton.classList.toggle('is-visible', visible);
+            if (backButton) {
+                backButton.classList.remove('is-visible');
+                backButton.hidden = true;
+            }
+            syncHeaderBackButton();
         }
 
         function handleTopBackAction() {
-            if (activeDetailRecipeId !== null) {
+            const action = chromeBackAction;
+            if (activeDetailRecipeId !== null || action === 'list') {
                 renderList();
                 return;
             }
-
-            switch (currentView) {
-                case 'add':
-                    cancelRecipeEditor();
-                    return;
-                case 'browse':
-                    renderList();
-                    return;
-                case 'shopping':
-                    renderList();
-                    return;
-                case 'profile':
-                    renderList();
-                    return;
-                case 'settings':
-                    renderList();
-                    return;
-                default:
-                    renderList();
+            if (action === 'cancel-editor' || currentView === 'add') {
+                cancelRecipeEditor();
+                return;
             }
+            if (action === 'profile') {
+                renderProfile();
+                return;
+            }
+            if (action === 'shop') {
+                renderShoppingList();
+                return;
+            }
+            if (action === 'browse') {
+                renderBrowse();
+                return;
+            }
+            renderList();
         }
 
         function isDesktopNavAutoHideEnabled() {
@@ -9699,6 +9866,8 @@
         // --- VIEWS ---
         function renderProfile() {
             if (!ensureAuthenticatedAccess()) return;
+            chromeBackAction = null;
+            chromePeer = 'profile';
             activeDetailRecipeId = null;
             isCookingMode = false;
             document.getElementById('body').classList.remove('cooking-mode-active');
@@ -9848,6 +10017,7 @@
 
             isCookingMode = false;
             document.getElementById('body').classList.remove('cooking-mode-active');
+            chromeBackAction = 'profile';
             setActiveNav('profile');
 
             const bannerBg = userSettings.bannerPic || defaultPlaceholderBanner;
@@ -9857,7 +10027,7 @@
             const publishedRecipes = recipes.filter(recipe => recipe.source !== 'published' && isRecipePublishedLive(recipe)).length;
 
             contentDiv.innerHTML = `
-                <div class="max-w-4xl mx-auto space-y-6">
+                <div class="push-sheet max-w-4xl mx-auto space-y-6">
                     <div class="bg-white rounded-sm shadow-sm border border-parchmentDark overflow-hidden">
                         <div class="h-44 bg-cover bg-center relative" style="background-image: url('${bannerBg}')">
                             <div class="absolute inset-0 bg-gradient-to-t from-forest/60 to-transparent"></div>
@@ -9897,9 +10067,6 @@
                             <h3 class="font-fantasy font-bold text-3xl text-forest flex items-center gap-2">
                                 <i data-lucide="user-round-cog" class="w-7 h-7 text-gold"></i> Profile Details
                             </h3>
-                            <button type="button" onclick="renderProfile()" class="${getAppButtonClasses('secondary')}">
-                                <i data-lucide="arrow-left" class="h-4 w-4"></i>Back to profile
-                            </button>
                         </div>
 
                         <form onsubmit="saveProfile(event)" class="space-y-6">
@@ -10016,6 +10183,10 @@
 
         function renderSettings() {
             if (!ensureAuthenticatedAccess()) return;
+            if (currentView === 'shopping') chromeBackAction = 'shop';
+            else if (currentView === 'browse') chromeBackAction = 'browse';
+            else if (currentView === 'profile') chromeBackAction = 'profile';
+            else chromeBackAction = 'list';
             activeDetailRecipeId = null;
             isCookingMode = false;
             document.getElementById('body').classList.remove('cooking-mode-active');
@@ -10228,7 +10399,6 @@
                                 <option value="de" ${userSettings.language === 'de' ? 'selected' : ''}>Deutsch</option>
                                 <option value="es" ${userSettings.language === 'es' ? 'selected' : ''}>Español</option>
                             </select>
-                            <p class="mt-2 text-xs font-semibold text-sage">Language preference is saved in-app. For highest translation quality on every screen, browser Translate remains the fallback.</p>
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Visual Mode</label>
@@ -10274,75 +10444,73 @@
                 </div>
             `;
 
+            const accountStatus = currentUser?.email || userSettings.email || userSettings.name || 'Lokaal';
+            const backupStatus = premiumActive ? 'Ready' : 'Premium';
             contentDiv.innerHTML = `
-                <div class="mb-8 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg">
-                    <div class="border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment px-5 py-5">
-                        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                            <div>
-                                <h2 class="font-fantasy text-3xl font-bold text-forest">Opties</h2>
-                                <p class="mt-1 text-sm font-semibold text-sage opacity-80">Profile, preferences, privacy, and terms.</p>
-                            </div>
-                            <div class="flex flex-wrap gap-3">
-                                <button onclick="renderProfile()" class="${getAppButtonClasses('secondary', { size: 'lg' })}">
-                                    <i data-lucide="user-round" class="w-4 h-4"></i> Profiel
-                                </button>
-                                <button onclick="renderList()" class="${getAppButtonClasses('secondary', { size: 'lg' })}">
-                                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Archive
-                                </button>
-                            </div>
-                        </div>
+                <div class="settings-sheet push-sheet">
+                    <h2 class="px-1 pb-1 font-fantasy text-2xl font-bold text-forest">Opties</h2>
+                    <div class="settings-row">
+                        <span>Plan</span>
+                        <span class="settings-status">${escapeHTML(billingMeta.badge || '')}</span>
                     </div>
-
-                    <div class="p-5 md:p-8">
-                        ${currentPlanSection}
-                        
-                        <div class="space-y-6">
-                            ${renderSettingsDisclosure({
-                                icon: 'user-round',
-                                title: 'Account Settings',
-                                summary: 'Manage your profile details and cloud sync connection.',
-                                content: accountContent,
-                                open: false,
-                                badge: ''
-                            })}
-                            ${renderSettingsDisclosure({
-                                icon: 'book-open',
-                                title: 'App Preferences',
-                                summary: 'Adjust measurement and language defaults.',
-                                content: preferencesContent,
-                                open: true
-                            })}
-                            ${renderSettingsDisclosure({
-                                icon: 'credit-card',
-                                title: 'Billing',
-                                summary: 'Plan and restore actions.',
-                                content: billingContent,
-                                open: false
-                            })}
-                            ${renderSettingsDisclosure({
-                                icon: 'info',
-                                title: 'About & Support',
-                                summary: 'Tutorial, guide, and legal pages.',
-                                content: infoContent,
-                                open: false
-                            })}
-                            ${renderSettingsDisclosure({
-                                icon: 'archive',
-                                title: 'Backup & Restore',
-                                summary: 'Download or restore your data archive.',
-                                content: powerToolsContent,
-                                open: false
-                            })}
-                            ${renderSettingsDisclosure({
-                                icon: 'shield-check',
-                                title: 'Admin & Safety',
-                                summary: 'Account admin rights, duplicate cleanup, and harmful-content moderation.',
-                                content: adminManagementContent,
-                                open: false,
-                                badge: isCurrentUserAdmin() ? 'Admin' : ''
-                            })}
-                        </div>
+                    <div class="settings-actions">
+                        <button type="button" onclick="showPlansModal()" class="${getAppButtonClasses('accent', { size: 'sm' })}">View Plans</button>
+                        ${billingMeta.state === 'preview'
+                            ? `<button type="button" onclick="resetPremiumPreviewAccess()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">Reset</button>`
+                            : `<button type="button" onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { size: 'sm' })}">Restore</button>`}
                     </div>
+                    <div class="settings-divider"></div>
+                    <div class="settings-row">
+                        <span>Account</span>
+                        <span class="settings-status">${escapeHTML(accountStatus)}</span>
+                    </div>
+                    <div class="settings-actions">
+                        ${isAuthenticated
+                            ? `<button type="button" onclick="signOut()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">Sign Out</button>`
+                            : `<button type="button" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { size: 'sm' })}">${firebaseInitialized ? 'Google' : 'Google'}</button>`}
+                    </div>
+                    <div class="settings-divider"></div>
+                    <form onsubmit="saveSettings(event)">
+                        <label class="settings-row">
+                            <span>Measurement</span>
+                            <select id="settings-measurement" class="settings-select">
+                                <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>Metric</option>
+                                <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>Imperial</option>
+                            </select>
+                        </label>
+                        <label class="settings-row">
+                            <span>Language</span>
+                            <select id="settings-language" class="settings-select">
+                                <option value="en" ${userSettings.language === 'en' ? 'selected' : ''}>English</option>
+                                <option value="nl" ${userSettings.language === 'nl' ? 'selected' : ''}>Nederlands</option>
+                                <option value="fr" ${userSettings.language === 'fr' ? 'selected' : ''}>Français</option>
+                                <option value="de" ${userSettings.language === 'de' ? 'selected' : ''}>Deutsch</option>
+                                <option value="es" ${userSettings.language === 'es' ? 'selected' : ''}>Español</option>
+                            </select>
+                        </label>
+                        <label class="settings-row">
+                            <span>Auto-publish</span>
+                            <input type="checkbox" id="settings-auto-publish" ${userSettings.autoPublish ? 'checked' : ''}>
+                        </label>
+                        <div class="settings-actions">
+                            <button type="submit" class="${getAppButtonClasses('primary', { size: 'sm' })}">Save</button>
+                        </div>
+                    </form>
+                    <div class="settings-divider"></div>
+                    <div class="settings-row">
+                        <span>Backup</span>
+                        <span class="settings-status">${backupStatus}</span>
+                    </div>
+                    <div class="settings-actions">
+                        <button type="button" onclick="${backupDownloadLocked ? "showPremiumModal('download backups')" : 'exportAllAsJSON()'}" class="${getAppButtonClasses(backupDownloadLocked ? 'locked' : 'secondary', { size: 'sm' })}">Download</button>
+                        ${backupRestoreLocked
+                            ? `<button type="button" onclick="showPremiumModal('restore backups')" class="${getAppButtonClasses('locked', { size: 'sm' })}">Restore</button>`
+                            : `<label class="${getAppButtonClasses('secondary', { size: 'sm' })} cursor-pointer">Restore<input type="file" accept=".json" onchange="importFromJSON(event)" style="display: none;"></label>`}
+                    </div>
+                    <div class="settings-divider"></div>
+                    <button type="button" onclick="showPrivacyPolicy()" class="settings-row">Privacybeleid</button>
+                    <button type="button" onclick="showTermsOfUse()" class="settings-row">Gebruiksvoorwaarden</button>
+                    ${isCurrentUserAdmin() ? `<div class="settings-divider"></div><div class="pt-2">${adminManagementContent}</div>` : ''}
                 </div>
             `;
             lucide.createIcons();
@@ -10389,16 +10557,16 @@
                 },
                 {
                     title: 'Navigatie',
-                    body: 'Via de tabbladen onderaan schakel je tussen Recepten, Boodschappenlijst, Browse, Profiel en Instellingen.',
+                    body: 'Via de tabbladen onderaan schakel je tussen Recepten, Shop, Browse en Profiel.',
                     icon: 'navigation',
                     target: '#main-nav',
                     position: 'above'
                 },
                 {
                     title: 'Instellingen',
-                    body: 'Sla taalvoorkeur op, maak backups, beheer je account en herstart deze rondleiding wanneer je wil via Settings.',
+                    body: 'Opties open je via het tandwiel. Daar staan account, taal en backup.',
                     icon: 'settings-2',
-                    target: 'button[data-nav-view="settings"]',
+                    target: '#header-open-settings',
                     position: 'above'
                 }
             ];
@@ -11853,6 +12021,8 @@
         }
 
         function renderList() {
+            chromeBackAction = null;
+            chromePeer = 'index';
             activeDetailRecipeId = null;
             if (!ensureAuthenticatedAccess()) {
                 return;
@@ -12226,6 +12396,8 @@
         }
 
         function renderShoppingList() {
+            chromeBackAction = null;
+            chromePeer = 'shopping';
             activeDetailRecipeId = null;
             document.getElementById('body').classList.remove('cooking-mode-active');
             setActiveNav('shopping');
@@ -12393,6 +12565,7 @@
             activeDetailRecipeId = null;
             isCookingMode = false;
             document.getElementById('body').classList.remove('cooking-mode-active');
+            chromeBackAction = 'browse';
             setActiveNav('browse');
             viewedPublicProfileAuthorId = authorId;
 
@@ -12447,24 +12620,14 @@
 
             contentDiv.innerHTML = `
                 <div class="max-w-5xl mx-auto space-y-6">
-                    <div class="mb-2">
-                        <button onclick="renderBrowse()" class="${getAppButtonClasses('secondary', { size: 'lg' })}">
-                            <i data-lucide="arrow-left" class="h-4 w-4"></i>Back to Browse
-                        </button>
-                    </div>
-
-                    <div class="bg-white rounded-sm shadow-sm border border-parchmentDark overflow-hidden">
-                        <div class="h-52 md:h-60 bg-cover bg-center relative" style="background-image: url('${displayBanner}')">
-                            <div class="absolute inset-0 bg-gradient-to-t from-forest/70 via-forest/20 to-transparent"></div>
-                            <div class="absolute left-6 md:left-8 bottom-0 translate-y-1/2 w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-white shadow-2xl bg-cover bg-center bg-white z-20" style="background-image: url('${displayPhoto}')"></div>
-                        </div>
-                        <div class="px-6 md:px-8 pb-8 pt-0">
-                            <div class="flex flex-col gap-4 relative z-10 -mt-14 md:-mt-20 md:flex-row md:items-end md:justify-between">
-                                <div class="flex flex-col gap-4 md:min-w-0 md:pl-36">
-                                    <div class="rounded-[28px] border border-white/70 bg-gradient-to-br from-white/95 via-parchment/85 to-white/90 px-5 py-4 shadow-2xl backdrop-blur-md md:max-w-2xl md:min-w-[420px]">
-                                        <h2 class="font-fantasy font-bold text-4xl text-forest leading-tight break-words">${escapeHTML(displayName)}</h2>
-                                        <p class="text-sm font-bold uppercase tracking-[0.24em] text-sage mt-1">${escapeHTML(displayCountry)}</p>
-                                        <p class="mt-3 text-sm font-semibold text-forest opacity-85 truncate" title="${escapeHTML(displayBio)}">${escapeHTML(displayBio)}</p>
+                    <div class="push-sheet bg-white rounded-sm shadow-sm border border-parchmentDark overflow-hidden">
+                        <div class="profile-banner" style="background-image: url('${displayBanner}')"></div>
+                        <div class="profile-identity">
+                            <div class="profile-avatar" style="background-image: url('${displayPhoto}')"></div>
+                            <div class="profile-copy">
+                                <h2 class="profile-name font-fantasy font-bold">${escapeHTML(displayName)}</h2>
+                                <p class="profile-place">${escapeHTML(displayCountry)}</p>
+                                <p class="profile-bio" title="${escapeHTML(displayBio)}">${escapeHTML(displayBio)}</p>
                                         <div class="mt-4 flex flex-wrap items-center gap-2">
                                             <span class="inline-flex items-center gap-1.5 rounded-full bg-white/85 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-sage shadow-sm ring-1 ring-parchmentDark/60">
                                                 <i data-lucide="globe" class="h-3.5 w-3.5"></i>Public profile
@@ -12479,8 +12642,6 @@
                                                 <i data-lucide="flag" class="h-3.5 w-3.5"></i>Report profile
                                             </button>
                                         </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -12545,6 +12706,8 @@
         }
 
         async function renderBrowse() {
+            chromeBackAction = null;
+            chromePeer = 'browse';
             activeDetailRecipeId = null;
             isCookingMode = false;
             document.getElementById('body').classList.remove('cooking-mode-active');
@@ -12682,6 +12845,7 @@
                 return;
             }
 
+            chromeBackAction = 'browse';
             setActiveNav('browse');
 
             const saved = isPublishedRecipeSaved(recipe.id);
@@ -12693,9 +12857,8 @@
             const canAdminForceOfflinePublished = isCurrentUserAdmin() && recipe.publicationState !== 'retracted';
 
             contentDiv.innerHTML = `
-                <div class="bg-white rounded-sm shadow-sm mb-6 border border-parchmentDark relative w-full overflow-hidden">
-                    <div class="absolute top-4 left-4 right-4 flex justify-between z-10 pointer-events-none">
-                        <button onclick="renderBrowse()" class="pointer-events-auto ${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })} border-2 border-white shadow-xl hover:scale-105"><i data-lucide="arrow-left" class="w-6 h-6"></i></button>
+                <div class="push-sheet bg-white rounded-sm shadow-sm mb-6 border border-parchmentDark relative w-full overflow-hidden">
+                    <div class="absolute top-4 left-4 right-4 flex justify-end z-10 pointer-events-none">
                         ${owned ? `
                             <div class="pointer-events-auto flex flex-wrap items-center justify-end gap-2">
                                 ${ownedLocalRecipe ? `<button onclick="renderDetail(${ownedLocalRecipe.id})" class="${getAppButtonClasses('secondary', { size: 'lg' })} border-2 border-white shadow-xl"><i data-lucide="book-open" class="w-4 h-4"></i>Open local</button>` : ''}
@@ -13025,7 +13188,17 @@
             startPremiumUpgradeFlow('legacy-preview');
         };
 
+        function closeCompetingSheets() {
+            document.querySelectorAll('.app-overlay[id^="dynamic-modal-"]').forEach(node => node.remove());
+            ['notes-modal', 'cover-editor-modal', 'timer-modal'].forEach(id => {
+                const node = document.getElementById(id);
+                if (!node) return;
+                node.classList.add('hidden', 'opacity-0');
+            });
+        }
+
         function createModal(title, contentHTML, buttons = []) {
+            closeCompetingSheets();
             const modalId = 'dynamic-modal-' + Date.now();
             const modalHtml = `
                 <div id="${modalId}" class="app-overlay fixed inset-0 bg-black bg-opacity-60 hidden opacity-0 transition-opacity z-[180] flex">
@@ -13654,6 +13827,7 @@
         function openNotesEditor(recipeId) {
             const recipe = recipes.find(r => r.id === recipeId);
             if (!recipe) return;
+            closeCompetingSheets();
             
             const currentNotes = recipe.personalNotes || '';
             const modal = document.getElementById('notes-modal');
@@ -13779,6 +13953,7 @@
             if (!recipe) return;
 
             activeDetailRecipeId = id;
+            chromeBackAction = 'list';
             setActiveNav('index');
             check12HourReset(recipe);
             currentScale = 1;
@@ -13853,17 +14028,12 @@
 
             contentDiv.innerHTML = `
                 <div class="cook-mode-bar">
-                    <button onclick="toggleCookingMode(${recipe.id})" id="cooking-mode-exit-btn" class="cooking-mode-exit-btn h-11 items-center gap-2 rounded-full bg-forest px-4 text-sm font-bold text-white shadow-md transition-[background-color,color,border-color] duration-200 hover:bg-gold hover:text-forest">
-                        <i data-lucide="x-circle" class="w-5 h-5"></i> Back to recipe
+                    <button onclick="toggleCookingMode(${recipe.id})" id="cooking-mode-exit-btn" class="cooking-mode-exit-btn header-icon-button" aria-label="Back to recipe">
+                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
                     </button>
                     <p class="cook-mode-title">${escapeHTML(recipe.title)}</p>
                 </div>
-                <div class="detail-back-row mb-4 flex flex-wrap items-center gap-3">
-                    <button onclick="renderList()" class="${getAppButtonClasses('secondary', { size: 'lg' })}">
-                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Archive
-                    </button>
-                </div>
-                <div class="detail-shell bg-white rounded-sm shadow-sm mb-6 border border-parchmentDark relative w-full">
+                <div class="detail-shell push-sheet bg-white rounded-sm shadow-sm mb-6 border border-parchmentDark relative w-full">
                     <div class="detail-hero-shell rounded-t-sm">
                         <div class="detail-hero-wash" aria-hidden="true">
                             <div class="detail-hero-wash-image" style="background-image: url('${headerBg}')"></div>
@@ -14123,6 +14293,7 @@
 
             isCookingMode = false;
             document.getElementById('body').classList.remove('cooking-mode-active');
+            chromeBackAction = 'cancel-editor';
             setActiveNav('add');
             const recipeToEdit = recipeId ? recipes.find(recipe => recipe.id === recipeId && recipe.source === 'local') : null;
             editingRecipeId = recipeToEdit ? recipeToEdit.id : null;
@@ -14156,16 +14327,10 @@
             }).join('');
 
             contentDiv.innerHTML = `
-                <div class="bg-white p-6 md:p-10 rounded-sm shadow-sm mb-6 border border-parchmentDark max-w-4xl mx-auto">
+                <div class="push-sheet bg-white p-6 md:p-10 rounded-sm shadow-sm mb-6 border border-parchmentDark max-w-4xl mx-auto">
 
-                    <div class="mb-8 flex flex-col gap-4 border-b border-accent pb-5 md:flex-row md:items-start md:justify-between">
-                        <div>
-                            <h2 class="font-fantasy font-bold text-3xl text-forest flex items-center gap-2"><i data-lucide="file-plus-2" class="w-8 h-8 text-gold"></i> ${formTitle}</h2>
-                            <p class="mt-2 text-sm font-semibold text-sage">${editorGuidance}</p>
-                        </div>
-                        <button type="button" onclick="cancelRecipeEditor()" class="${getAppButtonClasses('secondary', { size: 'lg' })}">
-                            <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
-                        </button>
+                    <div class="mb-6">
+                        <h2 class="font-fantasy font-bold text-3xl text-forest">${formTitle}</h2>
                     </div>
                     
                     <form id="add-recipe-form" class="space-y-8" onsubmit="saveRecipe(event)">
