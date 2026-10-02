@@ -3670,7 +3670,13 @@
             userSettings.premium = hasPremiumBillingStatus(userSettings.billing.status);
         }
 
+        // Alleen de lokale Testmodus, nooit een echt account en nooit uculi.com.
+        function isLocalTestPremiumSession() {
+            return isDeveloperBypassSession() && !isProductionUculiHost() && isLocalDeveloperPreviewContext();
+        }
+
         function hasPremiumAccess() {
+            if (isLocalTestPremiumSession()) return true;
             return hasPremiumBillingStatus(normalizeBillingProfile(userSettings.billing).status) || Boolean(userSettings.premium);
         }
 
@@ -3693,6 +3699,16 @@
         }
 
         function getBillingStatusMeta() {
+            if (isLocalTestPremiumSession()) {
+                return {
+                    state: 'testmodus',
+                    badge: 'Testmodus Premium',
+                    summary: 'Premium staat open in deze testsessie. Alles blijft lokaal op dit apparaat, zonder betaling.',
+                    sourceLabel: 'Testmodus',
+                    actionLabel: 'Lokaal in testmodus'
+                };
+            }
+
             const billing = normalizeBillingProfile(userSettings.billing);
             const status = String(billing.status || 'free').toLowerCase();
             const planId = String(billing.planId || 'premium').toLowerCase();
@@ -6355,7 +6371,7 @@
                 return false;
             }
 
-            showToast('Testmodus staat aan. Alles blijft lokaal op dit apparaat, zonder login.', 'shield');
+            showToast('Testmodus staat aan. Premium is lokaal open op dit apparaat, zonder login.', 'shield');
             enterAppFromLanding('local-test-mode');
             return true;
         }
