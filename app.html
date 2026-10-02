@@ -286,6 +286,33 @@
                 min-width: 5.2rem;
                 padding: 0.85rem 0.95rem 0.75rem;
             }
+
+            .profile-banner {
+                height: 10.5rem;
+            }
+
+            .profile-identity {
+                flex-direction: row;
+                align-items: flex-end;
+                gap: 1.25rem;
+                margin-top: -3rem;
+                padding: 0 2rem 1.5rem;
+                text-align: left;
+            }
+
+            .profile-avatar {
+                width: 7.25rem;
+                height: 7.25rem;
+            }
+
+            .profile-name {
+                font-size: 2.6rem;
+            }
+
+            .profile-chips,
+            .profile-actions {
+                justify-content: flex-start;
+            }
         }
 
         @media (min-width: 1024px) {
@@ -294,6 +321,118 @@
                 top: 5.25rem;
                 bottom: auto;
             }
+        }
+
+        #header-add-recipe {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            height: 2.5rem;
+            padding: 0 0.9rem;
+            border-radius: 0.85rem;
+            background: #1c1410;
+            color: #fbf8f3;
+            font-family: Outfit, sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            line-height: 1;
+            box-shadow: none;
+        }
+
+        #header-add-recipe:hover {
+            background: #c89050;
+            color: #1c1410;
+        }
+
+        #header-add-recipe[hidden] {
+            display: none !important;
+        }
+
+        .profile-banner {
+            position: relative;
+            height: 6.5rem;
+            background-color: #f6f1e8;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .profile-banner::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(246, 241, 232, 0.2), rgba(28, 20, 16, 0.22));
+        }
+
+        .profile-identity {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: -2.15rem;
+            padding: 0 1rem 1.15rem;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 5.25rem;
+            height: 5.25rem;
+            flex: 0 0 auto;
+            border: 3px solid #fbf8f3;
+            border-radius: 999px;
+            background-color: #f6f1e8;
+            background-position: center;
+            background-size: cover;
+            box-shadow: 0 10px 22px rgba(28, 20, 16, 0.16);
+        }
+
+        .profile-copy {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .profile-name {
+            margin: 0;
+            color: #1c1410;
+            font-size: clamp(1.65rem, 7vw, 2.15rem);
+            line-height: 1.1;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-place {
+            margin: 0.35rem 0 0;
+            color: #909870;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            line-height: 1.35;
+            text-transform: uppercase;
+        }
+
+        .profile-bio {
+            margin: 0.55rem 0 0;
+            color: #1c1410;
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .profile-chips,
+        .profile-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.45rem;
+        }
+
+        .profile-chips {
+            margin-top: 0.75rem;
+        }
+
+        .profile-actions {
+            margin-top: 0.85rem;
         }
 
         .app-overlay {
@@ -370,9 +509,15 @@
             }
         }
 
+        @media (max-width: 1023px) {
+            .floating-back-button {
+                display: none !important;
+            }
+        }
+
         @media (max-width: 767px) {
             #app-content {
-                padding-bottom: calc(4.9rem + env(safe-area-inset-bottom, 0px));
+                padding-bottom: calc(8rem + env(safe-area-inset-bottom, 0px));
             }
 
             #main-header {
@@ -392,6 +537,41 @@
             #main-header > button i {
                 width: 0.95rem;
                 height: 0.95rem;
+            }
+
+            #header-add-recipe {
+                width: 2.75rem;
+                padding: 0;
+            }
+
+            #header-add-recipe .header-add-label {
+                display: none;
+            }
+
+            .index-overview {
+                margin-bottom: 0.75rem !important;
+            }
+
+            .index-overview .index-overview-head {
+                padding: 0.75rem 0.8rem !important;
+            }
+
+            .index-overview .index-overview-title {
+                font-size: 1.35rem;
+                line-height: 1.15;
+            }
+
+            .index-overview .index-overview-count {
+                margin-top: 0.35rem !important;
+            }
+
+            .index-overview .index-plan-note {
+                margin-top: 0.5rem !important;
+                padding: 0.5rem 0.7rem !important;
+            }
+
+            .index-overview .index-plan-detail {
+                display: none;
             }
 
             .app-header-brand {
@@ -2158,8 +2338,8 @@
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                     <span id="undo-delete-label">Undo</span>
                 </button>
-                <button onclick="renderAddForm()" class="flex h-10 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Add Recipe
+                <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="flex h-10 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
+                    <i data-lucide="plus" class="w-4 h-4"></i> <span class="header-add-label">Add Recipe</span>
                 </button>
             </div>
         </header>
@@ -7972,7 +8152,14 @@
             syncNotificationBell();
             syncRecipeUndoButton();
             syncTopBackButton();
+            syncHeaderAddButton();
             revealDesktopNav();
+        }
+
+        function syncHeaderAddButton() {
+            const button = document.getElementById('header-add-recipe');
+            if (!button) return;
+            button.hidden = !(currentView === 'index' && activeDetailRecipeId == null);
         }
 
         function shouldShowTopBackButton() {
@@ -9523,13 +9710,6 @@
             const hasCustomProfile = Boolean(userSettings.profilePic && userSettings.profilePic !== defaultPlaceholderProfile);
             const bannerBg = hasCustomBanner ? userSettings.bannerPic : getCulinaryTextureBanner();
             const profileBg = hasCustomProfile ? userSettings.profilePic : getWarmAvatarPlaceholder(userSettings.name || 'U');
-            const bannerTone = getProfileBannerTone(bannerBg);
-            const nameTextClass = bannerTone === 'dark'
-                ? 'text-gold drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]'
-                : 'text-forest';
-            const countryTextClass = bannerTone === 'dark'
-                ? 'text-parchment drop-shadow-[0_1px_2px_rgba(0,0,0,0.45)]'
-                : 'text-sage';
             const createdRecipes = recipes.filter(recipe => recipe.source !== 'published').length;
             const savedRecipes = recipes.filter(recipe => recipe.source === 'published').length;
             const publishedRecipes = recipes.filter(recipe => recipe.source !== 'published' && isRecipePublishedLive(recipe)).length;
@@ -9541,36 +9721,29 @@
             contentDiv.innerHTML = `
                 <div class="max-w-4xl mx-auto space-y-6">
                     <div class="bg-white rounded-sm shadow-sm border border-parchmentDark overflow-hidden">
-                        <div class="h-52 md:h-60 bg-cover bg-center relative" style="background-image: url('${bannerBg}')">
-                            <div class="absolute inset-0 bg-gradient-to-t from-forest/22 via-transparent to-white/15"></div>
-                            <div class="absolute inset-0 bg-gradient-to-r from-white/8 via-transparent to-forest/10"></div>
-                            <div class="absolute left-6 md:left-8 bottom-0 translate-y-1/2 w-28 h-28 md:w-32 md:h-32 rounded-full border-4 border-white shadow-2xl bg-cover bg-center bg-white z-20 ring-4 ring-forest/10" style="background-image: url('${profileBg}')"></div>
-                        </div>
-                        <div class="px-6 md:px-8 pb-8 pt-0">
-                            <div class="flex flex-col gap-4 relative z-10 -mt-14 md:-mt-20 md:flex-row md:items-end md:justify-between">
-                                <div class="flex flex-col gap-4 md:min-w-0 md:pl-36">
-                                    <div class="rounded-[28px] border border-white/60 bg-gradient-to-br from-white/96 via-parchment/88 to-white/92 px-5 py-4 shadow-xl backdrop-blur-sm md:max-w-2xl md:min-w-[420px]">
-                                        <h2 class="font-fantasy font-bold text-4xl leading-tight break-words ${nameTextClass}">${escapeHTML(userSettings.name || t.yourProfile)}</h2>
-                                        <p class="text-sm font-bold uppercase tracking-[0.24em] mt-1 ${countryTextClass}">${escapeHTML(userSettings.country || t.setCountry)}</p>
-                                        <p class="mt-3 text-sm font-semibold text-forest opacity-85 truncate" title="${escapeHTML(userSettings.bio || t.addBio)}">${escapeHTML(userSettings.bio || t.addBio)}</p>
-                                        <div class="mt-4 flex flex-wrap items-center gap-2">
-                                            <span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-sage shadow-sm">
-                                                <i data-lucide="${userSettings.isPublic ? 'globe' : 'lock'}" class="h-3.5 w-3.5"></i>
-                                                ${userSettings.isPublic ? t.publicProfile : t.privateProfile}
-                                            </span>
-                                            <span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold text-sage shadow-sm">
-                                                <i data-lucide="heart" class="h-3.5 w-3.5"></i>${totalPublicLikes} ${t.likes}
-                                            </span>
-                                            ${(() => {
-                                                const primaryFamily = (userFamilies || []).find(f => !f.removedMembers?.some(m => m.userId === currentUser?.uid));
-                                                if (!primaryFamily) return '';
-                                                const fc = getFamilyColorOption(primaryFamily.colorKey);
-                                                return `<span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold shadow-sm" style="color:${fc.hex};"><i data-lucide="users" class="h-3.5 w-3.5"></i>#1 ${escapeHTML(primaryFamily.name)}</span>`;
-                                            })()}
-                                        </div>
-                                    </div>
+                        <div class="profile-banner" style="background-image: url('${bannerBg}')"></div>
+                        <div class="profile-identity">
+                            <div class="profile-avatar" style="background-image: url('${profileBg}')"></div>
+                            <div class="profile-copy">
+                                <h2 class="profile-name font-fantasy font-bold">${escapeHTML(userSettings.name || t.yourProfile)}</h2>
+                                <p class="profile-place">${escapeHTML(userSettings.country || t.setCountry)}</p>
+                                <p class="profile-bio" title="${escapeHTML(userSettings.bio || t.addBio)}">${escapeHTML(userSettings.bio || t.addBio)}</p>
+                                <div class="profile-chips">
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-sage shadow-sm">
+                                        <i data-lucide="${userSettings.isPublic ? 'globe' : 'lock'}" class="h-3.5 w-3.5"></i>
+                                        ${userSettings.isPublic ? t.publicProfile : t.privateProfile}
+                                    </span>
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold text-sage shadow-sm">
+                                        <i data-lucide="heart" class="h-3.5 w-3.5"></i>${totalPublicLikes} ${t.likes}
+                                    </span>
+                                    ${(() => {
+                                        const primaryFamily = (userFamilies || []).find(f => !f.removedMembers?.some(m => m.userId === currentUser?.uid));
+                                        if (!primaryFamily) return '';
+                                        const fc = getFamilyColorOption(primaryFamily.colorKey);
+                                        return `<span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold shadow-sm" style="color:${fc.hex};"><i data-lucide="users" class="h-3.5 w-3.5"></i>#1 ${escapeHTML(primaryFamily.name)}</span>`;
+                                    })()}
                                 </div>
-                                <div class="self-start md:self-end flex flex-wrap gap-2 rounded-2xl border border-white/70 bg-white/75 p-1.5 shadow-lg backdrop-blur-sm">
+                                <div class="profile-actions">
                                     <button onclick="renderSettings()" class="${getAppButtonClasses('secondary')}">
                                         <i data-lucide="settings-2" class="h-4 w-4 text-gold"></i>Opties
                                     </button>
@@ -9655,7 +9828,6 @@
                 </div>
             `;
             lucide.createIcons();
-            analyzeProfileBannerTone(bannerBg);
             initFamilySortable();
         }
 
@@ -11768,8 +11940,8 @@
             </div>`).join('');
 
             let html = showNotebookOverviewCard ? `
-                <div class="${isNotebookMode ? 'mb-3 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg' : 'mb-8 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg'}">
-                    <div class="border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment ${isNotebookMode ? 'px-4 py-3 md:px-5 md:py-3' : 'px-5 py-5'}">
+                <div class="${isNotebookMode ? 'mb-3 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg' : 'index-overview mb-8 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg'}">
+                    <div class="index-overview-head border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment ${isNotebookMode ? 'px-4 py-3 md:px-5 md:py-3' : 'px-5 py-5'}">
                         <div class="${isNotebookMode ? 'flex flex-wrap items-center justify-between gap-3' : 'flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'}">
                             <div>
                                 ${isNotebookMode ? `
@@ -11779,13 +11951,13 @@
                                         <span class="inline-flex items-center rounded-full border border-parchmentDark bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-sage shadow-sm">${resultLabel}</span>
                                     </div>
                                 ` : `
-                                    <h2 class="font-fantasy text-3xl font-bold text-forest">Every recipe you created and liked</h2>
-                                    <p class="mt-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-sage opacity-80">
+                                    <h2 class="index-overview-title font-fantasy text-3xl font-bold text-forest">Every recipe you created and liked</h2>
+                                    <p class="index-overview-count mt-3 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.22em] text-sage opacity-80">
                                         <i data-lucide="book-copy" class="h-4 w-4"></i>${resultLabel}
                                     </p>
-                                    <div class="mt-4 rounded-2xl border border-parchmentDark bg-white/90 px-4 py-3 shadow-sm max-w-xl">
-                                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${premiumActive ? billingMeta.badge : `Free plan: ${localRecipeCount}/${freeLocalRecipeLimit} local recipes used`}</p>
-                                        <p class="mt-1 text-sm font-semibold leading-relaxed text-forest">${premiumActive ? billingMeta.summary : `${freeRecipeSlotsRemaining} free slot${freeRecipeSlotsRemaining === 1 ? '' : 's'} left on this device. Premium unlocks notebook mode, sharing, downloads, cloud sync, and families.`}</p>
+                                    <div class="index-plan-note mt-4 rounded-2xl border border-parchmentDark bg-white/90 px-4 py-3 shadow-sm max-w-xl">
+                                        <p class="index-plan-kicker text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${premiumActive ? billingMeta.badge : `Free plan: ${localRecipeCount}/${freeLocalRecipeLimit} local recipes used`}</p>
+                                        <p class="index-plan-detail mt-1 text-sm font-semibold leading-relaxed text-forest">${premiumActive ? billingMeta.summary : `${freeRecipeSlotsRemaining} free slot${freeRecipeSlotsRemaining === 1 ? '' : 's'} left on this device. Premium unlocks notebook mode, sharing, downloads, cloud sync, and families.`}</p>
                                     </div>
                                 `}
                             </div>
@@ -11989,7 +12161,7 @@
                 });
                 html += '</div>';
             } else {
-                html += '<div class="grid grid-cols-1 gap-6 pb-6 md:grid-cols-2 lg:grid-cols-3">';
+                html += '<div class="grid grid-cols-1 gap-3 pb-6 md:grid-cols-2 md:gap-6 lg:grid-cols-3">';
                 filteredRecipes.forEach(recipe => {
                     const savedRecipeOutdated = isSavedPublishedRecipeOutdated(recipe);
                     const recipeVersionLabel = getPublishedVersionLabel(recipe);
