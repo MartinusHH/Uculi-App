@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Uculi — Your recipe book, forever</title>
     <meta name="description" content="Uculi is a personal recipe notebook you share with family. Save recipes, cook together, and make sure grandma's apple pie is never lost again.">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <script>
@@ -12,19 +13,20 @@
             theme: {
                 extend: {
                     colors: {
-                        forest:       '#2D4A3E',
-                        forestLight:  '#3D6050',
-                        sage:         '#7A9E7E',
-                        gold:         '#C9A84C',
-                        goldLight:    '#E8C96B',
-                        parchment:    '#F5F0E8',
-                        parchmentDark:'#E8DFD0',
+                        forest:       '#1c1410',
+                        forestLight:  '#c89050',
+                        sage:         '#909870',
+                        gold:         '#c89050',
+                        goldLight:    '#c89050',
+                        parchment:    '#f6f1e8',
+                        paper:        '#fbf8f3',
+                        parchmentDark:'#E4D7C4',
                         coral:        '#E07A5F',
                     },
                     fontFamily: {
-                        serif:   ['Georgia', 'Cambria', 'serif'],
-                        sans:    ['system-ui', '-apple-system', 'sans-serif'],
-                        fantasy: ['Palatino Linotype', 'Palatino', 'Book Antiqua', 'Georgia', 'serif'],
+                        serif:   ['Fraunces', 'serif'],
+                        sans:    ['Outfit', 'sans-serif'],
+                        fantasy: ['Fraunces', 'serif'],
                     },
                     animation: {
                         'fade-up': 'fadeUp 0.6s ease both',
@@ -44,7 +46,7 @@
 
         .hero-grain {
             background-image:
-                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201,168,76,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(200, 144, 80,0.18) 0%, transparent 60%),
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
         }
 
@@ -59,7 +61,7 @@
             transition: box-shadow 0.2s ease, transform 0.2s ease;
         }
         .card-hover:hover {
-            box-shadow: 0 8px 32px rgba(45,74,62,0.10);
+            box-shadow: 0 8px 32px rgba(28, 20, 16,0.10);
             transform: translateY(-2px);
         }
 
@@ -105,9 +107,7 @@
 <nav class="sticky top-0 z-50 border-b border-parchmentDark bg-white bg-opacity-90 backdrop-blur-md">
     <div class="mx-auto flex max-w-5xl items-center justify-between px-5 py-3">
         <a href="#" class="flex items-center gap-2.5">
-            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-forest text-white">
-                <i data-lucide="book-open" class="h-4 w-4"></i>
-            </span>
+            <img src="assets/uculi-boekje.jpg" alt="" class="h-8 w-8 rounded-lg object-cover" />
             <span class="font-serif text-lg font-bold text-forest tracking-tight">Uculi</span>
         </a>
         <div class="hidden items-center gap-6 text-sm font-semibold text-sage sm:flex">
@@ -148,7 +148,7 @@
         <div class="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <a href="app.html?auth=register"
                 class="flex w-full items-center justify-center gap-2 rounded-2xl bg-forest px-7 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:bg-forestLight hover:shadow-lg sm:w-auto">
-                <i data-lucide="book-open" class="h-4 w-4"></i>
+                <img src="assets/uculi-boekje.jpg" alt="" width="16" height="16" class="h-4 w-4 rounded object-cover" />
                 Start for free
             </a>
             <a href="#features"
@@ -227,9 +227,7 @@
 
             <!-- Pillar 1 -->
             <div class="card-hover rounded-2xl border border-parchmentDark bg-parchment p-6">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-forest text-white">
-                    <i data-lucide="book-open" class="h-6 w-6"></i>
-                </div>
+                <img src="assets/uculi-boekje.jpg" alt="" width="48" height="48" class="mb-4 h-12 w-12 rounded-xl object-cover" />
                 <h3 class="font-serif text-lg font-bold text-forest mb-2">Your personal notebook</h3>
                 <p class="text-sm font-medium text-sage leading-relaxed">
                     Add recipes the way you'd write them: a name, ingredients, steps, a photo.
@@ -416,7 +414,7 @@
         <div class="mt-10 text-center">
             <a href="app.html?auth=register"
                 class="inline-flex items-center gap-2 rounded-2xl bg-forest px-7 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:bg-forestLight hover:shadow-lg">
-                <i data-lucide="book-open" class="h-4 w-4"></i>
+                <img src="assets/uculi-boekje.jpg" alt="" width="16" height="16" class="h-4 w-4 rounded object-cover" />
                 Open Uculi — it's free
             </a>
         </div>
@@ -455,7 +453,7 @@
                 <p class="font-serif text-3xl font-bold text-forest">€0 <span class="text-base font-normal text-sage">/ forever</span></p>
                 <p class="mt-2 mb-5 text-xs font-semibold text-sage">Everything you need to get started.</p>
                 <ul class="space-y-2.5 flex-1">
-                    <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Up to 8 recipes</li>
+                    <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Up to 3 recipes</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Notebook mode</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Cloud sync</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>5 display languages</li>
@@ -523,9 +521,7 @@
 <section class="bg-white py-20">
     <div class="mx-auto max-w-2xl px-5 text-center">
         <div class="mb-5 flex justify-center">
-            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-forest text-white shadow-lg">
-                <i data-lucide="book-open" class="h-8 w-8"></i>
-            </div>
+            <img src="assets/uculi-boekje.jpg" alt="Uculi" class="mx-auto h-16 w-16 rounded-2xl object-cover shadow-lg" />
         </div>
         <h2 class="font-serif text-3xl font-bold text-forest md:text-4xl">
             Start today — it's free
@@ -536,7 +532,7 @@
         </p>
         <a href="app.html?auth=register"
             class="mt-8 inline-flex items-center gap-2 rounded-2xl bg-forest px-8 py-4 text-sm font-bold text-white shadow-md transition-all hover:bg-forestLight hover:shadow-xl">
-            <i data-lucide="book-open" class="h-5 w-5"></i>
+            <img src="assets/uculi-boekje.jpg" alt="" width="20" height="20" class="h-5 w-5 rounded object-cover" />
             Open Uculi
         </a>
         <p class="mt-4 text-xs font-semibold text-sage opacity-60">
@@ -552,21 +548,19 @@
     <div class="mx-auto max-w-5xl px-5">
         <div class="flex flex-col items-center gap-4 md:flex-row md:justify-between">
             <div class="flex items-center gap-2.5">
-                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-forest text-white">
-                    <i data-lucide="book-open" class="h-3.5 w-3.5"></i>
-                </span>
+                <img src="assets/uculi-boekje.jpg" alt="" class="h-7 w-7 rounded-lg object-cover" />
                 <span class="font-serif text-base font-bold text-forest">Uculi</span>
                 <span class="text-xs font-semibold text-sage">— Recipe Notebook</span>
             </div>
             <div class="flex items-center gap-5 text-xs font-semibold text-sage">
                 <a href="app.html?auth=login" class="hover:text-forest transition-colors">Open app</a>
                 <span class="opacity-30">·</span>
-                <span class="opacity-50">Privacy Policy</span>
+                <a href="app.html?legal=privacy" class="hover:text-forest transition-colors">Privacybeleid</a>
                 <span class="opacity-30">·</span>
-                <span class="opacity-50">Terms of Use</span>
+                <a href="app.html?legal=terms" class="hover:text-forest transition-colors">Gebruiksvoorwaarden</a>
             </div>
-            <p class="text-xs font-semibold text-sage opacity-50">
-                © 2026 Uculi. Available in NL · EN · FR · DE · ES
+            <p class="inline-flex items-center gap-1.5 text-xs font-semibold text-sage opacity-80">
+                © 2026 Uculi · <img src="assets/mholt-apple.png" alt="" class="h-4 w-4 rounded-full object-cover" />Created by Mholt
             </p>
         </div>
     </div>
