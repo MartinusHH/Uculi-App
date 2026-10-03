@@ -2077,17 +2077,24 @@
             mix-blend-mode: screen;
         }
 
-        .notebook-book-spread-surface.is-turning-forward {
-            animation: notebookPageTurnForward 480ms cubic-bezier(0.22, 0.74, 0.22, 1);
+        .notebook-spread > .grid {
+            transform-style: preserve-3d;
         }
 
-        .notebook-book-spread-surface.is-turning-backward {
-            animation: notebookPageTurnBackward 480ms cubic-bezier(0.22, 0.74, 0.22, 1);
+        .notebook-paper.is-turning-forward,
+        .notebook-paper.is-turning-backward {
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
         }
 
-        .notebook-book-spread-surface.is-turning-forward::after,
-        .notebook-book-spread-surface.is-turning-backward::after {
-            animation: notebookPageTurnSheen 320ms cubic-bezier(0.22, 0.74, 0.22, 1);
+        .notebook-paper.is-turning-forward {
+            transform-origin: left center;
+            animation: notebookPageTurnForward 320ms cubic-bezier(0.2, 0.72, 0.18, 1);
+        }
+
+        .notebook-paper.is-turning-backward {
+            transform-origin: right center;
+            animation: notebookPageTurnBackward 320ms cubic-bezier(0.2, 0.72, 0.18, 1);
         }
 
         .notebook-paper {
@@ -2637,23 +2644,19 @@
 
         @keyframes notebookPageTurnForward {
             0% {
-                transform: translateX(22%);
-                opacity: 0.72;
+                transform: rotateY(-64deg);
             }
             100% {
-                transform: translateX(0);
-                opacity: 1;
+                transform: rotateY(0deg);
             }
         }
 
         @keyframes notebookPageTurnBackward {
             0% {
-                transform: translateX(-22%);
-                opacity: 0.72;
+                transform: rotateY(64deg);
             }
             100% {
-                transform: translateX(0);
-                opacity: 1;
+                transform: rotateY(0deg);
             }
         }
 
@@ -2675,17 +2678,15 @@
             40% { transform: translateX(14px); }
         }
 
-        @keyframes notebookPageTurnSheen {
-            0% {
-                opacity: 0;
-                transform: translateX(-24%) skewX(-10deg);
+        @media (min-width: 768px) {
+            .notebook-book-frame {
+                width: 100%;
+                max-width: 100%;
             }
-            45% {
-                opacity: 0.95;
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(26%) skewX(-10deg);
+
+            .notebook-page-photo-cluster {
+                width: 6.15rem;
+                max-width: 6.15rem;
             }
         }
 
@@ -12486,7 +12487,6 @@
             if (!notebookFrame || !notebookSurface) return;
 
             const frameRect = notebookFrame.getBoundingClientRect();
-            const contentRect = contentDiv.getBoundingClientRect();
             const navRect = document.getElementById('main-nav')?.getBoundingClientRect();
             const viewportHeight = Math.floor(window.visualViewport?.height || window.innerHeight || 0);
             const bottomLimit = navRect ? Math.min(navRect.top, viewportHeight) : viewportHeight;
@@ -12496,19 +12496,13 @@
             const availableHeight = Math.max(minHeight, Math.floor(bottomLimit - frameRect.top - bottomReserve));
             let fittedHeight = availableHeight || fallbackHeight;
 
-            const horizontalReserve = 26;
-            const maxSurfaceWidth = Math.max(320, Math.floor((contentRect.width || window.innerWidth) - horizontalReserve));
-            const desktopAspectRatio = 1.414;
+            const fittedWidth = Math.max(320, Math.floor(notebookFrame.clientWidth));
 
             notebookFrame.style.setProperty('--notebook-spread-max-height', `${fittedHeight}px`);
-
-            let fittedWidth = Math.floor(fittedHeight * desktopAspectRatio);
-            if (fittedWidth > maxSurfaceWidth) {
-                fittedWidth = maxSurfaceWidth;
-                fittedHeight = Math.max(minHeight, Math.floor(fittedWidth / desktopAspectRatio));
-                notebookFrame.style.setProperty('--notebook-spread-max-height', `${fittedHeight}px`);
-            }
             notebookFrame.style.setProperty('--notebook-spread-fit-width', `${fittedWidth}px`);
+            notebookSurface.style.width = '100%';
+            notebookSurface.style.maxWidth = '100%';
+            notebookSurface.style.aspectRatio = 'auto';
             notebookSurface.style.height = `${fittedHeight}px`;
             notebookSurface.style.minHeight = `${fittedHeight}px`;
         }
@@ -12964,11 +12958,6 @@
             const hasNotebookStickyNote = notebookStickyNotes.length > 0;
             const notebookNoteActionLabel = hasNotebookStickyNote ? 'Edit note' : 'Add note';
             const notebookVisibilityActionLabel = showNotebookStickyNotes ? 'Hide notes' : 'Show notes';
-            const pageTurnClass = notebookPageTurnDirection > 0
-                ? 'is-turning-forward'
-                : notebookPageTurnDirection < 0
-                    ? 'is-turning-backward'
-                    : '';
             const safeRecipeTitle = escapeHTML(recipe.title || 'Untitled recipe');
             const safeRecipeCategory = escapeHTML(recipe.category || 'Recipe');
             const safeRecipeAuthor = escapeHTML(recipe.author || 'Chef');
@@ -12989,6 +12978,13 @@
             const notebookPageLabel = isMobileNotebook
                 ? `${mobileLeafIndex + 1} / ${mobileLeafCount}`
                 : `${notebookSpreadPageIndex + 1} / ${notebookRecipeSpreads.length}`;
+            const notebookLeafTurnClass = side => {
+                if (!notebookPageTurnDirection) return '';
+                const turningForward = notebookPageTurnDirection > 0;
+                const turningSide = isMobileNotebook ? notebookMobileSide : (turningForward ? 'right' : 'left');
+                if (side !== turningSide) return '';
+                return turningForward ? 'is-turning-forward' : 'is-turning-backward';
+            };
             recipe.notebookStickyNotes = notebookStickyNotes;
 
             const renderNotebookIngredientRows = ingredients => {
@@ -13305,11 +13301,11 @@
                     </div>
 
                     <div class="notebook-book-frame relative" data-notebook-frame="true">
-                        <div id="notebook-swipe-surface" data-recipe-id="${recipe.id}" data-notebook-leaf="${mobileLeafIndex}" data-notebook-side="${notebookMobileSide}" class="notebook-book-spread-surface notebook-swipe-surface notebook-spread relative overflow-hidden rounded-lg border border-sage border-opacity-15 px-2 py-2 shadow-none md:rounded-[28px] md:px-7 md:py-7 md:shadow-[0_30px_60px_rgba(28,20,16,0.16)] ${pageTurnClass}">
+                        <div id="notebook-swipe-surface" data-recipe-id="${recipe.id}" data-notebook-leaf="${mobileLeafIndex}" data-notebook-side="${notebookMobileSide}" class="notebook-book-spread-surface notebook-swipe-surface notebook-spread relative overflow-hidden rounded-lg border border-sage border-opacity-15 px-2 py-2 shadow-none md:rounded-[28px] md:px-7 md:py-7 md:shadow-[0_30px_60px_rgba(28,20,16,0.16)]">
                             <div class="pointer-events-none absolute inset-y-6 left-7 hidden w-8 rounded-full border-x border-parchmentDark bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.95)_0,rgba(255,255,255,0.7)_58%,rgba(239,239,239,0.88)_100%)] md:block"></div>
                             <div class="pointer-events-none absolute inset-y-8 left-[3.65rem] hidden w-px bg-gradient-to-b from-transparent via-sage/20 to-transparent md:block"></div>
                             <div class="grid h-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-0">
-                                <section class="notebook-paper notebook-paper-left relative rounded-[24px] border border-white border-opacity-70 px-4 py-4 md:h-full md:rounded-r-none md:border-r-0 md:px-6 md:py-6 ${notebookMobileSide !== 'left' ? 'hidden md:flex' : ''}" data-notebook-paper-side="left">
+                                <section class="notebook-paper notebook-paper-left relative rounded-[24px] border border-white border-opacity-70 px-4 py-4 md:h-full md:rounded-r-none md:border-r-0 md:px-6 md:py-6 ${notebookMobileSide !== 'left' ? 'hidden md:flex' : ''} ${notebookLeafTurnClass('left')}" data-notebook-paper-side="left">
                                     ${renderNotebookLeftPage(currentSpread.left)}
 
                                     <div class="notebook-paper__footer hidden items-end justify-start md:flex">
@@ -13321,7 +13317,7 @@
                                     ${renderNotebookStickyNotes(recipe.id, notebookStickyNotes, 'left', showNotebookStickyNotes)}
                                 </section>
 
-                                <section class="notebook-paper notebook-paper-right relative rounded-[24px] border border-white border-opacity-70 px-4 py-4 md:h-full md:rounded-l-none md:px-6 md:py-6 ${notebookMobileSide !== 'right' ? 'hidden md:flex' : ''}" data-notebook-paper-side="right">
+                                <section class="notebook-paper notebook-paper-right relative rounded-[24px] border border-white border-opacity-70 px-4 py-4 md:h-full md:rounded-l-none md:px-6 md:py-6 ${notebookMobileSide !== 'right' ? 'hidden md:flex' : ''} ${notebookLeafTurnClass('right')}" data-notebook-paper-side="right">
                                     ${renderNotebookRightPage(currentSpread.right)}
 
                                     <div class="notebook-paper__footer hidden items-end justify-end md:flex">
