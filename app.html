@@ -980,6 +980,7 @@
                 border-left: 0;
                 border-right: 0;
                 border-bottom: 0;
+                border-top: 1px solid rgba(144, 152, 112, 0.28);
                 background: rgba(246, 241, 232, 0.97);
                 box-shadow: none;
                 padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -2557,10 +2558,13 @@
             }
 
             .notebook-mobile-pager {
-                position: sticky;
-                bottom: calc(3.2rem + env(safe-area-inset-bottom, 0px));
-                z-index: 7;
-                margin-top: 0.45rem;
+                position: fixed;
+                left: 0.7rem;
+                right: 0.7rem;
+                bottom: calc(3.15rem + 0.7rem + env(safe-area-inset-bottom, 0px));
+                z-index: 30;
+                width: auto;
+                margin-top: 0;
                 padding: 0.3rem;
                 border-radius: 0.9rem;
                 background: rgba(246, 241, 232, 0.94);
