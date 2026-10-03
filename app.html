@@ -1969,37 +1969,79 @@
             background: rgba(255, 255, 255, 0.92);
         }
 
+        .notebook-chrome-kicker {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
         .notebook-chrome-page {
             display: none;
+            margin: 0;
+        }
+
+        .notebook-chrome-bar button,
+        .notebook-chrome-bar .notebook-note-control--cook {
+            flex: 0 0 2.75rem;
+            width: 2.75rem;
+            min-width: 2.75rem;
+            max-width: 2.75rem;
+            height: 2.75rem;
+            min-height: 2.75rem;
+            padding: 0;
+        }
+
+        .notebook-cook-label {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         @media (min-width: 768px) {
             .notebook-chrome {
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                gap: 1.25rem;
+                gap: 0.85rem;
                 margin-bottom: 1.6rem;
             }
 
             .notebook-chrome-bar {
-                width: auto;
-                margin-left: auto;
+                width: 100%;
+                margin-left: 0;
                 padding: 0.4rem 0.5rem;
                 gap: 1rem;
                 background: #fff;
             }
 
             .notebook-chrome-page {
-                display: inline-flex;
-                align-items: center;
-                min-height: 2.5rem;
-                padding: 0 0.35rem;
+                display: block;
                 color: #909870;
                 font-size: 0.68rem;
                 font-weight: 800;
-                letter-spacing: 0.18em;
+                letter-spacing: 0.16em;
                 text-transform: uppercase;
+            }
+        }
+
+        @media (max-width: 767px) {
+            #toast {
+                top: calc(3.8rem + env(safe-area-inset-top, 0px));
+                right: 0.55rem;
+                left: 0.55rem;
+                width: auto;
+                max-width: none;
+                transform: none;
+                justify-content: center;
+            }
+
+            body.toast-open .notebook-chrome {
+                margin-top: var(--toast-clearance, 0px);
             }
         }
 
@@ -9477,6 +9519,7 @@
         const desktopNavAutoHideMedia = window.matchMedia('(min-width: 1024px) and (hover: hover) and (pointer: fine)');
         const toastEl = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
+        let toastHideTimer = null;
         let currentView = 'index';
         let chromeBackAction = null;
         let chromePeer = 'index';
@@ -9686,12 +9729,35 @@
             }, 220);
         }
 
+        function placeNotebookToastClearance() {
+            if (window.innerWidth >= 768 || !document.body.classList.contains('toast-open')) {
+                document.documentElement.style.removeProperty('--toast-clearance');
+                return;
+            }
+            const chrome = document.querySelector('.notebook-chrome');
+            if (!chrome) {
+                document.documentElement.style.removeProperty('--toast-clearance');
+                return;
+            }
+            document.documentElement.style.setProperty('--toast-clearance', '0px');
+            const overlap = Math.ceil(toastEl.getBoundingClientRect().bottom - chrome.getBoundingClientRect().top + 10);
+            if (overlap > 0) document.documentElement.style.setProperty('--toast-clearance', `${overlap}px`);
+            else document.documentElement.style.removeProperty('--toast-clearance');
+        }
+
         function showToast(message, iconName = 'check-circle') {
             document.getElementById('toast-icon').setAttribute('data-lucide', iconName);
             toastMessage.textContent = message;
             lucide.createIcons();
             toastEl.classList.remove('opacity-0', '-translate-y-4');
-            setTimeout(() => toastEl.classList.add('opacity-0', '-translate-y-4'), 3000);
+            document.body.classList.add('toast-open');
+            requestAnimationFrame(placeNotebookToastClearance);
+            clearTimeout(toastHideTimer);
+            toastHideTimer = setTimeout(() => {
+                toastEl.classList.add('opacity-0', '-translate-y-4');
+                document.body.classList.remove('toast-open');
+                document.documentElement.style.removeProperty('--toast-clearance');
+            }, 3000);
         }
 
         function showCloudSetupStatusModal(origin = 'app') {
@@ -13205,10 +13271,11 @@
             return `
                 <div>
                     <div class="notebook-chrome">
-                        <div class="min-w-0">
+                        <div class="notebook-chrome-kicker">
                             <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-80">Notebook mode</p>
-                            ${hasActiveFilters ? `<p class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}</p>` : ''}
+                            <p class="notebook-chrome-page">Page ${notebookPageLabel}</p>
                         </div>
+                        ${hasActiveFilters ? `<p class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}</p>` : ''}
                         <div class="notebook-chrome-bar">
                             <div class="notebook-chrome-group" role="group" aria-label="View">
                                 <button type="button" onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex h-11 w-11 items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest md:h-10 md:w-12" title="Cards view" aria-label="Cards view">
@@ -13233,7 +13300,6 @@
                                     <span class="notebook-cook-label">Cook</span>
                                 </button>
                             </div>
-                            <span class="notebook-chrome-page">Page ${notebookPageLabel}</span>
                         </div>
                     </div>
 
@@ -13654,6 +13720,7 @@
                 attachNotebookInteractions();
                 requestAnimationFrame(syncNotebookViewportHeight);
                 scheduleNotebookCoverTextFit(contentDiv);
+                requestAnimationFrame(placeNotebookToastClearance);
             }
             notebookPageTurnDirection = 0;
         }
