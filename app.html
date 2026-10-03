@@ -3121,10 +3121,10 @@
         .cooking-mode-active #app-content {
             font-size: 1.1rem;
             padding-top: 5.4rem;
-            padding-bottom: calc(12rem + env(safe-area-inset-bottom, 0px));
+            padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
             max-width: 100%;
             scroll-padding-top: 5rem;
-            scroll-padding-bottom: 13rem;
+            scroll-padding-bottom: 2rem;
         }
 
         .cooking-mode-active #toast {
@@ -3281,69 +3281,189 @@
             font-size: 0.95rem;
         }
 
-        .cook-timer-dock {
-            position: fixed;
-            left: 50%;
-            bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
-            transform: translateX(-50%);
-            z-index: 90;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.6rem;
-            width: min(calc(100vw - 1.25rem), 42rem);
-            padding: 0.75rem 0.85rem;
-            border: 1px solid rgba(200, 144, 80, 0.45);
-            border-radius: 1.25rem;
-            background: #fbf8f3;
-            box-shadow: 0 16px 34px rgba(28, 20, 16, 0.16);
+        .cooking-mode-active .detail-content-shell > :not(.cook-stage) {
+            display: none;
         }
 
-        .cook-timer-dock[hidden] {
-            display: none !important;
+        .cook-stage {
+            display: none;
         }
 
-        .cook-timer-dock__time {
-            font-family: Fraunces, serif;
-            font-size: clamp(2.4rem, 8vw, 3.4rem);
-            line-height: 1;
-            font-weight: 700;
-            color: #1c1410;
-            min-width: 6.2rem;
+        .cooking-mode-active .cook-stage {
+            display: block;
         }
 
-        .cook-timer-dock__actions,
-        .cook-timer-dock__presets {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
+        .cook-paper {
+            position: relative;
+            overflow: hidden;
+            min-height: min(70vh, 40rem);
+            padding: 1.35rem 1.25rem 1.5rem;
+            border: 1px solid rgba(200, 144, 80, 0.28);
+            border-radius: 1.35rem;
+            background:
+                linear-gradient(to bottom, transparent 0, transparent 31px, rgba(144, 152, 112, 0.14) 31px, rgba(144, 152, 112, 0.14) 32px, transparent 32px) 0 0 / 100% 34px,
+                linear-gradient(160deg, #fbf8f3 0%, #f6f1e8 100%);
+            box-shadow: 0 18px 36px rgba(28, 20, 16, 0.08);
+            touch-action: manipulation;
         }
 
-        .cook-timer-dock button {
-            min-height: 2.75rem;
-            border-radius: 0.8rem;
-            border: 1px solid rgba(144, 152, 112, 0.45);
-            background: #f6f1e8;
-            color: #1c1410;
-            font-family: Outfit, sans-serif;
-            font-size: 0.82rem;
-            font-weight: 700;
-            padding: 0.35rem 0.75rem;
-        }
-
-        .cook-timer-dock button.is-primary {
-            background: #c89050;
-            border-color: #c89050;
-            color: #fbf8f3;
-        }
-
-        .cook-timer-dock__note {
-            width: 100%;
+        .cook-kicker {
             margin: 0;
             color: #909870;
             font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .cook-instruction {
+            margin: 0.7rem 0 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.85rem, 4.6vw, 2.8rem);
             font-weight: 700;
+            line-height: 1.22;
+        }
+
+        .cook-ingredients {
+            margin: 1rem 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .cook-ingredients li {
+            color: #1c1410;
+            font-size: clamp(1.25rem, 3vw, 1.7rem);
+            font-weight: 700;
+            line-height: 1.35;
+            padding: 0.35rem 0;
+        }
+
+        .cook-clock {
+            margin: 1.15rem 0 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(4.2rem, 12vw, 6.5rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 0.95;
+        }
+
+        .cook-peek {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 1.1rem 1.25rem 1.35rem;
+            border-top: 1px solid rgba(200, 144, 80, 0.45);
+            background: #f6f1e8;
+            box-shadow: 0 -14px 28px rgba(28, 20, 16, 0.12);
+            transform: translateY(105%);
+            transition: transform 180ms ease;
+            pointer-events: none;
+        }
+
+        .cook-paper.is-peeking .cook-peek {
+            transform: translateY(0);
+        }
+
+        .cook-peek-kicker {
+            margin: 0;
+            color: #909870;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .cook-peek-text {
+            margin: 0.45rem 0 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.35rem, 3vw, 1.8rem);
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        .cook-nav {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.85rem;
+        }
+
+        .cook-nav-btn,
+        .cook-begin {
+            min-height: 4.75rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(144, 152, 112, 0.35);
+            background: #fbf8f3;
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+
+        .cook-nav-btn {
+            flex: 1 1 0;
+        }
+
+        .cook-nav-btn--next,
+        .cook-begin {
+            width: 100%;
+            margin-top: 1rem;
+            background: #62724c;
+            border-color: #556340;
+            color: #fbf8f3;
+        }
+
+        .cook-nav-btn--next {
+            margin-top: 0;
+        }
+
+        .cook-prep-list {
+            margin: 1rem 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .cook-prep-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(144, 152, 112, 0.18);
+        }
+
+        .cook-prep-row p {
+            margin: 0;
+            color: #1c1410;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .cook-prep-row label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            color: #909870;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .cook-prep-row input {
+            width: 4.5rem;
+            height: 3rem;
+            border: 1px solid rgba(144, 152, 112, 0.35);
+            border-radius: 0.75rem;
+            background: #fff;
+            color: #1c1410;
+            font-size: 1.15rem;
+            font-weight: 700;
+            text-align: center;
         }
 
         @media (max-width: 767px) {
@@ -3360,7 +3480,7 @@
                 text-overflow: unset;
             }
 
-            .cooking-mode-active #app-content {
+            body.chrome-push.cooking-mode-active #app-content {
                 padding-top: 7.4rem;
                 scroll-padding-top: 7.1rem;
             }
@@ -3504,20 +3624,6 @@
                 </button>
             </div>
         </nav>
-
-        <div id="cook-timer-dock" class="cook-timer-dock" hidden translate="no">
-            <div id="cook-timer-display" class="cook-timer-dock__time">05:00</div>
-            <div class="cook-timer-dock__actions">
-                <button type="button" id="cook-timer-toggle" class="is-primary" onclick="toggleCookTimer()">Start</button>
-                <button type="button" onclick="resetCookTimer()">Reset</button>
-            </div>
-            <div class="cook-timer-dock__presets">
-                <button type="button" onclick="startStepTimer(1, '1 minute')">1m</button>
-                <button type="button" onclick="startStepTimer(5, '5 minutes')">5m</button>
-                <button type="button" onclick="startStepTimer(10, '10 minutes')">10m</button>
-            </div>
-            <p id="cook-timer-note" class="cook-timer-dock__note"></p>
-        </div>
 
         <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-forest text-white px-6 py-3 rounded-sm shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-50 text-center text-sm font-bold flex items-center gap-2" translate="no">
             <i id="toast-icon" data-lucide="info" class="w-5 h-5"></i>
@@ -8228,13 +8334,20 @@
             return typeof step === 'string' ? '' : step?.image || '';
         }
 
+        function getRecipeInstructionMinutes(step) {
+            const explicit = typeof step === 'object' && step ? Number(step.minutes) : 0;
+            if (Number.isFinite(explicit) && explicit > 0) return Math.round(explicit);
+            return readStepMinutes(getRecipeInstructionText(step)) || 0;
+        }
+
         function normalizeRecipeInstructionStep(step) {
             const text = getRecipeInstructionText(step).trim();
             if (!text) return null;
 
             return {
                 text,
-                image: getRecipeInstructionImage(step)
+                image: getRecipeInstructionImage(step),
+                minutes: getRecipeInstructionMinutes(step)
             };
         }
 
@@ -10798,39 +10911,28 @@
         function generateId() { return recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1; }
 
         function toggleCookingMode(recipeId = null) {
+            const id = recipeId || activeDetailRecipeId;
             isCookingMode = !isCookingMode;
             document.getElementById('body').classList.toggle('cooking-mode-active', isCookingMode);
-            const btnText = document.getElementById('focus-btn-text');
-            const btnIcon = document.getElementById('focus-btn-icon');
-            
-            if(isCookingMode) {
-                showCookTimerDock(true);
-                renderCookTimer();
+
+            if (isCookingMode) {
+                const recipe = recipes.find(entry => entry.id === id);
+                cookSession = {
+                    recipeId: id,
+                    phase: 'prepare',
+                    index: 0,
+                    minutes: (recipe?.instructions || []).map(step => getRecipeInstructionMinutes(step) || 1),
+                    remaining: []
+                };
                 requestCookWakeLock();
-                showToast('Cooking mode on. Follow the next unfinished step.', 'chef-hat');
-                if(btnText) btnText.textContent = "Exit Cooking";
-                if(btnIcon) btnIcon.setAttribute('data-lucide', 'x-circle');
-
-                if (recipeId) {
-                    const recipe = recipes.find(r => r.id === recipeId);
-                    const nextStepIndex = recipe ? (recipe.instructions || []).findIndex((_, index) => !(recipe.checkedSteps || []).includes(index)) : -1;
-                    const targetIndex = nextStepIndex === -1 ? 0 : nextStepIndex;
-                    const targetStep = document.querySelector(`.recipe-step-${recipeId}[data-step-index="${targetIndex}"]`);
-
-                    if (targetStep) {
-                        targetStep.classList.add('cooking-step-highlight');
-                        targetStep.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        window.setTimeout(() => targetStep.classList.remove('cooking-step-highlight'), 1800);
-                    }
-                }
             } else {
+                stopCookTicker();
+                cookSession = null;
                 releaseCookWakeLock();
-                if (!cookTimerRunning) showCookTimerDock(false);
                 showToast('Back to the recipe', 'layout-template');
-                if(btnText) btnText.textContent = "Cook Mode";
-                if(btnIcon) btnIcon.setAttribute('data-lucide', 'chef-hat');
             }
-            lucide.createIcons();
+
+            if (id) renderDetail(id);
         }
 
         function cancelRecipeEditor() {
@@ -14304,6 +14406,7 @@
         let cookTimerDuration = 5 * 60;
         let cookTimerRunning = false;
         let cookWakeLock = null;
+        let cookSession = null;
 
         function formatCookClock(totalSeconds) {
             const safe = Math.max(0, Number(totalSeconds) || 0);
@@ -14312,74 +14415,166 @@
             return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
         }
 
-        function showCookTimerDock(show) {
-            const dock = document.getElementById('cook-timer-dock');
-            if (dock) dock.hidden = !show;
-        }
+        function showCookTimerDock() {}
 
-        function renderCookTimer() {
-            const display = document.getElementById('cook-timer-display');
-            const toggle = document.getElementById('cook-timer-toggle');
-            if (display) display.textContent = formatCookClock(cookTimerRemaining);
-            if (toggle) toggle.textContent = cookTimerRunning ? 'Pause' : 'Start';
-        }
-
-        function pauseCookTimer() {
+        function stopCookTicker() {
             cookTimerRunning = false;
             if (cookTimerInterval) clearInterval(cookTimerInterval);
             cookTimerInterval = null;
-            renderCookTimer();
         }
 
-        function resumeCookTimer() {
-            if (cookTimerRemaining <= 0) cookTimerRemaining = cookTimerDuration || 5 * 60;
-            if (cookTimerInterval) clearInterval(cookTimerInterval);
-            cookTimerRunning = true;
-            showCookTimerDock(true);
-            renderCookTimer();
-            cookTimerInterval = setInterval(() => {
-                cookTimerRemaining -= 1;
-                if (cookTimerRemaining <= 0) {
-                    cookTimerRemaining = 0;
-                    pauseCookTimer();
-                    showToast('Time\'s up!', 'bell');
-                    try {
-                        const beep = new AudioContext();
-                        const osc = beep.createOscillator();
-                        osc.connect(beep.destination);
-                        osc.frequency.value = 800;
-                        osc.start();
-                        setTimeout(() => osc.stop(), 180);
-                    } catch (error) {}
-                    return;
-                }
-                renderCookTimer();
-            }, 1000);
+        function pauseCookTimer() {
+            stopCookTicker();
         }
 
-        function toggleCookTimer() {
-            if (cookTimerRunning) pauseCookTimer();
-            else resumeCookTimer();
+        function cookIngredientName(item) {
+            return String(item || '').replace(/^\d[\d\s./]*/, '').replace(/\b(g|kg|ml|cl|l|tbsp|tsp|cups?|cloves?|of)\b/gi, ' ').replace(/\s+/g, ' ').trim();
         }
 
-        function resetCookTimer() {
-            pauseCookTimer();
-            cookTimerRemaining = cookTimerDuration || 5 * 60;
-            renderCookTimer();
+        function ingredientsForCookStep(recipe, stepText) {
+            const hay = String(stepText || '').toLowerCase();
+            return (recipe?.ingredients || []).filter(item => {
+                const name = cookIngredientName(item).toLowerCase();
+                if (!name) return false;
+                if (hay.includes(name)) return true;
+                return name.split(' ').filter(word => word.length >= 4).some(word => hay.includes(word));
+            });
         }
 
-        function startStepTimer(minutes, label = '') {
-            const mins = Number(minutes);
-            if (!Number.isInteger(mins) || mins <= 0) {
-                showToast('Enter valid time in minutes', 'alert-circle');
+        function paintCookClock() {
+            const clock = document.getElementById('cook-clock');
+            if (!clock || !cookSession) return;
+            const seconds = cookSession.phase === 'done' ? 0 : (cookSession.remaining[cookSession.index] || 0);
+            clock.textContent = formatCookClock(seconds);
+        }
+
+        function paintCookStep() {
+            if (!cookSession) return;
+            const recipe = recipes.find(entry => entry.id === cookSession.recipeId);
+            const steps = recipe?.instructions || [];
+            const stage = document.querySelector('.cook-stage');
+            if (stage) {
+                stage.dataset.cookPhase = cookSession.phase;
+                stage.dataset.cookStep = String(cookSession.index);
+            }
+            if (cookSession.phase === 'done') {
+                const kicker = document.getElementById('cook-kicker');
+                const instruction = document.getElementById('cook-instruction');
+                const list = document.getElementById('cook-ingredients');
+                const peek = document.getElementById('cook-peek-text');
+                if (kicker) kicker.textContent = 'Finished';
+                if (instruction) instruction.textContent = 'Cooking is done.';
+                if (list) list.innerHTML = '';
+                if (peek) peek.textContent = 'That was the last step.';
+                paintCookClock();
                 return;
             }
-            cookTimerDuration = mins * 60;
-            cookTimerRemaining = cookTimerDuration;
-            const note = document.getElementById('cook-timer-note');
-            if (note) note.textContent = label || `${mins} minute timer`;
-            showCookTimerDock(true);
-            resumeCookTimer();
+            const step = steps[cookSession.index];
+            const plain = getRecipeInstructionText(step);
+            const text = applyMeasurementSystem(plain);
+            const kicker = document.getElementById('cook-kicker');
+            const instruction = document.getElementById('cook-instruction');
+            const list = document.getElementById('cook-ingredients');
+            const peek = document.getElementById('cook-peek-text');
+            if (kicker) kicker.textContent = `Step ${cookSession.index + 1} of ${steps.length}`;
+            if (instruction) instruction.textContent = text;
+            if (list) {
+                const items = ingredientsForCookStep(recipe, plain);
+                list.innerHTML = items.map(item => `<li>${escapeHTML(applyMeasurementSystem(scaleCookQuantityText(item, currentScale)))}</li>`).join('');
+            }
+            const next = steps[cookSession.index + 1];
+            if (peek) peek.textContent = next ? applyMeasurementSystem(getRecipeInstructionText(next)) : 'That was the last step.';
+            paintCookClock();
+        }
+
+        function tickCook() {
+            if (!cookSession || cookSession.phase !== 'cooking') return;
+            const index = cookSession.index;
+            if ((cookSession.remaining[index] || 0) <= 0) return;
+            cookSession.remaining[index] -= 1;
+            paintCookClock();
+            if (cookSession.remaining[index] > 0) return;
+            const recipe = recipes.find(entry => entry.id === cookSession.recipeId);
+            const last = (recipe?.instructions || []).length - 1;
+            if (index >= last) {
+                cookSession.phase = 'done';
+                stopCookTicker();
+                paintCookStep();
+                return;
+            }
+            cookSession.index += 1;
+            paintCookStep();
+        }
+
+        function startCookTicker() {
+            if (cookTimerInterval || !cookSession || cookSession.phase !== 'cooking') return;
+            cookTimerRunning = true;
+            cookTimerInterval = setInterval(tickCook, 1000);
+        }
+
+        function beginCookSession() {
+            if (!cookSession) return;
+            document.querySelectorAll('[data-cook-minutes]').forEach(input => {
+                const index = Number(input.dataset.cookMinutes);
+                const value = Math.max(1, Math.min(240, Number.parseInt(input.value, 10) || 1));
+                cookSession.minutes[index] = value;
+            });
+            cookSession.remaining = cookSession.minutes.map(minutes => minutes * 60);
+            cookSession.index = 0;
+            cookSession.phase = 'cooking';
+            renderDetail(cookSession.recipeId);
+            startCookTicker();
+        }
+
+        function moveCookStep(direction) {
+            if (!cookSession || cookSession.phase === 'prepare') return;
+            const recipe = recipes.find(entry => entry.id === cookSession.recipeId);
+            const count = (recipe?.instructions || []).length;
+            if (!count) return;
+            if (cookSession.phase === 'done') {
+                if (direction > 0) return;
+                cookSession.phase = 'cooking';
+                cookSession.index = count - 1;
+                paintCookStep();
+                return;
+            }
+            const next = cookSession.index + (direction > 0 ? 1 : -1);
+            if (next < 0) return;
+            if (next >= count) {
+                cookSession.phase = 'done';
+                stopCookTicker();
+                paintCookStep();
+                return;
+            }
+            cookSession.index = next;
+            cookSession.phase = 'cooking';
+            paintCookStep();
+            startCookTicker();
+        }
+
+        function bindCookStage() {
+            if (!isCookingMode || !cookSession) return;
+            if (cookSession.phase === 'cooking' || cookSession.phase === 'done') paintCookStep();
+            const sheet = document.getElementById('cook-sheet');
+            if (!sheet || sheet.dataset.peekBound === 'true') return;
+            sheet.dataset.peekBound = 'true';
+            let holding = false;
+            const endPeek = () => {
+                if (!holding) return;
+                holding = false;
+                sheet.classList.remove('is-peeking');
+            };
+            sheet.addEventListener('pointerdown', event => {
+                if (event.target.closest('button, input, a, label')) return;
+                if (!cookSession || cookSession.phase !== 'cooking') return;
+                holding = true;
+                sheet.classList.add('is-peeking');
+                if (sheet.setPointerCapture) {
+                    try { sheet.setPointerCapture(event.pointerId); } catch (error) {}
+                }
+            });
+            sheet.addEventListener('pointerup', endPeek);
+            sheet.addEventListener('pointercancel', endPeek);
         }
 
         function readStepMinutes(text) {
@@ -14391,19 +14586,10 @@
             return null;
         }
 
-        function startTimerForRecipeStep(recipeId, index) {
-            const recipe = recipes.find(entry => entry.id === recipeId);
-            const minutes = readStepMinutes(getRecipeInstructionText(recipe?.instructions?.[index]));
-            if (!minutes) {
-                showStepTimerPrompt(5);
-                return;
-            }
-            startStepTimer(minutes, `Step ${index + 1}`);
-        }
-
         function closeTimer() {
-            pauseCookTimer();
-            if (!isCookingMode) showCookTimerDock(false);
+            const modal = document.getElementById('timer-modal');
+            if (!modal) return;
+            modal.classList.add('hidden', 'opacity-0');
         }
 
         async function requestCookWakeLock() {
@@ -14631,38 +14817,6 @@
                     targetModal.remove();
                 }, 300);
             }
-        }
-
-        function showStepTimerPrompt(defaultMinutes = 5) {
-            const inputId = `step-timer-input-${Date.now()}`;
-            createModal('Start Step Timer', `
-                <div class="space-y-4">
-                    <p class="text-sm font-semibold leading-relaxed text-sage">Pick how long this step needs, then Uculi will keep the timer visible without leaving the recipe.</p>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-[0.22em] text-sage mb-2" for="${inputId}">Minutes</label>
-                        <input id="${inputId}" type="number" min="1" max="240" value="${defaultMinutes}" inputmode="numeric" class="${inputClass}" />
-                    </div>
-                </div>
-            `, [
-                { text: 'Cancel', onClick: () => closeModal() },
-                { text: 'Start Timer', primary: true, onClick: () => {
-                    const value = Number.parseInt(document.getElementById(inputId)?.value || '', 10);
-                    if (!Number.isInteger(value) || value <= 0) {
-                        showToast('Enter valid time in minutes', 'alert-circle');
-                        return;
-                    }
-                    closeModal();
-                    startStepTimer(value);
-                } }
-            ]);
-
-            requestAnimationFrame(() => {
-                const timerInput = document.getElementById(inputId);
-                if (timerInput) {
-                    timerInput.focus();
-                    timerInput.select();
-                }
-            });
         }
 
         // --- FAMILY RECIPE BOOKS ---
@@ -15413,6 +15567,7 @@
                     <div class="detail-hero-spacer"></div>
 
                     <div class="detail-content-shell p-4 md:p-10">
+                        ${isCookingMode ? renderCookStage(recipe) : ''}
                         <div class="detail-meta-grid grid grid-cols-1 gap-4 mb-6 rounded-md border border-sage border-opacity-10 bg-accent bg-opacity-30 p-4 sm:grid-cols-2 md:grid-cols-5">
                             ${recipe.prepTime ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Prep</div><div class="text-lg font-bold text-forest">${recipe.prepTime}m</div></div>` : ''}
                             ${recipe.cookTime ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Cook</div><div class="text-lg font-bold text-forest">${recipe.cookTime}m</div></div>` : ''}
@@ -15506,9 +15661,6 @@
                                                     <p onclick="toggleItemCheck(${recipe.id}, 'step', ${index}, this.closest('li'))" class="text-forest font-medium text-base leading-relaxed pt-1 cursor-pointer">${finalStep}</p>
                                                     ${stepImage ? `<div class="mt-4 overflow-hidden rounded-md border border-parchmentDark bg-parchment"><img src="${stepImage}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''}
                                                 </div>
-                                                <button type="button" onclick="startTimerForRecipeStep(${recipe.id}, ${index})" class="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-gold hover:text-sage p-2" title="Start timer" aria-label="Start timer for step ${index + 1}">
-                                                    <i data-lucide="timer" class="w-5 h-5"></i>
-                                                </button>
                                             </li>
                                         `;
                                     }).join('')}
@@ -15554,6 +15706,54 @@
                 </div>
             `;
             lucide.createIcons();
+            if (isCookingMode) bindCookStage();
+        }
+
+        function renderCookStage(recipe) {
+            const steps = recipe.instructions || [];
+            if (cookSession && (cookSession.phase === 'cooking' || cookSession.phase === 'done')) {
+                return `
+                    <section class="cook-stage" data-cook-phase="${cookSession.phase}" data-cook-step="${cookSession.index}">
+                        <article class="cook-paper" id="cook-sheet">
+                            <p class="cook-kicker" id="cook-kicker"></p>
+                            <p class="cook-instruction" id="cook-instruction"></p>
+                            <ul class="cook-ingredients" id="cook-ingredients"></ul>
+                            <p class="cook-clock" id="cook-clock" aria-live="polite">00:00</p>
+                            <div class="cook-peek" id="cook-peek">
+                                <p class="cook-peek-kicker">Next</p>
+                                <p class="cook-peek-text" id="cook-peek-text"></p>
+                            </div>
+                        </article>
+                        <div class="cook-nav">
+                            <button type="button" class="cook-nav-btn" onclick="moveCookStep(-1)">Previous</button>
+                            <button type="button" class="cook-nav-btn cook-nav-btn--next" onclick="moveCookStep(1)">Next</button>
+                        </div>
+                    </section>
+                `;
+            }
+
+            const rows = steps.map((step, index) => {
+                const minutes = cookSession?.minutes?.[index] || getRecipeInstructionMinutes(step) || 1;
+                return `
+                    <li class="cook-prep-row">
+                        <p>${index + 1}. ${escapeHTML(getRecipeInstructionText(step))}</p>
+                        <label>Minutes
+                            <input type="number" min="1" max="240" inputmode="numeric" value="${minutes}" data-cook-minutes="${index}" aria-label="Minutes for step ${index + 1}">
+                        </label>
+                    </li>
+                `;
+            }).join('');
+
+            return `
+                <section class="cook-stage" data-cook-phase="prepare">
+                    <article class="cook-paper">
+                        <p class="cook-kicker">Before cooking</p>
+                        <p class="cook-instruction">Adjust the times, then the kitchen takes over.</p>
+                        <ul class="cook-prep-list">${rows}</ul>
+                        <button type="button" class="cook-begin" onclick="beginCookSession()">Start cooking</button>
+                    </article>
+                </section>
+            `;
         }
 
         function formatCookAmount(value) {
@@ -15746,6 +15946,7 @@
                                 <ul id="draft-steps-list" class="mb-3 space-y-2"></ul>
                                 <div class="flex gap-2 items-start">
                                     <textarea id="new-step" placeholder="Describe the next step..." class="${textareaClass} flex-1 !min-h-[48px] !h-12 py-3"></textarea>
+                                    <input type="number" id="new-step-minutes" min="1" max="240" value="1" inputmode="numeric" aria-label="Minutes for this step" class="${inputClass} !w-20">
                                     <button type="button" onclick="addDraftStep()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="Add step"><i data-lucide="plus" class="w-5 h-5"></i></button>
                                 </div>
                             </div>
@@ -16588,9 +16789,22 @@
         function addDraftStep() {
             const input = document.getElementById('new-step');
             if(input.value.trim() === '') return;
-            draftSteps.push({ text: input.value.trim(), image: '' });
+            const minutesInput = document.getElementById('new-step-minutes');
+            const typed = Number.parseInt(minutesInput?.value || '', 10);
+            const minutes = Math.max(1, Math.min(240, Number.isInteger(typed) ? typed : (readStepMinutes(input.value) || 1)));
+            draftSteps.push({ text: input.value.trim(), image: '', minutes });
             input.value = '';
+            if (minutesInput) minutesInput.value = '1';
             renderDraftSteps();
+        }
+
+        function setDraftStepMinutes(index, value) {
+            if (!draftSteps[index]) return;
+            const normalized = normalizeRecipeInstructionStep(draftSteps[index]) || { text: '', image: '', minutes: 1 };
+            draftSteps[index] = {
+                ...normalized,
+                minutes: Math.max(1, Math.min(240, Number.parseInt(value, 10) || 1))
+            };
         }
 
         function removeDraftStep(index) { draftSteps.splice(index, 1); renderDraftSteps(); }
@@ -16626,6 +16840,7 @@
             document.getElementById('draft-steps-list').innerHTML = draftSteps.map((step, i) => {
                 const stepText = getRecipeInstructionText(step);
                 const stepImage = getRecipeInstructionImage(step);
+                const stepMinutes = getRecipeInstructionMinutes(step) || 1;
 
                 return `
                     <li class="bg-white p-3 rounded-sm border border-parchmentDark shadow-sm text-sm font-medium text-forest">
@@ -16634,6 +16849,10 @@
                             <div class="flex-1 pt-0.5">
                                 <p class="leading-relaxed">${stepText}</p>
                                 ${stepImage ? `<div class="mt-3 overflow-hidden rounded-md border border-parchmentDark bg-parchment"><img src="${stepImage}" alt="Draft step ${i + 1}" class="h-40 w-full object-cover"></div>` : ''}
+                                <label class="mt-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-sage">
+                                    Minutes
+                                    <input type="number" min="1" max="240" inputmode="numeric" value="${stepMinutes}" aria-label="Minutes for step ${i + 1}" class="${inputClass} !h-9 !w-20" onchange="setDraftStepMinutes(${i}, this.value)">
+                                </label>
                                 <div class="mt-3 flex flex-wrap gap-2">
                                     <label class="inline-flex h-9 items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-sage shadow-sm transition-all hover:border-gold hover:text-forest cursor-pointer">
                                         <input type="file" accept="image/*" class="hidden" onchange="handleDraftStepImageUpload(event, ${i})">
