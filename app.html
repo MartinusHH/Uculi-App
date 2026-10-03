@@ -432,6 +432,65 @@
             gap: 0.5rem;
         }
 
+        .button-pair {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: stretch;
+            justify-content: stretch;
+            width: 100%;
+            gap: 0.5rem;
+        }
+
+        .button-pair > button,
+        .button-pair > label {
+            flex: 1 1 0;
+            width: auto;
+            min-width: 0;
+            max-width: none;
+            justify-content: center;
+        }
+
+        .index-toolbar {
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            gap: 0.4rem;
+        }
+
+        .index-view-switch {
+            display: contents;
+        }
+
+        .index-view-switch > button,
+        .index-toolbar > button {
+            flex: 0 0 2.75rem;
+            width: 2.75rem;
+            min-width: 2.75rem;
+            max-width: 2.75rem;
+            height: 2.75rem;
+            min-height: 2.75rem;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .quick-add-submit {
+            flex-shrink: 0;
+            width: 2.75rem;
+            height: 2.75rem;
+            margin-right: 0.25rem;
+            border: 1px solid #556340;
+            border-radius: 0.75rem;
+            background: #62724c;
+            color: #fbf8f3;
+        }
+
+        .quick-add-submit:hover {
+            background: #909870;
+            border-color: #7d8a62;
+            color: #fbf8f3;
+        }
+
         button.app-btn-primary,
         label.app-btn-primary {
             background-color: #62724c;
@@ -890,8 +949,14 @@
             }
 
             #app-content .index-toolbar {
-                justify-content: flex-start;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: nowrap;
                 width: 100%;
+            }
+
+            #app-content .settings-actions.button-pair {
+                justify-content: space-between;
             }
 
             #app-content .profile-actions,
@@ -11578,24 +11643,25 @@
                         <span>Plan</span>
                         <span class="settings-status">${escapeHTML(billingMeta.badge || '')}</span>
                     </div>
-                    <div class="settings-actions">
+                    <div class="settings-actions button-pair">
                         <button type="button" onclick="showPlansModal()" class="${getAppButtonClasses('accent', { size: 'sm' })}">View Plans</button>
                         ${billingMeta.state === 'preview'
                             ? `<button type="button" onclick="resetPremiumPreviewAccess()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">Reset</button>`
                             : `<button type="button" onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${purchaseRestoreLabel}" title="${purchaseRestoreLabel}">${purchaseRestoreLabel}</button>`}
                     </div>
                     <div class="settings-divider"></div>
+                    <form id="settings-form" onsubmit="saveSettings(event)">
                     <div class="settings-row">
                         <span>Account</span>
                         <span class="settings-status">${escapeHTML(accountStatus)}</span>
                     </div>
-                    <div class="settings-actions">
+                    <div class="settings-actions button-pair">
+                        <button type="submit" class="${getAppButtonClasses('primary', { size: 'sm' })}">Save</button>
                         ${isAuthenticated
                             ? `<button type="button" onclick="signOut()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">Sign Out</button>`
                             : `<button type="button" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { size: 'sm' })}">${firebaseInitialized ? 'Google' : 'Google'}</button>`}
                     </div>
                     <div class="settings-divider"></div>
-                    <form onsubmit="saveSettings(event)">
                         <label class="settings-row">
                             <span>Measurement</span>
                             <select id="settings-measurement" class="settings-select">
@@ -11617,16 +11683,13 @@
                             <span>Auto-publish</span>
                             <input type="checkbox" id="settings-auto-publish" ${userSettings.autoPublish ? 'checked' : ''}>
                         </label>
-                        <div class="settings-actions">
-                            <button type="submit" class="${getAppButtonClasses('primary', { size: 'sm' })}">Save</button>
-                        </div>
                     </form>
                     <div class="settings-divider"></div>
                     <div class="settings-row">
                         <span>Backup</span>
                         <span class="settings-status">${backupStatus}</span>
                     </div>
-                    <div class="settings-actions">
+                    <div class="settings-actions button-pair">
                         <button type="button" onclick="${backupDownloadLocked ? "showPremiumModal('download backups')" : 'exportAllAsJSON()'}" class="${getAppButtonClasses(backupDownloadLocked ? 'locked' : 'secondary', { size: 'sm' })} phone-save-icon" aria-label="${backupDownloadLabel}" title="${backupDownloadLabel}">
                             <i data-lucide="download" class="w-4 h-4"></i><span class="phone-icon-label">Download</span>
                         </button>
@@ -13320,7 +13383,7 @@
             let html = showNotebookOverviewCard ? `
                 <div class="screen-sheet ${isNotebookMode ? 'mb-3 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg' : 'index-overview mb-8 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg'}">
                     <div class="index-overview-head border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment ${isNotebookMode ? 'px-4 py-3 md:px-5 md:py-3' : 'px-5 py-5'}">
-                        <div class="${isNotebookMode ? 'flex flex-wrap items-center justify-between gap-3' : 'flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between'}">
+                        <div class="flex flex-col gap-4">
                             <div>
                                 ${isNotebookMode ? `
                                     <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage opacity-80">Notebook mode</p>
@@ -13340,7 +13403,7 @@
                                 `}
                             </div>
                             <div class="index-toolbar">
-                                <div class="inline-flex h-11 items-center rounded-xl border border-parchmentDark bg-white p-0.5">
+                                <div class="index-view-switch">
                                     <button onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex h-10 w-11 items-center justify-center rounded-lg transition-all ${indexViewMode === 'cards' ? 'is-active text-white' : 'text-sage hover:text-forest'}" title="Cards view">
                                         <i data-lucide="layout-grid" class="h-4 w-4"></i>
                                     </button>
@@ -13648,12 +13711,12 @@
             contentDiv.innerHTML = `
                 <div class="screen-sheet shop-sheet mx-auto mb-8 max-w-6xl overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg">
                     <div class="border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment px-5 py-5">
-                        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                        <div class="flex flex-col gap-4">
                             <div class="flex flex-wrap items-center gap-3">
                                 <h2 class="font-fantasy text-3xl font-bold text-forest">Shopping list</h2>
                                 ${shoppingList.collaborators.length > 0 ? `<span class="inline-flex items-center rounded-full border border-parchmentDark bg-parchment px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-forest">${shoppingList.collaborators.length} ${shoppingList.collaborators.length === 1 ? 'partner' : 'partners'}</span>` : ''}
                             </div>
-                            <div class="action-row">
+                            <div class="action-row button-pair">
                                 <button type="button" onclick="showShoppingListCollaboratorModal()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
                                     <i data-lucide="user-plus" class="h-4 w-4 text-gold"></i>Add partner
                                 </button>
@@ -13672,10 +13735,7 @@
                             <div class="mt-3 md:mt-4">
                                 <div class="relative flex items-center bg-white rounded-xl shadow-sm border border-parchmentDark">
                                     <input id="shopping-list-custom-name" type="text" class="w-full bg-transparent border-none outline-none px-4 h-11 text-base font-semibold text-forest placeholder-sage placeholder-opacity-60" placeholder="e.g. Sparkling water" />
-                                    <button type="button" onclick="const noteInput = document.getElementById('shopping-list-custom-note'); noteInput.classList.toggle('hidden'); if (!noteInput.classList.contains('hidden')) noteInput.focus();" class="flex-shrink-0 mr-1 flex h-11 w-11 items-center justify-center rounded-xl border border-parchmentDark bg-white text-sage hover:border-gold hover:text-gold" title="Add note">
-                                        <i data-lucide="file-text" class="h-4 w-4"></i>
-                                    </button>
-                                    <button type="button" onclick="addCustomShoppingListItem()" class="flex-shrink-0 ml-1 mr-1 flex h-11 w-11 items-center justify-center rounded-xl border border-[#111111] bg-[#111111] text-white hover:bg-[#232323]" title="Add item">
+                                    <button type="button" onclick="addCustomShoppingListItem()" class="quick-add-submit flex items-center justify-center" title="Add item" aria-label="Add item">
                                         <i data-lucide="plus" class="h-6 w-6"></i>
                                     </button>
                                 </div>
