@@ -2466,13 +2466,13 @@
             }
 
             .notebook-landing-hero {
-                padding: 0.65rem 0;
+                padding: 0.85rem 0.85rem 1rem;
                 border-radius: 1.5rem;
             }
 
             .notebook-landing-cover-frame {
-                width: 100%;
-                max-width: 100%;
+                width: min(100%, 13.5rem);
+                max-width: 13.5rem;
                 margin-inline: auto;
             }
 
@@ -2481,7 +2481,7 @@
                 height: auto;
                 min-height: 0;
                 max-height: none;
-                aspect-ratio: 1 / 1.414;
+                aspect-ratio: 0.74 / 1;
             }
 
             .notebook-sticky-note--sm {
@@ -3036,11 +3036,10 @@
             }
 
             .notebook-landing-cover-frame {
-                width: 100%;
-                max-width: 100%;
+                width: min(100%, 13.5rem);
+                max-width: 13.5rem;
             }
 
-            .notebook-landing-cover-surface,
             .notebook-book-spread-surface {
                 width: 100%;
                 height: auto;
@@ -12734,10 +12733,17 @@
             if (window.innerWidth < 768) {
                 const coverFrame = coverSurface?.closest('.notebook-landing-cover-frame');
                 if (coverFrame) {
-                    coverFrame.style.width = '100%';
-                    coverFrame.style.maxWidth = '100%';
+                    coverFrame.style.width = '';
+                    coverFrame.style.maxWidth = '';
                 }
-                applyNotebookPhoneFrame(coverSurface);
+                if (coverSurface) {
+                    coverSurface.style.width = '';
+                    coverSurface.style.maxWidth = '';
+                    coverSurface.style.height = '';
+                    coverSurface.style.minHeight = '';
+                    coverSurface.style.maxHeight = '';
+                    coverSurface.style.aspectRatio = '';
+                }
                 if (notebookSurface) {
                     const navRect = document.getElementById('main-nav')?.getBoundingClientRect();
                     const viewportHeight = Math.floor(window.visualViewport?.height || window.innerHeight || 0);
