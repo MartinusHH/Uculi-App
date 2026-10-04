@@ -12740,12 +12740,11 @@
                 applyNotebookPhoneFrame(coverSurface);
                 if (notebookSurface) {
                     const navRect = document.getElementById('main-nav')?.getBoundingClientRect();
-                    const pager = document.querySelector('.notebook-mobile-pager');
                     const viewportHeight = Math.floor(window.visualViewport?.height || window.innerHeight || 0);
                     const navTop = navRect ? Math.min(navRect.top, viewportHeight) : viewportHeight;
-                    const pagerTop = pager && pager.getBoundingClientRect().height > 0 ? pager.getBoundingClientRect().top : navTop;
                     const surfaceTop = notebookSurface.getBoundingClientRect().top;
-                    const fittedHeight = Math.max(320, Math.floor(pagerTop - surfaceTop - 10));
+                    const fittedHeight = Math.max(320, Math.ceil(navTop - surfaceTop));
+                    notebookSurface.style.paddingBottom = '0px';
                     notebookSurface.style.width = '100%';
                     notebookSurface.style.maxWidth = '100%';
                     notebookSurface.style.aspectRatio = 'auto';
