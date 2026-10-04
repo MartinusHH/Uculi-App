@@ -12558,11 +12558,13 @@
 
             const isCompactNotebook = window.matchMedia('(max-width: 767px)').matches;
             const isShortNotebook = isNotebookShortViewport();
-            const overviewIngredientCount = isShortNotebook ? 2 : (isCompactNotebook ? 4 : 5);
+            const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+            const overviewIngredientCount = isCompactNotebook
+                ? ingredients.length
+                : (isShortNotebook ? 2 : 5);
             const extraIngredientPageSize = isShortNotebook ? 3 : (isCompactNotebook ? 5 : 7);
             const firstInstructionPageSize = isShortNotebook ? 2 : (isCompactNotebook ? 3 : 4);
             const extraInstructionPageSize = isShortNotebook ? 3 : (isCompactNotebook ? 4 : 5);
-            const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
             const instructions = normalizeRecipeInstructions(recipe.instructions || []);
             const noteBlocks = [];
 
@@ -13093,7 +13095,7 @@
             };
 
             surface.addEventListener('pointerdown', event => {
-                if (event.pointerType === 'mouse' && event.button !== 0) return;
+                if (event.pointerType !== 'mouse' || event.button !== 0) return;
                 if (isNotebookInteractiveTarget(event.target)) return;
                 startX = event.clientX;
                 startY = event.clientY;
@@ -13105,6 +13107,7 @@
             });
 
             surface.addEventListener('pointermove', event => {
+                if (event.pointerType !== 'mouse') return;
                 if (!isDragging || pointerId !== event.pointerId) return;
                 lastX = event.clientX;
                 lastY = event.clientY;
@@ -13118,11 +13121,11 @@
             }, { passive: false });
 
             surface.addEventListener('pointerup', event => {
-                if (pointerId !== event.pointerId) return;
+                if (event.pointerType !== 'mouse' || pointerId !== event.pointerId) return;
                 finishSwipe(event.clientX, event.clientY);
             });
             surface.addEventListener('pointercancel', event => {
-                if (pointerId !== event.pointerId) return;
+                if (event.pointerType !== 'mouse' || pointerId !== event.pointerId) return;
                 finishSwipe(lastX, lastY);
             });
             surface.addEventListener('lostpointercapture', () => {
@@ -13133,6 +13136,52 @@
                     finishSwipe(lastX, lastY);
                 }
             });
+
+            let trackingTouch = false;
+            const releaseTouch = (turnPage) => {
+                if (!trackingTouch) return;
+                trackingTouch = false;
+                surface.style.transform = '';
+                if (!turnPage) return;
+                const deltaX = lastX - startX;
+                const deltaY = lastY - startY;
+                if (Math.abs(deltaX) >= 44 && Math.abs(deltaX) > Math.abs(deltaY) * 0.85) {
+                    goToNotebookPage(deltaX < 0 ? 1 : -1);
+                }
+            };
+
+            surface.addEventListener('touchstart', event => {
+                if (event.touches.length !== 1) return;
+                if (isNotebookInteractiveTarget(event.target)) return;
+                const touch = event.touches[0];
+                startX = touch.clientX;
+                startY = touch.clientY;
+                lastX = startX;
+                lastY = startY;
+                trackingTouch = true;
+            }, { passive: true });
+
+            surface.addEventListener('touchmove', event => {
+                if (!trackingTouch || event.touches.length !== 1) return;
+                const touch = event.touches[0];
+                lastX = touch.clientX;
+                lastY = touch.clientY;
+                const deltaX = lastX - startX;
+                const deltaY = lastY - startY;
+                if (Math.abs(deltaY) > 8 && Math.abs(deltaY) >= Math.abs(deltaX)) {
+                    trackingTouch = false;
+                    surface.style.transform = '';
+                    return;
+                }
+                if (Math.abs(deltaX) > 12 && Math.abs(deltaX) > Math.abs(deltaY)) {
+                    if (event.cancelable) event.preventDefault();
+                    const shift = Math.max(-56, Math.min(56, deltaX));
+                    surface.style.transform = `translateX(${shift * 0.35}px)`;
+                }
+            }, { passive: false });
+
+            surface.addEventListener('touchend', () => releaseTouch(true));
+            surface.addEventListener('touchcancel', () => releaseTouch(false));
 
             attachNotebookStickyNoteInteractions(surface);
         }
