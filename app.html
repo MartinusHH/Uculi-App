@@ -6566,6 +6566,8 @@
             showToast(`${checkedCount} checked item${checkedCount === 1 ? '' : 's'} cleared.`, 'rotate-ccw');
         }
 
+        const shoppingListSelfName = 'You';
+
         function submitShoppingListCollaborator(inputId, modalId) {
             const input = document.getElementById(inputId);
             if (!(input instanceof HTMLInputElement)) return;
@@ -6574,6 +6576,13 @@
             if (!name) {
                 showToast('Enter a partner name first.', 'alert-circle');
                 input.focus();
+                return;
+            }
+
+            if (name.toLowerCase() === shoppingListSelfName.toLowerCase()) {
+                showToast('That is you, the person using this device.', 'info');
+                input.focus();
+                input.select();
                 return;
             }
 
@@ -6593,39 +6602,20 @@
         }
 
         function showShoppingListCollaboratorModal() {
-            const activeFamilies = (userFamilies || []).filter(f => !f.removedMembers || !f.removedMembers.some(m => m.userId === currentUser?.uid));
-            if (activeFamilies.length === 0) {
-                const modalId = createModal('Family Required', `
-                    <div class="space-y-4 text-inkDark">
-                        <div class="rounded-2xl border border-parchmentDark bg-parchment p-4 shadow-sm">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">No active family</p>
-                            <p class="mt-2 text-sm font-semibold leading-relaxed text-forest">Partners can only be selected from an existing family. Please create or join a family book in your Profile first.</p>
-                        </div>
-                    </div>
-                `, [
-                    { text: 'Close', onClick: () => closeModal(modalId) },
-                    { text: 'Go to Profile', primary: true, onClick: () => { closeModal(modalId); renderProfile(); } }
-                ]);
-                return;
-            }
-
             const inputId = `shopping-collaborator-input-${Date.now()}`;
             let modalId = null;
 
-            modalId = createModal('Select Family Partner', `
+            modalId = createModal('Add partner', `
                 <div class="space-y-4 text-inkDark">
-                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4 shadow-sm">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Family Roster</p>
-                        <p class="mt-2 text-sm font-semibold leading-relaxed text-forest">Select a partner from your active family books to share this list with.</p>
-                    </div>
+                    <p class="text-sm font-semibold leading-relaxed text-forest">Type a name. It stays on this device only.</p>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-[0.22em] text-sage mb-2" for="${inputId}">Partner name</label>
-                        <input id="${inputId}" type="text" class="${inputClass}" placeholder="Name of family member..." />
+                        <label class="block text-xs font-bold uppercase tracking-[0.22em] text-sage mb-2" for="${inputId}">Name</label>
+                        <input id="${inputId}" type="text" class="${inputClass}" placeholder="e.g. Anna" autocomplete="off" />
                     </div>
                 </div>
             `, [
                 { text: 'Cancel', onClick: () => closeModal(modalId) },
-                { text: 'Add Partner', primary: true, onClick: () => submitShoppingListCollaborator(inputId, modalId) }
+                { text: 'Add partner', primary: true, onClick: () => submitShoppingListCollaborator(inputId, modalId) }
             ]);
 
             requestAnimationFrame(() => {
@@ -6657,19 +6647,62 @@
             const item = userSettings.shoppingList.items.find(entry => entry.id === itemId);
             if (!item) return;
 
-            item.assignedTo = normalizeShoppingListLabel(assignedTo);
+            item.assignedTo = normalizeShoppingListLabel(decodeURIComponent(String(assignedTo || '').replace(/\+/g, ' ')));
             item.updatedAt = new Date().toISOString();
             persistShoppingListState({ rerender: true });
+        }
+
+        function shoppingListAssigneeMark(name, names) {
+            const compact = String(name || '').replace(/\s+/g, '');
+            if (!compact) return '?';
+            const lower = compact.toLowerCase();
+            const others = names
+                .filter(entry => entry !== name)
+                .map(entry => String(entry || '').replace(/\s+/g, '').toLowerCase());
+            let length = 1;
+            while (length < compact.length && others.some(other => other.slice(0, length) === lower.slice(0, length))) {
+                length += 1;
+            }
+            const mark = compact.slice(0, length);
+            return mark.charAt(0).toUpperCase() + mark.slice(1);
+        }
+
+        function shoppingListAssigneeGroups(items, collaborators) {
+            const you = [];
+            const buckets = (collaborators || []).map(collaborator => ({ name: collaborator.name, items: [] }));
+            const open = [];
+            items.forEach(item => {
+                const assignedTo = normalizeShoppingListLabel(item.assignedTo);
+                if (!assignedTo) {
+                    open.push(item);
+                    return;
+                }
+                if (assignedTo.toLowerCase() === shoppingListSelfName.toLowerCase()) {
+                    you.push(item);
+                    return;
+                }
+                const bucket = buckets.find(entry => entry.name.toLowerCase() === assignedTo.toLowerCase());
+                if (bucket) bucket.items.push(item);
+                else open.push(item);
+            });
+            const groups = [];
+            if (you.length) groups.push({ title: shoppingListSelfName, items: you });
+            buckets.forEach(bucket => {
+                if (bucket.items.length) groups.push({ title: bucket.name, items: bucket.items });
+            });
+            if (open.length) groups.push({ title: 'Not assigned', items: open });
+            return groups;
         }
 
         function shareShoppingListSnapshot() {
             const shoppingList = normalizeShoppingListState(userSettings.shoppingList);
             const pendingItems = shoppingList.items.filter(item => !item.checked);
             const completedCount = shoppingList.items.filter(item => item.checked).length;
-            const pendingLines = pendingItems.length > 0
-                ? pendingItems.map(item => `- ${item.label}${item.assignedTo ? ` (${item.assignedTo})` : ''}`).join('\n')
-                : '- Everything is checked off.';
-            const shareText = `Uculi shopping list\n\nPending items:\n${pendingLines}\n\nCompleted: ${completedCount}`;
+            const groups = shoppingListAssigneeGroups(pendingItems, shoppingList.collaborators);
+            const pendingBody = groups.length > 0
+                ? groups.map(group => `${group.title}\n${group.items.map(item => `- ${item.label}`).join('\n')}`).join('\n\n')
+                : 'Nothing left to pick up.';
+            const shareText = `Uculi shopping list\n\n${pendingBody}\n\nCompleted: ${completedCount}`;
 
             if (navigator.share) {
                 navigator.share({
@@ -6690,16 +6723,17 @@
                 ((item.sourceRecipeTitles || []).length > 2) ? `<span class="inline-flex items-center rounded-full border border-parchmentDark bg-parchment px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-sage">+${item.sourceRecipeTitles.length - 2} more</span>` : ''
             ].join('');
 
-            const assignees = [
-                { value: 'You', label: 'U' },
-                ...shoppingList.collaborators.map(c => ({ value: c.name, label: c.name.charAt(0).toUpperCase() }))
-            ].slice(0, 2);
+            const assigneeNames = [shoppingListSelfName, ...shoppingList.collaborators.map(collaborator => collaborator.name)];
+            const assignees = assigneeNames.map(name => ({
+                value: name,
+                label: shoppingListAssigneeMark(name, assigneeNames)
+            }));
 
-            const assigneesHtml = assignees.map(a => `
-                <button type="button" onclick="assignShoppingListItem('${item.id}', '${item.assignedTo === a.value ? '' : escapeHTML(a.value)}')" 
-                    class="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${item.assignedTo === a.value ? 'bg-forest text-white shadow-sm ring-2 ring-forest/20' : 'bg-parchment text-sage border border-parchmentDark hover:border-gold hover:text-forest'}" 
-                    title="Assign to ${escapeHTML(a.value)}">
-                    ${escapeHTML(a.label)}
+            const assigneesHtml = assignees.map(assignee => `
+                <button type="button" onclick="assignShoppingListItem('${item.id}', '${item.assignedTo === assignee.value ? '' : encodeURIComponent(assignee.value)}')"
+                    class="inline-flex h-8 min-w-8 shrink-0 items-center justify-center rounded-full px-1.5 text-[11px] font-bold leading-none transition-all ${item.assignedTo === assignee.value ? 'bg-forest text-white shadow-sm ring-2 ring-forest/20' : 'bg-parchment text-sage border border-parchmentDark hover:border-gold hover:text-forest'}"
+                    title="Assign to ${escapeHTML(assignee.value)}" aria-label="Assign to ${escapeHTML(assignee.value)}">
+                    ${escapeHTML(assignee.label)}
                 </button>
             `).join('');
 
@@ -6721,7 +6755,7 @@
                         </div>
 
                         <div class="flex items-center gap-2 pl-2 border-l border-parchmentDark">
-                            ${assignees.length > 0 ? `<div class="flex -space-x-1 mr-1">${assigneesHtml}</div>` : ''}
+                            ${assignees.length > 0 ? `<div class="flex max-w-[9.5rem] flex-wrap items-center justify-end gap-1.5">${assigneesHtml}</div>` : ''}
                             <button type="button" onclick="removeShoppingListItem('${item.id}')" class="flex h-11 w-11 items-center justify-center rounded-xl text-sage hover:bg-coral hover:text-white transition-colors" title="Remove">
                                 <i data-lucide="trash-2" class="h-4 w-4"></i>
                             </button>
@@ -13882,8 +13916,14 @@
                 `).join('')
                 : '';
 
+            const pendingGroups = shoppingListAssigneeGroups(pendingItems, shoppingList.collaborators);
             const pendingMarkup = pendingItems.length > 0
-                ? pendingItems.map(item => renderShoppingListItem(item)).join('')
+                ? pendingGroups.map(group => `
+                    <section class="space-y-3">
+                        <h3 class="text-[11px] font-bold uppercase tracking-[0.22em] text-sage">${escapeHTML(group.title)}</h3>
+                        <div class="space-y-3">${group.items.map(item => renderShoppingListItem(item)).join('')}</div>
+                    </section>
+                `).join('')
                 : `
                     <div class="rounded-2xl border border-dashed border-parchmentDark bg-parchment p-6 text-center shadow-sm">
                         <i data-lucide="shopping-basket" class="mx-auto h-10 w-10 text-gold opacity-80"></i>
