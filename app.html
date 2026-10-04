@@ -3498,6 +3498,34 @@
             }
         }
 
+        @media (max-width: 767px) {
+            article.shop-line > .shop-line-row {
+                display: grid;
+                grid-template-columns: auto minmax(0, 1fr) auto;
+                align-items: center;
+                column-gap: 0.75rem;
+                row-gap: 0.45rem;
+            }
+
+            article.shop-line .shop-line-name {
+                overflow: visible;
+                text-overflow: unset;
+                white-space: normal;
+                word-break: break-word;
+            }
+
+            article.shop-line .shop-line-actions {
+                grid-column: 1 / -1;
+                justify-content: flex-end;
+                border-left-width: 0;
+                padding-left: 0;
+            }
+
+            article.shop-line .shop-line-assignees {
+                max-width: none;
+            }
+        }
+
         input[type="file"] { display: none; }
         .custom-file-upload { display: inline-block; cursor: pointer; }
         input::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }
@@ -6738,25 +6766,25 @@
             `).join('');
 
             return `
-                <article class="rounded-xl border border-parchmentDark bg-white p-3 shadow-sm transition-all ${item.checked ? 'opacity-70' : ''}">
-                    <div class="flex items-center gap-3">
+                <article class="shop-line rounded-xl border border-parchmentDark bg-white p-3 shadow-sm transition-all ${item.checked ? 'opacity-70' : ''}">
+                    <div class="shop-line-row flex items-center gap-3">
                         <button type="button" onclick="toggleShoppingListItemChecked('${item.id}')" class="${getAppButtonClasses(item.checked ? 'accent' : 'secondary', { iconOnly: true, size: 'sm' })} flex-shrink-0" title="${item.checked ? 'Reopen item' : 'Mark item done'}" aria-label="${item.checked ? 'Reopen item' : 'Mark item done'}">
                             <i data-lucide="${item.checked ? 'check-check' : 'circle'}" class="h-4 w-4"></i>
                         </button>
 
-                        <div class="min-w-0 flex-1 flex flex-col justify-center">
-                            <p class="text-sm font-bold text-forest truncate ${item.checked ? 'line-through' : ''}">${escapeHTML(item.label)}</p>
+                        <div class="shop-line-copy min-w-0 flex-1 flex flex-col justify-center">
+                            <p class="shop-line-name text-sm font-bold text-forest truncate ${item.checked ? 'line-through' : ''}">${escapeHTML(item.label)}</p>
                             ${(itemMetaBadges || item.note) ? `
-                                <div class="mt-1 flex flex-wrap items-center gap-2">
+                                <div class="shop-line-meta mt-1 flex flex-wrap items-center gap-2">
                                     ${itemMetaBadges}
                                     ${item.note ? `<span class="text-[10px] font-semibold text-sage truncate max-w-[120px]">- ${escapeHTML(item.note)}</span>` : ''}
                                 </div>
                             ` : ''}
                         </div>
 
-                        <div class="flex items-center gap-2 pl-2 border-l border-parchmentDark">
-                            ${assignees.length > 0 ? `<div class="flex max-w-[9.5rem] flex-wrap items-center justify-end gap-1.5">${assigneesHtml}</div>` : ''}
-                            <button type="button" onclick="removeShoppingListItem('${item.id}')" class="flex h-11 w-11 items-center justify-center rounded-xl text-sage hover:bg-coral hover:text-white transition-colors" title="Remove">
+                        <div class="shop-line-actions flex items-center gap-2 pl-2 border-l border-parchmentDark">
+                            ${assignees.length > 0 ? `<div class="shop-line-assignees flex max-w-[9.5rem] flex-wrap items-center justify-end gap-1.5">${assigneesHtml}</div>` : ''}
+                            <button type="button" onclick="removeShoppingListItem('${item.id}')" class="shop-line-remove flex h-11 w-11 items-center justify-center rounded-xl text-sage hover:bg-coral hover:text-white transition-colors" title="Remove" aria-label="Remove">
                                 <i data-lucide="trash-2" class="h-4 w-4"></i>
                             </button>
                         </div>
