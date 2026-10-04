@@ -505,6 +505,89 @@
             color: #fbf8f3;
         }
 
+        #app-landing .landing-header-login {
+            display: none;
+        }
+
+        #app-landing .landing-auth-row {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            width: min(100%, 24rem);
+            max-width: 24rem;
+            margin-top: 1.5rem;
+            margin-left: auto;
+            margin-right: auto;
+            gap: 0.65rem;
+        }
+
+        #app-landing .landing-auth-row > button,
+        #app-landing .landing-auth-row > div {
+            width: 100%;
+            max-width: none;
+            align-self: stretch;
+        }
+
+        #app-landing .landing-auth-row > div {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        #app-landing .landing-auth-row > div > p {
+            width: 100%;
+            max-width: none;
+            margin-top: 0.35rem;
+        }
+
+        #app-landing .landing-auth-btn,
+        #app-landing #local-test-mode-landing {
+            display: flex;
+            width: 100%;
+            max-width: none;
+            min-height: 2.75rem;
+            height: auto;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 0;
+            border-radius: 0.75rem;
+            padding: 0.55rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1.25;
+            text-align: center;
+            white-space: normal;
+            box-shadow: none;
+        }
+
+        #app-landing .landing-auth-btn--primary {
+            border: 1px solid #556340;
+            background: #62724c;
+            color: #fbf8f3;
+        }
+
+        #app-landing .landing-auth-btn--primary:hover {
+            border-color: #7d8a62;
+            background: #909870;
+            color: #fbf8f3;
+        }
+
+        #app-landing .landing-auth-btn--quiet,
+        #app-landing #local-test-mode-landing {
+            border: 1px solid rgba(144, 152, 112, 0.45);
+            background: #fbf8f3;
+            color: #1c1410;
+        }
+
+        #app-landing .landing-auth-btn--quiet:hover,
+        #app-landing #local-test-mode-landing:hover {
+            border-color: #909870;
+            background: #ffffff;
+            color: #1c1410;
+        }
+
         button.notebook-view-toggle.is-active {
             background-color: #62724c;
             color: #fbf8f3;
@@ -10057,7 +10140,7 @@
                                 </div>
                                 <span class="font-fantasy text-2xl font-bold tracking-wide text-forest">Uculi</span>
                             </div>
-                            <button type="button" onclick="signInFromLanding()" class="hidden md:flex h-10 items-center gap-2 rounded-xl border border-parchmentDark bg-white px-5 text-sm font-bold text-forest shadow-sm transition-all hover:border-gold hover:text-gold">
+                            <button type="button" onclick="signInFromLanding()" class="landing-header-login hidden md:flex h-10 items-center gap-2 rounded-xl border border-parchmentDark bg-white px-5 text-sm font-bold text-forest shadow-sm transition-all hover:border-gold hover:text-gold">
                                 <i data-lucide="log-in" class="h-4 w-4"></i> ${authText.legacyMobileLogin}
                             </button>
                         </div>
@@ -10073,11 +10156,11 @@
                             <p class="mx-auto mt-8 max-w-2xl text-lg font-semibold leading-relaxed text-sage md:text-xl">
                                 No clutter, no pop-ups, just cooking. Uculi turns your scattered notes and internet finds into a calm, focused digital cookbook.
                             </p>
-                            <div class="landing-auth-row mt-6 flex flex-col items-center justify-center gap-2 sm:flex-row sm:flex-wrap">
-                                <button type="button" onclick="enterAppFromLanding('hero-enter')" class="flex h-11 items-center justify-center gap-2 rounded-xl bg-forest px-5 text-sm font-bold text-white transition-colors hover:bg-inkDark">
+                            <div class="landing-auth-row">
+                                <button type="button" onclick="enterAppFromLanding('hero-enter')" class="landing-auth-btn landing-auth-btn--primary">
                                     <i data-lucide="${landingAuthActionIcon}" class="h-4 w-4"></i> ${landingAuthActionLabel}
                                 </button>
-                                <button type="button" onclick="signInFromLanding()" class="md:hidden flex h-11 items-center justify-center gap-2 rounded-xl border border-parchmentDark bg-white px-5 text-sm font-bold text-forest transition-colors hover:border-gold hover:text-gold">
+                                <button type="button" onclick="signInFromLanding()" class="landing-auth-btn landing-auth-btn--quiet">
                                     <i data-lucide="log-in" class="h-4 w-4"></i> ${authText.legacyMobileLogin}
                                 </button>
                                 ${localTestModeButtonMarkup('local-test-mode-landing')}
