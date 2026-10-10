@@ -678,6 +678,14 @@
             text-underline-offset: 0.18em;
         }
 
+        .settings-auth-agreements {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 0.35rem 0 0.55rem;
+        }
+
         button.auth-gate-submit,
         button.auth-gate-social,
         button.auth-gate-submit:hover,
@@ -4966,6 +4974,9 @@
         const developerBypassStorageKey = 'uculiDeveloperBypass';
         const developerBypassQueryParam = 'dev-bypass';
         const developerBypassUserId = '__uculi_local_dev__';
+        const AGREEMENT_VERSION = '2026-10-10';
+        const pendingAgreementStorageKey = 'uculiPendingAgreementVersion';
+        const agreementRetryStorageKey = 'uculiAgreementRetryUid';
         const billingIntegrationConfig = {
             provider: 'Stripe',
             checkoutReady: false,
@@ -8256,6 +8267,79 @@
             return false;
         }
 
+        function notePendingAgreement() {
+            sessionStorage.setItem(pendingAgreementStorageKey, AGREEMENT_VERSION);
+        }
+
+        function hasPendingAgreement() {
+            return sessionStorage.getItem(pendingAgreementStorageKey) === AGREEMENT_VERSION;
+        }
+
+        function clearPendingAgreement() {
+            sessionStorage.removeItem(pendingAgreementStorageKey);
+        }
+
+        function applyPendingAgreementToSettings() {
+            if (!hasPendingAgreement()) return;
+            userSettings.termsAccepted = true;
+            userSettings.termsAcceptedAt = userSettings.termsAcceptedAt || new Date().toISOString();
+            userSettings.termsAcceptedVersion = AGREEMENT_VERSION;
+        }
+
+        function isCloudAccountUid(uid) {
+            const value = String(uid || '');
+            return Boolean(value) && value !== developerBypassUserId && !value.startsWith('local-');
+        }
+
+        function isNewFirebaseAccount(result) {
+            return result?.additionalUserInfo?.isNewUser === true;
+        }
+
+        function connectFirebaseEmulatorsIfRequested() {
+            if (!isLocalDeveloperPreviewContext()) return false;
+            const hostname = String(window.location.hostname || '').toLowerCase();
+            if (hostname !== 'localhost' && hostname !== '127.0.0.1') return false;
+            const params = new URLSearchParams(window.location.search || '');
+            if (params.get('emulator') === '0') {
+                localStorage.removeItem('uculiUseFirebaseEmulator');
+                return false;
+            }
+            if (params.get('emulator') === '1') localStorage.setItem('uculiUseFirebaseEmulator', '1');
+            if (localStorage.getItem('uculiUseFirebaseEmulator') !== '1') return false;
+            firebase.auth().useEmulator('http://127.0.0.1:9099');
+            firebase.firestore().useEmulator('127.0.0.1', 8080);
+            console.info('Uculi is using the local Firebase emulators.');
+            return true;
+        }
+
+        async function savePrivateAgreementOnce(uid) {
+            if (!firebaseInitialized || isDeveloperBypassSession() || !isCloudAccountUid(uid)) return;
+            const retryUid = sessionStorage.getItem(agreementRetryStorageKey);
+            if (!hasPendingAgreement() && retryUid !== uid) return;
+            const ref = firebase.firestore().collection('users').doc(uid).collection('private').doc('agreement');
+            const existing = await ref.get();
+            if (existing.exists) {
+                sessionStorage.removeItem(agreementRetryStorageKey);
+                return;
+            }
+            await ref.set({
+                acceptedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                version: AGREEMENT_VERSION
+            });
+            sessionStorage.removeItem(agreementRetryStorageKey);
+        }
+
+        async function recordNewAccountAgreement(result, forceNew = false) {
+            const uid = result?.user?.uid;
+            if (!uid || (!forceNew && !isNewFirebaseAccount(result))) return;
+            try {
+                await savePrivateAgreementOnce(uid);
+            } catch (error) {
+                sessionStorage.setItem(agreementRetryStorageKey, uid);
+                console.error('Agreement save error:', error);
+            }
+        }
+
         function isCloudAuthConfigured() {
             const config = window.UCULI_FIREBASE_CONFIG || {};
             const key = String(config.apiKey || '');
@@ -8299,7 +8383,7 @@
             userSettings.email = account.email;
             userSettings.termsAccepted = true;
             userSettings.termsAcceptedAt = userSettings.termsAcceptedAt || new Date().toISOString();
-            userSettings.termsAcceptedVersion = userSettings.termsAcceptedVersion || 'v2026-04';
+            userSettings.termsAcceptedVersion = userSettings.termsAcceptedVersion || AGREEMENT_VERSION;
             saveData();
             syncAuthenticatedAppChrome();
             document.getElementById('app-landing')?.remove();
@@ -8377,11 +8461,13 @@
             try {
                 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
                 firebaseInitialized = true;
+                connectFirebaseEmulatorsIfRequested();
 
                 // Handle redirect result from mobile Google sign-in
-                firebase.auth().getRedirectResult().then(result => {
+                firebase.auth().getRedirectResult().then(async result => {
                     if (result && result.user) {
                         const u = result.user;
+                        applyPendingAgreementToSettings();
                         userSettings.email = u.email || userSettings.email || '';
                         const existingName = String(userSettings.name || '').trim();
                         const googleName = String(u.displayName || '').trim();
@@ -8389,8 +8475,10 @@
                             userSettings.name = googleName;
                         }
                         userSettings.profilePic = u.photoURL || userSettings.profilePic;
+                        if (isNewFirebaseAccount(result)) await recordNewAccountAgreement(result);
                         saveData();
                         syncToFirestore();
+                        if (!sessionStorage.getItem(agreementRetryStorageKey)) clearPendingAgreement();
                         showToast(`Welcome, ${u.displayName || 'Chef'}!`, 'check-circle');
                     }
                 }).catch(error => {
@@ -8406,6 +8494,7 @@
                     if (user) {
                         migrateLegacyStorageToCurrentAccount();
                         loadData();
+                        applyPendingAgreementToSettings();
                         userSettings.email = user.email || userSettings.email || '';
                         const existingName = String(userSettings.name || '').trim();
                         const googleName = String(user.displayName || '').trim();
@@ -8429,6 +8518,9 @@
                         dismissAuthLoadingScreen();
                         loadFamiliesFromFirestore();
                         setTimeout(() => checkFamilyRemovals(), 1000);
+                        if (sessionStorage.getItem(agreementRetryStorageKey) === user.uid) {
+                            savePrivateAgreementOnce(user.uid).catch(error => console.error('Agreement save error:', error));
+                        }
                     } else if (activateDeveloperBypassSession()) {
                         dismissAuthLoadingScreen();
                         renderList();
@@ -8454,8 +8546,10 @@
                 return;
             }
 
+            notePendingAgreement();
             if (!isCloudAuthConfigured() || !firebaseInitialized) {
                 signInLocalAccount(email, password);
+                clearPendingAgreement();
                 return;
             }
 
@@ -8464,8 +8558,12 @@
 
             try {
                 await firebase.auth().signInWithEmailAndPassword(email, password);
+                applyPendingAgreementToSettings();
+                saveData();
+                if (!sessionStorage.getItem(agreementRetryStorageKey)) clearPendingAgreement();
                 // onAuthStateChanged handles navigation
             } catch (error) {
+                clearPendingAgreement();
                 const authText = getAuthI18n();
                 showToast(getReadableAuthErrorMessage(error), 'alert-circle');
                 if (btn) { btn.disabled = false; btn.innerHTML = `<i data-lucide="log-in" class="h-4 w-4"></i>${authText.submitLogin}`; lucide.createIcons(); }
@@ -8490,8 +8588,10 @@
                 return;
             }
 
+            notePendingAgreement();
             if (!isCloudAuthConfigured() || !firebaseInitialized) {
                 registerLocalAccount({ firstName, lastName, email, password });
+                clearPendingAgreement();
                 return;
             }
 
@@ -8506,13 +8606,17 @@
                 if (result.user) {
                     await result.user.updateProfile({ displayName });
                     currentUser = result.user;
+                    applyPendingAgreementToSettings();
                     userSettings.name = displayName;
                     userSettings.email = result.user.email || email;
                     saveData();
+                    await recordNewAccountAgreement(result, true);
                     syncToFirestore();
+                    if (!sessionStorage.getItem(agreementRetryStorageKey)) clearPendingAgreement();
                 }
                 // onAuthStateChanged handles navigation
             } catch (error) {
+                clearPendingAgreement();
                 showToast(getReadableAuthErrorMessage(error), 'alert-circle');
                 if (btn) { btn.disabled = false; btn.innerHTML = `<i data-lucide="user-plus" class="h-4 w-4"></i>${authText.submitRegister}`; lucide.createIcons(); }
             }
@@ -8527,12 +8631,13 @@
         }
 
         async function signInWithGoogle(origin = 'app') {
-            if (origin === 'auth-gate' && !authAgreementsAccepted()) return;
+            if (!authAgreementsAccepted()) return;
             if (!firebaseInitialized) {
                 showCloudSetupStatusModal(origin);
                 return;
             }
 
+            notePendingAgreement();
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 if (shouldUseRedirectForGoogleSignIn()) {
@@ -8543,6 +8648,7 @@
                 const result = await firebase.auth().signInWithPopup(provider);
                 currentUser = result.user;
                 isAuthenticated = true;
+                applyPendingAgreementToSettings();
                 userSettings.email = currentUser.email || userSettings.email || '';
                 const existingName = String(userSettings.name || '').trim();
                 const googleName = String(currentUser.displayName || '').trim();
@@ -8550,8 +8656,10 @@
                     userSettings.name = googleName;
                 }
                 userSettings.profilePic = currentUser.photoURL || userSettings.profilePic;
+                await recordNewAccountAgreement(result);
                 saveData();
                 await syncToFirestore();
+                if (!sessionStorage.getItem(agreementRetryStorageKey)) clearPendingAgreement();
                 showToast(`Welcome, ${currentUser.displayName || 'Chef'}!`, 'check-circle');
             } catch (error) {
                 const errorCode = String(error?.code || '');
@@ -8561,11 +8669,13 @@
                         await firebase.auth().signInWithRedirect(provider);
                         return;
                     } catch (fallbackError) {
+                        clearPendingAgreement();
                         const fallbackCode = String(fallbackError?.code || 'unknown');
                         showToast(`${getReadableAuthErrorMessage(fallbackError)} [${fallbackCode}]`, 'alert-circle');
                         return;
                     }
                 }
+                clearPendingAgreement();
                 showToast(`${getReadableAuthErrorMessage(error)} [${errorCode || 'unknown'}]`, 'alert-circle');
             }
         }
@@ -11997,8 +12107,9 @@
                 `
                 : `
                     <p class="text-sm font-semibold text-sage mb-5">${firebaseInitialized ? 'Log in or create your account now so cloud sync, publishing, and cross-device access can be connected later. Premium still gates sync, publishing, and family collaboration.' : 'Google login is still in setup. Keep using the app locally for now, and only treat cloud sync, publishing, and shared families as live once Firebase is fully connected.'}</p>
+                    <div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>
                     <div class="${settingsActionGridClass}">
-                        <button onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses(cloudAuthActionVariant, { fullWidth: true, size: 'lg' })}">
+                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses(cloudAuthActionVariant, { fullWidth: true, size: 'lg' })} auth-gate-social auth-gate-action-locked">
                             <i data-lucide="${cloudAuthActionIcon}" class="w-4 h-4"></i> ${cloudAuthActionLabel}
                         </button>
                         ${firebaseInitialized
@@ -12208,6 +12319,7 @@
             const purchaseRestoreLabel = settingsNl ? 'Herstel aankoop' : 'Restore purchase';
             const backupRestoreLabel = settingsNl ? 'Herstel backup' : 'Restore backup';
             const backupDownloadLabel = settingsNl ? 'Backup downloaden' : 'Download backup';
+            const offerCloudSignIn = !isCloudAccountUid(currentUser?.uid);
             contentDiv.innerHTML = `
                 <div class="settings-sheet push-sheet">
                     <h2 class="px-1 pb-1 font-fantasy text-2xl font-bold text-forest">Opties</h2>
@@ -12227,12 +12339,14 @@
                         <span>Account</span>
                         <span class="settings-status">${escapeHTML(accountStatus)}</span>
                     </div>
+                    ${offerCloudSignIn ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
                     <div class="settings-actions button-pair">
                         <button type="submit" class="${getAppButtonClasses('primary', { size: 'sm' })}">Save</button>
                         ${isAuthenticated
                             ? `<button type="button" onclick="signOut()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">Sign Out</button>`
-                            : `<button type="button" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { size: 'sm' })}">${firebaseInitialized ? 'Google' : 'Google'}</button>`}
+                            : `<button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { size: 'sm' })} auth-gate-social auth-gate-action-locked">Google</button>`}
                     </div>
+                    ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'sm' })} auth-gate-social auth-gate-action-locked">Google</button></div>` : ''}
                     <div class="settings-divider"></div>
                         <label class="settings-row">
                             <span>Measurement</span>
@@ -12276,6 +12390,7 @@
                 </div>
             `;
             lucide.createIcons();
+            syncAuthGateButtons();
         }
 
         function showAppInfo() {
@@ -12494,7 +12609,7 @@
                         ['Jouw recepten', 'Jij blijft eigenaar van recepten en notities die je schrijft. Uculi bewaart ze lokaal voor je account op dit apparaat.'],
                         ['Account', 'Jij bent verantwoordelijk voor de naam, het e-mailadres en de recepten onder je login.'],
                         ['Geen medisch advies', 'Uculi is een receptenschrift. Het geeft geen medisch, voedings- of allergieadvies.'],
-                        ['Wijzigingen', 'Het schrift kan veranderen om betrouwbaar en veilig te blijven. Deze voorwaarden zijn versie v2026-04.']
+                        ['Wijzigingen', `Het schrift kan veranderen om betrouwbaar en veilig te blijven. Deze voorwaarden zijn versie ${AGREEMENT_VERSION}.`]
                     ]
                 };
             }
@@ -12631,7 +12746,7 @@
             }
             userSettings.termsAccepted = true;
             userSettings.termsAcceptedAt = new Date().toISOString();
-            userSettings.termsAcceptedVersion = 'v2026-04';
+            userSettings.termsAcceptedVersion = AGREEMENT_VERSION;
             saveData();
             const modal = document.getElementById('terms-accept-modal');
             if (modal) modal.remove();
