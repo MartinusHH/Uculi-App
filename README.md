@@ -34,7 +34,7 @@ If a note overlaps with one of these files, merge it into the relevant canonical
 
 ### Free
 
-- Up to 8 local recipes on the current device.
+- Up to 3 local recipes on the current device.
 - Local editing, search, filtering, notes, timers, favorites, ratings, and onboarding.
 - No premium downloads, no cloud sync, and no premium collaboration features.
 
