@@ -588,6 +588,230 @@
             color: #1c1410;
         }
 
+        #app-landing .landing-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
+        #app-landing .landing-brand-copy {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.28rem;
+            min-width: 0;
+        }
+
+        #app-landing .landing-brand-credit {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin: 0;
+            color: #8a7a70;
+            font-family: Outfit, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: 0;
+            text-transform: none;
+            white-space: nowrap;
+        }
+
+        #app-landing .landing-brand-credit .brand-apple {
+            width: 1.05rem;
+            height: 1.05rem;
+        }
+
+        #app-landing .landing-footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.85rem 1.35rem;
+        }
+
+        #app-landing a.landing-legal-link,
+        #app-landing a.landing-legal-link:visited,
+        #app-landing a.landing-legal-link:hover {
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 650;
+            letter-spacing: 0;
+            text-transform: none;
+            text-decoration: underline;
+            text-underline-offset: 0.18em;
+        }
+
+        .auth-agreement {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin: 0;
+            padding: 0.8rem 0.9rem;
+            border: 1px solid rgba(28, 20, 16, 0.12);
+            border-radius: 1rem;
+            background: #f6f1e8;
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.45;
+            text-align: left;
+        }
+
+        .auth-agreement-check {
+            width: 1.05rem;
+            height: 1.05rem;
+            margin-top: 0.15rem;
+            flex-shrink: 0;
+            accent-color: #929D75;
+        }
+
+        .auth-agreement a,
+        .auth-agreement a:visited,
+        .auth-agreement a:hover {
+            color: #1c1410;
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 0.18em;
+        }
+
+        button.auth-gate-submit,
+        button.auth-gate-social,
+        button.auth-gate-submit:hover,
+        button.auth-gate-social:hover {
+            background-color: #929D75 !important;
+            border-color: #929D75 !important;
+            color: #1c1410 !important;
+        }
+
+        button.auth-gate-action-locked,
+        button.auth-gate-action-locked:hover {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .legal-page {
+            position: fixed;
+            inset: 0;
+            z-index: 260;
+            overflow-y: auto;
+            background: #f6f1e8;
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+        }
+
+        .legal-page a,
+        .legal-page a:visited,
+        .legal-page a:hover {
+            color: #1c1410;
+            text-decoration: underline;
+            text-underline-offset: 0.18em;
+        }
+
+        .legal-page-frame {
+            width: min(40rem, calc(100% - 2.5rem));
+            margin: 0 auto;
+            padding: 1.35rem 0 2.75rem;
+        }
+
+        .legal-page-header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.35rem;
+            margin-bottom: 1rem;
+        }
+
+        .legal-page-back {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 0.85rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .legal-page-kicker {
+            margin: 0;
+            color: #8a7a70;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .legal-page-title {
+            margin: 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        .legal-page-paper {
+            background: #fbf8f3;
+            border-radius: 1.25rem;
+            padding: 1.25rem 1.15rem 1.45rem;
+            color: #1c1410;
+        }
+
+        .legal-page-intro,
+        .legal-page-paper p,
+        .legal-page-paper h2 {
+            color: #1c1410;
+        }
+
+        .legal-page-intro {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .legal-page-section {
+            margin-top: 1.15rem;
+        }
+
+        .legal-page-section h2 {
+            margin: 0;
+            font-family: Fraunces, serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .legal-page-section p,
+        .legal-page-cross {
+            margin: 0.45rem 0 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .legal-page-cross {
+            margin-top: 1.35rem;
+        }
+
+        @media (max-width: 767px) {
+            .legal-page-frame {
+                width: min(40rem, calc(100% - 1.7rem));
+                padding-top: 1.1rem;
+            }
+
+            .legal-page-title {
+                font-size: 1.75rem;
+            }
+
+            .legal-page-paper {
+                padding: 1.05rem 0.95rem 1.2rem;
+            }
+        }
+
         button.notebook-view-toggle.is-active {
             background-color: #929D75;
             color: #1c1410;
@@ -7957,20 +8181,11 @@
                                     </div>
 
                                     <div class="mt-6 space-y-3">
-                                        ${showRegister ? `
-                                            <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
-                                                <input id="auth-read-privacy" type="checkbox" class="mt-1 h-4 w-4">
-                                                <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().readPrivacy} <button type="button" onclick="showLegalDocument('privacy')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().privacyName}</button>.</span>
-                                            </label>
-                                            <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
-                                                <input id="auth-agree-terms" type="checkbox" class="mt-1 h-4 w-4">
-                                                <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().agreeTerms} <button type="button" onclick="showLegalDocument('terms')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().termsName}</button>.</span>
-                                            </label>
-                                        ` : ''}
-                                        <button type="button" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
+                                        ${authAgreementFieldsMarkup()}
+                                        <button type="button" data-auth-gate-action="submit" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} auth-gate-submit auth-gate-action-locked">
                                             <i data-lucide="${showRegister ? 'user-plus' : 'log-in'}" class="h-4 w-4"></i>${showRegister ? authText.submitRegister : authText.submitLogin}
                                         </button>
-                                        <button type="button" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses(firebaseInitialized ? 'secondary' : 'muted', { fullWidth: true, size: 'lg' })}" ${firebaseInitialized ? '' : 'disabled'}>
+                                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} auth-gate-social auth-gate-action-locked">
                                             <i data-lucide="globe-2" class="h-4 w-4"></i>${authText.continueGoogle}
                                         </button>
                                         ${localTestModeButtonMarkup('local-test-mode-auth')}
@@ -7985,6 +8200,20 @@
             `;
 
             lucide.createIcons();
+            syncAuthGateButtons();
+        }
+
+        function authAgreementFieldsMarkup() {
+            return `
+                <label class="auth-agreement">
+                    <input id="auth-read-privacy" type="checkbox" class="auth-agreement-check" onchange="syncAuthGateButtons()">
+                    <span>Ik heb het <a href="app.html?legal=privacy">privacybeleid</a> gelezen en ga akkoord</span>
+                </label>
+                <label class="auth-agreement">
+                    <input id="auth-agree-terms" type="checkbox" class="auth-agreement-check" onchange="syncAuthGateButtons()">
+                    <span>Ik heb de <a href="app.html?legal=terms">voorwaarden</a> gelezen en ga akkoord</span>
+                </label>
+            `;
         }
 
         function ensureAuthenticatedAccess() {
@@ -8007,10 +8236,22 @@
             };
         }
 
-        function authAgreementsAccepted() {
+        function authAgreementsChecked() {
             const privacyChecked = Boolean(document.getElementById('auth-read-privacy')?.checked);
             const termsChecked = Boolean(document.getElementById('auth-agree-terms')?.checked);
-            if (privacyChecked && termsChecked) return true;
+            return privacyChecked && termsChecked;
+        }
+
+        function syncAuthGateButtons() {
+            const unlocked = authAgreementsChecked();
+            document.querySelectorAll('[data-auth-gate-action]').forEach(button => {
+                button.classList.toggle('auth-gate-action-locked', !unlocked);
+                button.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+            });
+        }
+
+        function authAgreementsAccepted() {
+            if (authAgreementsChecked()) return true;
             showToast(getAgreementCopy().needAgreements, 'alert-circle');
             return false;
         }
@@ -8204,7 +8445,7 @@
         }
 
         async function signInWithEmailPassword() {
-            // Inloggen vraagt geen privacy- of voorwaardenvinkjes. Die horen alleen bij een nieuw account.
+            if (!authAgreementsAccepted()) return;
             const email = document.getElementById('auth-email')?.value?.trim();
             const password = document.getElementById('auth-password')?.value || '';
 
@@ -8286,6 +8527,7 @@
         }
 
         async function signInWithGoogle(origin = 'app') {
+            if (origin === 'auth-gate' && !authAgreementsAccepted()) return;
             if (!firebaseInitialized) {
                 showCloudSetupStatusModal(origin);
                 return;
@@ -10112,11 +10354,14 @@
                         
                         <!-- Header -->
                         <div class="mx-auto w-full max-w-6xl flex items-center justify-between mb-12 md:mb-20">
-                            <div class="flex items-center gap-3">
+                            <div class="landing-brand">
                                 <div class="h-10 w-10 overflow-hidden rounded-xl bg-paper shadow-lg shadow-forest/20">
                                     <img src="assets/uculi-boekje.jpg" alt="Uculi" class="brand-boekje" />
                                 </div>
-                                <span class="font-fantasy text-2xl font-bold tracking-wide text-forest">Uculi</span>
+                                <div class="landing-brand-copy">
+                                    <span class="font-fantasy text-2xl font-bold tracking-wide text-forest leading-none">Uculi</span>
+                                    <p class="landing-brand-credit"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
+                                </div>
                             </div>
                             <button type="button" onclick="signInFromLanding()" class="landing-header-login hidden md:flex h-10 items-center gap-2 rounded-xl border border-parchmentDark bg-white px-5 text-sm font-bold text-forest shadow-sm transition-all hover:border-gold hover:text-gold">
                                 <i data-lucide="log-in" class="h-4 w-4"></i> ${authText.legacyMobileLogin}
@@ -10211,14 +10456,14 @@
                         <!-- Footer -->
                         <div class="mx-auto w-full max-w-6xl mt-auto border-t border-sage/20 pt-8 pb-4">
                             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                                <div class="flex items-center gap-2 opacity-60">
+                                <div class="flex items-center gap-2">
                                     <img src="assets/uculi-boekje.jpg" alt="" class="h-5 w-5 rounded-md object-cover" />
-                                    <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.2em] text-forest">© 2026 Uculi · <img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</span>
+                                    <span class="text-xs font-bold uppercase tracking-[0.2em] text-forest">© 2026 Uculi</span>
                                 </div>
-                                <div class="flex gap-6 text-[10px] font-bold uppercase tracking-[0.2em] text-sage">
-                                    <a href="#" class="hover:text-gold transition-colors">Privacy</a>
-                                    <a href="#" class="hover:text-gold transition-colors">Terms</a>
-                                    <a href="#" class="hover:text-gold transition-colors">Instagram</a>
+                                <div class="landing-footer-links">
+                                    <a class="landing-legal-link" href="app.html?legal=privacy">Privacybeleid</a>
+                                    <a class="landing-legal-link" href="app.html?legal=terms">Voorwaarden</a>
+                                    <a href="#" class="text-[10px] font-bold uppercase tracking-[0.2em] text-sage hover:text-gold transition-colors">Instagram</a>
                                 </div>
                             </div>
                         </div>
@@ -12294,14 +12539,37 @@
             `;
         }
 
+        function legalPageHref(kind) {
+            return `app.html?legal=${kind === 'terms' ? 'terms' : 'privacy'}`;
+        }
+
         function showLegalDocument(kind) {
-            document.querySelectorAll('.app-overlay[id^="dynamic-modal-"]').forEach(node => node.remove());
             const doc = getLegalDocument(kind === 'terms' ? 'terms' : 'privacy');
-            const modalId = createModal(doc.title, renderLegalDocumentMarkup(doc.id), [
-                { text: 'Sluiten', primary: true, onClick: () => closeModal() }
-            ]);
-            const modal = document.getElementById(modalId);
-            if (modal) modal.style.zIndex = '240';
+            const otherKind = doc.id === 'privacy' ? 'terms' : 'privacy';
+            const other = getLegalDocument(otherKind);
+            const sections = doc.sections.map(([heading, body]) => `
+                <section class="legal-page-section">
+                    <h2>${heading}</h2>
+                    <p>${body}</p>
+                </section>
+            `).join('');
+            document.getElementById('legal-page')?.remove();
+            document.body.insertAdjacentHTML('beforeend', `
+                <div id="legal-page" class="legal-page" data-legal-kind="${doc.id}">
+                    <div class="legal-page-frame">
+                        <header class="legal-page-header">
+                            <a class="legal-page-back" href="app.html">Terug</a>
+                            <p class="legal-page-kicker">${doc.kicker}</p>
+                            <h1 class="legal-page-title">${doc.title}</h1>
+                        </header>
+                        <article class="legal-page-paper">
+                            <p class="legal-page-intro">${doc.intro}</p>
+                            ${sections}
+                            <p class="legal-page-cross"><a href="${legalPageHref(otherKind)}">${other.title}</a></p>
+                        </article>
+                    </div>
+                </div>
+            `);
         }
 
         function showPrivacyPolicy() {
