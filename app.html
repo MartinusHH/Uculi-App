@@ -1206,6 +1206,11 @@
             gap: 0.9rem;
         }
 
+        .profile-side {
+            display: grid;
+            gap: 0.9rem;
+        }
+
         .profile-hero {
             overflow: hidden;
             border: 1px solid rgba(28, 20, 16, 0.08);
@@ -11595,6 +11600,41 @@
             return chromeBackAction != null;
         }
 
+        function syncChromeLabels() {
+            const nl = userSettings.language === 'nl';
+            const gear = document.getElementById('header-open-settings');
+            const help = document.getElementById('header-help');
+            const add = document.getElementById('header-add-recipe');
+            const back = document.getElementById('header-back');
+            const optionsLabel = nl ? 'Opties' : 'Options';
+            const helpLabel = 'Help';
+            const addLabel = nl ? 'Recept' : 'Add Recipe';
+            const backLabel = nl ? 'Terug' : 'Back';
+            if (gear) {
+                gear.setAttribute('aria-label', optionsLabel);
+                gear.title = optionsLabel;
+                const gearLabel = gear.querySelector('.header-icon-label');
+                if (gearLabel) gearLabel.textContent = optionsLabel;
+            }
+            if (help) {
+                help.setAttribute('aria-label', helpLabel);
+                help.title = helpLabel;
+                const helpText = help.querySelector('.header-icon-label');
+                if (helpText) helpText.textContent = helpLabel;
+            }
+            if (add) {
+                add.setAttribute('aria-label', addLabel);
+                const addText = add.querySelector('.header-add-label');
+                if (addText) addText.textContent = addLabel;
+            }
+            if (back) {
+                back.setAttribute('aria-label', backLabel);
+                back.title = backLabel;
+                const backText = back.querySelector('.header-icon-label');
+                if (backText) backText.textContent = backLabel;
+            }
+        }
+
         function syncHeaderBackButton() {
             const back = document.getElementById('header-back');
             const show = chromeBackAction != null;
@@ -11604,6 +11644,7 @@
             const help = document.getElementById('header-help');
             if (gear) gear.hidden = currentView === 'settings';
             if (help) help.hidden = currentView !== 'settings';
+            syncChromeLabels();
         }
 
         function syncTopBackButton() {
@@ -13737,7 +13778,7 @@
             contentDiv.innerHTML = `
                 <div class="settings-sheet push-sheet">
                     <header class="settings-hero">
-                        <h2>Opties</h2>
+                        <h2>${settingsNl ? 'Opties' : 'Options'}</h2>
                         <p>${settingsNl ? 'Plan, account en archiefvoorkeuren op één plek.' : 'Plan, account, and archive preferences in one place.'}</p>
                     </header>
                     <form id="settings-form" onsubmit="saveSettings(event)" class="settings-grid">
@@ -16150,42 +16191,44 @@
             const totalLikes = authorRecipes.reduce((total, recipe) => total + getPublishedRecipeLikeCount(recipe), 0);
 
             contentDiv.innerHTML = `
-                <div class="max-w-5xl mx-auto space-y-6">
-                    <div class="push-sheet bg-white rounded-sm shadow-sm border border-parchmentDark overflow-hidden">
+                <div class="profile-sheet">
+                    <div class="profile-layout">
+                    <section class="profile-hero">
                         <div class="profile-banner" style="background-image: url('${displayBanner}')"></div>
                         <div class="profile-identity">
                             <div class="profile-avatar" style="background-image: url('${displayPhoto}')"></div>
                             <div class="profile-copy">
-                                <h2 class="profile-name font-fantasy font-bold">${escapeHTML(displayName)}</h2>
+                                <h2 class="profile-name">${escapeHTML(displayName)}</h2>
                                 <p class="profile-place">${escapeHTML(displayCountry)}</p>
                                 <p class="profile-bio" title="${escapeHTML(displayBio)}">${escapeHTML(displayBio)}</p>
-                                        <div class="mt-4 flex flex-wrap items-center gap-2">
-                                            <span class="inline-flex items-center gap-1.5 rounded-full bg-white/85 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-sage shadow-sm ring-1 ring-parchmentDark/60">
-                                                <i data-lucide="globe" class="h-3.5 w-3.5"></i>Public profile
-                                            </span>
-                                            <span class="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[11px] font-bold text-sage shadow-sm ring-1 ring-parchmentDark/50">
-                                                <i data-lucide="heart" class="h-3.5 w-3.5"></i>${totalLikes} likes
-                                            </span>
-                                            <span class="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[11px] font-bold text-sage shadow-sm ring-1 ring-parchmentDark/50">
-                                                <i data-lucide="book-open" class="h-3.5 w-3.5"></i>${authorRecipes.length} published
-                                            </span>
-                                            <button onclick="openReportModal({ reportType: 'profile', targetUserId: '${authorId}', targetName: '${escapeHTML(String(displayName || 'Chef').replace(/'/g, "&#39;"))}' })" class="inline-flex items-center gap-1.5 rounded-full border border-parchmentDark bg-white px-3 py-1.5 text-[11px] font-bold text-sage shadow-sm transition-all hover:border-coral hover:text-coral">
-                                                <i data-lucide="flag" class="h-3.5 w-3.5"></i>Report profile
-                                            </button>
-                                        </div>
+                                <div class="profile-chips">
+                                    <span class="shop-stat"><i data-lucide="globe" class="h-3.5 w-3.5"></i>Public profile</span>
+                                    <span class="shop-stat"><i data-lucide="heart" class="h-3.5 w-3.5"></i>${totalLikes} likes</span>
+                                    <span class="shop-stat"><i data-lucide="book-open" class="h-3.5 w-3.5"></i>${authorRecipes.length} published</span>
+                                    <button type="button" onclick="openReportModal({ reportType: 'profile', targetUserId: '${authorId}', targetName: '${escapeHTML(String(displayName || 'Chef').replace(/'/g, "&#39;"))}' })" class="shop-stat" style="cursor:pointer;">
+                                        <i data-lucide="flag" class="h-3.5 w-3.5"></i>Report
+                                    </button>
+                                </div>
+                                <div class="profile-actions">
+                                    <button type="button" onclick="renderBrowse()" class="${getAppButtonClasses('secondary')}">
+                                        <i data-lucide="arrow-left" class="h-4 w-4"></i>Back to Browse
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    </section>
 
-                    <div class="bg-white rounded-sm shadow-sm border border-parchmentDark p-6">
+                    <div class="profile-side">
+                    <section class="profile-family-panel">
                         <div class="mb-4">
                             <h3 class="font-fantasy text-3xl font-bold text-forest">Recipes by ${escapeHTML(displayName)}</h3>
                             <p class="mt-1 text-sm font-semibold text-sage">Open, like, and save recipes from this public profile.</p>
                         </div>
 
                         ${authorRecipes.length === 0 ? `
-                            <div class="rounded-2xl border border-parchmentDark bg-parchment p-6 text-center">
-                                <p class="font-semibold text-forest">No public recipes found for this profile yet.</p>
+                            <div class="browse-empty">
+                                <h3>No public recipes yet</h3>
+                                <p>This cook has not published anything visible right now.</p>
                             </div>
                         ` : `
                             <div class="space-y-3">
@@ -16230,6 +16273,8 @@
                                 }).join('')}
                             </div>
                         `}
+                    </section>
+                    </div>
                     </div>
                 </div>
             `;
