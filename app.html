@@ -13532,8 +13532,22 @@
         }
 
         function getLegalDocument(kind) {
+            const en = getActiveUiLanguage() === 'en';
             if (kind === 'terms') {
-                return {
+                return en ? {
+                    id: 'terms',
+                    kicker: 'Terms of use',
+                    title: 'Terms of use',
+                    intro: 'These terms explain how you may use Uculi, with or without an account.',
+                    sections: [
+                        ['Allowed use', 'Do not add harmful, hateful, explicit, illegal, or abusive material.'],
+                        ['Your recipes', 'You keep ownership of recipes and notes you write. Without an account they stay in this browser. With an account they are stored in Google Firebase (project mholt-uculi).'],
+                        ['Publishing', 'If you publish a recipe to Browse, that public copy can be read by others. Unpublish timing follows the in-app rules (immediate in the first hour, then a 24-hour schedule).'],
+                        ['Account', 'You sign in with email and password, or with Google. For Google we only use your name and email address. You are responsible for the name, email, and recipes under your login.'],
+                        ['No medical advice', 'Uculi is a recipe notebook. It does not give medical, nutrition, or allergy advice.'],
+                        ['Changes', `Uculi may change to stay reliable and safe. These terms are version ${AGREEMENT_VERSION}. Questions? Email mholt.apps@gmail.com.`]
+                    ]
+                } : {
                     id: 'terms',
                     kicker: 'Gebruiksvoorwaarden',
                     title: 'Gebruiksvoorwaarden',
@@ -13541,22 +13555,37 @@
                     sections: [
                         ['Toegestaan gebruik', 'Voeg geen schadelijk, haatdragend, expliciet, illegaal of beledigend materiaal toe.'],
                         ['Jouw recepten', 'Jij blijft eigenaar van recepten en notities die je schrijft. Zonder account blijven ze in je browser. Met een account worden ze opgeslagen in Google Firebase, project mholt-uculi.'],
+                        ['Publiceren', 'Publiceer je een recept in Browse, dan kan die openbare kopie door anderen gelezen worden. Unpublish volgt de regels in de app (direct in het eerste uur, daarna een planning van 24 uur).'],
                         ['Account', 'Je logt in met e-mail en wachtwoord, of met Google. Bij Google gebruiken we alleen je naam en je e-mailadres. Jij bent verantwoordelijk voor de naam, het e-mailadres en de recepten onder je login.'],
                         ['Geen medisch advies', 'Uculi is een receptenschrift. Het geeft geen medisch, voedings- of allergieadvies.'],
                         ['Wijzigingen', `Het schrift kan veranderen om betrouwbaar en veilig te blijven. Deze voorwaarden zijn versie ${AGREEMENT_VERSION}. Vragen? Mail naar mholt.apps@gmail.com.`]
                     ]
                 };
             }
-            return {
+            return en ? {
+                id: 'privacy',
+                kicker: 'Privacy',
+                title: 'Privacy policy',
+                intro: 'This policy explains what Uculi stores and where it lives.',
+                sections: [
+                    ['Without an account', 'Without an account everything stays local in this browser (including local storage on this device). Nothing is sent to a server.'],
+                    ['With an account', 'With an account your data is stored in Google Firebase (project mholt-uculi): Firestore and Authentication. Sign-in can use email/password or Google. For Google we only use your name and email address.'],
+                    ['Published recipes', 'Recipes you publish to Browse are publicly readable. Private recipes, notes, and settings stay with your account or this device.'],
+                    ['Agreement record', 'When you create an account we also store when you accepted these documents: version and timestamp, kept privately with your user record in Firebase.'],
+                    ['Your choices', 'You can edit or delete recipes and sign out. Without an account, clear this browser’s site data. With an account you can ask for access, correction, or deletion of what is stored in Firebase via mholt.apps@gmail.com.'],
+                    ['Controller', 'Uculi is an app by Mholt. For questions about your data, email mholt.apps@gmail.com.']
+                ]
+            } : {
                 id: 'privacy',
                 kicker: 'Privacy',
                 title: 'Privacybeleid',
                 intro: 'Dit beleid legt uit wat Uculi bewaart, en waar dat staat.',
                 sections: [
-                    ['Zonder account', 'Zonder account blijft alles lokaal in je browser op dit apparaat. Er gaat dan niets naar een server.'],
+                    ['Zonder account', 'Zonder account blijft alles lokaal in je browser op dit apparaat (inclusief lokale opslag). Er gaat dan niets naar een server.'],
                     ['Met een account', 'Met een account worden je gegevens opgeslagen in Google Firebase, project mholt-uculi. Dat geldt voor Firestore en voor Authentication. Inloggen kan met e-mail en wachtwoord, of met Google. Bij Google gebruiken we alleen je naam en je e-mailadres.'],
-                    ['Akkoordmoment', 'Maak je een account, dan bewaren we ook het moment waarop je akkoord ging. Dat staat in Firestore op users/{uid}/private/agreement, met de voorwaardenversie en het tijdstip.'],
-                    ['Jouw keuzes', 'Je kunt recepten bewerken of verwijderen en uitloggen. Zonder account wis je de gegevens in deze browser. Met een account kun je inzage, correctie of verwijdering vragen van wat in Firebase staat.'],
+                    ['Gepubliceerde recepten', 'Recepten die je in Browse publiceert zijn openbaar leesbaar. Privérecepten, notities en instellingen blijven bij jouw account of dit apparaat.'],
+                    ['Akkoordmoment', 'Maak je een account, dan bewaren we ook wanneer je akkoord ging: de voorwaardenversie en het tijdstip, privé bij jouw gebruikersrecord in Firebase.'],
+                    ['Jouw keuzes', 'Je kunt recepten bewerken of verwijderen en uitloggen. Zonder account wis je de sitegegevens in deze browser. Met een account kun je inzage, correctie of verwijdering vragen van wat in Firebase staat via mholt.apps@gmail.com.'],
                     ['Verantwoordelijke', 'Uculi is een app van Mholt. Voor vragen over je gegevens mail je naar mholt.apps@gmail.com.']
                 ]
             };
