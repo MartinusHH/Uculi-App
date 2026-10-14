@@ -11468,8 +11468,8 @@
                                     <span class="text-xs font-bold uppercase tracking-[0.2em] text-forest">© 2026 Uculi</span>
                                 </div>
                                 <div class="landing-footer-links">
-                                    <a class="landing-legal-link" href="${legalPageHref('privacy')}" onclick="event.preventDefault(); showLegalDocument('privacy');">Privacybeleid</a>
-                                    <a class="landing-legal-link" href="${legalPageHref('terms')}" onclick="event.preventDefault(); showLegalDocument('terms');">Gebruiksvoorwaarden</a>
+                                    <a class="landing-legal-link" href="${legalPageHref('privacy')}" onclick="event.preventDefault(); showLegalDocument('privacy');">${getLegalLabels().privacy}</a>
+                                    <a class="landing-legal-link" href="${legalPageHref('terms')}" onclick="event.preventDefault(); showLegalDocument('terms');">${getLegalLabels().terms}</a>
                                     <a href="#" class="text-[10px] font-bold uppercase tracking-[0.2em] text-sage hover:text-gold transition-colors">Instagram</a>
                                 </div>
                             </div>
@@ -13054,10 +13054,10 @@
                         <i data-lucide="book-text" class="w-4 h-4"></i> Usage Guide / Q&A
                     </button>
                     <button onclick="showPrivacyPolicy()" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}">
-                        <i data-lucide="shield-check" class="w-4 h-4"></i> Privacybeleid
+                        <i data-lucide="shield-check" class="w-4 h-4"></i> ${getLegalLabels().privacy}
                     </button>
                     <button onclick="showTermsOfUse()" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}">
-                        <i data-lucide="scroll-text" class="w-4 h-4"></i> Gebruiksvoorwaarden
+                        <i data-lucide="scroll-text" class="w-4 h-4"></i> ${getLegalLabels().terms}
                     </button>
                 </div>
             `;
@@ -13314,11 +13314,11 @@
                             <p class="settings-panel-kicker">${settingsNl ? 'Juridisch' : 'Legal'}</p>
                             <div class="settings-legal">
                                 <button type="button" onclick="showPrivacyPolicy()" class="settings-row">
-                                    <span>Privacybeleid</span>
+                                    <span>${getLegalLabels().privacy}</span>
                                     <i data-lucide="chevron-right" class="w-4 h-4 text-sage"></i>
                                 </button>
                                 <button type="button" onclick="showTermsOfUse()" class="settings-row">
-                                    <span>Gebruiksvoorwaarden</span>
+                                    <span>${getLegalLabels().terms}</span>
                                     <i data-lucide="chevron-right" class="w-4 h-4 text-sage"></i>
                                 </button>
                             </div>
@@ -13531,8 +13531,14 @@
             `, [{ text: nl ? 'Sluiten' : 'Close', primary: true, onClick: () => closeModal() }]);
         }
 
+        function getLegalLabels() {
+            return getActiveUiLanguage() === 'nl'
+                ? { privacy: 'Privacybeleid', terms: 'Gebruiksvoorwaarden', back: 'Terug', accept: 'Akkoord en verder', acceptIntro: 'Lees het privacybeleid en de gebruiksvoorwaarden en vink beide vakjes aan voordat je verdergaat.' }
+                : { privacy: 'Privacy policy', terms: 'Terms of use', back: 'Back', accept: 'Agree and continue', acceptIntro: 'Read the privacy policy and terms of use and tick both boxes before you continue.' };
+        }
+
         function getLegalDocument(kind) {
-            const en = getActiveUiLanguage() === 'en';
+            const en = getActiveUiLanguage() !== 'nl';
             if (kind === 'terms') {
                 return en ? {
                     id: 'terms',
@@ -13636,7 +13642,7 @@
                 <div id="legal-page" class="legal-page" data-legal-kind="${doc.id}">
                     <div class="legal-page-frame">
                         <header class="legal-page-header">
-                            <button type="button" class="legal-page-back" onclick="closeLegalDocument()">${getActiveUiLanguage() === 'en' ? 'Back' : 'Terug'}</button>
+                            <button type="button" class="legal-page-back" onclick="closeLegalDocument()">${getLegalLabels().back}</button>
                             <p class="legal-page-kicker">${doc.kicker}</p>
                             <h1 class="legal-page-title">${doc.title}</h1>
                         </header>
@@ -13670,8 +13676,8 @@
                 <div id="terms-accept-modal" class="app-overlay fixed inset-0 bg-black bg-opacity-70 z-[220] flex">
                     <div class="app-modal-panel max-w-3xl w-full" id="terms-accept-modal-content">
                         <div class="p-4 md:p-6 border-b border-parchmentDark bg-parchment shrink-0">
-                            <h2 class="font-serif font-bold text-xl md:text-2xl text-forest">Gebruiksvoorwaarden</h2>
-                            <p class="mt-2 text-sm font-semibold text-sage">Lees het privacybeleid en de gebruiksvoorwaarden en vink beide vakjes aan voordat je verdergaat.</p>
+                            <h2 class="font-serif font-bold text-xl md:text-2xl text-forest">${getLegalLabels().terms}</h2>
+                            <p class="mt-2 text-sm font-semibold text-sage">${getLegalLabels().acceptIntro}</p>
                         </div>
                         <div class="app-modal-body p-4 md:p-6 max-h-[60vh] overflow-y-auto">
                             ${renderLegalDocumentMarkup('terms')}
@@ -13688,7 +13694,7 @@
                         </div>
                         <div class="app-modal-footer p-4 md:p-6 border-t border-parchmentDark bg-parchment shrink-0">
                             <button id="terms-accept-confirm-btn" disabled onclick="confirmTermsAcceptance()" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} disabled:opacity-50 disabled:cursor-not-allowed">
-                                <i data-lucide="check-circle" class="w-4 h-4"></i> Akkoord en verder
+                                <i data-lucide="check-circle" class="w-4 h-4"></i> ${getLegalLabels().accept}
                             </button>
                         </div>
                     </div>
