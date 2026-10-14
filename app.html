@@ -733,13 +733,28 @@
             margin-bottom: 1rem;
         }
 
-        .legal-page-back {
+        .legal-page-back,
+        .legal-page-cross-link {
             display: inline-flex;
             align-items: center;
             margin-bottom: 0.85rem;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            font: inherit;
             font-size: 0.875rem;
             font-weight: 700;
             line-height: 1.2;
+            text-decoration: underline;
+            text-underline-offset: 0.2em;
+            cursor: pointer;
+        }
+
+        .legal-page-cross-link {
+            margin-bottom: 0;
+            font-size: inherit;
+            font-weight: 500;
         }
 
         .legal-page-kicker {
@@ -8215,14 +8230,15 @@
         }
 
         function authAgreementFieldsMarkup() {
+            const copy = getAgreementCopy();
             return `
                 <label class="auth-agreement">
                     <input id="auth-read-privacy" type="checkbox" class="auth-agreement-check" onchange="syncAuthGateButtons()">
-                    <span>Ik heb het <a href="app.html?legal=privacy">privacybeleid</a> gelezen en ga akkoord</span>
+                    <span>${copy.readPrivacy} <a href="${legalPageHref('privacy')}" onclick="event.preventDefault(); event.stopPropagation(); showLegalDocument('privacy');">${copy.privacyName}</a> ${copy.readSuffix}</span>
                 </label>
                 <label class="auth-agreement">
                     <input id="auth-agree-terms" type="checkbox" class="auth-agreement-check" onchange="syncAuthGateButtons()">
-                    <span>Ik heb de <a href="app.html?legal=terms">voorwaarden</a> gelezen en ga akkoord</span>
+                    <span>${copy.readTerms} <a href="${legalPageHref('terms')}" onclick="event.preventDefault(); event.stopPropagation(); showLegalDocument('terms');">${copy.termsName}</a> ${copy.readSuffix}</span>
                 </label>
             `;
         }
@@ -8241,9 +8257,11 @@
             return {
                 readPrivacy: 'Ik heb het',
                 privacyName: 'privacybeleid',
-                agreeTerms: 'Ik ga akkoord met de',
-                termsName: 'voorwaarden',
-                needAgreements: 'Lees het privacybeleid en ga akkoord met de voorwaarden voordat je verdergaat.'
+                readTerms: 'Ik heb de',
+                agreeTerms: 'Ik heb de',
+                termsName: 'gebruiksvoorwaarden',
+                readSuffix: 'gelezen en ga akkoord',
+                needAgreements: 'Lees het privacybeleid en de gebruiksvoorwaarden voordat je verdergaat.'
             };
         }
 
@@ -10571,8 +10589,8 @@
                                     <span class="text-xs font-bold uppercase tracking-[0.2em] text-forest">© 2026 Uculi</span>
                                 </div>
                                 <div class="landing-footer-links">
-                                    <a class="landing-legal-link" href="app.html?legal=privacy">Privacybeleid</a>
-                                    <a class="landing-legal-link" href="app.html?legal=terms">Voorwaarden</a>
+                                    <a class="landing-legal-link" href="${legalPageHref('privacy')}" onclick="event.preventDefault(); showLegalDocument('privacy');">Privacybeleid</a>
+                                    <a class="landing-legal-link" href="${legalPageHref('terms')}" onclick="event.preventDefault(); showLegalDocument('terms');">Gebruiksvoorwaarden</a>
                                     <a href="#" class="text-[10px] font-bold uppercase tracking-[0.2em] text-sage hover:text-gold transition-colors">Instagram</a>
                                 </div>
                             </div>
@@ -12601,9 +12619,9 @@
             if (kind === 'terms') {
                 return {
                     id: 'terms',
-                    kicker: 'Voorwaarden',
+                    kicker: 'Gebruiksvoorwaarden',
                     title: 'Gebruiksvoorwaarden',
-                    intro: 'Deze voorwaarden leggen uit hoe je Uculi op dit apparaat gebruikt.',
+                    intro: 'Deze gebruiksvoorwaarden leggen uit hoe je Uculi op dit apparaat gebruikt.',
                     sections: [
                         ['Toegestaan gebruik', 'Voeg geen schadelijk, haatdragend, expliciet, illegaal of beledigend materiaal toe.'],
                         ['Jouw recepten', 'Jij blijft eigenaar van recepten en notities die je schrijft. Uculi bewaart ze lokaal voor je account op dit apparaat.'],
@@ -12673,18 +12691,22 @@
                 <div id="legal-page" class="legal-page" data-legal-kind="${doc.id}">
                     <div class="legal-page-frame">
                         <header class="legal-page-header">
-                            <a class="legal-page-back" href="app.html">Terug</a>
+                            <button type="button" class="legal-page-back" onclick="closeLegalDocument()">Terug</button>
                             <p class="legal-page-kicker">${doc.kicker}</p>
                             <h1 class="legal-page-title">${doc.title}</h1>
                         </header>
                         <article class="legal-page-paper">
                             <p class="legal-page-intro">${doc.intro}</p>
                             ${sections}
-                            <p class="legal-page-cross"><a href="${legalPageHref(otherKind)}">${other.title}</a></p>
+                            <p class="legal-page-cross"><button type="button" class="legal-page-cross-link" onclick="showLegalDocument('${otherKind}')">${other.title}</button></p>
                         </article>
                     </div>
                 </div>
             `);
+        }
+
+        function closeLegalDocument() {
+            document.getElementById('legal-page')?.remove();
         }
 
         function showPrivacyPolicy() {
@@ -12703,7 +12725,7 @@
                 <div id="terms-accept-modal" class="app-overlay fixed inset-0 bg-black bg-opacity-70 z-[220] flex">
                     <div class="app-modal-panel max-w-3xl w-full" id="terms-accept-modal-content">
                         <div class="p-4 md:p-6 border-b border-parchmentDark bg-parchment shrink-0">
-                            <h2 class="font-serif font-bold text-xl md:text-2xl text-forest">Voorwaarden</h2>
+                            <h2 class="font-serif font-bold text-xl md:text-2xl text-forest">Gebruiksvoorwaarden</h2>
                             <p class="mt-2 text-sm font-semibold text-sage">Lees het privacybeleid en de gebruiksvoorwaarden en vink beide vakjes aan voordat je verdergaat.</p>
                         </div>
                         <div class="app-modal-body p-4 md:p-6 max-h-[60vh] overflow-y-auto">
@@ -12711,11 +12733,11 @@
                             <div class="mt-6 space-y-3">
                                 <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
                                     <input id="terms-accept-privacy" type="checkbox" class="mt-1 h-4 w-4" onchange="syncTermsAcceptButton()">
-                                    <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().readPrivacy} <button type="button" onclick="showLegalDocument('privacy')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().privacyName}</button>.</span>
+                                    <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().readPrivacy} <button type="button" onclick="showLegalDocument('privacy')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().privacyName}</button> ${getAgreementCopy().readSuffix}.</span>
                                 </label>
                                 <label class="flex items-start gap-3 rounded-2xl border border-parchmentDark bg-parchment p-3 text-left">
                                     <input id="terms-accept-terms" type="checkbox" class="mt-1 h-4 w-4" onchange="syncTermsAcceptButton()">
-                                    <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().agreeTerms} <button type="button" onclick="showLegalDocument('terms')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().termsName}</button>.</span>
+                                    <span class="text-sm font-semibold leading-relaxed text-forest">${getAgreementCopy().readTerms} <button type="button" onclick="showLegalDocument('terms')" class="font-bold text-forest underline decoration-gold underline-offset-4">${getAgreementCopy().termsName}</button> ${getAgreementCopy().readSuffix}.</span>
                                 </label>
                             </div>
                         </div>
