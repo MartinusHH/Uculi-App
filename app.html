@@ -3619,7 +3619,9 @@
         }
         .cooking-mode-active #app-shell,
         .cooking-mode-active #app-content {
-            background: #f6f1e8;
+            background:
+                radial-gradient(ellipse 80% 50% at 50% -10%, rgba(146, 157, 117, 0.18), transparent 55%),
+                linear-gradient(180deg, #efe8dc 0%, #f7f2ea 42%, #f3ebe0 100%);
         }
 
         .cooking-mode-active {
@@ -3631,7 +3633,9 @@
             font-size: 1.1rem;
             padding-top: 0.85rem;
             padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
-            max-width: 100%;
+            max-width: min(72rem, 100%);
+            margin-left: auto;
+            margin-right: auto;
             scroll-padding-top: 0.85rem;
             scroll-padding-bottom: 2rem;
         }
@@ -3642,9 +3646,9 @@
         }
 
         .cooking-mode-active .detail-shell {
-            border: 1px solid rgba(200, 144, 80, 0.28);
+            border: none;
             box-shadow: none;
-            background: #fbf8f3;
+            background: transparent;
             overflow: visible;
         }
 
@@ -3667,14 +3671,14 @@
             z-index: 35;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin: 0 0 1rem;
-            padding: 0.7rem 0.85rem;
-            border: 1px solid rgba(200, 144, 80, 0.28);
-            border-radius: 1rem;
-            background: rgba(255, 253, 249, 0.97);
-            box-shadow: 0 10px 24px rgba(28, 20, 16, 0.08);
-            backdrop-filter: blur(10px);
+            gap: 0.85rem;
+            margin: 0 0 1.15rem;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1.1rem;
+            background: rgba(255, 252, 247, 0.92);
+            box-shadow: 0 12px 28px rgba(28, 20, 16, 0.07);
+            backdrop-filter: blur(14px);
         }
 
         .cooking-mode-exit-btn {
@@ -3686,25 +3690,29 @@
             transform: none;
             opacity: 1;
             filter: none;
+            background: #f3eee6;
         }
 
         .cooking-mode-active .cooking-mode-exit-btn {
             display: inline-flex;
             position: static;
             flex: 0 0 auto;
+            align-items: center;
+            justify-content: center;
             transform: none;
             width: auto;
-            min-width: 2.75rem;
-            height: 2.75rem;
-            padding: 0 0.85rem;
-            gap: 0.4rem;
-            border-radius: 0.85rem;
-            border: 1px solid rgba(28, 20, 16, 0.12);
-            background: #fff;
+            min-width: 2.85rem;
+            height: 2.85rem;
+            padding: 0 1rem;
+            gap: 0.45rem;
+            border-radius: 0.9rem;
+            border: 1px solid rgba(28, 20, 16, 0.1);
+            background: #fffdf9;
             color: #1c1410;
-            font-size: 0.72rem;
+            font-family: Outfit, sans-serif;
+            font-size: 0.78rem;
             font-weight: 800;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
         }
 
@@ -3715,7 +3723,7 @@
             overflow: hidden;
             color: #1c1410;
             font-family: Fraunces, serif;
-            font-size: clamp(1.15rem, 3.4vw, 1.7rem);
+            font-size: clamp(1.2rem, 2.8vw, 1.85rem);
             font-weight: 700;
             line-height: 1.15;
             text-overflow: ellipsis;
@@ -3729,6 +3737,10 @@
         @media (min-width: 768px) {
             .cook-mode-exit-label {
                 display: inline;
+            }
+
+            .cooking-mode-active .cook-mode-bar {
+                padding: 0.75rem 1rem;
             }
         }
 
@@ -3823,62 +3835,129 @@
 
         .cooking-mode-active .cook-stage {
             display: block;
+            width: 100%;
         }
 
-        .cook-paper {
+        .cook-board {
             position: relative;
             overflow: hidden;
-            min-height: min(70vh, 40rem);
-            padding: 1.35rem 1.25rem 1.5rem;
-            border: 1px solid rgba(200, 144, 80, 0.28);
-            border-radius: 1.35rem;
+            padding: 1.35rem 1.2rem 1.4rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1.4rem;
             background:
-                linear-gradient(to bottom, transparent 0, transparent 31px, rgba(144, 152, 112, 0.14) 31px, rgba(144, 152, 112, 0.14) 32px, transparent 32px) 0 0 / 100% 34px,
-                linear-gradient(160deg, #fbf8f3 0%, #f6f1e8 100%);
-            box-shadow: 0 18px 36px rgba(28, 20, 16, 0.08);
+                linear-gradient(145deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.96) 100%);
+            box-shadow: 0 22px 44px rgba(28, 20, 16, 0.08);
             touch-action: manipulation;
+        }
+
+        .cook-board--active {
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            padding: 1.5rem 1.35rem 1.6rem;
+        }
+
+        .cook-board--prepare {
+            padding: 1.5rem 1.25rem 1.5rem;
+        }
+
+        .cook-prepare-head {
+            display: grid;
+            gap: 0.55rem;
+            margin-bottom: 1.15rem;
+            max-width: 40rem;
         }
 
         .cook-kicker {
             margin: 0;
-            color: #8a7a70;
-            font-size: 0.75rem;
+            color: #7a6b60;
+            font-family: Outfit, sans-serif;
+            font-size: 0.74rem;
             font-weight: 800;
             letter-spacing: 0.16em;
             text-transform: uppercase;
         }
 
         .cook-instruction {
-            margin: 0.7rem 0 0;
+            margin: 0;
             color: #1c1410;
             font-family: Fraunces, serif;
-            font-size: clamp(1.85rem, 4.6vw, 2.8rem);
+            font-size: clamp(1.7rem, 3.8vw, 2.55rem);
             font-weight: 700;
-            line-height: 1.22;
+            line-height: 1.18;
+        }
+
+        .cook-prepare-lead {
+            margin: 0;
+            color: #5c5148;
+            font-family: Outfit, sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .cook-active-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.65rem 1.25rem;
+            margin-top: 0.35rem;
+        }
+
+        .cook-clock {
+            margin: 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(3.4rem, 9vw, 5.6rem);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 0.95;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .cook-clock-label {
+            margin: 0;
+            color: #7a6b60;
+            font-family: Outfit, sans-serif;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
         }
 
         .cook-ingredients {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
             margin: 1rem 0 0;
             padding: 0;
             list-style: none;
         }
 
-        .cook-ingredients li {
-            color: #1c1410;
-            font-size: clamp(1.25rem, 3vw, 1.7rem);
-            font-weight: 700;
-            line-height: 1.35;
-            padding: 0.35rem 0;
+        .cook-ingredients:empty {
+            display: none;
         }
 
-        .cook-clock {
-            margin: 1.15rem 0 0;
+        .cook-ingredients li {
+            margin: 0;
+            padding: 0.45rem 0.75rem;
+            border: 1px solid rgba(146, 157, 117, 0.28);
+            border-radius: 999px;
+            background: rgba(146, 157, 117, 0.12);
             color: #1c1410;
-            font-family: Fraunces, serif;
-            font-size: clamp(4.2rem, 12vw, 6.5rem);
+            font-family: Outfit, sans-serif;
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
             font-weight: 700;
-            letter-spacing: -0.03em;
-            line-height: 0.95;
+            line-height: 1.25;
+        }
+
+        .cook-active-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            padding: 0.85rem 0 0.35rem;
         }
 
         .cook-peek {
@@ -3886,22 +3965,23 @@
             left: 0;
             right: 0;
             bottom: 0;
-            padding: 1.1rem 1.25rem 1.35rem;
-            border-top: 1px solid rgba(200, 144, 80, 0.45);
-            background: #f6f1e8;
-            box-shadow: 0 -14px 28px rgba(28, 20, 16, 0.12);
+            padding: 1.1rem 1.35rem 1.35rem;
+            border-top: 1px solid rgba(28, 20, 16, 0.08);
+            background: linear-gradient(180deg, rgba(247, 241, 230, 0.98), rgba(239, 232, 220, 0.98));
+            box-shadow: 0 -16px 32px rgba(28, 20, 16, 0.1);
             transform: translateY(105%);
-            transition: transform 180ms ease;
+            transition: transform 200ms ease;
             pointer-events: none;
         }
 
-        .cook-paper.is-peeking .cook-peek {
+        .cook-board.is-peeking .cook-peek {
             transform: translateY(0);
         }
 
         .cook-peek-kicker {
             margin: 0;
-            color: #8a7a70;
+            color: #7a6b60;
+            font-family: Outfit, sans-serif;
             font-size: 0.72rem;
             font-weight: 800;
             letter-spacing: 0.16em;
@@ -3909,93 +3989,261 @@
         }
 
         .cook-peek-text {
-            margin: 0.45rem 0 0;
+            margin: 0.4rem 0 0;
             color: #1c1410;
             font-family: Fraunces, serif;
-            font-size: clamp(1.35rem, 3vw, 1.8rem);
+            font-size: clamp(1.25rem, 2.8vw, 1.65rem);
             font-weight: 700;
             line-height: 1.25;
         }
 
         .cook-nav {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1.35fr;
             gap: 0.75rem;
-            margin-top: 0.85rem;
+            margin-top: 0.9rem;
         }
 
         .cook-nav-btn,
         .cook-begin {
-            min-height: 4.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.45rem;
+            min-height: 3.85rem;
             border-radius: 1rem;
-            border: 1px solid rgba(144, 152, 112, 0.35);
-            background: #fbf8f3;
+            border: 1px solid rgba(28, 20, 16, 0.1);
+            background: #fffdf9;
             color: #1c1410;
             font-family: Outfit, sans-serif;
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 800;
+            transition: background 160ms ease, transform 160ms ease;
         }
 
-        .cook-nav-btn {
-            flex: 1 1 0;
+        .cook-nav-btn:hover,
+        .cook-begin:hover {
+            transform: translateY(-1px);
         }
 
         .cook-nav-btn--next,
         .cook-begin {
-            width: 100%;
-            margin-top: 1rem;
-            background: #929D75;
-            border-color: #929D75;
-            color: #1c1410;
+            background: #8f9a6f;
+            border-color: #8f9a6f;
+            color: #14110d;
         }
 
-        .cook-nav-btn--next {
-            margin-top: 0;
+        .cook-begin {
+            width: 100%;
+            margin-top: 1.25rem;
+            min-height: 4.1rem;
+            font-size: 1.12rem;
         }
 
         .cook-prep-list {
-            margin: 1rem 0 0;
+            display: grid;
+            gap: 0.65rem;
+            margin: 0;
             padding: 0;
             list-style: none;
         }
 
         .cook-prep-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto;
             align-items: center;
-            justify-content: space-between;
-            gap: 0.75rem;
-            padding: 0.75rem 0;
-            border-bottom: 1px solid rgba(144, 152, 112, 0.18);
+            gap: 0.85rem 1rem;
+            padding: 0.95rem 1rem;
+            border: 1px solid rgba(28, 20, 16, 0.07);
+            border-radius: 1.05rem;
+            background: rgba(255, 253, 249, 0.88);
         }
 
-        .cook-prep-row p {
+        .cook-prep-index {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 0.7rem;
+            background: rgba(146, 157, 117, 0.18);
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .cook-prep-copy {
+            min-width: 0;
+        }
+
+        .cook-prep-copy p {
             margin: 0;
             color: #1c1410;
-            font-size: 1rem;
+            font-family: Outfit, sans-serif;
+            font-size: 1.02rem;
             font-weight: 700;
             line-height: 1.35;
         }
 
-        .cook-prep-row label {
+        .cook-stepper {
+            display: grid;
+            grid-template-columns: 2.55rem minmax(3.4rem, auto) 2.55rem;
+            align-items: center;
+            gap: 0.2rem;
+            justify-self: end;
+        }
+
+        .cook-stepper-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.55rem;
+            height: 2.55rem;
+            border: 1px solid rgba(28, 20, 16, 0.1);
+            border-radius: 0.8rem;
+            background: #fff;
+            color: #1c1410;
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .cook-stepper-btn:hover,
+        .cook-stepper-btn:focus-visible {
+            background: #f3eee6;
+        }
+
+        .cook-stepper-value {
             display: flex;
             flex-direction: column;
-            gap: 0.2rem;
-            color: #8a7a70;
-            font-size: 0.68rem;
+            align-items: center;
+            justify-content: center;
+            min-width: 3.4rem;
+            padding: 0 0.15rem;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: 1.45rem;
+            font-weight: 700;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            text-align: center;
+        }
+
+        .cook-stepper-unit {
+            margin-top: 0.15rem;
+            color: #7a6b60;
+            font-family: Outfit, sans-serif;
+            font-size: 0.62rem;
             font-weight: 800;
             letter-spacing: 0.12em;
             text-transform: uppercase;
         }
 
-        .cook-prep-row input {
-            width: 4.5rem;
-            height: 3rem;
-            border: 1px solid rgba(144, 152, 112, 0.35);
-            border-radius: 0.75rem;
-            background: #fff;
-            color: #1c1410;
-            font-size: 1.15rem;
-            font-weight: 700;
-            text-align: center;
+        .cook-stepper input[type="number"] {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            border: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+        }
+
+        @media (min-width: 900px) {
+            .cook-board--prepare {
+                padding: 1.75rem 1.75rem 1.65rem;
+            }
+
+            .cook-prepare-layout {
+                display: grid;
+                grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr);
+                gap: 2rem;
+                align-items: start;
+            }
+
+            .cook-prepare-head {
+                position: sticky;
+                top: 5.5rem;
+                margin-bottom: 0;
+            }
+
+            .cook-prep-list {
+                gap: 0.75rem;
+            }
+
+            .cook-prep-row {
+                grid-template-columns: auto minmax(0, 1fr) auto;
+                padding: 1.05rem 1.15rem;
+            }
+
+            .cook-prep-copy p {
+                font-size: 1.08rem;
+            }
+
+            .cook-prepare-head .cook-begin {
+                margin-top: 0.85rem;
+                max-width: 100%;
+            }
+
+            .cook-board--active {
+                padding: 2rem 2.25rem 1.9rem;
+            }
+
+            .cook-board--active .cook-active-meta {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: end;
+                gap: 1.5rem;
+            }
+
+            .cook-board--active .cook-active-body {
+                display: grid;
+                grid-template-columns: minmax(0, 1.55fr) minmax(14rem, 0.85fr);
+                gap: 1.75rem 2.25rem;
+                align-items: start;
+                padding-top: 1rem;
+            }
+
+            .cook-board--active .cook-instruction {
+                max-width: none;
+                font-size: clamp(2rem, 3.2vw, 2.75rem);
+            }
+
+            .cook-board--active .cook-ingredients {
+                margin-top: 0;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .cook-board--active .cook-ingredients li {
+                border-radius: 0.85rem;
+            }
+
+            .cook-nav {
+                max-width: 42rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .cook-prep-row {
+                grid-template-columns: auto minmax(0, 1fr);
+                grid-template-areas:
+                    "index copy"
+                    "stepper stepper";
+                gap: 0.7rem;
+            }
+
+            .cook-prep-index { grid-area: index; }
+            .cook-prep-copy { grid-area: copy; }
+            .cook-stepper {
+                grid-area: stepper;
+                justify-self: stretch;
+                grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem;
+            }
         }
 
         @media (max-width: 767px) {
@@ -15354,11 +15602,28 @@
             cookTimerInterval = setInterval(tickCook, 1000);
         }
 
+        function syncCookMinuteDisplay(index) {
+            if (!cookSession) return;
+            const value = Math.max(1, Math.min(240, Number(cookSession.minutes[index]) || 1));
+            cookSession.minutes[index] = value;
+            const input = document.querySelector(`[data-cook-minutes="${index}"]`);
+            const readout = document.querySelector(`[data-cook-minutes-display="${index}"]`);
+            if (input) input.value = String(value);
+            if (readout) readout.textContent = String(value);
+        }
+
+        function adjustCookMinutes(index, delta) {
+            if (!cookSession) return;
+            const next = Math.max(1, Math.min(240, (Number(cookSession.minutes[index]) || 1) + Number(delta || 0)));
+            cookSession.minutes[index] = next;
+            syncCookMinuteDisplay(index);
+        }
+
         function beginCookSession() {
             if (!cookSession) return;
             document.querySelectorAll('[data-cook-minutes]').forEach(input => {
                 const index = Number(input.dataset.cookMinutes);
-                const value = Math.max(1, Math.min(240, Number.parseInt(input.value, 10) || 1));
+                const value = Math.max(1, Math.min(240, Number.parseInt(input.value, 10) || cookSession.minutes[index] || 1));
                 cookSession.minutes[index] = value;
             });
             cookSession.remaining = cookSession.minutes.map(minutes => minutes * 60);
@@ -15407,7 +15672,7 @@
                 sheet.classList.remove('is-peeking');
             };
             sheet.addEventListener('pointerdown', event => {
-                if (event.target.closest('button, input, a, label')) return;
+                if (event.target.closest('button, input, a, label, .cook-stepper')) return;
                 if (!cookSession || cookSession.phase !== 'cooking') return;
                 holding = true;
                 sheet.classList.add('is-peeking');
@@ -16381,8 +16646,8 @@
             contentDiv.innerHTML = `
                 <div class="cook-mode-bar">
                     <button onclick="toggleCookingMode(${recipe.id})" id="cooking-mode-exit-btn" class="cooking-mode-exit-btn" aria-label="Stop cooking and go back">
-                        <i data-lucide="arrow-left" class="w-5 h-5"></i>
-                        <span class="cook-mode-exit-label">Stop</span>
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                        <span class="cook-mode-exit-label">Stop cooking</span>
                     </button>
                     <p class="cook-mode-title">${escapeHTML(recipe.title)}</p>
                 </div>
@@ -16557,19 +16822,32 @@
             if (cookSession && (cookSession.phase === 'cooking' || cookSession.phase === 'done')) {
                 return `
                     <section class="cook-stage" data-cook-phase="${cookSession.phase}" data-cook-step="${cookSession.index}">
-                        <article class="cook-paper" id="cook-sheet">
-                            <p class="cook-kicker" id="cook-kicker"></p>
-                            <p class="cook-instruction" id="cook-instruction"></p>
-                            <ul class="cook-ingredients" id="cook-ingredients"></ul>
-                            <p class="cook-clock" id="cook-clock" aria-live="polite">00:00</p>
+                        <article class="cook-board cook-board--active" id="cook-sheet">
+                            <div class="cook-active-meta">
+                                <p class="cook-kicker" id="cook-kicker"></p>
+                                <div>
+                                    <p class="cook-clock-label">Timer</p>
+                                    <p class="cook-clock" id="cook-clock" aria-live="polite">00:00</p>
+                                </div>
+                            </div>
+                            <div class="cook-active-body">
+                                <p class="cook-instruction" id="cook-instruction"></p>
+                                <ul class="cook-ingredients" id="cook-ingredients"></ul>
+                            </div>
                             <div class="cook-peek" id="cook-peek">
-                                <p class="cook-peek-kicker">Next</p>
+                                <p class="cook-peek-kicker">Up next</p>
                                 <p class="cook-peek-text" id="cook-peek-text"></p>
                             </div>
                         </article>
                         <div class="cook-nav">
-                            <button type="button" class="cook-nav-btn" onclick="moveCookStep(-1)">Previous</button>
-                            <button type="button" class="cook-nav-btn cook-nav-btn--next" onclick="moveCookStep(1)">Next</button>
+                            <button type="button" class="cook-nav-btn" onclick="moveCookStep(-1)">
+                                <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                                Previous
+                            </button>
+                            <button type="button" class="cook-nav-btn cook-nav-btn--next" onclick="moveCookStep(1)">
+                                Next
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </button>
                         </div>
                     </section>
                 `;
@@ -16579,21 +16857,38 @@
                 const minutes = cookSession?.minutes?.[index] || getRecipeInstructionMinutes(step) || 1;
                 return `
                     <li class="cook-prep-row">
-                        <p>${index + 1}. ${escapeHTML(getRecipeInstructionText(step))}</p>
-                        <label>Minutes
-                            <input type="number" min="1" max="240" inputmode="numeric" value="${minutes}" data-cook-minutes="${index}" aria-label="Minutes for step ${index + 1}">
-                        </label>
+                        <span class="cook-prep-index" aria-hidden="true">${index + 1}</span>
+                        <div class="cook-prep-copy">
+                            <p>${escapeHTML(getRecipeInstructionText(step))}</p>
+                        </div>
+                        <div class="cook-stepper" role="group" aria-label="Minutes for step ${index + 1}">
+                            <button type="button" class="cook-stepper-btn" onclick="adjustCookMinutes(${index}, -1)" aria-label="Decrease minutes for step ${index + 1}">−</button>
+                            <div class="cook-stepper-value">
+                                <span data-cook-minutes-display="${index}">${minutes}</span>
+                                <span class="cook-stepper-unit">min</span>
+                            </div>
+                            <button type="button" class="cook-stepper-btn" onclick="adjustCookMinutes(${index}, 1)" aria-label="Increase minutes for step ${index + 1}">+</button>
+                            <input type="number" min="1" max="240" inputmode="numeric" value="${minutes}" data-cook-minutes="${index}" tabindex="-1" aria-hidden="true">
+                        </div>
                     </li>
                 `;
             }).join('');
 
             return `
                 <section class="cook-stage" data-cook-phase="prepare">
-                    <article class="cook-paper">
-                        <p class="cook-kicker">Before cooking</p>
-                        <p class="cook-instruction">Adjust the times, then the kitchen takes over.</p>
-                        <ul class="cook-prep-list">${rows}</ul>
-                        <button type="button" class="cook-begin" onclick="beginCookSession()">Start cooking</button>
+                    <article class="cook-board cook-board--prepare">
+                        <div class="cook-prepare-layout">
+                            <header class="cook-prepare-head">
+                                <p class="cook-kicker">Before cooking</p>
+                                <p class="cook-instruction">Set the pace for each step.</p>
+                                <p class="cook-prepare-lead">Tune the minutes, then start. The timer moves with you through the recipe.</p>
+                                <button type="button" class="cook-begin" onclick="beginCookSession()">
+                                    <i data-lucide="flame" class="w-5 h-5"></i>
+                                    Start cooking
+                                </button>
+                            </header>
+                            <ul class="cook-prep-list">${rows}</ul>
+                        </div>
                     </article>
                 </section>
             `;
