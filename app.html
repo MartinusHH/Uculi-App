@@ -1007,6 +1007,234 @@
             }
         }
 
+        .browse-sheet {
+            max-width: none;
+            width: 100%;
+            margin: 0 auto 2rem;
+        }
+
+        .browse-hero {
+            display: grid;
+            gap: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .browse-hero-copy h2 {
+            margin: 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.8rem, 3vw, 2.45rem);
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .browse-hero-copy p {
+            margin: 0.4rem 0 0;
+            color: #8a7a70;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+            max-width: 48ch;
+        }
+
+        .browse-stat-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .browse-search {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            min-height: 3rem;
+            padding: 0.35rem 0.85rem;
+            border: 1px solid rgba(28, 20, 16, 0.1);
+            border-radius: 1rem;
+            background: #fffdf9;
+            box-shadow: 0 10px 22px rgba(28, 20, 16, 0.04);
+        }
+
+        .browse-search input {
+            flex: 1 1 auto;
+            min-width: 0;
+            height: 2.5rem;
+            border: 0;
+            background: transparent;
+            color: #1c1410;
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .browse-empty {
+            display: grid;
+            gap: 0.55rem;
+            justify-items: start;
+            padding: 1.5rem 1.15rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1.25rem;
+            background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
+        }
+
+        .browse-empty h3 {
+            margin: 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.45rem, 2.6vw, 1.9rem);
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        .browse-empty p {
+            margin: 0;
+            max-width: 42ch;
+            color: #6d5f55;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .browse-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.9rem;
+        }
+
+        .browse-card {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100%;
+            overflow: hidden;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1.25rem;
+            background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .browse-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 34px rgba(28, 20, 16, 0.08);
+        }
+
+        .browse-card-media {
+            height: 10.5rem;
+            background-color: #efe6d8;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .browse-card-body {
+            display: grid;
+            gap: 0.45rem;
+            padding: 1rem 1.05rem 0.75rem;
+        }
+
+        .browse-card-body h3 {
+            margin: 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .browse-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem 0.85rem;
+            color: #8a7a70;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .browse-card-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            padding: 0 1.05rem 1.05rem;
+        }
+
+        .browse-card-action-label {
+            display: none;
+        }
+
+        @media (min-width: 900px) {
+            .browse-hero {
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: end;
+                gap: 1rem 1.5rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .browse-search {
+                max-width: 42rem;
+            }
+
+            .browse-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1.1rem;
+            }
+
+            .browse-card-action-label {
+                display: inline;
+            }
+
+            .browse-empty {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .browse-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        .profile-sheet {
+            max-width: 42rem;
+            margin: 0 auto;
+        }
+
+        .profile-family-panel {
+            padding: 1rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1.25rem;
+            background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
+        }
+
+        .profile-family-note {
+            margin: 0 0 1rem;
+            padding: 0.75rem 0.9rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 0.9rem;
+            background: rgba(255, 253, 249, 0.9);
+            color: #6d5f55;
+            font-size: 0.85rem;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .family-sortable-row {
+            border-radius: 1rem !important;
+        }
+
+        @media (min-width: 900px) {
+            .profile-sheet {
+                max-width: none;
+                width: 100%;
+            }
+
+            .profile-family-panel {
+                padding: 1.25rem 1.35rem;
+            }
+        }
+
         button.app-btn-primary,
         label.app-btn-primary {
             background-color: #929D75;
@@ -9831,9 +10059,11 @@
                             id: String(family.id),
                             name: String(family.name || 'Family book').trim(),
                             tag: String(family.tag || ''),
+                            pinCode: String(family.pinCode || ''),
                             colorKey: String(family.colorKey || 'sage'),
                             creatorId: String(family.creatorId || currentUser.uid || ''),
                             memberIds: Array.isArray(family.memberIds) ? family.memberIds.filter(Boolean) : [],
+                            memberProfiles: family.memberProfiles && typeof family.memberProfiles === 'object' ? family.memberProfiles : {},
                             removedMembers: Array.isArray(family.removedMembers) ? family.removedMembers : [],
                             removedMemberIds: Array.isArray(family.removedMembers) ? family.removedMembers.map(member => member.userId).filter(Boolean) : [],
                             updatedAt: new Date()
@@ -11695,13 +11925,40 @@
 
         function normalizeFamilyRecord(family = {}) {
             const color = getFamilyColorOption(family.colorKey);
+            const memberProfiles = family.memberProfiles && typeof family.memberProfiles === 'object'
+                ? Object.fromEntries(
+                    Object.entries(family.memberProfiles).map(([uid, profile]) => [
+                        String(uid),
+                        { name: String(profile?.name || '').trim() }
+                    ]).filter(([uid, profile]) => uid && profile.name)
+                )
+                : {};
             return {
                 ...family,
                 name: String(family.name || 'Family book').trim(),
+                pinCode: String(family.pinCode || ''),
                 colorKey: color.key,
                 memberIds: Array.isArray(family.memberIds) ? family.memberIds.filter(Boolean) : [],
+                memberProfiles,
                 removedMembers: Array.isArray(family.removedMembers) ? family.removedMembers : []
             };
+        }
+
+        function getFamilyMemberDisplayName(family, uid) {
+            if (uid === currentUser?.uid) return 'You';
+            const named = family?.memberProfiles?.[uid]?.name;
+            if (named) return named;
+            return 'Family member';
+        }
+
+        function upsertFamilyMemberProfile(family, uid, name) {
+            if (!family || !uid) return;
+            const cleanName = String(name || '').trim();
+            if (!cleanName) return;
+            if (!family.memberProfiles || typeof family.memberProfiles !== 'object') {
+                family.memberProfiles = {};
+            }
+            family.memberProfiles[uid] = { name: cleanName };
         }
 
         function getActiveFamiliesForCurrentUser() {
@@ -12850,8 +13107,12 @@
             const archivedFamilyCount = Math.max((userFamilies || []).length - activeFamilyCount, 0);
             const familySummaryText = t.familySummary(activeFamilyCount, archivedFamilyCount);
 
+            const softLaunchFamilyNote = userSettings.language === 'nl'
+                ? 'Families kun je al aanmaken en delen via naam + tag + pincode. Volledige family-cloud (live sync voor iedereen) komt in een latere ronde.'
+                : 'You can already create and join families with name + tag + pin. Full family-cloud sync for every member lands in a later round.';
+
             contentDiv.innerHTML = `
-                <div class="profile-sheet max-w-4xl mx-auto space-y-6">
+                <div class="profile-sheet space-y-6">
                     <div class="bg-white rounded-sm shadow-sm border border-parchmentDark overflow-hidden">
                         <div class="profile-banner" style="background-image: url('${bannerBg}')"></div>
                         <div class="profile-identity">
@@ -12905,9 +13166,8 @@
                         </div>
                     </div>
 
-                    <!-- New My Families Section -->
-                    <div class="bg-white rounded-sm shadow-sm border border-parchmentDark p-6 md:p-8">
-                        <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div class="profile-family-panel">
+                        <div class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                             <div>
                                 <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage">${t.sharedBooks}</p>
                                 <h3 class="mt-2 font-fantasy text-3xl font-bold text-forest">${t.myFamilies}</h3>
@@ -12922,22 +13182,22 @@
                                 </button>
                             </div>
                         </div>
+                        <p class="profile-family-note">${softLaunchFamilyNote}</p>
                         
                         ${userFamilies && userFamilies.length > 0 ? `
                             <div id="family-list-sortable" class="flex flex-col gap-3">
                                 ${userFamilies.slice(0, 3).map((family, idx) => {
                                     const isRemoved = family.removedMembers && family.removedMembers.some(m => m.userId === currentUser?.uid);
-                                    const isCreator = family.creatorId === currentUser?.uid;
                                     const memberCount = family.memberIds ? family.memberIds.length : 0;
                                     const familyColor = getFamilyColorOption(family.colorKey);
                                     const rankLabel = ['#1', '#2', '#3'][idx] || '';
                                     return `
-                                        <div class="family-sortable-row group flex items-center gap-4 rounded-2xl border bg-white px-5 py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-grab active:cursor-grabbing select-none ${isRemoved ? 'opacity-70' : ''}" data-family-id="${family.id}" draggable="true" style="border-left: 4px solid ${familyColor.hex};">
+                                        <div class="family-sortable-row group flex items-center gap-3 sm:gap-4 border bg-white px-4 py-3.5 sm:px-5 sm:py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-grab active:cursor-grabbing select-none ${isRemoved ? 'opacity-70' : ''}" data-family-id="${family.id}" draggable="true" style="border-left: 4px solid ${familyColor.hex};">
                                             <div class="flex-shrink-0 text-sage/50 hover:text-sage transition-colors">
                                                 <i data-lucide="grip-vertical" class="w-5 h-5 pointer-events-none"></i>
                                             </div>
-                                            <span class="text-[11px] font-bold uppercase tracking-[0.2em] w-20 flex-shrink-0" style="color:${familyColor.hex};">${rankLabel}</span>
-                                            <span class="font-fantasy font-bold text-forest text-xl leading-none flex-1 truncate">${family.name}</span>
+                                            <span class="text-[11px] font-bold uppercase tracking-[0.2em] w-12 sm:w-16 flex-shrink-0" style="color:${familyColor.hex};">${rankLabel}</span>
+                                            <span class="font-fantasy font-bold text-forest text-lg sm:text-xl leading-none flex-1 truncate">${escapeHTML(family.name)}</span>
                                             <span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-sage flex-shrink-0 hidden sm:inline-flex">
                                                 <i data-lucide="users" class="w-3.5 h-3.5"></i>${memberCount}
                                             </span>
@@ -12947,12 +13207,9 @@
                                 }).join('')}
                             </div>
                         ` : `
-                            <div class="rounded-[24px] border-2 border-dashed border-parchmentDark bg-parchment px-6 py-10 text-center">
-                                <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-parchmentDark bg-white shadow-sm">
-                                    <i data-lucide="users" class="text-sage w-6 h-6"></i>
-                                </div>
-                                <p class="text-forest font-bold mb-1">${t.noFamiliesYet}</p>
-                                <p class="text-sage text-sm font-semibold">${t.noFamiliesDesc}</p>
+                            <div class="browse-empty">
+                                <h3>${t.noFamiliesYet}</h3>
+                                <p>${t.noFamiliesDesc}</p>
                             </div>
                         `}
                     </div>
@@ -15929,108 +16186,98 @@
                     .some(value => value.toLowerCase().includes(normalizedQuery));
             });
 
+            const browseNl = userSettings.language === 'nl';
+            const browseTitle = browseNl ? 'Ontdek wat iedereen kookt' : 'Browse what everyone is cooking';
+            const browseIntro = browseNl
+                ? 'Bekijk gepubliceerde recepten van andere koks en bewaar favorieten in je Index.'
+                : 'Explore published recipes from other cooks and save the ones you love into your Index.';
+            const searchPlaceholder = browseNl
+                ? 'Zoek op titel, kok, ingrediënt of keuken…'
+                : 'Search by title, author, ingredient, or cuisine…';
+
             let html = `
-                <div class="screen-sheet mb-8 overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg">
-                    <div class="border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment px-5 py-5">
-                        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                            <div>
-                                <h2 class="font-fantasy text-3xl font-bold text-forest">Browse what everyone is cooking</h2>
-                                <p class="mt-1 text-sm font-semibold text-sage opacity-80">Explore published recipes from all users and save the ones you love into your Index.</p>
-                            </div>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="inline-flex items-center gap-2 rounded-full border border-parchmentDark bg-white px-3 py-2 text-xs font-bold text-sage shadow-sm">
-                                    <i data-lucide="globe-2" class="h-4 w-4"></i>${filteredPublishedRecipes.length} published
-                                </span>
-                                <span class="inline-flex items-center gap-2 rounded-full border border-parchmentDark bg-white px-3 py-2 text-xs font-bold text-sage shadow-sm">
-                                    <i data-lucide="heart" class="h-4 w-4"></i>${savedPublishedCount} saved
-                                </span>
-                            </div>
+                <div class="browse-sheet">
+                    <div class="browse-hero">
+                        <div class="browse-hero-copy">
+                            <h2>${browseTitle}</h2>
+                            <p>${browseIntro}</p>
+                        </div>
+                        <div class="browse-stat-row">
+                            <span class="shop-stat"><i data-lucide="globe-2" class="h-4 w-4"></i>${filteredPublishedRecipes.length} ${browseNl ? 'gepubliceerd' : 'published'}</span>
+                            <span class="shop-stat"><i data-lucide="bookmark" class="h-4 w-4"></i>${savedPublishedCount} ${browseNl ? 'opgeslagen' : 'saved'}</span>
                         </div>
                     </div>
-
-                    <div class="space-y-5 p-5">
-                        <div class="relative">
-                            <i data-lucide="search" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-sage opacity-70"></i>
-                            <input type="text" placeholder="Search by title, author, ingredient, or cuisine..." value="${browseQuery}" oninput="browseQuery = this.value; renderBrowse()" class="w-full h-11 rounded-xl border border-accent bg-parchment px-12 text-base font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:bg-white">
-                        </div>
+                    <div class="browse-search">
+                        <i data-lucide="search" class="h-5 w-5 shrink-0 text-sage opacity-70"></i>
+                        <input type="text" placeholder="${searchPlaceholder}" value="${escapeHTML(browseQuery)}" oninput="browseQuery = this.value; renderBrowse()" aria-label="${browseNl ? 'Zoeken in Browse' : 'Search Browse'}">
                     </div>
                 </div>
             `;
 
             if (!firebaseInitialized) {
                 html += `
-                    <div class="text-center mt-10 p-8 glass-panel rounded-sm border border-parchmentDark bg-white">
-                        <i data-lucide="cloud-off" class="w-16 h-16 mx-auto mb-4 text-sage opacity-50"></i>
-                        <p class="font-fantasy text-2xl text-forest font-bold mb-2">Browse needs cloud setup.</p>
-                        <p class="text-sm opacity-80 font-semibold mb-4">Open Settings and connect Firebase to browse published recipes from everyone.</p>
+                    <div class="browse-empty">
+                        <h3>${browseNl ? 'Browse heeft cloud nodig' : 'Browse needs cloud setup'}</h3>
+                        <p>${browseNl ? 'Open Opties en verbind Firebase om gepubliceerde recepten te bekijken.' : 'Open Options and connect Firebase to browse published recipes from everyone.'}</p>
                         <button onclick="renderSettings()" class="${getAppButtonClasses('primary', { size: 'lg' })}">
-                            <i data-lucide="settings-2" class="w-4 h-4"></i> Open Settings
+                            <i data-lucide="settings-2" class="w-4 h-4"></i> ${browseNl ? 'Open Opties' : 'Open Options'}
                         </button>
                     </div>
                 `;
             } else if (filteredPublishedRecipes.length === 0) {
                 html += `
-                    <div class="text-center mt-10 p-8 glass-panel rounded-sm border border-parchmentDark bg-white">
-                        <i data-lucide="chef-hat" class="w-16 h-16 mx-auto mb-4 text-sage opacity-50"></i>
-                        <p class="font-fantasy text-2xl text-forest font-bold mb-2">No published recipes yet.</p>
-                        <p class="text-sm opacity-80 font-semibold">Be the first to publish one from your own collection.</p>
+                    <div class="browse-empty">
+                        <h3>${browseNl ? (normalizedQuery ? 'Geen treffers' : 'Nog geen gepubliceerde recepten') : (normalizedQuery ? 'No matches' : 'No published recipes yet')}</h3>
+                        <p>${browseNl
+                            ? (normalizedQuery ? 'Probeer een andere zoekterm, of publiceer zelf een recept uit je Index.' : 'Wees de eerste: publiceer een recept uit je eigen verzameling.')
+                            : (normalizedQuery ? 'Try another search, or publish a recipe from your Index.' : 'Be the first to publish one from your own collection.')}</p>
                     </div>
                 `;
             } else {
-                html += '<div class="grid grid-cols-1 gap-6 pb-6 md:grid-cols-2 lg:grid-cols-3">';
+                html += '<div class="browse-grid pb-6">';
                 filteredPublishedRecipes.forEach(recipe => {
                     const saved = isPublishedRecipeSaved(recipe.id);
                     const owned = isPublishedRecipeOwnedByCurrentUser(recipe);
                     const versionLabel = getPublishedVersionLabel(recipe);
-                    const metaSummary = [
-                        recipe.prepTime ? `${recipe.prepTime}m prep` : '',
-                        recipe.cookTime ? `${recipe.cookTime}m cook` : '',
-                        recipe.servings ? `${recipe.servings} servings` : ''
-                    ].filter(Boolean).join(' · ');
+                    const authorLabel = escapeHTML(recipe.authorName || recipe.author || 'Chef');
+                    const titleLabel = escapeHTML(recipe.title || 'Untitled');
+                    const safeAuthorAttr = escapeHTML(String(recipe.authorName || recipe.author || 'Chef').replace(/'/g, "&#39;"));
+                    const safeTitleAttr = escapeHTML(String(recipe.title || 'Untitled').replace(/'/g, "&#39;"));
                     html += `
-                        <div onclick="renderPublishedRecipeDetail('${recipe.id}')" class="h-full bg-white rounded-md shadow-sm hover:shadow-xl transition-all cursor-pointer border border-parchmentDark group overflow-hidden relative flex flex-col">
-                            <div class="absolute right-4 top-4 z-10">
+                        <article onclick="renderPublishedRecipeDetail('${recipe.id}')" class="browse-card group">
+                            <div class="browse-card-media" style="background-image: url('${recipe.profile || defaultPlaceholderProfile}')"></div>
+                            <div class="browse-card-body">
+                                <h3>${titleLabel}</h3>
+                                ${recipe.authorId && !owned
+                                    ? `<button type="button" onclick="event.stopPropagation(); renderPublicProfile('${recipe.authorId}', '${safeAuthorAttr}')" class="text-xs text-sage font-semibold inline-flex items-center gap-1 hover:text-forest w-fit"><i data-lucide="user" class="w-3.5 h-3.5"></i>${authorLabel}</button>`
+                                    : `<p class="text-xs text-sage font-semibold inline-flex items-center gap-1"><i data-lucide="user" class="w-3.5 h-3.5"></i>${authorLabel}${owned ? ` · ${browseNl ? 'Jij' : 'You'}` : ''}</p>`
+                                }
+                                <div class="browse-card-meta">
+                                    ${recipe.prepTime ? `<span class="inline-flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5"></i>${recipe.prepTime}m</span>` : ''}
+                                    ${recipe.cookTime ? `<span class="inline-flex items-center gap-1"><i data-lucide="flame" class="w-3.5 h-3.5"></i>${recipe.cookTime}m</span>` : ''}
+                                    ${recipe.servings ? `<span class="inline-flex items-center gap-1"><i data-lucide="users" class="w-3.5 h-3.5"></i>${recipe.servings}</span>` : ''}
+                                    <span class="inline-flex items-center gap-1"><i data-lucide="heart" class="w-3.5 h-3.5"></i>${getPublishedRecipeLikeCount(recipe)}</span>
+                                    ${versionLabel ? `<span>${escapeHTML(versionLabel)}</span>` : ''}
+                                </div>
+                                <div class="flex flex-wrap gap-2 mt-1">
+                                    <span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${escapeHTML(recipe.category || 'Misc')}</span>
+                                    ${recipe.difficulty ? `<span class="text-[10px] bg-gold bg-opacity-20 text-sage font-bold px-2 py-1 rounded-sm">${escapeHTML(recipe.difficulty)}</span>` : ''}
+                                    ${recipe.cuisine ? `<span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${escapeHTML(recipe.cuisine)}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="browse-card-actions">
                                 ${owned ? `
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-sage shadow-md">Yours${versionLabel ? ` · ${versionLabel}` : ''}</span>
+                                    <span class="inline-flex items-center rounded-full border border-parchmentDark bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-sage">${browseNl ? 'Van jou' : 'Yours'}${versionLabel ? ` · ${escapeHTML(versionLabel)}` : ''}</span>
                                 ` : `
-                                    <div class="flex items-center gap-2">
-                                        <button onclick="event.stopPropagation(); openReportModal({ reportType: 'published-recipe', targetUserId: '${recipe.authorId || ''}', targetName: '${escapeHTML(String(recipe.authorName || recipe.author || 'Chef').replace(/'/g, "&#39;"))}', targetPublishedRecipeId: '${recipe.id}', targetRecipeTitle: '${escapeHTML(String(recipe.title || 'Untitled').replace(/'/g, "&#39;"))}' })" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white bg-white text-sage shadow-md transition-all hover:scale-105" title="Report">
-                                            <i data-lucide="flag" class="w-5 h-5"></i>
-                                        </button>
-                                        <button onclick="event.stopPropagation(); toggleSavedPublishedRecipe('${recipe.id}')" class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white bg-white ${saved ? 'text-red-500' : 'text-sage'} shadow-md transition-all hover:scale-105">
-                                            <i data-lucide="heart" class="w-5 h-5 ${saved ? 'fill-current' : ''}"></i>
-                                        </button>
-                                    </div>
+                                    <button type="button" onclick="event.stopPropagation(); toggleSavedPublishedRecipe('${recipe.id}')" class="${getAppButtonClasses(saved ? 'danger' : 'secondary')}">
+                                        <i data-lucide="bookmark" class="w-4 h-4 ${saved ? 'fill-current' : ''}"></i><span class="browse-card-action-label">${saved ? (browseNl ? 'Opgeslagen' : 'Saved') : (browseNl ? 'Bewaren' : 'Save')}</span>
+                                    </button>
+                                    <button type="button" onclick="event.stopPropagation(); openReportModal({ reportType: 'published-recipe', targetUserId: '${recipe.authorId || ''}', targetName: '${safeAuthorAttr}', targetPublishedRecipeId: '${recipe.id}', targetRecipeTitle: '${safeTitleAttr}' })" class="${getAppButtonClasses('secondary')}" title="${browseNl ? 'Melden' : 'Report'}">
+                                        <i data-lucide="flag" class="w-4 h-4"></i><span class="browse-card-action-label">${browseNl ? 'Melden' : 'Report'}</span>
+                                    </button>
                                 `}
                             </div>
-                            <div class="w-full h-48 bg-cover bg-center" style="background-image: url('${recipe.profile || defaultPlaceholderProfile}')"></div>
-                            <div class="flex flex-1 flex-col p-5">
-                                <div>
-                                    <h3 class="min-h-[4rem] font-fantasy font-bold text-2xl text-forest leading-tight group-hover:text-gold transition-colors">${recipe.title}</h3>
-                                </div>
-                                ${recipe.authorId && !owned
-                                    ? `<button onclick="event.stopPropagation(); renderPublicProfile('${recipe.authorId}', '${escapeHTML((recipe.authorName || recipe.author || 'Chef').replace(/'/g, "&#39;"))}')" class="text-xs text-sage mt-2 font-semibold inline-flex items-center gap-1 hover:text-forest"><i data-lucide="user" class="w-3 h-3"></i> ${recipe.authorName || recipe.author || 'Chef'}</button>`
-                                    : `<p class="text-xs text-sage mt-2 font-semibold flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i> ${recipe.authorName || recipe.author || 'Chef'}</p>`
-                                }
-                                ${versionLabel ? `<p class="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-sage opacity-80">${versionLabel}</p>` : ''}
-                                <div class="flex min-h-[1.25rem] flex-wrap gap-2 mt-3 text-[10px] font-semibold text-sage">
-                                    ${recipe.prepTime ? `<span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ${recipe.prepTime}m prep</span>` : ''}
-                                    ${recipe.cookTime ? `<span class="flex items-center gap-1"><i data-lucide="flame" class="w-3 h-3"></i> ${recipe.cookTime}m cook</span>` : ''}
-                                    ${recipe.servings ? `<span class="flex items-center gap-1"><i data-lucide="users" class="w-3 h-3"></i> ${recipe.servings}</span>` : ''}
-                                    <span class="flex items-center gap-1"><i data-lucide="heart" class="w-3 h-3"></i> ${getPublishedRecipeLikeCount(recipe)}</span>
-                                </div>
-                                <div class="mt-4">
-                                    <div class="flex min-h-[2rem] flex-wrap content-start gap-2">
-                                        <span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${recipe.category || 'Misc'}</span>
-                                        ${recipe.difficulty ? `<span class="text-[10px] bg-gold bg-opacity-20 text-sage font-bold px-2 py-1 rounded-sm">${recipe.difficulty}</span>` : ''}
-                                        ${recipe.cuisine ? `<span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${recipe.cuisine}</span>` : ''}
-                                    </div>
-                                    <div class="mt-2 flex min-h-[1.5rem] flex-wrap content-start gap-1">
-                                        ${recipe.diet && recipe.diet.length > 0 ? recipe.diet.map(d => `<span class="text-[9px] bg-sage bg-opacity-10 text-sage font-bold px-1.5 py-0.5 rounded">${d}</span>`).join('') : ''}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        </article>
                     `;
                 });
                 html += '</div>';
@@ -16725,54 +16972,57 @@
                 showToast('Family changes are disabled for your account.', 'alert-circle', true);
                 return;
             }
+            const nl = userSettings.language === 'nl';
             if (!isAuthenticated || !currentUser) {
-                showToast('Je moet ingelogd zijn om een familie te joinen.', 'alert-circle', true);
+                showToast(nl ? 'Je moet ingelogd zijn om een familie te joinen.' : 'Sign in to join a family.', 'alert-circle', true);
                 return;
             }
             const activeFamilies = getActiveFamiliesForCurrentUser();
             if (activeFamilies.length >= 3) {
-                showToast('Je kunt maximaal 3 families hebben.', 'alert-circle', true);
+                showToast(nl ? 'Je kunt maximaal 3 families hebben.' : 'You can join up to 3 families.', 'alert-circle', true);
                 return;
             }
 
             let modalId = null;
-            modalId = createModal('Deelnemen aan een familie', `
+            modalId = createModal(nl ? 'Deelnemen aan een familie' : 'Join a family', `
                 <div class="space-y-4 text-inkDark">
                     <div class="rounded-2xl border border-parchmentDark bg-parchment p-4 shadow-sm">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Hoe werkt het?</p>
-                        <p class="mt-2 text-sm font-semibold leading-relaxed text-forest">Vraag de familiebeheerder om de exacte naam, de 4-cijferige code en de pincode. Vul alle drie in om direct deel te nemen.</p>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${nl ? 'Hoe werkt het?' : 'How it works'}</p>
+                        <p class="mt-2 text-sm font-semibold leading-relaxed text-forest">${nl
+                            ? 'Vraag de familiebeheerder om de exacte naam, de 4-cijferige code en de pincode. Vul alle drie in om direct deel te nemen.'
+                            : 'Ask the family admin for the exact name, 4-digit tag, and pincode. Enter all three to join the shared book.'}</p>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">Naam van de familie</label>
-                        <input type="text" id="join-family-name" placeholder="Bijv. Jansen" class="${mutedInputClass}" maxlength="25">
+                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">${nl ? 'Naam van de familie' : 'Family name'}</label>
+                        <input type="text" id="join-family-name" placeholder="${nl ? 'Bijv. Jansen' : 'e.g. Smith Family'}" class="${mutedInputClass}" maxlength="25">
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">Familiecode (4 cijfers)</label>
-                        <input type="text" id="join-family-tag" placeholder="Bijv. 2968" class="${mutedInputClass}" maxlength="4" inputmode="numeric" pattern="[0-9]*">
+                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">${nl ? 'Familiecode (4 cijfers)' : 'Family tag (4 digits)'}</label>
+                        <input type="text" id="join-family-tag" placeholder="${nl ? 'Bijv. 2968' : 'e.g. 2968'}" class="${mutedInputClass}" maxlength="4" inputmode="numeric" pattern="[0-9]*">
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">Pincode</label>
-                        <input type="password" id="join-family-pin" placeholder="De toegangspincode" class="${mutedInputClass}" maxlength="8">
+                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">${nl ? 'Pincode' : 'Pincode'}</label>
+                        <input type="password" id="join-family-pin" placeholder="${nl ? 'De toegangspincode' : 'Access pincode'}" class="${mutedInputClass}" maxlength="8">
                     </div>
                     <p id="join-family-error" class="hidden text-sm font-semibold text-coral"></p>
                 </div>
             `, [
-                { text: 'Annuleren', onClick: () => closeModal(modalId) },
-                { text: 'Deelnemen', primary: true, onClick: async () => {
+                { text: nl ? 'Annuleren' : 'Cancel', onClick: () => closeModal(modalId) },
+                { text: nl ? 'Deelnemen' : 'Join family', primary: true, onClick: async () => {
                     const name = document.getElementById('join-family-name')?.value?.trim();
                     const tag = document.getElementById('join-family-tag')?.value?.trim();
                     const pin = document.getElementById('join-family-pin')?.value?.trim();
                     const errEl = document.getElementById('join-family-error');
                     if (!name || !tag || !pin) {
-                        if (errEl) { errEl.textContent = 'Vul alle velden in.'; errEl.classList.remove('hidden'); }
+                        if (errEl) { errEl.textContent = nl ? 'Vul alle velden in.' : 'Fill in all fields.'; errEl.classList.remove('hidden'); }
                         return;
                     }
                     if (!/^\d{4}$/.test(tag)) {
-                        if (errEl) { errEl.textContent = 'De familiecode bestaat uit precies 4 cijfers.'; errEl.classList.remove('hidden'); }
+                        if (errEl) { errEl.textContent = nl ? 'De familiecode bestaat uit precies 4 cijfers.' : 'The family tag must be exactly 4 digits.'; errEl.classList.remove('hidden'); }
                         return;
                     }
                     if (!validateFamilyNameForModeration(name)) {
-                        if (errEl) { errEl.textContent = 'De familienaam bevat geblokkeerde woorden.'; errEl.classList.remove('hidden'); }
+                        if (errEl) { errEl.textContent = nl ? 'De familienaam bevat geblokkeerde woorden.' : 'That family name contains blocked language.'; errEl.classList.remove('hidden'); }
                         return;
                     }
                     closeModal(modalId);
@@ -16795,6 +17045,9 @@
                 colorKey: color.key,
                 creatorId: currentUser.uid,
                 memberIds: [currentUser.uid],
+                memberProfiles: {
+                    [currentUser.uid]: { name: String(userSettings.name || currentUser.displayName || 'You').trim() }
+                },
                 removedMembers: []
             };
             
@@ -16862,13 +17115,23 @@
                     return;
                 }
 
+                const displayName = String(userSettings.name || currentUser.displayName || 'Chef').trim();
                 const updatedMemberIds = [...(targetFamily.memberIds || []), currentUser.uid];
+                const nextProfiles = {
+                    ...(targetFamily.memberProfiles && typeof targetFamily.memberProfiles === 'object' ? targetFamily.memberProfiles : {}),
+                    [currentUser.uid]: { name: displayName }
+                };
                 await db.collection('family-books').doc(targetFamily.id).update({
                     memberIds: updatedMemberIds,
+                    memberProfiles: nextProfiles,
                     updatedAt: new Date()
                 });
 
-                const normalizedFamily = normalizeFamilyRecord({ ...targetFamily, memberIds: updatedMemberIds });
+                const normalizedFamily = normalizeFamilyRecord({
+                    ...targetFamily,
+                    memberIds: updatedMemberIds,
+                    memberProfiles: nextProfiles
+                });
                 userFamilies = [...(userFamilies || []), normalizedFamily];
                 saveData();
 
@@ -16884,44 +17147,52 @@
             const family = userFamilies.find(f => f.id === familyId);
             if (!family) return;
 
+            const nl = userSettings.language === 'nl';
             const isRemoved = family.removedMembers && family.removedMembers.some(m => m.userId === currentUser?.uid);
             const isCreator = family.creatorId === currentUser?.uid;
+            upsertFamilyMemberProfile(family, currentUser?.uid, userSettings.name || currentUser?.displayName || 'You');
 
-            const membersHtml = family.memberIds.map(uid => `
-                <div class="flex items-center justify-between p-3 border-b border-parchmentDark last:border-0 hover:bg-white transition-colors group">
-                    <div class="flex items-center gap-3">
-                        <div class="w-8 h-8 rounded-full bg-forest text-white flex items-center justify-center font-bold text-xs uppercase">
-                            ${uid === currentUser?.uid ? 'ME' : 'U'}
+            const membersHtml = family.memberIds.map(uid => {
+                const displayName = getFamilyMemberDisplayName(family, uid);
+                const initial = String(displayName).replace(/[^A-Za-zÀ-ÿ0-9]/g, '').charAt(0).toUpperCase() || 'U';
+                return `
+                <div class="flex items-center justify-between gap-3 p-3 border-b border-parchmentDark last:border-0 hover:bg-white transition-colors group">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-8 h-8 rounded-full bg-forest text-white flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                            ${uid === currentUser?.uid ? (nl ? 'IK' : 'ME') : escapeHTML(initial)}
                         </div>
-                        <div>
-                            <p class="font-bold text-forest text-sm">${uid === currentUser?.uid ? 'You' : 'Family Member'}</p>
-                            <p class="text-[10px] text-sage uppercase tracking-wider">${uid === family.creatorId ? 'Admin' : 'Member'}</p>
+                        <div class="min-w-0">
+                            <p class="font-bold text-forest text-sm truncate">${escapeHTML(displayName)}</p>
+                            <p class="text-[10px] text-sage uppercase tracking-wider">${uid === family.creatorId ? (nl ? 'Beheerder' : 'Admin') : (nl ? 'Lid' : 'Member')}</p>
                         </div>
                     </div>
                     ${(isCreator && uid !== currentUser?.uid) ? `
-                        <button onclick="removeFamilyMember('${family.id}', '${uid}')" class="${getAppButtonClasses('danger', { iconOnly: true })} opacity-0 group-hover:opacity-100 group-focus-within:opacity-100" title="Remove Member">
-                            <i data-lucide="user-minus" class="w-4 h-4"></i>
+                        <button onclick="removeFamilyMember('${family.id}', '${uid}')" class="${getAppButtonClasses('danger')}" title="${nl ? 'Lid verwijderen' : 'Remove member'}">
+                            <i data-lucide="user-minus" class="w-4 h-4"></i><span class="browse-card-action-label">${nl ? 'Verwijderen' : 'Remove'}</span>
                         </button>
                     ` : ''}
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
-            createModal(`${family.name} <span class="text-sage font-normal text-sm opacity-60">#${family.tag}</span>`, `
+            createModal(`${escapeHTML(family.name)} <span class="text-sage font-normal text-sm opacity-60">#${escapeHTML(String(family.tag || ''))}</span>`, `
                 <div class="space-y-6 text-inkDark max-h-[60vh] overflow-y-auto w-[650px] max-w-[90vw]">
                     ${isRemoved ? `
                         <div class="bg-coral text-white p-4 rounded-sm flex gap-3 text-sm shadow-sm mb-6 border border-coral/20">
                             <i data-lucide="alert-triangle" class="w-5 h-5 shrink-0 mt-0.5"></i>
                             <div>
-                                <p class="font-bold mb-1">You are no longer an active member.</p>
-                                <p class="opacity-90">You have read-only access to this family's recipes to back them up via PDF export. This access will expire automatically 30 days after removal.</p>
+                                <p class="font-bold mb-1">${nl ? 'Je bent geen actief lid meer.' : 'You are no longer an active member.'}</p>
+                                <p class="opacity-90">${nl
+                                    ? 'Je hebt alleen-lezen toegang om recepten te exporteren. Deze toegang verloopt automatisch 30 dagen na verwijdering.'
+                                    : 'You have read-only access to back up recipes via PDF export. This access expires automatically 30 days after removal.'}</p>
                             </div>
                         </div>
                     ` : ''}
 
                     <div>
-                        <h4 class="text-xs uppercase tracking-wide font-bold text-sage mb-3 flex justify-between items-end">
-                            <span>Members (${family.memberIds.length})</span>
-                            ${isCreator ? '<span class="text-[10px] font-normal opacity-70">You can manage members</span>' : ''}
+                        <h4 class="text-xs uppercase tracking-wide font-bold text-sage mb-3 flex justify-between items-end gap-3">
+                            <span>${nl ? 'Leden' : 'Members'} (${family.memberIds.length})</span>
+                            ${isCreator ? `<span class="text-[10px] font-normal opacity-70">${nl ? 'Jij beheert leden' : 'You can manage members'}</span>` : ''}
                         </h4>
                         <div class="bg-parchment rounded-sm border border-parchmentDark">
                             ${membersHtml}
@@ -16931,29 +17202,34 @@
                     ${!isRemoved ? `
                         <div class="bg-white p-5 border border-parchmentDark rounded-sm shadow-sm">
                             <h4 class="text-xs uppercase tracking-wide font-bold text-sage mb-2 flex items-center justify-between">
-                                Invite Others
+                                ${nl ? 'Nodig anderen uit' : 'Invite others'}
                                 <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
                             </h4>
-                            <p class="text-sm text-forest opacity-80 mb-4">Share your exact family name, tag, and pincode so loved ones can search and join your book. They will need all three parts.</p>
-                            <button onclick="shareFamilyInvite('${family.name}', '${family.tag}', '${family.pinCode || 'Hidden'}')" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
-                                Share Invite Link
+                            <p class="text-sm text-forest opacity-80 mb-4">${nl
+                                ? 'Deel de exacte familienaam, tag en pincode. Anderen hebben alle drie nodig om via Profiel deel te nemen.'
+                                : 'Share the exact family name, tag, and pincode. Others need all three parts to join from Profile.'}</p>
+                            <button onclick="shareFamilyInvite('${escapeHTML(String(family.name || '').replace(/'/g, "&#39;"))}', '${escapeHTML(String(family.tag || ''))}', '${escapeHTML(String(family.pinCode || 'Hidden').replace(/'/g, "&#39;"))}')" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
+                                <i data-lucide="share-2" class="w-4 h-4"></i>${nl ? 'Deel uitnodiging' : 'Share invite'}
                             </button>
                         </div>
                     ` : ''}
                 </div>
             `, [
-                { text: 'Close', onClick: () => closeModal() },
-                (!isRemoved && !isCreator) ? { text: 'Leave Family', danger: true, onClick: () => handleLeaveFamily(family.id) } : null
+                { text: nl ? 'Sluiten' : 'Close', onClick: () => closeModal() },
+                (!isRemoved && !isCreator) ? { text: nl ? 'Familie verlaten' : 'Leave family', danger: true, onClick: () => handleLeaveFamily(family.id) } : null
             ].filter(Boolean));
         }
 
         async function shareFamilyInvite(name, tag, pin) {
-            const shareText = `Cook with me on Uculi!\n\nSearch my family book in the Profile section.\nFamily: ${name}\nTag: #${tag}\nPincode: ${pin}`;
+            const nl = userSettings.language === 'nl';
+            const shareText = nl
+                ? `Kook met mij op Uculi!\n\nZoek mijn familieboek in Profiel.\nFamilie: ${name}\nTag: #${tag}\nPincode: ${pin}`
+                : `Cook with me on Uculi!\n\nFind my family book in Profile.\nFamily: ${name}\nTag: #${tag}\nPincode: ${pin}`;
             
             if (navigator.share) {
                 try {
                     await navigator.share({
-                        title: 'Join our Recipe Book',
+                        title: nl ? 'Doe mee met ons receptenboek' : 'Join our recipe book',
                         text: shareText
                     });
                 } catch (err) {
@@ -16961,7 +17237,7 @@
                 }
             } else {
                 navigator.clipboard.writeText(shareText);
-                showToast('Invite copied to clipboard!', 'clipboard-copy');
+                showToast(nl ? 'Uitnodiging gekopieerd' : 'Invite copied to clipboard!', 'clipboard-copy');
             }
         }
 
