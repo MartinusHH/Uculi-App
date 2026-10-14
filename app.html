@@ -62,6 +62,15 @@
             transition: background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
         }
 
+        @media (min-width: 1280px) {
+            body:not(.auth-gate-active) #app-shell {
+                max-width: min(90rem, calc(100vw - 2rem));
+                border-left-color: transparent;
+                border-right-color: transparent;
+                box-shadow: none;
+            }
+        }
+
         #app-content {
             padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
             transition: padding-bottom 220ms ease;
@@ -644,26 +653,109 @@
             text-underline-offset: 0.18em;
         }
 
+        body.auth-gate-active #app-shell {
+            max-width: none;
+            border-left-width: 0;
+            border-right-width: 0;
+            box-shadow: none;
+            background: #f6f1e8;
+        }
+
+        body.auth-gate-active #app-content {
+            padding-bottom: 0;
+            overflow-y: auto;
+        }
+
+        .auth-gate-shell {
+            min-height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            padding: clamp(1rem, 3vw, 2.5rem);
+            background:
+                radial-gradient(circle at 12% 0%, rgba(200, 144, 80, 0.16) 0%, transparent 42%),
+                radial-gradient(circle at 88% 100%, rgba(146, 157, 117, 0.14) 0%, transparent 40%),
+                #f6f1e8;
+        }
+
+        .auth-gate-panel {
+            width: min(72rem, 100%);
+            display: grid;
+            overflow: hidden;
+            border: 1px solid rgba(28, 20, 16, 0.12);
+            border-radius: 2rem;
+            background: #fbf8f3;
+            box-shadow: 0 28px 70px rgba(28, 20, 16, 0.1);
+        }
+
+        @media (min-width: 1024px) {
+            .auth-gate-panel {
+                grid-template-columns: minmax(0, 1.1fr) minmax(22rem, 26rem);
+                min-height: min(40rem, calc(100dvh - 3rem));
+            }
+        }
+
+        .auth-gate-brand {
+            position: relative;
+            padding: clamp(1.5rem, 3vw, 3rem);
+            background: linear-gradient(145deg, #f3ebe0 0%, #fbf8f3 55%, #f6f1e8 100%);
+        }
+
+        .auth-gate-brand-mark {
+            width: 3.5rem;
+            height: 3.5rem;
+            overflow: hidden;
+            border-radius: 1.15rem;
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.12);
+        }
+
+        .auth-gate-brand-name {
+            margin: 1.35rem 0 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(3rem, 6vw, 4.5rem);
+            font-weight: 700;
+            line-height: 0.95;
+            letter-spacing: -0.03em;
+        }
+
+        .auth-gate-form-wrap {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: clamp(1.25rem, 2.5vw, 2.25rem);
+            background: #fffdf9;
+            border-top: 1px solid rgba(28, 20, 16, 0.08);
+        }
+
+        @media (min-width: 1024px) {
+            .auth-gate-form-wrap {
+                border-top: 0;
+                border-left: 1px solid rgba(28, 20, 16, 0.08);
+            }
+        }
+
         .auth-agreement {
             display: flex;
             align-items: flex-start;
-            gap: 0.75rem;
+            gap: 0.65rem;
             margin: 0;
-            padding: 0.8rem 0.9rem;
-            border: 1px solid rgba(28, 20, 16, 0.12);
-            border-radius: 1rem;
-            background: #f6f1e8;
+            padding: 0.35rem 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
             color: #1c1410;
             font-family: Outfit, sans-serif;
             font-size: 0.875rem;
             font-weight: 600;
-            line-height: 1.45;
+            line-height: 1.4;
             text-align: left;
         }
 
         .auth-agreement-check {
-            width: 1.05rem;
-            height: 1.05rem;
+            width: 1rem;
+            height: 1rem;
             margin-top: 0.15rem;
             flex-shrink: 0;
             accent-color: #929D75;
@@ -681,23 +773,29 @@
         .settings-auth-agreements {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.35rem;
             width: 100%;
-            padding: 0.35rem 0 0.55rem;
+            padding: 0.2rem 0 0.35rem;
         }
 
         button.auth-gate-submit,
-        button.auth-gate-social,
-        button.auth-gate-submit:hover,
-        button.auth-gate-social:hover {
+        button.auth-gate-submit:hover {
             background-color: #929D75 !important;
             border-color: #929D75 !important;
             color: #1c1410 !important;
         }
 
+        button.auth-gate-social,
+        button.auth-gate-social:hover {
+            background-color: #fffdf9 !important;
+            border: 1px solid rgba(28, 20, 16, 0.18) !important;
+            color: #1c1410 !important;
+            box-shadow: none !important;
+        }
+
         button.auth-gate-action-locked,
         button.auth-gate-action-locked:hover {
-            opacity: 0.5;
+            opacity: 0.45;
             pointer-events: none;
         }
 
@@ -3845,7 +3943,7 @@
     </style>
 </head>
 <body class="font-body text-forest min-h-screen selection:bg-gold selection:text-white transition-all duration-300" id="body">
-    <div id="app-shell" class="w-full max-w-6xl mx-auto flex flex-col h-[100dvh] max-h-[100dvh] relative shadow-2xl bg-parchment overflow-hidden border-x border-parchmentDark">
+    <div id="app-shell" class="w-full max-w-7xl mx-auto flex flex-col h-[100dvh] max-h-[100dvh] relative shadow-2xl bg-parchment overflow-hidden border-x border-parchmentDark">
         
         <header id="main-header" class="text-forest transition-all" translate="no">
             <button id="header-back" type="button" onclick="handleTopBackAction()" class="header-icon-button" hidden aria-label="Back">
@@ -4722,12 +4820,13 @@
             const lang = getActiveUiLanguage();
             const dictionary = {
                 en: {
-                    heroTitle: 'Log in to open your Uculi kitchen.',
-                    heroIntro: 'Access is now account-only. Your recipes, uploaded photos, notebook notes, shopping list, and family data stay scoped to your own account on this device.',
-                    whyChanged: 'Why this changed',
-                    whyChangedBody: 'No more shared browser archive between users. Every sign-in now gets its own saved recipes and uploaded images.',
+                    brandKicker: 'Private recipe archive',
+                    heroTitle: 'Your kitchen, behind your own login.',
+                    heroIntro: 'Recipes, photos, notes, and lists stay on your account — not shared in the browser.',
+                    whyChanged: 'Why accounts',
+                    whyChangedBody: 'Each sign-in keeps its own recipes and photos, so nothing mixes between people on one device.',
                     whatNeed: 'What you need',
-                    whatNeedBody: 'Only the essentials: first name, last name, email + password, or one tap with Google.',
+                    whatNeedBody: 'Email and password, or continue with Google. Creating an account also asks for your first and last name.',
                     tabLogin: 'Log in',
                     tabRegister: 'Create account',
                     welcomeBack: 'Welcome back',
@@ -4735,7 +4834,7 @@
                     titleLogin: 'Log in',
                     titleRegister: 'Create your account',
                     introLogin: 'Use your email and password, or continue with Google.',
-                    introRegister: 'Use your first name, last name, email, and password. Your profile is created instantly.',
+                    introRegister: 'Add your name, email, and password. Your profile is ready right away.',
                     firstName: 'First name',
                     lastName: 'Last name',
                     email: 'Email address',
@@ -4749,19 +4848,21 @@
                     submitRegister: 'Create account',
                     submitRegisterLoading: 'Creating account...',
                     continueGoogle: 'Continue with Google',
-                    googleReady: 'Google sign-in and account storage are ready.',
-                    googleLoading: 'Authentication is still loading. If Google stays unavailable, refresh and try again.',
+                    googleReady: 'Google sign-in is ready on this site.',
+                    googleLoading: 'Authentication is still loading. Refresh if Google stays unavailable.',
+                    orDivider: 'or',
                     legacyPrimaryAuth: 'Log in / Sign up',
                     legacyPrimaryGetStarted: 'Get Started',
                     legacyMobileLogin: 'Log in'
                 },
                 nl: {
-                    heroTitle: 'Log in om je Uculi-keuken te openen.',
-                    heroIntro: 'Toegang is nu account-gebonden. Je recepten, geuploade foto\'s, notities, boodschappenlijst en familiegegevens blijven gekoppeld aan jouw account op dit apparaat.',
-                    whyChanged: 'Waarom dit veranderde',
-                    whyChangedBody: 'Geen gedeeld browserarchief meer tussen gebruikers. Elke login krijgt nu een eigen set opgeslagen recepten en afbeeldingen.',
+                    brandKicker: 'Privé receptenarchief',
+                    heroTitle: 'Jouw keuken, achter je eigen login.',
+                    heroIntro: 'Recepten, foto’s, notities en lijsten horen bij jouw account — niet gedeeld in de browser.',
+                    whyChanged: 'Waarom accounts',
+                    whyChangedBody: 'Elke login houdt eigen recepten en foto’s, zodat niets door elkaar loopt op één apparaat.',
                     whatNeed: 'Wat je nodig hebt',
-                    whatNeedBody: 'Alleen het noodzakelijke: voornaam, achternaam, e-mail + wachtwoord, of in één tik met Google.',
+                    whatNeedBody: 'E-mail en wachtwoord, of doorgaan met Google. Bij een nieuw account vragen we ook je voor- en achternaam.',
                     tabLogin: 'Inloggen',
                     tabRegister: 'Account aanmaken',
                     welcomeBack: 'Welkom terug',
@@ -4769,7 +4870,7 @@
                     titleLogin: 'Inloggen',
                     titleRegister: 'Maak je account aan',
                     introLogin: 'Gebruik je e-mail en wachtwoord, of ga verder met Google.',
-                    introRegister: 'Gebruik je voornaam, achternaam, e-mail en wachtwoord. Je profiel wordt direct aangemaakt.',
+                    introRegister: 'Vul je naam, e-mail en wachtwoord in. Je profiel is meteen klaar.',
                     firstName: 'Voornaam',
                     lastName: 'Achternaam',
                     email: 'E-mailadres',
@@ -4783,19 +4884,21 @@
                     submitRegister: 'Account aanmaken',
                     submitRegisterLoading: 'Account aanmaken...',
                     continueGoogle: 'Doorgaan met Google',
-                    googleReady: 'Google-inloggen en accountopslag zijn gereed.',
-                    googleLoading: 'Authenticatie laadt nog. Als Google niet beschikbaar blijft, ververs de pagina en probeer opnieuw.',
+                    googleReady: 'Google-inloggen staat klaar op deze site.',
+                    googleLoading: 'Authenticatie laadt nog. Ververs als Google niet beschikbaar blijft.',
+                    orDivider: 'of',
                     legacyPrimaryAuth: 'Inloggen / Registreren',
                     legacyPrimaryGetStarted: 'Aan de slag',
                     legacyMobileLogin: 'Inloggen'
                 },
                 fr: {
-                    heroTitle: 'Connectez-vous pour ouvrir votre cuisine Uculi.',
-                    heroIntro: 'L\'accès est désormais lié à un compte. Vos recettes, photos, notes, liste de courses et données famille restent associées à votre compte sur cet appareil.',
-                    whyChanged: 'Pourquoi ce changement',
-                    whyChangedBody: 'Plus d\'archive partagée dans le navigateur. Chaque connexion possède désormais ses propres recettes et images sauvegardées.',
+                    brandKicker: 'Archive de recettes privée',
+                    heroTitle: 'Votre cuisine, derrière votre propre compte.',
+                    heroIntro: 'Recettes, photos, notes et listes restent liées à votre compte — pas partagées dans le navigateur.',
+                    whyChanged: 'Pourquoi des comptes',
+                    whyChangedBody: 'Chaque connexion garde ses propres recettes et photos, sans mélange entre personnes sur un même appareil.',
                     whatNeed: 'Ce qu\'il faut',
-                    whatNeedBody: 'Uniquement l\'essentiel : prénom, nom, e-mail + mot de passe, ou connexion Google en un geste.',
+                    whatNeedBody: 'E-mail et mot de passe, ou Google. La création de compte demande aussi prénom et nom.',
                     tabLogin: 'Connexion',
                     tabRegister: 'Créer un compte',
                     welcomeBack: 'Bon retour',
@@ -4803,7 +4906,7 @@
                     titleLogin: 'Connexion',
                     titleRegister: 'Créez votre compte',
                     introLogin: 'Utilisez votre e-mail et mot de passe, ou continuez avec Google.',
-                    introRegister: 'Utilisez votre prénom, nom, e-mail et mot de passe. Votre profil est créé immédiatement.',
+                    introRegister: 'Ajoutez votre nom, e-mail et mot de passe. Votre profil est prêt tout de suite.',
                     firstName: 'Prénom',
                     lastName: 'Nom',
                     email: 'Adresse e-mail',
@@ -4817,19 +4920,21 @@
                     submitRegister: 'Créer un compte',
                     submitRegisterLoading: 'Création du compte...',
                     continueGoogle: 'Continuer avec Google',
-                    googleReady: 'Connexion Google et stockage de compte prêts.',
-                    googleLoading: 'L\'authentification est en cours. Si Google reste indisponible, actualisez puis réessayez.',
+                    googleReady: 'La connexion Google est prête sur ce site.',
+                    googleLoading: 'L\'authentification charge encore. Actualisez si Google reste indisponible.',
+                    orDivider: 'ou',
                     legacyPrimaryAuth: 'Connexion / Inscription',
                     legacyPrimaryGetStarted: 'Commencer',
                     legacyMobileLogin: 'Connexion'
                 },
                 de: {
-                    heroTitle: 'Melde dich an, um deine Uculi-Küche zu öffnen.',
-                    heroIntro: 'Der Zugriff ist jetzt kontobasiert. Deine Rezepte, hochgeladenen Fotos, Notizen, Einkaufsliste und Familiendaten bleiben auf diesem Gerät deinem Konto zugeordnet.',
-                    whyChanged: 'Warum diese Änderung',
-                    whyChangedBody: 'Kein gemeinsam genutztes Browser-Archiv mehr. Jede Anmeldung hat jetzt eigene gespeicherte Rezepte und Bilder.',
+                    brandKicker: 'Privates Rezeptarchiv',
+                    heroTitle: 'Deine Küche, hinter deinem eigenen Login.',
+                    heroIntro: 'Rezepte, Fotos, Notizen und Listen gehören zu deinem Konto — nicht geteilt im Browser.',
+                    whyChanged: 'Warum Konten',
+                    whyChangedBody: 'Jeder Login behält eigene Rezepte und Fotos, ohne Vermischung auf einem Gerät.',
                     whatNeed: 'Was du brauchst',
-                    whatNeedBody: 'Nur das Nötigste: Vorname, Nachname, E-Mail + Passwort oder Google mit einem Klick.',
+                    whatNeedBody: 'E-Mail und Passwort oder Google. Beim neuen Konto auch Vor- und Nachname.',
                     tabLogin: 'Anmelden',
                     tabRegister: 'Konto erstellen',
                     welcomeBack: 'Willkommen zurück',
@@ -4837,7 +4942,7 @@
                     titleLogin: 'Anmelden',
                     titleRegister: 'Konto erstellen',
                     introLogin: 'Nutze E-Mail und Passwort oder fahre mit Google fort.',
-                    introRegister: 'Nutze Vorname, Nachname, E-Mail und Passwort. Dein Profil wird sofort erstellt.',
+                    introRegister: 'Name, E-Mail und Passwort reichen. Dein Profil ist sofort bereit.',
                     firstName: 'Vorname',
                     lastName: 'Nachname',
                     email: 'E-Mail-Adresse',
@@ -4851,19 +4956,21 @@
                     submitRegister: 'Konto erstellen',
                     submitRegisterLoading: 'Konto wird erstellt...',
                     continueGoogle: 'Mit Google fortfahren',
-                    googleReady: 'Google-Anmeldung und Kontospeicher sind bereit.',
-                    googleLoading: 'Authentifizierung lädt noch. Wenn Google weiterhin nicht verfügbar ist, Seite neu laden und erneut versuchen.',
+                    googleReady: 'Google-Anmeldung ist auf dieser Seite bereit.',
+                    googleLoading: 'Authentifizierung lädt noch. Neu laden, wenn Google nicht verfügbar bleibt.',
+                    orDivider: 'oder',
                     legacyPrimaryAuth: 'Anmelden / Registrieren',
                     legacyPrimaryGetStarted: 'Loslegen',
                     legacyMobileLogin: 'Anmelden'
                 },
                 es: {
-                    heroTitle: 'Inicia sesión para abrir tu cocina Uculi.',
-                    heroIntro: 'El acceso ahora está vinculado a una cuenta. Tus recetas, fotos subidas, notas, lista de compras y datos familiares quedan asociados a tu cuenta en este dispositivo.',
-                    whyChanged: 'Por qué cambió',
-                    whyChangedBody: 'Ya no hay archivo compartido del navegador entre usuarios. Cada inicio de sesión tiene sus recetas e imágenes guardadas.',
+                    brandKicker: 'Archivo privado de recetas',
+                    heroTitle: 'Tu cocina, detrás de tu propio acceso.',
+                    heroIntro: 'Recetas, fotos, notas y listas quedan en tu cuenta — no compartidas en el navegador.',
+                    whyChanged: 'Por qué cuentas',
+                    whyChangedBody: 'Cada inicio de sesión guarda sus propias recetas y fotos, sin mezclarse en un mismo dispositivo.',
                     whatNeed: 'Qué necesitas',
-                    whatNeedBody: 'Solo lo esencial: nombre, apellido, correo + contraseña, o Google con un toque.',
+                    whatNeedBody: 'Correo y contraseña, o Google. Al crear una cuenta también pedimos nombre y apellido.',
                     tabLogin: 'Iniciar sesión',
                     tabRegister: 'Crear cuenta',
                     welcomeBack: 'Bienvenido de nuevo',
@@ -4871,7 +4978,7 @@
                     titleLogin: 'Iniciar sesión',
                     titleRegister: 'Crea tu cuenta',
                     introLogin: 'Usa tu correo y contraseña, o continúa con Google.',
-                    introRegister: 'Usa tu nombre, apellido, correo y contraseña. Tu perfil se crea al instante.',
+                    introRegister: 'Añade tu nombre, correo y contraseña. Tu perfil queda listo al momento.',
                     firstName: 'Nombre',
                     lastName: 'Apellido',
                     email: 'Correo electrónico',
@@ -4885,8 +4992,9 @@
                     submitRegister: 'Crear cuenta',
                     submitRegisterLoading: 'Creando cuenta...',
                     continueGoogle: 'Continuar con Google',
-                    googleReady: 'Inicio de sesión con Google y almacenamiento de cuenta listos.',
-                    googleLoading: 'La autenticación aún se está cargando. Si Google sigue sin estar disponible, actualiza e inténtalo de nuevo.',
+                    googleReady: 'El inicio de sesión con Google está listo en este sitio.',
+                    googleLoading: 'La autenticación aún carga. Actualiza si Google no está disponible.',
+                    orDivider: 'o',
                     legacyPrimaryAuth: 'Entrar / Registrarse',
                     legacyPrimaryGetStarted: 'Empezar',
                     legacyMobileLogin: 'Entrar'
@@ -7964,6 +8072,9 @@
             const header = document.getElementById('main-header');
             const nav = document.getElementById('main-nav');
             const shouldHideChrome = !isAuthenticated;
+            const onAuthGate = currentView === 'auth' || (!isAuthenticated && currentView !== 'landing');
+
+            document.body.classList.toggle('auth-gate-active', shouldHideChrome && onAuthGate);
 
             if (header) {
                 header.style.display = shouldHideChrome ? 'none' : '';
@@ -8139,79 +8250,77 @@
         }
 
         function renderAuthGate() {
-            syncAuthenticatedAppChrome();
             currentView = 'auth';
+            syncAuthenticatedAppChrome();
 
             if (!contentDiv) return;
 
             const showRegister = authViewMode === 'register';
             const authText = getAuthI18n();
+            const sideNoteTitle = showRegister ? authText.whatNeed : authText.whyChanged;
+            const sideNoteBody = showRegister ? authText.whatNeedBody : authText.whyChangedBody;
             contentDiv.innerHTML = `
-                <div class="mx-auto flex min-h-full w-full max-w-5xl items-center justify-center py-8 md:py-12">
-                    <div class="grid w-full overflow-hidden rounded-[32px] border border-parchmentDark bg-paper shadow-[0_30px_80px_rgba(28,20,16,0.12)] lg:grid-cols-[minmax(0,1.05fr)_28rem]">
-                        <section class="relative overflow-hidden bg-[linear-gradient(135deg,#f6f1e8,#fbf8f3)] px-6 py-8 md:px-10 md:py-12">
-                            <div class="absolute inset-0 pointer-events-none opacity-50" style="background-image: radial-gradient(circle at 10% 0%, rgba(200,144,80,0.18) 0%, transparent 40%), radial-gradient(circle at 90% 100%, rgba(144,152,112,0.16) 0%, transparent 38%);"></div>
-                            <div class="relative">
-                                <div class="h-12 w-12 overflow-hidden rounded-2xl bg-paper shadow-lg shadow-forest/20">
-                                    <img src="assets/uculi-boekje.jpg" alt="Uculi" class="brand-boekje" />
-                                </div>
-                                <p class="mt-6 text-[11px] font-bold uppercase tracking-[0.28em] text-sage">Private recipe archive</p>
-                                <h1 class="mt-4 font-fantasy text-4xl font-bold leading-[1.02] text-forest md:text-5xl">${authText.heroTitle}</h1>
-                                <p class="mt-4 max-w-xl text-sm font-semibold leading-relaxed text-sage md:text-base">${authText.heroIntro}</p>
-                                <div class="mt-8 grid gap-3 text-sm font-semibold text-forest md:max-w-xl">
-                                    <div class="rounded-2xl border border-parchmentDark bg-white/90 p-4 shadow-sm">
-                                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${authText.whyChanged}</p>
-                                        <p class="mt-2 leading-relaxed">${authText.whyChangedBody}</p>
-                                    </div>
-                                    <div class="rounded-2xl border border-parchmentDark bg-white/90 p-4 shadow-sm">
-                                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${authText.whatNeed}</p>
-                                        <p class="mt-2 leading-relaxed">${authText.whatNeedBody}</p>
-                                    </div>
-                                </div>
+                <div class="auth-gate-shell">
+                    <div class="auth-gate-panel">
+                        <section class="auth-gate-brand">
+                            <div class="auth-gate-brand-mark">
+                                <img src="assets/uculi-boekje.jpg" alt="Uculi" class="brand-boekje h-full w-full object-cover" />
+                            </div>
+                            <p class="auth-gate-brand-name">Uculi</p>
+                            <p class="mt-3 text-[11px] font-bold uppercase tracking-[0.28em] text-sage">${authText.brandKicker}</p>
+                            <h1 class="mt-5 max-w-xl font-fantasy text-3xl font-bold leading-[1.08] text-forest md:text-4xl">${authText.heroTitle}</h1>
+                            <p class="mt-4 max-w-lg text-sm font-semibold leading-relaxed text-sage md:text-base">${authText.heroIntro}</p>
+                            <div class="mt-8 max-w-lg border-t border-parchmentDark/70 pt-5 text-sm font-semibold text-forest">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${sideNoteTitle}</p>
+                                <p class="mt-2 leading-relaxed text-sage">${sideNoteBody}</p>
                             </div>
                         </section>
 
-                        <section class="px-6 py-8 md:px-8 md:py-10">
-                            <div class="mx-auto flex h-full max-w-md flex-col">
-                                <div class="inline-flex rounded-2xl border border-parchmentDark bg-parchment p-1 shadow-sm">
+                        <section class="auth-gate-form-wrap">
+                            <div class="mx-auto flex w-full max-w-md flex-col">
+                                <div class="inline-flex rounded-2xl border border-parchmentDark bg-parchment p-1">
                                     <button type="button" onclick="setAuthViewMode('login')" class="flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${showRegister ? 'text-sage hover:text-forest' : 'bg-white text-forest shadow-sm'}">${authText.tabLogin}</button>
                                     <button type="button" onclick="setAuthViewMode('register')" class="flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${showRegister ? 'bg-white text-forest shadow-sm' : 'text-sage hover:text-forest'}">${authText.tabRegister}</button>
                                 </div>
 
-                                <div class="mt-8 rounded-[28px] border border-parchmentDark bg-[#fbf8f3] p-5 shadow-sm md:p-6">
+                                <div class="mt-6">
                                     <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${showRegister ? authText.newAccount : authText.welcomeBack}</p>
-                                    <h2 class="mt-3 font-fantasy text-3xl font-bold text-forest">${showRegister ? authText.titleRegister : authText.titleLogin}</h2>
+                                    <h2 class="mt-2 font-fantasy text-3xl font-bold text-forest">${showRegister ? authText.titleRegister : authText.titleLogin}</h2>
                                     <p class="mt-2 text-sm font-semibold leading-relaxed text-sage">${showRegister ? authText.introRegister : authText.introLogin}</p>
 
-                                    <div class="mt-6 space-y-4">
+                                    <div class="mt-5 space-y-3.5">
                                         ${showRegister ? `
-                                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                            <div class="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
                                                 <div>
-                                                    <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-sage">${authText.firstName}</label>
+                                                    <label class="mb-1.5 block text-xs font-bold uppercase tracking-[0.18em] text-sage">${authText.firstName}</label>
                                                     <input id="auth-first-name" type="text" autocomplete="given-name" class="${inputClass}" placeholder="${authText.firstNamePlaceholder}">
                                                 </div>
                                                 <div>
-                                                    <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-sage">${authText.lastName}</label>
+                                                    <label class="mb-1.5 block text-xs font-bold uppercase tracking-[0.18em] text-sage">${authText.lastName}</label>
                                                     <input id="auth-last-name" type="text" autocomplete="family-name" class="${inputClass}" placeholder="${authText.lastNamePlaceholder}">
                                                 </div>
                                             </div>
                                         ` : ''}
                                         <div>
-                                            <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-sage">${authText.email}</label>
+                                            <label class="mb-1.5 block text-xs font-bold uppercase tracking-[0.18em] text-sage">${authText.email}</label>
                                             <input id="auth-email" type="email" autocomplete="email" class="${inputClass}" placeholder="${authText.emailPlaceholder}">
                                         </div>
                                         <div>
-                                            <label class="mb-2 block text-xs font-bold uppercase tracking-[0.22em] text-sage">${authText.password}</label>
+                                            <label class="mb-1.5 block text-xs font-bold uppercase tracking-[0.18em] text-sage">${authText.password}</label>
                                             <input id="auth-password" type="password" autocomplete="${showRegister ? 'new-password' : 'current-password'}" class="${inputClass}" placeholder="${showRegister ? authText.passwordPlaceholderRegister : authText.passwordPlaceholderLogin}" onkeydown="if(event.key==='Enter'){${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}}">
                                         </div>
                                     </div>
 
-                                    <div class="mt-6 space-y-3">
+                                    <div class="mt-5 space-y-2.5">
                                         ${authAgreementFieldsMarkup()}
+                                    </div>
+
+                                    <div class="mt-5 space-y-2.5">
                                         <button type="button" data-auth-gate-action="submit" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} auth-gate-submit auth-gate-action-locked">
                                             <i data-lucide="${showRegister ? 'user-plus' : 'log-in'}" class="h-4 w-4"></i>${showRegister ? authText.submitRegister : authText.submitLogin}
                                         </button>
-                                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} auth-gate-social auth-gate-action-locked">
+                                        <p class="text-center text-[10px] font-bold uppercase tracking-[0.22em] text-sage">${authText.orDivider || 'or'}</p>
+                                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })} auth-gate-social auth-gate-action-locked">
                                             <i data-lucide="globe-2" class="h-4 w-4"></i>${authText.continueGoogle}
                                         </button>
                                         ${localTestModeButtonMarkup('local-test-mode-auth')}
@@ -8254,15 +8363,55 @@
         }
 
         function getAgreementCopy() {
-            return {
-                readPrivacy: 'Ik heb het',
-                privacyName: 'privacybeleid',
-                readTerms: 'Ik heb de',
-                agreeTerms: 'Ik heb de',
-                termsName: 'gebruiksvoorwaarden',
-                readSuffix: 'gelezen en ga akkoord',
-                needAgreements: 'Lees het privacybeleid en de gebruiksvoorwaarden voordat je verdergaat.'
+            const lang = getActiveUiLanguage();
+            const dictionary = {
+                en: {
+                    readPrivacy: 'I have read the',
+                    privacyName: 'privacy policy',
+                    readTerms: 'I have read the',
+                    agreeTerms: 'I have read the',
+                    termsName: 'terms of use',
+                    readSuffix: 'and agree',
+                    needAgreements: 'Read the privacy policy and terms of use before you continue.'
+                },
+                nl: {
+                    readPrivacy: 'Ik heb het',
+                    privacyName: 'privacybeleid',
+                    readTerms: 'Ik heb de',
+                    agreeTerms: 'Ik heb de',
+                    termsName: 'gebruiksvoorwaarden',
+                    readSuffix: 'gelezen en ga akkoord',
+                    needAgreements: 'Lees het privacybeleid en de gebruiksvoorwaarden voordat je verdergaat.'
+                },
+                fr: {
+                    readPrivacy: 'J\'ai lu la',
+                    privacyName: 'politique de confidentialité',
+                    readTerms: 'J\'ai lu les',
+                    agreeTerms: 'J\'ai lu les',
+                    termsName: 'conditions d\'utilisation',
+                    readSuffix: 'et j\'accepte',
+                    needAgreements: 'Lisez la politique de confidentialité et les conditions d\'utilisation avant de continuer.'
+                },
+                de: {
+                    readPrivacy: 'Ich habe die',
+                    privacyName: 'Datenschutzerklärung',
+                    readTerms: 'Ich habe die',
+                    agreeTerms: 'Ich habe die',
+                    termsName: 'Nutzungsbedingungen',
+                    readSuffix: 'gelesen und stimme zu',
+                    needAgreements: 'Bitte Datenschutzerklärung und Nutzungsbedingungen lesen, bevor du weitermachst.'
+                },
+                es: {
+                    readPrivacy: 'He leído la',
+                    privacyName: 'política de privacidad',
+                    readTerms: 'He leído las',
+                    agreeTerms: 'He leído las',
+                    termsName: 'condiciones de uso',
+                    readSuffix: 'y acepto',
+                    needAgreements: 'Lee la política de privacidad y las condiciones de uso antes de continuar.'
+                }
             };
+            return dictionary[lang] || dictionary.en;
         }
 
         function authAgreementsChecked() {
@@ -13015,8 +13164,12 @@
         }
 
         function isNotebookShortViewport() {
+            // Only phone layouts use the short packing path. Desktop content height
+            // often sits under 760px because of chrome, which wrongly limited page 1.
+            const isPhoneWidth = window.matchMedia('(max-width: 767px)').matches;
+            if (!isPhoneWidth) return false;
             const viewportHeight = contentDiv?.clientHeight || window.innerHeight || 0;
-            return viewportHeight > 0 && viewportHeight < 760;
+            return viewportHeight > 0 && viewportHeight < 640;
         }
 
         function getNotebookRecipeSpreads(recipe) {
@@ -13027,7 +13180,7 @@
             const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
             const overviewIngredientCount = isCompactNotebook
                 ? ingredients.length
-                : (isShortNotebook ? 2 : 5);
+                : Math.min(ingredients.length, 7);
             const extraIngredientPageSize = isShortNotebook ? 3 : (isCompactNotebook ? 5 : 7);
             const firstInstructionPageSize = isShortNotebook ? 2 : (isCompactNotebook ? 3 : 4);
             const extraInstructionPageSize = isShortNotebook ? 3 : (isCompactNotebook ? 4 : 5);
