@@ -686,18 +686,22 @@
             padding: 0.35rem 0 0.55rem;
         }
 
-        button.auth-gate-submit,
-        button.auth-gate-social,
-        button.auth-gate-submit:hover,
-        button.auth-gate-social:hover {
+        button.auth-gate-submit:not(.auth-gate-action-locked),
+        button.auth-gate-social:not(.auth-gate-action-locked),
+        button.auth-gate-submit:not(.auth-gate-action-locked):hover,
+        button.auth-gate-social:not(.auth-gate-action-locked):hover {
             background-color: #929D75 !important;
             border-color: #929D75 !important;
             color: #1c1410 !important;
+            opacity: 1;
         }
 
         button.auth-gate-action-locked,
         button.auth-gate-action-locked:hover {
-            opacity: 0.5;
+            background-color: #d9d4cc !important;
+            border-color: #d9d4cc !important;
+            color: #8a7a70 !important;
+            opacity: 1;
             pointer-events: none;
         }
 
@@ -8193,10 +8197,10 @@
 
                                     <div class="mt-6 space-y-3">
                                         ${authAgreementFieldsMarkup()}
-                                        <button type="button" data-auth-gate-action="submit" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} auth-gate-submit auth-gate-action-locked">
+                                        <button type="button" data-auth-gate-action="submit" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' }).replace('text-white', '')} auth-gate-submit auth-gate-action-locked">
                                             <i data-lucide="${showRegister ? 'user-plus' : 'log-in'}" class="h-4 w-4"></i>${showRegister ? authText.submitRegister : authText.submitLogin}
                                         </button>
-                                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} auth-gate-social auth-gate-action-locked">
+                                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' }).replace('text-white', '')} auth-gate-social auth-gate-action-locked">
                                             <i data-lucide="globe-2" class="h-4 w-4"></i>${authText.continueGoogle}
                                         </button>
                                         ${localTestModeButtonMarkup('local-test-mode-auth')}
@@ -12603,13 +12607,13 @@
                     id: 'terms',
                     kicker: 'Voorwaarden',
                     title: 'Gebruiksvoorwaarden',
-                    intro: 'Deze voorwaarden leggen uit hoe je Uculi op dit apparaat gebruikt.',
+                    intro: 'Deze voorwaarden leggen uit hoe je Uculi gebruikt, met of zonder account.',
                     sections: [
                         ['Toegestaan gebruik', 'Voeg geen schadelijk, haatdragend, expliciet, illegaal of beledigend materiaal toe.'],
-                        ['Jouw recepten', 'Jij blijft eigenaar van recepten en notities die je schrijft. Uculi bewaart ze lokaal voor je account op dit apparaat.'],
-                        ['Account', 'Jij bent verantwoordelijk voor de naam, het e-mailadres en de recepten onder je login.'],
+                        ['Jouw recepten', 'Jij blijft eigenaar van recepten en notities die je schrijft. Zonder account blijven ze in je browser. Met een account worden ze opgeslagen in Google Firebase, project mholt-uculi.'],
+                        ['Account', 'Je logt in met e-mail en wachtwoord, of met Google. Bij Google gebruiken we alleen je naam en je e-mailadres. Jij bent verantwoordelijk voor de naam, het e-mailadres en de recepten onder je login.'],
                         ['Geen medisch advies', 'Uculi is een receptenschrift. Het geeft geen medisch, voedings- of allergieadvies.'],
-                        ['Wijzigingen', `Het schrift kan veranderen om betrouwbaar en veilig te blijven. Deze voorwaarden zijn versie ${AGREEMENT_VERSION}.`]
+                        ['Wijzigingen', `Het schrift kan veranderen om betrouwbaar en veilig te blijven. Deze voorwaarden zijn versie ${AGREEMENT_VERSION}. [Nog in te vullen: officiële naam, adres en contact van de aanbieder.]`]
                     ]
                 };
             }
@@ -12617,13 +12621,13 @@
                 id: 'privacy',
                 kicker: 'Privacy',
                 title: 'Privacybeleid',
-                intro: 'Dit beleid legt uit wat Uculi op dit apparaat bewaart.',
+                intro: 'Dit beleid legt uit wat Uculi bewaart, en waar dat staat.',
                 sections: [
-                    ['Wat wordt bewaard', 'Je naam, e-mail, recepten, notities en instellingen blijven in deze browser bij je account.'],
-                    ['Waarom', 'Zodat je je eigen recepten kunt openen, bewerken en verwijderen zonder ze naar een live clouddienst te sturen.'],
-                    ['Jouw keuzes', 'Je kunt recepten bewerken of verwijderen, uitloggen en de opgeslagen gegevens van deze browser wissen.'],
-                    ['Cloud', 'Live synchronisatie, publiceren en gedeelde families horen niet bij dit lokale schrift.'],
-                    ['Rechten', 'Je kunt inzage, correctie, export of verwijdering vragen van de gegevens die voor je account zijn opgeslagen.']
+                    ['Zonder account', 'Zonder account blijft alles lokaal in je browser op dit apparaat. Er gaat dan niets naar een server.'],
+                    ['Met een account', 'Met een account worden je gegevens opgeslagen in Google Firebase, project mholt-uculi. Dat geldt voor Firestore en voor Authentication. Inloggen kan met e-mail en wachtwoord, of met Google. Bij Google gebruiken we alleen je naam en je e-mailadres.'],
+                    ['Akkoordmoment', 'Maak je een account, dan bewaren we ook het moment waarop je akkoord ging. Dat staat in Firestore op users/{uid}/private/agreement, met de voorwaardenversie en het tijdstip.'],
+                    ['Jouw keuzes', 'Je kunt recepten bewerken of verwijderen en uitloggen. Zonder account wis je de gegevens in deze browser. Met een account kun je inzage, correctie of verwijdering vragen van wat in Firebase staat.'],
+                    ['Verantwoordelijke', '[Nog in te vullen: officiële naam, adres en contact van de verantwoordelijke.]']
                 ]
             };
         }
