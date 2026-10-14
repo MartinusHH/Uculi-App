@@ -945,14 +945,22 @@
             outline: none;
         }
 
-        .shop-empty {
+        .shop-empty,
+        .browse-empty,
+        .sheet-empty {
             display: grid;
-            gap: 0.65rem;
+            gap: 0.55rem;
             justify-items: start;
-            padding: 1.25rem 0.15rem 0.35rem;
+            padding: 1.5rem 1.15rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1.25rem;
+            background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
         }
 
-        .shop-empty h3 {
+        .shop-empty h3,
+        .browse-empty h3,
+        .sheet-empty h3 {
             margin: 0;
             color: #1c1410;
             font-family: Fraunces, serif;
@@ -961,13 +969,19 @@
             line-height: 1.15;
         }
 
-        .shop-empty p {
+        .shop-empty p,
+        .browse-empty p,
+        .sheet-empty p {
             margin: 0;
-            max-width: 34ch;
+            max-width: 42ch;
             color: #6d5f55;
             font-size: 0.95rem;
             font-weight: 600;
             line-height: 1.45;
+        }
+
+        .detail-action-label {
+            display: none;
         }
 
         @media (min-width: 900px) {
@@ -1002,8 +1016,14 @@
                 display: inline;
             }
 
-            .shop-empty {
-                padding: 2rem 0.5rem 1rem;
+            .shop-empty,
+            .browse-empty,
+            .sheet-empty {
+                padding: 2rem 1.5rem;
+            }
+
+            .detail-action-label {
+                display: inline;
             }
         }
 
@@ -1066,35 +1086,6 @@
             font-size: 1rem;
             font-weight: 600;
             outline: none;
-        }
-
-        .browse-empty {
-            display: grid;
-            gap: 0.55rem;
-            justify-items: start;
-            padding: 1.5rem 1.15rem;
-            border: 1px solid rgba(28, 20, 16, 0.08);
-            border-radius: 1.25rem;
-            background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
-            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
-        }
-
-        .browse-empty h3 {
-            margin: 0;
-            color: #1c1410;
-            font-family: Fraunces, serif;
-            font-size: clamp(1.45rem, 2.6vw, 1.9rem);
-            font-weight: 700;
-            line-height: 1.15;
-        }
-
-        .browse-empty p {
-            margin: 0;
-            max-width: 42ch;
-            color: #6d5f55;
-            font-size: 0.95rem;
-            font-weight: 600;
-            line-height: 1.45;
         }
 
         .browse-grid {
@@ -1182,10 +1173,6 @@
 
             .browse-card-action-label {
                 display: inline;
-            }
-
-            .browse-empty {
-                padding: 2rem 1.5rem;
             }
         }
 
@@ -5140,7 +5127,8 @@
             }
 
             .cook-nav {
-                max-width: 42rem;
+                max-width: none;
+                width: 100%;
             }
         }
 
@@ -6814,6 +6802,10 @@
                 '"': '&quot;',
                 "'": '&#39;'
             }[char]));
+        }
+
+        function cssUrl(value = '') {
+            return `url("${String(value || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"')}")`;
         }
 
         function showTemporaryFeatureOffline(featureName, detail = '') {
@@ -10917,10 +10909,11 @@
 
         function renderDetailIconAction(label, iconName, onClick, variant = 'secondary', extraClasses = '', iconOnly = false) {
             const safeLabel = escapeHTML(label);
+            const showDesktopLabel = iconOnly;
             return `
                 <div class="flex" translate="no">
-                    <button onclick="${onClick}" aria-label="${safeLabel}" title="${safeLabel}" class="${getAppButtonClasses(variant, { size: 'md', iconOnly })}${iconOnly ? '' : ' min-w-[8.75rem]'} ${extraClasses}">
-                        <i data-lucide="${iconName}" class="h-5 w-5"></i>${iconOnly ? '' : `<span class="text-[11px] font-bold uppercase tracking-[0.16em]">${safeLabel}</span>`}
+                    <button onclick="${onClick}" aria-label="${safeLabel}" title="${safeLabel}" class="${getAppButtonClasses(variant, { size: 'md', iconOnly: false })}${showDesktopLabel ? '' : ' min-w-[8.75rem]'} ${extraClasses}">
+                        <i data-lucide="${iconName}" class="h-5 w-5"></i><span class="${showDesktopLabel ? 'detail-action-label text-[11px] font-bold uppercase tracking-[0.16em]' : 'text-[11px] font-bold uppercase tracking-[0.16em]'}">${safeLabel}</span>
                     </button>
                 </div>
             `;
@@ -11644,6 +11637,12 @@
             const helpLabel = 'Help';
             const addLabel = nl ? 'Recept' : 'Add Recipe';
             const backLabel = nl ? 'Terug' : 'Back';
+            const navLabels = {
+                index: 'Index',
+                shopping: 'Shop',
+                browse: 'Browse',
+                profile: nl ? 'Profiel' : 'Profile'
+            };
             if (gear) {
                 gear.setAttribute('aria-label', optionsLabel);
                 gear.title = optionsLabel;
@@ -11667,6 +11666,15 @@
                 const backText = back.querySelector('.header-icon-label');
                 if (backText) backText.textContent = backLabel;
             }
+            document.querySelectorAll('#main-nav .app-nav-button[data-nav-view]').forEach(button => {
+                const view = button.getAttribute('data-nav-view');
+                const label = navLabels[view];
+                if (!label) return;
+                button.setAttribute('aria-label', label);
+                button.title = label;
+                const text = button.querySelector('.app-nav-label');
+                if (text) text.textContent = label;
+            });
         }
 
         function syncHeaderBackButton() {
@@ -13302,9 +13310,9 @@
                 <div class="profile-sheet">
                     <div class="profile-layout">
                         <section class="profile-hero">
-                            <div class="profile-banner" style="background-image: url(&quot;${bannerBg}&quot;)"></div>
+                            <div class="profile-banner" style="background-image: ${cssUrl(bannerBg)}"></div>
                             <div class="profile-identity">
-                                <div class="profile-avatar" style="background-image: url(&quot;${profileBg}&quot;)" role="img" aria-label="${escapeHTML(userSettings.name || t.yourProfile)}"></div>
+                                <div class="profile-avatar" style="background-image: ${cssUrl(profileBg)}" role="img" aria-label="${escapeHTML(userSettings.name || t.yourProfile)}"></div>
                                 <div class="profile-copy">
                                     <h2 class="profile-name">${escapeHTML(userSettings.name || t.yourProfile)}</h2>
                                     <button type="button" class="profile-place ${hasCountry ? '' : 'is-placeholder'}" onclick="renderProfileEditor()">${escapeHTML(placeText)}</button>
@@ -13436,16 +13444,16 @@
                             <label class="custom-file-upload w-full block">
                                 <span class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">${nl ? 'Banner' : 'Profile banner'}</span>
                                 <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-banner-preview', 'bannerPic', true)">
-                                <div id="profile-banner-preview" class="w-full h-36 md:h-44 rounded-2xl bg-cover bg-center border border-parchmentDark flex items-center justify-center group" style="background-image: url('${bannerBg}')">
-                                    <div class="bg-white/90 px-3 py-1.5 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center gap-2 text-xs font-bold text-forest">
-                                        <i data-lucide="upload" class="w-4 h-4"></i> ${nl ? 'Banner wijzigen' : 'Change banner'}
+                                    <div id="profile-banner-preview" class="w-full h-36 md:h-44 rounded-2xl bg-cover bg-center border border-parchmentDark flex items-center justify-center group" style="background-image: ${cssUrl(bannerBg)}">
+                                        <div class="bg-white/90 px-3 py-1.5 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center gap-2 text-xs font-bold text-forest">
+                                            <i data-lucide="upload" class="w-4 h-4"></i> ${nl ? 'Banner wijzigen' : 'Change banner'}
+                                        </div>
                                     </div>
-                                </div>
-                            </label>
+                                </label>
 
                             <label class="custom-file-upload absolute -bottom-6 left-5 z-10 block">
                                 <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-avatar-preview', 'profilePic', true)">
-                                <div id="profile-avatar-preview" class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-cover bg-center border-4 border-white shadow-md flex items-center justify-center group" style="background-image: url('${profileBg}')">
+                                <div id="profile-avatar-preview" class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-cover bg-center border-4 border-white shadow-md flex items-center justify-center group" style="background-image: ${cssUrl(profileBg)}">
                                     <div class="bg-white/90 p-1.5 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"><i data-lucide="camera" class="w-5 h-5 text-forest"></i></div>
                                 </div>
                             </label>
@@ -15889,19 +15897,21 @@
 
             if (filteredRecipes.length === 0) {
                 const notebookIsEmpty = recipes.length === 0 && !hasActiveListFilters && !searchQuery.trim();
+                const indexNl = userSettings.language === 'nl';
                 html += notebookIsEmpty ? `
-                    <div class="mx-auto mt-10 max-w-xl rounded-[28px] border border-[#e4d3b6] bg-[#fbf8f3] p-8 text-center shadow-[0_18px_40px_rgba(90,64,32,0.08)]">
-                        <i data-lucide="book-open" class="mx-auto mb-4 h-16 w-16 text-gold"></i>
-                        <p class="mb-2 font-fantasy text-3xl font-bold text-forest">Your notebook is empty.</p>
-                        <p class="text-sm font-semibold text-sage">Add the first recipe. It stays on this device.</p>
-                        <button type="button" onclick="renderAddForm()" class="${getAppButtonClasses('primary', { size: 'lg' })} mt-6">
-                            <i data-lucide="plus" class="h-4 w-4"></i> Add Recipe
+                    <div class="sheet-empty mt-6">
+                        <h3>${indexNl ? 'Je notebook is leeg' : 'Your notebook is empty'}</h3>
+                        <p>${indexNl ? 'Voeg het eerste recept toe. Het blijft op dit apparaat.' : 'Add the first recipe. It stays on this device.'}</p>
+                        <button type="button" onclick="renderAddForm()" class="${getAppButtonClasses('primary', { size: 'lg' })}">
+                            <i data-lucide="plus" class="h-4 w-4"></i> ${indexNl ? 'Nieuw recept' : 'Add Recipe'}
                         </button>
                     </div>` : `
-                    <div class="text-center mt-10 p-8 rounded-[28px] border border-parchmentDark bg-[#fbf8f3]">
-                        <i data-lucide="package-open" class="w-16 h-16 mx-auto mb-4 text-sage opacity-50"></i>
-                        <p class="font-fantasy text-2xl text-forest font-bold mb-2">No recipes found.</p>
-                        <p class="text-sm opacity-80 font-semibold">Try adjusting your search or add a new one!</p>
+                    <div class="sheet-empty mt-6">
+                        <h3>${indexNl ? 'Geen recepten gevonden' : 'No recipes found'}</h3>
+                        <p>${indexNl ? 'Pas je zoekopdracht of filters aan, of voeg een nieuw recept toe.' : 'Try adjusting your search or filters, or add a new recipe.'}</p>
+                        <button type="button" onclick="renderAddForm()" class="${getAppButtonClasses('secondary', { size: 'lg' })}">
+                            <i data-lucide="plus" class="h-4 w-4"></i> ${indexNl ? 'Nieuw recept' : 'Add Recipe'}
+                        </button>
                     </div>`;
             } else if (indexViewMode === 'book') {
                 html += buildNotebookIndexView(filteredRecipes, activeFilters);
@@ -16232,9 +16242,9 @@
                 <div class="profile-sheet">
                     <div class="profile-layout">
                     <section class="profile-hero">
-                        <div class="profile-banner" style="background-image: url(&quot;${displayBanner}&quot;)"></div>
+                        <div class="profile-banner" style="background-image: ${cssUrl(displayBanner)}"></div>
                         <div class="profile-identity">
-                            <div class="profile-avatar" style="background-image: url(&quot;${displayPhoto}&quot;)"></div>
+                            <div class="profile-avatar" style="background-image: ${cssUrl(displayPhoto)}"></div>
                             <div class="profile-copy">
                                 <h2 class="profile-name">${escapeHTML(displayName)}</h2>
                                 <p class="profile-place">${escapeHTML(displayCountry)}</p>
@@ -16421,7 +16431,7 @@
                     const safeTitleAttr = escapeHTML(String(recipe.title || 'Untitled').replace(/'/g, "&#39;"));
                     html += `
                         <article onclick="renderPublishedRecipeDetail('${recipe.id}')" class="browse-card group">
-                            <div class="browse-card-media" style="background-image: url('${recipe.profile || defaultPlaceholderProfile}')"></div>
+                            <div class="browse-card-media" style="background-image: ${cssUrl(recipe.profile || defaultPlaceholderProfile)}"></div>
                             <div class="browse-card-body">
                                 <h3>${titleLabel}</h3>
                                 ${recipe.authorId && !owned
@@ -17728,7 +17738,9 @@
                     ${savedRecipeIsOutdated ? renderDetailIconAction('Update warning', 'alert-circle', `toggleSavedRecipeUpdateNotice(${recipe.id})`, 'warning', '', true) : ''}
                     <button onclick="toggleCookingMode(${recipe.id})" class="detail-cook-toggle-btn inline-flex h-11 items-center justify-center gap-2 rounded-xl transition-all bg-gold text-white font-bold text-xs uppercase tracking-wider px-4 hover:bg-opacity-90">
                         <i id="focus-btn-icon" data-lucide="${isCookingMode ? 'x-circle' : 'chef-hat'}" class="h-4 w-4"></i>
-                        <span id="focus-btn-text">${isCookingMode ? 'Exit Cooking' : 'Cook Mode'}</span>
+                        <span id="focus-btn-text">${isCookingMode
+                            ? (userSettings.language === 'nl' ? 'Stop koken' : 'Exit Cooking')
+                            : (userSettings.language === 'nl' ? 'Kookmodus' : 'Cook Mode')}</span>
                     </button>
                     ${primarySupportAction}
                     ${!isSavedCommunityRecipe && versionHistoryCount > 0 ? renderDetailIconAction(`History (${versionHistoryCount})`, 'history', `showRecipeVersionHistory(${recipe.id})`, 'secondary', '', true) : ''}
@@ -17751,20 +17763,20 @@
             }
 
             contentDiv.innerHTML = `
-                <div class="cook-mode-bar" role="banner" aria-label="Cooking mode controls">
-                    <button type="button" onclick="exitCookingMode()" id="cooking-mode-exit-btn" class="cooking-mode-exit-btn" aria-label="Stop cooking and go back to the recipe">
+                <div class="cook-mode-bar" role="banner" aria-label="${userSettings.language === 'nl' ? 'Kookmodus' : 'Cooking mode controls'}">
+                    <button type="button" onclick="exitCookingMode()" id="cooking-mode-exit-btn" class="cooking-mode-exit-btn" aria-label="${userSettings.language === 'nl' ? 'Stop met koken en ga terug naar het recept' : 'Stop cooking and go back to the recipe'}">
                         <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
-                        <span class="cook-mode-exit-label">Stop<span class="cook-mode-exit-label-long"> cooking</span></span>
+                        <span class="cook-mode-exit-label">${userSettings.language === 'nl' ? 'Stoppen' : 'Stop'}<span class="cook-mode-exit-label-long">${userSettings.language === 'nl' ? '' : ' cooking'}</span></span>
                     </button>
                     <p class="cook-mode-title">${escapeHTML(recipe.title)}</p>
                 </div>
                 <div class="detail-shell push-sheet bg-white rounded-sm shadow-sm mb-6 border border-parchmentDark relative w-full">
                     <div class="detail-hero-shell rounded-t-sm">
                         <div class="detail-hero-wash" aria-hidden="true">
-                            <div class="detail-hero-wash-image" style="background-image: url('${headerBg}')"></div>
+                            <div class="detail-hero-wash-image" style="background-image: ${cssUrl(headerBg)}"></div>
                         </div>
                         <div class="detail-hero-frame">
-                            <div class="detail-hero-portrait" style="background-image: url('${headerBg}')"></div>
+                            <div class="detail-hero-portrait" style="background-image: ${cssUrl(headerBg)}"></div>
                             <div class="detail-hero-copy">
                                 <p class="detail-hero-kicker">${recipeLocationLabel}</p>
                                 <h2 class="detail-hero-title">${recipe.title}</h2>
