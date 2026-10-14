@@ -1434,6 +1434,18 @@
             width: min(100%, 72rem);
         }
 
+        @media (min-width: 900px) {
+            .guide-modal {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.85rem;
+            }
+
+            .guide-modal > div {
+                height: 100%;
+            }
+        }
+
         .app-modal-body {
             flex: 1 1 auto;
             overflow-y: auto;
@@ -13321,27 +13333,32 @@
         }
 
         function showAppInfo() {
-            createModal('About Uculi', `
-                <div class="space-y-4 text-inkDark p-4 max-h-[70vh] overflow-y-auto w-[650px] max-w-[90vw]">
+            const nl = userSettings.language === 'nl';
+            createModal(nl ? 'Over Uculi' : 'About Uculi', `
+                <div class="guide-modal space-y-4 text-inkDark p-2 max-h-[70vh] overflow-y-auto">
                     <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
-                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">Brand</p>
+                        <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${nl ? 'Merk' : 'Brand'}</p>
                         <h3 class="mt-2 flex items-center gap-2 font-serif text-lg font-bold text-forest"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</h3>
-                        <p class="mt-2 text-sm font-semibold text-sage">Built for calm recipe keeping, clean exports, and a personal archive that still feels warm.</p>
+                        <p class="mt-2 text-sm font-semibold text-sage">${nl
+                            ? 'Uculi is een rustig receptenschrift: bewaren, koken en later delen zonder rommel.'
+                            : 'Uculi is a calm recipe notebook: keep, cook, and later share without clutter.'}</p>
                     </div>
-                    <h3 class="font-serif font-bold text-lg mb-2">Family Recipe Books</h3>
-                    <p class="text-sm">Family collaboration is a Premium feature. When it is enabled, you can create or join up to 3 shared books and keep collaborative versions of recipes together.</p>
-                    <ul class="text-sm list-disc pl-5 space-y-1 my-2">
-                        <li><strong>Rights:</strong> All active members can edit family recipes.</li>
-                        <li><strong>Limit:</strong> Maximum 3 families per user.</li>
-                        <li><strong>Publishing family recipes:</strong> Public upload is locked behind a family vote in Notifications. A majority is required within 24 hours, otherwise upload is refused.</li>
-                        <li><strong>Public unpublish timing (personal recipes):</strong> During the first hour after publish you can unpublish instantly. After that, unpublish is scheduled and goes live after 24 hours.</li>
-                        <li><strong>Admin moderation:</strong> Admin accounts can force published recipes offline immediately, scan duplicate publications, and run harmful-content checks.</li>
-                        <li><strong>History:</strong> The last 5 edits of a recipe are saved automatically.</li>
-                        <li><strong>If you are removed:</strong> You get a 30-day grace period to review the shared recipes and copy them into your own collection if you still need them.</li>
-                    </ul>
-                    <p class="text-sm font-bold text-coral">Premium unlocks notebook mode, sharing, downloads, cloud sync, and family collaboration. Free mode remains local-only on this device.</p>
+                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${nl ? 'Soft launch' : 'Soft launch'}</p>
+                        <p class="mt-2 text-sm text-sage">${nl
+                            ? 'Nu staan accounts, je lokale archief, notebook/kookmodus en Opties centraal. Betaalde Premium (Stripe) en volledige family-cloud komen in een volgende ronde.'
+                            : 'Right now the focus is accounts, your local archive, notebook/cook mode, and Options. Paid Premium (Stripe) and full family-cloud land in a later round.'}</p>
+                    </div>
+                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Free / Premium</p>
+                        <ul class="mt-2 space-y-1.5 text-sm text-sage list-disc pl-5">
+                            <li>${nl ? 'Free blijft lokaal op dit apparaat, met een klein aantal eigen recepten.' : 'Free stays local on this device, with a small number of your own recipes.'}</li>
+                            <li>${nl ? 'Premium ontgrendelt notebook, backups, cloud sync, publiceren en families zodra billing live is.' : 'Premium unlocks notebook, backups, cloud sync, publishing, and families once billing is live.'}</li>
+                            <li>${nl ? 'Testmodus Premium is alleen voor preview tijdens ontwikkeling.' : 'Testmodus Premium is preview-only during development.'}</li>
+                        </ul>
+                    </div>
                 </div>
-            `, [{ text: 'Close', primary: true, onClick: () => closeModal() }]);
+            `, [{ text: nl ? 'Sluiten' : 'Close', primary: true, onClick: () => closeModal() }]);
         }
 
         function showInteractiveTutorial(step = 0, manualOpen = false) {
@@ -13480,48 +13497,38 @@
         }
 
         function showUsageGuide() {
-            createModal('Usage Guide / Q&A', `
-                <div class="space-y-4 text-inkDark p-2 max-h-[68vh] overflow-y-auto">
-                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Shopping List</p>
-                        <p class="mt-2 text-sm font-semibold text-forest">Q: Why do items merge?</p>
-                        <p class="mt-1 text-sm text-sage">A: Uculi merges matching labels to keep lists clean. Source recipe links are preserved in each item.</p>
-                    </div>
-                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Color Meanings</p>
-                        <p class="mt-2 text-sm text-sage"><strong class="text-forest">Gold:</strong> highlight or premium emphasis. <strong class="text-forest">Forest:</strong> primary action. <strong class="text-forest">Coral:</strong> caution or destructive action.</p>
-                    </div>
-                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Family Collaboration</p>
-                        <p class="mt-2 text-sm font-semibold text-forest">Q: How does delete safety work in family books?</p>
-                        <p class="mt-1 text-sm text-sage">A: Family deletions trigger a vote, any member can veto, and unresolved votes auto-resolve after 72 hours based on current vote state.</p>
-                    </div>
-                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Publishing Rules</p>
-                        <p class="mt-2 text-sm font-semibold text-forest">Q: How does unpublish timing work for personal recipes?</p>
-                        <p class="mt-1 text-sm text-sage">A: In the first hour after publishing, unpublish is immediate. After that first hour, pressing the cloud action schedules unpublish and the recipe goes offline after 24 hours.</p>
-                    </div>
-                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Family Publishing</p>
-                        <p class="mt-2 text-sm font-semibold text-forest">Q: Why can I not publish a family recipe directly?</p>
-                        <p class="mt-1 text-sm text-sage">A: Family recipes are never published directly. Clicking publish starts a family notification vote. Upload only proceeds when a majority approves within 24 hours. No majority or no vote means no upload; publish is then only possible after saving the recipe as personal.</p>
-                    </div>
-                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Admin Accounts</p>
-                        <p class="mt-2 text-sm font-semibold text-forest">Q: How do I turn admin on/off for an account?</p>
-                        <p class="mt-1 text-sm text-sage">A: Open Settings > Admin & Safety. Enter an email and use "Set admin" to grant rights, or use "Remove admin" next to an existing admin email. The first signed-in account on a clean setup is auto-bootstrapped as initial admin.</p>
-                    </div>
-                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Safety Automation</p>
-                        <p class="mt-2 text-sm font-semibold text-forest">Q: Is there automatic duplicate or harmful-content moderation?</p>
-                        <p class="mt-1 text-sm text-sage">A: Yes. In Settings > Admin & Safety you can run duplicate scans and harmful-content scans manually, or enable duplicate auto-cleanup. Harmful-content guard can also block new publish attempts before they go live.</p>
-                    </div>
-                    <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Notebook Controls</p>
-                        <p class="mt-2 text-sm text-sage">Use notebook view for spread reading, sticky notes, and cook mode. On mobile, page controls appear below the spread for easier navigation.</p>
-                    </div>
+            const nl = userSettings.language === 'nl';
+            const qa = (kicker, q, a) => `
+                <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${kicker}</p>
+                    <p class="mt-2 text-sm font-semibold text-forest">${q}</p>
+                    <p class="mt-1 text-sm text-sage">${a}</p>
+                </div>`;
+            const cards = nl ? [
+                qa('Starten', 'Waar beginnen?', 'Maak of open een account, voeg recepten toe via Add Recipe, en wissel onderaan tussen Index, Shop, Browse en Profiel. Opties open je via Back/Help of het tandwiel.'),
+                qa('Free vs Premium', 'Wat kan ik nu?', 'Free bewaart recepten lokaal op dit apparaat (beperkt aantal eigen recepten). Premium-features zoals notebook, backups, cloud sync, publiceren en families staan klaar in de app, maar betaalde Stripe-unlock komt in een volgende ronde. Testmodus Premium is alleen preview.'),
+                qa('Notebook & koken', 'Hoe werkt kookmodus?', 'Kies Book-weergave of open Cook op een recept. Stel eerst de minuten per stap in, start daarna. Stop cooking of Leave cooking mode brengt je terug; Escape werkt ook op desktop.'),
+                qa('Boodschappenlijst', 'Waarom worden items samengevoegd?', 'Uculi voegt dezelfde labels samen om de lijst schoon te houden. Koppelingen naar het bronrecept blijven bewaard.'),
+                qa('Publiceren', 'Hoe werkt offline/publiceren?', 'Persoonlijke recepten: in het eerste uur na publiceren is unpublish direct. Daarna plant de cloud-actie unpublish en gaat het recept na 24 uur offline. Family-publiceren en votes zijn Premium en nog in opbouw voor de soft launch.'),
+                qa('Privacy', 'Waar staan mijn gegevens?', 'Recepten en notities blijven standaard op dit apparaat. Cloud-login bereidt sync voor; sync zelf blijft Premium. Privacybeleid en voorwaarden staan onderaan in Opties.')
+            ] : [
+                qa('Getting started', 'Where do I begin?', 'Create or open an account, add recipes with Add Recipe, and use the bottom tabs for Index, Shop, Browse, and Profile. Open Options from the gear, or Back/Help when you are already in Options.'),
+                qa('Free vs Premium', 'What can I use now?', 'Free keeps recipes local on this device (limited own recipes). Premium surfaces like notebook, backups, cloud sync, publishing, and families exist in the app, but paid Stripe unlock comes in a later round. Testmodus Premium is preview-only.'),
+                qa('Notebook & cooking', 'How does cook mode work?', 'Switch to Book view or open Cook on a recipe. Adjust minutes per step, then start. Stop cooking or Leave cooking mode returns you to the recipe; Escape also works on desktop.'),
+                qa('Shopping list', 'Why do items merge?', 'Uculi merges matching labels to keep lists clean. Source recipe links stay on each item.'),
+                qa('Publishing', 'How does unpublish timing work?', 'Personal recipes: unpublish is immediate in the first hour after publishing. After that, the cloud action schedules unpublish and the recipe goes offline after 24 hours. Family publish votes are Premium and still maturing for soft launch.'),
+                qa('Privacy', 'Where is my data?', 'Recipes and notes stay on this device by default. Cloud login prepares sync; sync itself remains Premium. Privacy Policy and Terms are linked at the bottom of Options.')
+            ];
+            if (typeof isCurrentUserAdmin === 'function' && isCurrentUserAdmin()) {
+                cards.push(nl
+                    ? qa('Admin', 'Waar staan admin-tools?', 'In Opties onder Admin: accounts beheren, duplicate-scans en harmful-content scans. De eerste ingelogde account op een schone setup wordt automatisch eerste admin.')
+                    : qa('Admin', 'Where are admin tools?', 'In Options under Admin: manage admin emails, duplicate scans, and harmful-content scans. The first signed-in account on a clean setup is bootstrapped as initial admin.'));
+            }
+            createModal(nl ? 'Hulp / Q&A' : 'Usage Guide / Q&A', `
+                <div class="guide-modal space-y-4 text-inkDark p-2 max-h-[68vh] overflow-y-auto">
+                    ${cards.join('')}
                 </div>
-            `, [{ text: 'Close', primary: true, onClick: () => closeModal() }]);
+            `, [{ text: nl ? 'Sluiten' : 'Close', primary: true, onClick: () => closeModal() }]);
         }
 
         function getLegalDocument(kind) {
