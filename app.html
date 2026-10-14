@@ -474,6 +474,13 @@
                 grid-column: 1 / -1;
             }
 
+            .settings-wide-split {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1.25rem 2rem;
+                align-items: start;
+            }
+
             .settings-panel .settings-actions.button-pair {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -488,8 +495,8 @@
 
             .settings-prefs {
                 display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 0.35rem 1.25rem;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 0.2rem;
             }
 
             .settings-prefs .settings-row--full {
@@ -13209,7 +13216,7 @@
                         <h2>Opties</h2>
                         <p>${settingsNl ? 'Plan, account en archiefvoorkeuren op één plek.' : 'Plan, account, and archive preferences in one place.'}</p>
                     </header>
-                    <div class="settings-grid">
+                    <form id="settings-form" onsubmit="saveSettings(event)" class="settings-grid">
                         <section class="settings-panel">
                             <p class="settings-panel-kicker">Plan</p>
                             <div class="settings-row">
@@ -13224,51 +13231,6 @@
                                     ? `<button type="button" onclick="resetPremiumPreviewAccess()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>${settingsNl ? 'Reset preview' : 'Reset preview'}</button>`
                                     : `<button type="button" onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${purchaseRestoreLabel}" title="${purchaseRestoreLabel}"><i data-lucide="shield-check" class="w-4 h-4"></i>${purchaseRestoreLabel}</button>`}
                             </div>
-                        </section>
-
-                        <section class="settings-panel">
-                            <p class="settings-panel-kicker">Account</p>
-                            <form id="settings-form" onsubmit="saveSettings(event)" class="space-y-1">
-                                <div class="settings-row">
-                                    <span>Account</span>
-                                    <span class="settings-status">${escapeHTML(accountStatus)}</span>
-                                </div>
-                                ${offerCloudSignIn ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
-                                <div class="settings-actions button-pair">
-                                    <button type="submit" class="${getAppButtonClasses('primary', { size: 'sm' })}">
-                                        <i data-lucide="save" class="w-4 h-4"></i>${settingsNl ? 'Opslaan' : 'Save'}
-                                    </button>
-                                    ${isAuthenticated
-                                        ? `<button type="button" onclick="signOut()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="log-out" class="w-4 h-4"></i>${settingsNl ? 'Uitloggen' : 'Sign Out'}</button>`
-                                        : `<button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { size: 'sm' })} auth-gate-social auth-gate-action-locked"><i data-lucide="log-in" class="w-4 h-4"></i>Google</button>`}
-                                </div>
-                                ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'sm' })} auth-gate-social auth-gate-action-locked"><i data-lucide="link" class="w-4 h-4"></i>${settingsNl ? 'Koppel Google' : 'Link Google'}</button></div>` : ''}
-
-                                <p class="settings-panel-kicker" style="margin-top:1rem;">${settingsNl ? 'Voorkeuren' : 'Preferences'}</p>
-                                <div class="settings-prefs">
-                                    <label class="settings-row">
-                                        <span>${settingsNl ? 'Maten' : 'Measurement'}</span>
-                                        <select id="settings-measurement" class="settings-select">
-                                            <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>Metric</option>
-                                            <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>Imperial</option>
-                                        </select>
-                                    </label>
-                                    <label class="settings-row">
-                                        <span>${settingsNl ? 'Taal' : 'Language'}</span>
-                                        <select id="settings-language" class="settings-select">
-                                            <option value="en" ${userSettings.language === 'en' ? 'selected' : ''}>English</option>
-                                            <option value="nl" ${userSettings.language === 'nl' ? 'selected' : ''}>Nederlands</option>
-                                            <option value="fr" ${userSettings.language === 'fr' ? 'selected' : ''}>Français</option>
-                                            <option value="de" ${userSettings.language === 'de' ? 'selected' : ''}>Deutsch</option>
-                                            <option value="es" ${userSettings.language === 'es' ? 'selected' : ''}>Español</option>
-                                        </select>
-                                    </label>
-                                    <label class="settings-row settings-row--full">
-                                        <span>Auto-publish</span>
-                                        <input type="checkbox" id="settings-auto-publish" ${userSettings.autoPublish ? 'checked' : ''}>
-                                    </label>
-                                </div>
-                            </form>
                         </section>
 
                         <section class="settings-panel">
@@ -13287,7 +13249,55 @@
                             </div>
                         </section>
 
-                        <section class="settings-panel">
+                        <section class="settings-panel settings-panel--wide">
+                            <div class="settings-wide-split">
+                                <div>
+                                    <p class="settings-panel-kicker">Account</p>
+                                    <div class="settings-row">
+                                        <span>Account</span>
+                                        <span class="settings-status">${escapeHTML(accountStatus)}</span>
+                                    </div>
+                                    ${offerCloudSignIn ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
+                                    <div class="settings-actions button-pair">
+                                        <button type="submit" class="${getAppButtonClasses('primary', { size: 'sm' })}">
+                                            <i data-lucide="save" class="w-4 h-4"></i>${settingsNl ? 'Opslaan' : 'Save'}
+                                        </button>
+                                        ${isAuthenticated
+                                            ? `<button type="button" onclick="signOut()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="log-out" class="w-4 h-4"></i>${settingsNl ? 'Uitloggen' : 'Sign Out'}</button>`
+                                            : `<button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { size: 'sm' })} auth-gate-social auth-gate-action-locked"><i data-lucide="log-in" class="w-4 h-4"></i>Google</button>`}
+                                    </div>
+                                    ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'sm' })} auth-gate-social auth-gate-action-locked"><i data-lucide="link" class="w-4 h-4"></i>${settingsNl ? 'Koppel Google' : 'Link Google'}</button></div>` : ''}
+                                </div>
+                                <div>
+                                    <p class="settings-panel-kicker">${settingsNl ? 'Voorkeuren' : 'Preferences'}</p>
+                                    <div class="settings-prefs">
+                                        <label class="settings-row">
+                                            <span>${settingsNl ? 'Maten' : 'Measurement'}</span>
+                                            <select id="settings-measurement" class="settings-select">
+                                                <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>Metric</option>
+                                                <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>Imperial</option>
+                                            </select>
+                                        </label>
+                                        <label class="settings-row">
+                                            <span>${settingsNl ? 'Taal' : 'Language'}</span>
+                                            <select id="settings-language" class="settings-select">
+                                                <option value="en" ${userSettings.language === 'en' ? 'selected' : ''}>English</option>
+                                                <option value="nl" ${userSettings.language === 'nl' ? 'selected' : ''}>Nederlands</option>
+                                                <option value="fr" ${userSettings.language === 'fr' ? 'selected' : ''}>Français</option>
+                                                <option value="de" ${userSettings.language === 'de' ? 'selected' : ''}>Deutsch</option>
+                                                <option value="es" ${userSettings.language === 'es' ? 'selected' : ''}>Español</option>
+                                            </select>
+                                        </label>
+                                        <label class="settings-row settings-row--full">
+                                            <span>Auto-publish</span>
+                                            <input type="checkbox" id="settings-auto-publish" ${userSettings.autoPublish ? 'checked' : ''}>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="settings-panel settings-panel--wide">
                             <p class="settings-panel-kicker">${settingsNl ? 'Juridisch' : 'Legal'}</p>
                             <div class="settings-legal">
                                 <button type="button" onclick="showPrivacyPolicy()" class="settings-row">
@@ -13302,7 +13312,7 @@
                         </section>
 
                         ${isCurrentUserAdmin() ? `<section class="settings-panel settings-panel--wide"><p class="settings-panel-kicker">Admin</p>${adminManagementContent}</section>` : ''}
-                    </div>
+                    </form>
                 </div>
             `;
             lucide.createIcons();
