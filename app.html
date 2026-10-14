@@ -808,20 +808,203 @@
         }
 
         .quick-add-submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
             flex-shrink: 0;
             width: 2.75rem;
             height: 2.75rem;
-            margin-right: 0.25rem;
+            margin-right: 0.35rem;
+            padding: 0;
             border: 1px solid #929D75;
             border-radius: 0.75rem;
             background: #929D75;
             color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
         }
 
         .quick-add-submit:hover {
-            background: #929D75;
-            border-color: #929D75;
+            background: #8f9a6f;
+            border-color: #8f9a6f;
             color: #1c1410;
+        }
+
+        .quick-add-label {
+            display: none;
+        }
+
+        .shop-sheet {
+            max-width: none;
+            width: 100%;
+            margin: 0 auto 2rem;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            overflow: visible;
+        }
+
+        .shop-hero {
+            display: grid;
+            gap: 0.85rem;
+            margin-bottom: 1rem;
+        }
+
+        .shop-hero-copy h2 {
+            margin: 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.8rem, 3vw, 2.45rem);
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .shop-hero-copy p {
+            margin: 0.4rem 0 0;
+            color: #8a7a70;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .shop-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .shop-stat-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .shop-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            min-height: 2.2rem;
+            padding: 0.35rem 0.75rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 999px;
+            background: rgba(255, 253, 249, 0.92);
+            color: #5c5148;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+        }
+
+        .shop-layout {
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .shop-panel {
+            padding: 1rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1.25rem;
+            background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
+        }
+
+        .shop-panel-kicker {
+            margin: 0 0 0.75rem;
+            color: #8a7a70;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .shop-quick-add {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.35rem 0.35rem 0.35rem 0.85rem;
+            border: 1px solid rgba(28, 20, 16, 0.1);
+            border-radius: 1rem;
+            background: #fffdf9;
+        }
+
+        .shop-quick-add input {
+            flex: 1 1 auto;
+            min-width: 0;
+            height: 2.75rem;
+            border: 0;
+            background: transparent;
+            color: #1c1410;
+            font-size: 1rem;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .shop-empty {
+            display: grid;
+            gap: 0.65rem;
+            justify-items: start;
+            padding: 1.25rem 0.15rem 0.35rem;
+        }
+
+        .shop-empty h3 {
+            margin: 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.45rem, 2.6vw, 1.9rem);
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        .shop-empty p {
+            margin: 0;
+            max-width: 34ch;
+            color: #6d5f55;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        @media (min-width: 900px) {
+            .shop-hero {
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: end;
+                gap: 1rem 1.5rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .shop-layout {
+                grid-template-columns: minmax(17rem, 0.85fr) minmax(0, 1.35fr);
+                gap: 1.15rem;
+                align-items: start;
+            }
+
+            .shop-panel {
+                padding: 1.2rem 1.25rem 1.15rem;
+            }
+
+            .shop-panel--list {
+                min-height: 22rem;
+            }
+
+            .quick-add-submit {
+                width: auto;
+                min-width: 5.5rem;
+                padding: 0 1rem;
+            }
+
+            .quick-add-label {
+                display: inline;
+            }
+
+            .shop-empty {
+                padding: 2rem 0.5rem 1rem;
+            }
         }
 
         button.app-btn-primary,
@@ -15426,100 +15609,109 @@
                 : '';
 
             const pendingGroups = shoppingListAssigneeGroups(pendingItems, shoppingList.collaborators);
-            const pendingMarkup = pendingItems.length > 0
-                ? pendingGroups.map(group => `
-                    <section class="space-y-3">
-                        <h3 class="text-[11px] font-bold uppercase tracking-[0.22em] text-sage">${escapeHTML(group.title)}</h3>
-                        <div class="space-y-3">${group.items.map(item => renderShoppingListItem(item)).join('')}</div>
-                    </section>
-                `).join('')
+            const pendingMarkup = pendingGroups.map(group => `
+                <section class="space-y-3">
+                    <h3 class="text-[11px] font-bold uppercase tracking-[0.22em] text-sage">${escapeHTML(group.title)}</h3>
+                    <div class="space-y-3">${group.items.map(item => renderShoppingListItem(item)).join('')}</div>
+                </section>
+            `).join('');
+
+            const shopNl = userSettings.language === 'nl';
+            const pendingLabel = shopNl
+                ? `${pendingItems.length} te halen`
+                : `${pendingItems.length} to pick up`;
+            const checkedLabel = shopNl
+                ? `${checkedItems.length} afgevinkt`
+                : `${checkedItems.length} checked`;
+            const recipeLabel = shopNl
+                ? `${recipeLinkedCount} uit recepten`
+                : `${recipeLinkedCount} from recipes`;
+
+            const pendingSection = pendingItems.length > 0
+                ? pendingMarkup
                 : `
-                    <div class="rounded-2xl border border-dashed border-parchmentDark bg-parchment p-6 text-center shadow-sm">
-                        <i data-lucide="shopping-basket" class="mx-auto h-10 w-10 text-gold opacity-80"></i>
-                        <p class="mt-4 font-fantasy text-2xl font-bold text-forest">Nothing left to pick up.</p>
-                        <p class="mt-2 text-sm font-semibold leading-relaxed text-sage">Add ingredients or a custom item.</p>
+                    <div class="shop-empty">
+                        <i data-lucide="shopping-basket" class="h-8 w-8 text-gold"></i>
+                        <h3>${shopNl ? 'Nog niets te halen' : 'Nothing to pick up yet'}</h3>
+                        <p>${shopNl
+                            ? 'Voeg snel een item toe, of zet ingrediënten vanaf een recept op de lijst.'
+                            : 'Quick-add an item, or send ingredients here from a recipe.'}</p>
+                        <button type="button" onclick="document.getElementById('shopping-list-custom-name')?.focus()" class="${getAppButtonClasses('primary', { size: 'sm' })}">
+                            <i data-lucide="plus" class="h-4 w-4"></i>${shopNl ? 'Item toevoegen' : 'Add an item'}
+                        </button>
                     </div>
                 `;
 
-            const checkedMarkup = checkedItems.length > 0
-                ? checkedItems.map(item => renderShoppingListItem(item)).join('')
-                : `
-                    <div class="rounded-2xl border border-dashed border-parchmentDark bg-white p-5 shadow-sm">
-                        <div class="flex items-start gap-3">
-                            <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-parchmentDark bg-parchment text-sage">
-                                <i data-lucide="check-check" class="h-5 w-5 opacity-80"></i>
-                            </div>
-                            <div>
-                                <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Checked items</p>
-                                <p class="mt-2 text-sm font-semibold leading-relaxed text-forest">Completed groceries will collect here once you start checking things off.</p>
-                            </div>
-                        </div>
+            const checkedSection = checkedItems.length > 0
+                ? `
+                    <div class="mb-3 flex items-center justify-between gap-2">
+                        <p class="shop-panel-kicker" style="margin:0;">${shopNl ? 'Afgevinkt' : 'Checked'}</p>
+                        <button type="button" onclick="clearCheckedShoppingListItems()" class="${getAppButtonClasses('secondary', { size: 'sm' })}" title="${shopNl ? 'Wis afgevinkte items' : 'Clear checked items'}">
+                            <i data-lucide="trash-2" class="h-4 w-4"></i>${shopNl ? 'Wissen' : 'Clear'}
+                        </button>
                     </div>
+                    <div class="space-y-3">${checkedItems.map(item => renderShoppingListItem(item)).join('')}</div>
+                `
+                : `
+                    <p class="shop-panel-kicker">${shopNl ? 'Afgevinkt' : 'Checked'}</p>
+                    <p class="text-sm font-semibold leading-relaxed text-sage">${shopNl
+                        ? 'Afgevinkte boodschappen verzamelen zich hier terwijl je de winkel doorloopt.'
+                        : 'Checked groceries collect here as you move through the store.'}</p>
                 `;
 
             contentDiv.innerHTML = `
-                <div class="screen-sheet shop-sheet mx-auto mb-8 max-w-6xl overflow-hidden rounded-2xl border border-parchmentDark bg-white shadow-lg">
-                    <div class="border-b border-parchmentDark bg-gradient-to-r from-accent via-white to-parchment px-5 py-5">
-                        <div class="flex flex-col gap-4">
-                            <div class="flex flex-wrap items-center gap-3">
-                                <h2 class="font-fantasy text-3xl font-bold text-forest">Shopping list</h2>
-                                ${shoppingList.collaborators.length > 0 ? `<span class="inline-flex items-center rounded-full border border-parchmentDark bg-parchment px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-forest">${shoppingList.collaborators.length} ${shoppingList.collaborators.length === 1 ? 'partner' : 'partners'}</span>` : ''}
+                <div class="screen-sheet shop-sheet">
+                    <header class="shop-hero">
+                        <div class="shop-hero-copy">
+                            <h2>${shopNl ? 'Boodschappenlijst' : 'Shopping list'}</h2>
+                            <p>${shopNl
+                                ? 'Snel toevoegen, delen met een partner, en afvinken onderweg.'
+                                : 'Quick-add, share with a partner, and check off as you go.'}</p>
+                            <div class="shop-stat-row mt-3">
+                                <span class="shop-stat"><i data-lucide="shopping-basket" class="h-4 w-4"></i>${pendingLabel}</span>
+                                <span class="shop-stat"><i data-lucide="check-check" class="h-4 w-4"></i>${checkedLabel}</span>
+                                ${recipeLinkedCount ? `<span class="shop-stat"><i data-lucide="book-open" class="h-4 w-4"></i>${recipeLabel}</span>` : ''}
+                                ${shoppingList.collaborators.length ? `<span class="shop-stat"><i data-lucide="users" class="h-4 w-4"></i>${shoppingList.collaborators.length} ${shoppingList.collaborators.length === 1 ? (shopNl ? 'partner' : 'partner') : (shopNl ? 'partners' : 'partners')}</span>` : ''}
                             </div>
-                            <div class="action-row button-pair">
-                                <button type="button" onclick="showShoppingListCollaboratorModal()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
-                                    <i data-lucide="user-plus" class="h-4 w-4 text-gold"></i>Add partner
+                        </div>
+                        <div class="shop-toolbar">
+                            <button type="button" onclick="showShoppingListCollaboratorModal()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
+                                <i data-lucide="user-plus" class="h-4 w-4"></i>${shopNl ? 'Partner' : 'Add partner'}
+                            </button>
+                            <button type="button" onclick="shareShoppingListSnapshot()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
+                                <i data-lucide="share-2" class="h-4 w-4"></i>${shopNl ? 'Delen' : 'Share'}
+                            </button>
+                        </div>
+                    </header>
+
+                    ${collaboratorsMarkup ? `<div class="mb-4 flex flex-wrap gap-2">${collaboratorsMarkup}</div>` : ''}
+
+                    <div class="shop-layout">
+                        <section class="shop-panel">
+                            <p class="shop-panel-kicker">${shopNl ? 'Snel toevoegen' : 'Quick add'}</p>
+                            <div class="shop-quick-add">
+                                <input id="shopping-list-custom-name" type="text" placeholder="${shopNl ? 'bijv. Bruiswater' : 'e.g. Sparkling water'}" />
+                                <button type="button" onclick="addCustomShoppingListItem()" class="quick-add-submit" title="${shopNl ? 'Item toevoegen' : 'Add item'}" aria-label="${shopNl ? 'Item toevoegen' : 'Add item'}">
+                                    <i data-lucide="plus" class="h-5 w-5"></i>
+                                    <span class="quick-add-label">${shopNl ? 'Toevoegen' : 'Add'}</span>
                                 </button>
-                                <button type="button" onclick="shareShoppingListSnapshot()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
-                                    <i data-lucide="share-2" class="h-4 w-4 text-gold"></i>Share list
-                                </button>
                             </div>
-                        </div>
-                    </div>
+                            <input id="shopping-list-custom-note" type="text" class="${inputClass} hidden mt-3 text-sm" placeholder="${shopNl ? 'Optionele notitie of gang' : 'Optional note or aisle'}" />
+                            <p class="mt-3 text-xs font-semibold leading-relaxed text-sage">${shopNl
+                                ? 'Tip: vanaf een recept kun je ingrediënten direct naar deze lijst sturen.'
+                                : 'Tip: from a recipe you can send ingredients straight to this list.'}</p>
+                        </section>
 
-                    <div class="space-y-4 p-4 md:space-y-5 md:p-5">
-                        ${collaboratorsMarkup ? `<div class="flex flex-wrap gap-3">${collaboratorsMarkup}</div>` : ''}
-
-                        <div class="quiet-panel rounded-2xl border border-parchmentDark bg-parchment p-4 shadow-sm md:p-5">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Quick add</p>
-                            <div class="mt-3 md:mt-4">
-                                <div class="relative flex items-center bg-white rounded-xl shadow-sm border border-parchmentDark">
-                                    <input id="shopping-list-custom-name" type="text" class="w-full bg-transparent border-none outline-none px-4 h-11 text-base font-semibold text-forest placeholder-sage placeholder-opacity-60" placeholder="e.g. Sparkling water" />
-                                    <button type="button" onclick="addCustomShoppingListItem()" class="quick-add-submit flex items-center justify-center" title="Add item" aria-label="Add item">
-                                        <i data-lucide="plus" class="h-6 w-6"></i>
-                                    </button>
-                                </div>
-                                <input id="shopping-list-custom-note" type="text" class="${inputClass} hidden mt-3 text-sm" placeholder="Optional note or aisle" />
+                        <section class="shop-panel shop-panel--list">
+                            <div class="mb-3 flex items-center justify-between gap-2">
+                                <p class="shop-panel-kicker" style="margin:0;">${shopNl ? 'Te halen' : 'To pick up'}</p>
+                                <span class="shop-stat">${pendingItems.length}</span>
                             </div>
-                        </div>
-
-                        <div class="space-y-5">
-                            <section class="space-y-4 relative pt-10">
-                                <div class="absolute top-0 right-0 z-10">
-                                    <span class="inline-flex items-center gap-1.5 rounded-full border border-parchmentDark bg-white px-3 py-1 text-xs font-bold text-sage shadow-sm" title="${pendingItems.length} pending">
-                                        <i data-lucide="shopping-basket" class="h-4 w-4 text-forest"></i> ${pendingItems.length}
-                                    </span>
-                                </div>
-                                <div class="space-y-3">${pendingMarkup}</div>
-                            </section>
-
-                            ${checkedItems.length > 0 ? `
-                                <section class="space-y-4 relative pt-10">
-                                    <div class="absolute top-0 right-0 z-10 flex items-center gap-2">
-                                        <span class="inline-flex items-center gap-1.5 rounded-full border border-parchmentDark bg-white px-3 py-1 text-xs font-bold text-sage shadow-sm" title="${checkedItems.length} checked">
-                                            <i data-lucide="check-check" class="h-4 w-4 text-forest"></i> ${checkedItems.length}
-                                        </span>
-                                        <button type="button" onclick="clearCheckedShoppingListItems()" class="${getAppButtonClasses('muted', { size: 'sm', iconOnly: true })} shadow-sm border border-parchmentDark bg-white hover:bg-coral hover:text-white" title="Clear checked items">
-                                            <i data-lucide="trash-2" class="h-4 w-4"></i>
-                                        </button>
-                                    </div>
-                                    <div class="space-y-3">${checkedMarkup}</div>
-                                </section>
-                            ` : `
-                                <section class="space-y-3">
-                                    ${checkedMarkup}
-                                </section>
-                            `}
-                        </div>
+                            <div class="space-y-3">${pendingSection}</div>
+                            <div class="mt-5 border-t border-parchmentDark/70 pt-4">
+                                ${checkedSection}
+                            </div>
+                        </section>
                     </div>
                 </div>
             `;
