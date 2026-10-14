@@ -1196,11 +1196,145 @@
         }
 
         .profile-sheet {
-            max-width: 42rem;
-            margin: 0 auto;
+            max-width: none;
+            width: 100%;
+            margin: 0 auto 2rem;
         }
 
-        .profile-family-panel {
+        .profile-layout {
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .profile-hero {
+            overflow: hidden;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1.25rem;
+            background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
+        }
+
+        .profile-banner {
+            position: relative;
+            height: 7.5rem;
+            background-color: #efe6d8;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .profile-banner::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(246, 241, 232, 0.12), rgba(28, 20, 16, 0.28));
+        }
+
+        .profile-identity {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 0.85rem;
+            margin-top: -2.4rem;
+            padding: 0 1rem 1.15rem;
+            justify-items: center;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 5.5rem;
+            height: 5.5rem;
+            border: 3px solid #fffdf9;
+            border-radius: 999px;
+            background-color: #f6f1e8;
+            background-position: center;
+            background-size: cover;
+            box-shadow: 0 10px 22px rgba(28, 20, 16, 0.16);
+        }
+
+        .profile-copy {
+            min-width: 0;
+            width: 100%;
+        }
+
+        .profile-name {
+            margin: 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.7rem, 5vw, 2.35rem);
+            font-weight: 700;
+            line-height: 1.1;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-place {
+            margin: 0.35rem 0 0;
+            color: #8a7a70;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            line-height: 1.35;
+            text-transform: uppercase;
+        }
+
+        .profile-bio {
+            margin: 0.55rem auto 0;
+            max-width: 42ch;
+            color: #5c5148;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .profile-chips {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.45rem;
+            margin-top: 0.8rem;
+        }
+
+        .profile-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.9rem;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.55rem;
+        }
+
+        .profile-stat {
+            display: grid;
+            gap: 0.2rem;
+            padding: 0.85rem 0.7rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1rem;
+            background: rgba(255, 253, 249, 0.92);
+            text-align: center;
+        }
+
+        .profile-stat strong {
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.55rem, 4vw, 2rem);
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .profile-stat span {
+            color: #8a7a70;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .profile-family-panel,
+        .profile-editor-panel {
             padding: 1rem;
             border: 1px solid rgba(28, 20, 16, 0.08);
             border-radius: 1.25rem;
@@ -1225,13 +1359,64 @@
         }
 
         @media (min-width: 900px) {
-            .profile-sheet {
-                max-width: none;
-                width: 100%;
+            .profile-layout {
+                grid-template-columns: minmax(18rem, 0.95fr) minmax(0, 1.25fr);
+                gap: 1.15rem;
+                align-items: start;
             }
 
-            .profile-family-panel {
+            .profile-hero {
+                position: sticky;
+                top: 0.5rem;
+            }
+
+            .profile-banner {
+                height: 11rem;
+            }
+
+            .profile-identity {
+                grid-template-columns: 7.5rem minmax(0, 1fr);
+                align-items: start;
+                justify-items: stretch;
+                gap: 1.15rem 1.25rem;
+                margin-top: 0;
+                padding: 0 1.35rem 1.35rem;
+                text-align: left;
+            }
+
+            .profile-avatar {
+                width: 7.5rem;
+                height: 7.5rem;
+                margin-top: -3.25rem;
+            }
+
+            .profile-bio {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            .profile-chips,
+            .profile-actions {
+                justify-content: flex-start;
+            }
+
+            .profile-side {
+                display: grid;
+                gap: 1rem;
+            }
+
+            .profile-family-panel,
+            .profile-editor-panel {
                 padding: 1.25rem 1.35rem;
+            }
+
+            .profile-stats {
+                gap: 0.75rem;
+            }
+
+            .profile-stat {
+                padding: 1rem 0.85rem;
+                text-align: left;
             }
         }
 
@@ -1700,126 +1885,6 @@
             display: none !important;
         }
 
-        .profile-banner {
-            position: relative;
-            height: 6.5rem;
-            background-color: #f6f1e8;
-            background-position: center;
-            background-size: cover;
-        }
-
-        .profile-banner::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(246, 241, 232, 0.2), rgba(28, 20, 16, 0.22));
-        }
-
-        .profile-identity {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.75rem;
-            margin-top: -2.15rem;
-            padding: 0 1rem 1.15rem;
-            text-align: center;
-        }
-
-        .profile-avatar {
-            width: 5.25rem;
-            height: 5.25rem;
-            flex: 0 0 auto;
-            border: 3px solid #fbf8f3;
-            border-radius: 999px;
-            background-color: #f6f1e8;
-            background-position: center;
-            background-size: cover;
-            box-shadow: 0 10px 22px rgba(28, 20, 16, 0.16);
-        }
-
-        .profile-copy {
-            min-width: 0;
-            width: 100%;
-        }
-
-        .profile-name {
-            margin: 0;
-            color: #1c1410;
-            font-size: clamp(1.65rem, 7vw, 2.15rem);
-            line-height: 1.1;
-            overflow-wrap: anywhere;
-        }
-
-        .profile-place {
-            margin: 0.35rem 0 0;
-            color: #8a7a70;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.16em;
-            line-height: 1.35;
-            text-transform: uppercase;
-        }
-
-        .profile-bio {
-            margin: 0.55rem 0 0;
-            color: #1c1410;
-            font-size: 0.9rem;
-            font-weight: 600;
-            line-height: 1.4;
-        }
-
-        .profile-chips {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.45rem;
-        }
-
-        .profile-chips {
-            margin-top: 0.75rem;
-        }
-
-        .profile-actions {
-            margin-top: 0.85rem;
-        }
-
-        @media (min-width: 768px) {
-            .profile-banner {
-                height: 10.5rem;
-            }
-
-            .profile-identity {
-                display: grid;
-                grid-template-columns: 7.25rem minmax(0, 1fr);
-                align-items: start;
-                gap: 1.25rem;
-                margin-top: 0;
-                padding: 0 2rem 1.5rem;
-                text-align: left;
-            }
-
-            .profile-avatar {
-                width: 7.25rem;
-                height: 7.25rem;
-                margin-top: -3rem;
-            }
-
-            .profile-copy {
-                flex: 1 1 auto;
-                width: auto;
-            }
-
-            .profile-name {
-                font-size: 2.6rem;
-            }
-
-            .profile-chips {
-                justify-content: flex-start;
-            }
-        }
-
         .app-overlay {
             align-items: flex-end;
             justify-content: center;
@@ -2012,14 +2077,20 @@
             }
 
             #app-content .screen-sheet,
-            #app-content .profile-sheet > .bg-white,
-            #app-content .profile-sheet > .grid > div,
             body.chrome-push:not(.cooking-mode-active) .push-sheet,
             body.chrome-push:not(.cooking-mode-active) .detail-shell {
                 background-color: transparent;
                 background-image: none;
                 border-width: 0;
                 border-radius: 0;
+                box-shadow: none;
+            }
+
+            #app-content .profile-hero,
+            #app-content .profile-family-panel,
+            #app-content .profile-editor-panel,
+            #app-content .profile-stat {
+                border-radius: 1rem;
                 box-shadow: none;
             }
 
@@ -2060,13 +2131,29 @@
                 height: auto;
             }
 
-            #app-content .profile-sheet > .grid {
-                gap: 0;
-            }
-
-            #app-content .profile-sheet > .grid > div + div,
             #app-content .shop-sheet article + article {
                 border-top: 1px solid rgba(144, 152, 112, 0.28);
+            }
+
+            #app-content .profile-layout {
+                gap: 0.75rem;
+            }
+
+            #app-content .profile-stats {
+                gap: 0.4rem;
+            }
+
+            #app-content .profile-stat {
+                padding: 0.7rem 0.45rem;
+            }
+
+            #app-content .profile-stat strong {
+                font-size: 1.35rem;
+            }
+
+            #app-content .profile-stat span {
+                font-size: 0.58rem;
+                letter-spacing: 0.1em;
             }
 
             body.chrome-push:not(.cooking-mode-active) .detail-meta-grid,
@@ -2332,22 +2419,31 @@
             }
 
             .profile-banner {
-                height: 4.25rem;
+                height: 5.25rem;
             }
 
             .profile-avatar {
-                width: 3.6rem;
-                height: 3.6rem;
+                width: 4.35rem;
+                height: 4.35rem;
             }
 
             .profile-name {
-                font-size: 1.35rem;
+                font-size: 1.45rem;
             }
 
             .profile-identity {
-                margin-top: -1.5rem;
-                gap: 0.4rem;
-                padding-bottom: 0.7rem;
+                margin-top: -1.85rem;
+                gap: 0.55rem;
+                padding: 0 0.85rem 0.95rem;
+            }
+
+            .profile-bio {
+                font-size: 0.88rem;
+            }
+
+            .profile-family-panel,
+            .profile-editor-panel {
+                padding: 0.85rem;
             }
 
             #app-landing {
@@ -8191,19 +8287,22 @@
 
         function showShoppingListCollaboratorModal() {
             const inputId = `shopping-collaborator-input-${Date.now()}`;
+            const nl = userSettings.language === 'nl';
             let modalId = null;
 
-            modalId = createModal('Add partner', `
+            modalId = createModal(nl ? 'Partner toevoegen' : 'Add partner', `
                 <div class="space-y-4 text-inkDark">
-                    <p class="text-sm font-semibold leading-relaxed text-forest">Type a name. It stays on this device only.</p>
+                    <p class="text-sm font-semibold leading-relaxed text-forest">${nl
+                        ? 'Typ een naam om boodschappen toe te wijzen. Partners blijven voorlopig alleen op dit apparaat — geen account-uitnodiging.'
+                        : 'Type a name to assign groceries. Partners stay on this device for now — no account invite yet.'}</p>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-[0.22em] text-sage mb-2" for="${inputId}">Name</label>
-                        <input id="${inputId}" type="text" class="${inputClass}" placeholder="e.g. Anna" autocomplete="off" />
+                        <label class="block text-xs font-bold uppercase tracking-[0.22em] text-sage mb-2" for="${inputId}">${nl ? 'Naam' : 'Name'}</label>
+                        <input id="${inputId}" type="text" class="${inputClass}" placeholder="${nl ? 'bijv. Anna' : 'e.g. Anna'}" autocomplete="off" />
                     </div>
                 </div>
             `, [
-                { text: 'Cancel', onClick: () => closeModal(modalId) },
-                { text: 'Add partner', primary: true, onClick: () => submitShoppingListCollaborator(inputId, modalId) }
+                { text: nl ? 'Annuleren' : 'Cancel', onClick: () => closeModal(modalId) },
+                { text: nl ? 'Partner toevoegen' : 'Add partner', primary: true, onClick: () => submitShoppingListCollaborator(inputId, modalId) }
             ]);
 
             requestAnimationFrame(() => {
@@ -13111,109 +13210,113 @@
                 ? 'Families kun je al aanmaken en delen via naam + tag + pincode. Volledige family-cloud (live sync voor iedereen) komt in een latere ronde.'
                 : 'You can already create and join families with name + tag + pin. Full family-cloud sync for every member lands in a later round.';
 
+            const optionsLabel = userSettings.language === 'nl' ? 'Opties' : 'Options';
+            const primaryFamily = (userFamilies || []).find(f => !f.removedMembers?.some(m => m.userId === currentUser?.uid));
+            const primaryFamilyChip = primaryFamily
+                ? (() => {
+                    const fc = getFamilyColorOption(primaryFamily.colorKey);
+                    return `<span class="shop-stat" style="color:${fc.hex};"><i data-lucide="users" class="h-3.5 w-3.5"></i>#1 ${escapeHTML(primaryFamily.name)}</span>`;
+                })()
+                : '';
+
             contentDiv.innerHTML = `
-                <div class="profile-sheet space-y-6">
-                    <div class="bg-white rounded-sm shadow-sm border border-parchmentDark overflow-hidden">
-                        <div class="profile-banner" style="background-image: url('${bannerBg}')"></div>
-                        <div class="profile-identity">
-                            <div class="profile-avatar" style="background-image: url('${profileBg}')"></div>
-                            <div class="profile-copy">
-                                <h2 class="profile-name font-fantasy font-bold">${escapeHTML(userSettings.name || t.yourProfile)}</h2>
-                                <p class="profile-place">${escapeHTML(userSettings.country || t.setCountry)}</p>
-                                <p class="profile-bio" title="${escapeHTML(userSettings.bio || t.addBio)}">${escapeHTML(userSettings.bio || t.addBio)}</p>
-                                <div class="profile-chips">
-                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-sage shadow-sm">
-                                        <i data-lucide="${userSettings.isPublic ? 'globe' : 'lock'}" class="h-3.5 w-3.5"></i>
-                                        ${userSettings.isPublic ? t.publicProfile : t.privateProfile}
-                                    </span>
-                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold text-sage shadow-sm">
-                                        <i data-lucide="heart" class="h-3.5 w-3.5"></i>${totalPublicLikes} ${t.likes}
-                                    </span>
-                                    ${(() => {
-                                        const primaryFamily = (userFamilies || []).find(f => !f.removedMembers?.some(m => m.userId === currentUser?.uid));
-                                        if (!primaryFamily) return '';
-                                        const fc = getFamilyColorOption(primaryFamily.colorKey);
-                                        return `<span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold shadow-sm" style="color:${fc.hex};"><i data-lucide="users" class="h-3.5 w-3.5"></i>#1 ${escapeHTML(primaryFamily.name)}</span>`;
-                                    })()}
-                                </div>
-                                <div class="profile-actions">
-                                    <button onclick="renderSettings()" class="${getAppButtonClasses('secondary')}">
-                                        <i data-lucide="settings-2" class="h-4 w-4 text-gold"></i>Opties
-                                    </button>
-                                    <button onclick="renderProfileEditor()" class="${getAppButtonClasses('secondary')}">
-                                        <i data-lucide="pencil-line" class="h-4 w-4 text-gold"></i>${t.editProfile}
-                                    </button>
+                <div class="profile-sheet">
+                    <div class="profile-layout">
+                        <section class="profile-hero">
+                            <div class="profile-banner" style="background-image: url('${bannerBg}')"></div>
+                            <div class="profile-identity">
+                                <div class="profile-avatar" style="background-image: url('${profileBg}')" role="img" aria-label="${escapeHTML(userSettings.name || t.yourProfile)}"></div>
+                                <div class="profile-copy">
+                                    <h2 class="profile-name">${escapeHTML(userSettings.name || t.yourProfile)}</h2>
+                                    <p class="profile-place">${escapeHTML(userSettings.country || t.setCountry)}</p>
+                                    <p class="profile-bio" title="${escapeHTML(userSettings.bio || t.addBio)}">${escapeHTML(userSettings.bio || t.addBio)}</p>
+                                    <div class="profile-chips">
+                                        <span class="shop-stat">
+                                            <i data-lucide="${userSettings.isPublic ? 'globe' : 'lock'}" class="h-3.5 w-3.5"></i>
+                                            ${userSettings.isPublic ? t.publicProfile : t.privateProfile}
+                                        </span>
+                                        <span class="shop-stat">
+                                            <i data-lucide="heart" class="h-3.5 w-3.5"></i>${totalPublicLikes} ${t.likes}
+                                        </span>
+                                        ${primaryFamilyChip}
+                                    </div>
+                                    <div class="profile-actions">
+                                        <button type="button" onclick="renderSettings()" class="${getAppButtonClasses('secondary')}">
+                                            <i data-lucide="settings-2" class="h-4 w-4"></i>${optionsLabel}
+                                        </button>
+                                        <button type="button" onclick="renderProfileEditor()" class="${getAppButtonClasses('primary')}">
+                                            <i data-lucide="pencil-line" class="h-4 w-4"></i>${t.editProfile}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
+                        </section>
+
+                        <div class="profile-side">
+                            <div class="profile-stats" aria-label="${userSettings.language === 'nl' ? 'Overzicht' : 'Overview'}">
+                                <div class="profile-stat">
+                                    <strong>${createdRecipes}</strong>
+                                    <span>${t.created}</span>
+                                </div>
+                                <div class="profile-stat">
+                                    <strong>${savedRecipes}</strong>
+                                    <span>${t.saved}</span>
+                                </div>
+                                <div class="profile-stat">
+                                    <strong>${publishedRecipes}</strong>
+                                    <span>${t.published}</span>
+                                </div>
+                            </div>
+
+                            <section class="profile-family-panel">
+                                <div class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                                    <div>
+                                        <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage">${t.sharedBooks}</p>
+                                        <h3 class="mt-2 font-fantasy text-3xl font-bold text-forest">${t.myFamilies}</h3>
+                                        <p class="mt-2 text-sm font-semibold text-sage">${familySummaryText}</p>
+                                    </div>
+                                    <div class="flex flex-wrap gap-3">
+                                        <button type="button" onclick="showJoinFamilyModal()" class="${getAppButtonClasses('secondary')}">
+                                            <i data-lucide="log-in" class="w-4 h-4"></i> ${t.join}
+                                        </button>
+                                        <button type="button" onclick="showCreateFamilyModal()" class="${getAppButtonClasses('primary')}">
+                                            <i data-lucide="plus" class="w-4 h-4"></i> ${t.create}
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="profile-family-note">${softLaunchFamilyNote}</p>
+                                
+                                ${userFamilies && userFamilies.length > 0 ? `
+                                    <div id="family-list-sortable" class="flex flex-col gap-3">
+                                        ${userFamilies.slice(0, 3).map((family, idx) => {
+                                            const isRemoved = family.removedMembers && family.removedMembers.some(m => m.userId === currentUser?.uid);
+                                            const memberCount = family.memberIds ? family.memberIds.length : 0;
+                                            const familyColor = getFamilyColorOption(family.colorKey);
+                                            const rankLabel = ['#1', '#2', '#3'][idx] || '';
+                                            return `
+                                                <div class="family-sortable-row group flex items-center gap-3 sm:gap-4 border bg-white px-4 py-3.5 sm:px-5 sm:py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-grab active:cursor-grabbing select-none ${isRemoved ? 'opacity-70' : ''}" data-family-id="${family.id}" draggable="true" style="border-left: 4px solid ${familyColor.hex};">
+                                                    <div class="flex-shrink-0 text-sage/50 hover:text-sage transition-colors">
+                                                        <i data-lucide="grip-vertical" class="w-5 h-5 pointer-events-none"></i>
+                                                    </div>
+                                                    <span class="text-[11px] font-bold uppercase tracking-[0.2em] w-12 sm:w-16 flex-shrink-0" style="color:${familyColor.hex};">${rankLabel}</span>
+                                                    <span class="font-fantasy font-bold text-forest text-lg sm:text-xl leading-none flex-1 truncate">${escapeHTML(family.name)}</span>
+                                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-sage flex-shrink-0 hidden sm:inline-flex">
+                                                        <i data-lucide="users" class="w-3.5 h-3.5"></i>${memberCount}
+                                                    </span>
+                                                    <button type="button" onclick="showFamilyDetails('${family.id}')" class="flex-shrink-0 rounded-xl bg-parchment px-3.5 py-2 text-xs font-bold text-forest shadow-sm transition-all hover:bg-white hover:shadow-md">${t.open}</button>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                ` : `
+                                    <div class="browse-empty">
+                                        <h3>${t.noFamiliesYet}</h3>
+                                        <p>${t.noFamiliesDesc}</p>
+                                    </div>
+                                `}
+                            </section>
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-white rounded-sm border border-parchmentDark p-5 shadow-sm">
-                            <p class="text-xs font-bold uppercase tracking-[0.24em] text-sage">${t.created}</p>
-                            <p class="mt-2 text-5xl md:text-6xl font-fantasy font-black text-forest leading-none">${createdRecipes}</p>
-                            <p class="text-sm font-semibold text-sage">${t.yourRecipes}</p>
-                        </div>
-                        <div class="bg-white rounded-sm border border-parchmentDark p-5 shadow-sm">
-                            <p class="text-xs font-bold uppercase tracking-[0.24em] text-sage">${t.saved}</p>
-                            <p class="mt-2 text-5xl md:text-6xl font-fantasy font-black text-forest leading-none">${savedRecipes}</p>
-                            <p class="text-sm font-semibold text-sage">${t.savedFromBrowse}</p>
-                        </div>
-                        <div class="bg-white rounded-sm border border-parchmentDark p-5 shadow-sm">
-                            <p class="text-xs font-bold uppercase tracking-[0.24em] text-sage">${t.published}</p>
-                            <p class="mt-2 text-5xl md:text-6xl font-fantasy font-black text-forest leading-none">${publishedRecipes}</p>
-                            <p class="text-sm font-semibold text-sage">${t.sharedLive}</p>
-                        </div>
-                    </div>
-
-                    <div class="profile-family-panel">
-                        <div class="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                            <div>
-                                <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage">${t.sharedBooks}</p>
-                                <h3 class="mt-2 font-fantasy text-3xl font-bold text-forest">${t.myFamilies}</h3>
-                                <p class="mt-2 text-sm font-semibold text-sage">${familySummaryText}</p>
-                            </div>
-                            <div class="flex flex-wrap gap-3">
-                                <button onclick="showJoinFamilyModal()" class="${getAppButtonClasses('secondary')}">
-                                    <i data-lucide="log-in" class="w-4 h-4"></i> ${t.join}
-                                </button>
-                                <button onclick="showCreateFamilyModal()" class="${getAppButtonClasses('primary')}">
-                                    <i data-lucide="plus" class="w-4 h-4"></i> ${t.create}
-                                </button>
-                            </div>
-                        </div>
-                        <p class="profile-family-note">${softLaunchFamilyNote}</p>
-                        
-                        ${userFamilies && userFamilies.length > 0 ? `
-                            <div id="family-list-sortable" class="flex flex-col gap-3">
-                                ${userFamilies.slice(0, 3).map((family, idx) => {
-                                    const isRemoved = family.removedMembers && family.removedMembers.some(m => m.userId === currentUser?.uid);
-                                    const memberCount = family.memberIds ? family.memberIds.length : 0;
-                                    const familyColor = getFamilyColorOption(family.colorKey);
-                                    const rankLabel = ['#1', '#2', '#3'][idx] || '';
-                                    return `
-                                        <div class="family-sortable-row group flex items-center gap-3 sm:gap-4 border bg-white px-4 py-3.5 sm:px-5 sm:py-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg cursor-grab active:cursor-grabbing select-none ${isRemoved ? 'opacity-70' : ''}" data-family-id="${family.id}" draggable="true" style="border-left: 4px solid ${familyColor.hex};">
-                                            <div class="flex-shrink-0 text-sage/50 hover:text-sage transition-colors">
-                                                <i data-lucide="grip-vertical" class="w-5 h-5 pointer-events-none"></i>
-                                            </div>
-                                            <span class="text-[11px] font-bold uppercase tracking-[0.2em] w-12 sm:w-16 flex-shrink-0" style="color:${familyColor.hex};">${rankLabel}</span>
-                                            <span class="font-fantasy font-bold text-forest text-lg sm:text-xl leading-none flex-1 truncate">${escapeHTML(family.name)}</span>
-                                            <span class="inline-flex items-center gap-1.5 rounded-full bg-accent/75 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-sage flex-shrink-0 hidden sm:inline-flex">
-                                                <i data-lucide="users" class="w-3.5 h-3.5"></i>${memberCount}
-                                            </span>
-                                            <button type="button" onclick="showFamilyDetails('${family.id}')" class="flex-shrink-0 rounded-xl bg-parchment px-3.5 py-2 text-xs font-bold text-forest shadow-sm transition-all hover:bg-white hover:shadow-md">${t.open}</button>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        ` : `
-                            <div class="browse-empty">
-                                <h3>${t.noFamiliesYet}</h3>
-                                <p>${t.noFamiliesDesc}</p>
-                            </div>
-                        `}
-                    </div>
-
                 </div>
             `;
             lucide.createIcons();
@@ -13233,110 +13336,78 @@
 
             const bannerBg = userSettings.bannerPic || defaultPlaceholderBanner;
             const profileBg = userSettings.profilePic || defaultPlaceholderProfile;
-            const createdRecipes = recipes.filter(recipe => recipe.source !== 'published').length;
-            const savedRecipes = recipes.filter(recipe => recipe.source === 'published').length;
-            const publishedRecipes = recipes.filter(recipe => recipe.source !== 'published' && isRecipePublishedLive(recipe)).length;
+            const nl = userSettings.language === 'nl';
 
             contentDiv.innerHTML = `
-                <div class="push-sheet max-w-4xl mx-auto space-y-6">
-                    <div class="bg-white rounded-sm shadow-sm border border-parchmentDark overflow-hidden">
-                        <div class="h-44 bg-cover bg-center relative" style="background-image: url('${bannerBg}')">
-                            <div class="absolute inset-0 bg-gradient-to-t from-forest/60 to-transparent"></div>
+                <div class="profile-sheet">
+                    <div class="browse-hero" style="margin-bottom:1rem;">
+                        <div class="browse-hero-copy">
+                            <h2>${nl ? 'Profiel bewerken' : 'Edit profile'}</h2>
+                            <p>${nl ? 'Pas banner, avatar, bio en zichtbaarheid aan. Op desktop blijft dit breed naast je families overzicht voelen.' : 'Update your banner, avatar, bio, and visibility. Desktop keeps the same wide sheet language as the rest of the app.'}</p>
                         </div>
-                        <div class="px-6 md:px-8 pb-8">
-                            <div class="flex flex-col md:flex-row md:items-end gap-5 -mt-12 relative z-10">
-                                <div class="w-24 h-24 rounded-full border-4 border-white shadow-xl bg-cover bg-center bg-white" style="background-image: url('${profileBg}')"></div>
-                                <div class="pt-2">
-                                    <p class="text-[11px] font-bold uppercase tracking-[0.32em] text-sage opacity-80">Profile editor</p>
-                                    <h2 class="font-fantasy font-bold text-4xl text-forest">Edit your profile details</h2>
-                                    <p class="mt-3 text-sm font-semibold text-forest opacity-80 max-w-2xl">Update your banner, avatar, bio, and visibility here, then return to the clean summary card.</p>
-                                </div>
-                            </div>
+                        <div class="browse-stat-row">
+                            <button type="button" onclick="renderProfile()" class="${getAppButtonClasses('secondary')}">
+                                <i data-lucide="arrow-left" class="h-4 w-4"></i>${nl ? 'Terug' : 'Back'}
+                            </button>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="bg-white rounded-sm border border-parchmentDark p-5 shadow-sm">
-                            <p class="text-xs font-bold uppercase tracking-[0.24em] text-sage">Created</p>
-                            <p class="mt-2 text-3xl font-fantasy font-bold text-forest">${createdRecipes}</p>
-                            <p class="text-sm font-semibold text-sage">Recipes you authored</p>
-                        </div>
-                        <div class="bg-white rounded-sm border border-parchmentDark p-5 shadow-sm">
-                            <p class="text-xs font-bold uppercase tracking-[0.24em] text-sage">Saved</p>
-                            <p class="mt-2 text-3xl font-fantasy font-bold text-forest">${savedRecipes}</p>
-                            <p class="text-sm font-semibold text-sage">Recipes liked from Browse</p>
-                        </div>
-                        <div class="bg-white rounded-sm border border-parchmentDark p-5 shadow-sm">
-                            <p class="text-xs font-bold uppercase tracking-[0.24em] text-sage">Published</p>
-                            <p class="mt-2 text-3xl font-fantasy font-bold text-forest">${publishedRecipes}</p>
-                            <p class="text-sm font-semibold text-sage">Live community recipes</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 md:p-8 rounded-sm shadow-sm border border-parchmentDark">
-                        <div class="mb-6 flex flex-col gap-4 border-b border-accent pb-4 md:flex-row md:items-center md:justify-between">
-                            <h3 class="font-fantasy font-bold text-3xl text-forest flex items-center gap-2">
-                                <i data-lucide="user-round-cog" class="w-7 h-7 text-gold"></i> Profile Details
-                            </h3>
-                        </div>
-
-                        <form onsubmit="saveProfile(event)" class="space-y-6">
-                            <div class="mb-10 relative">
-                                <label class="custom-file-upload w-full block mb-2">
-                                    <span class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Profile Banner</span>
-                                    <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-banner-preview', 'bannerPic', true)">
-                                    <div id="profile-banner-preview" class="w-full h-36 rounded-sm bg-cover bg-center border border-parchmentDark flex items-center justify-center group" style="background-image: url('${bannerBg}')">
-                                        <div class="bg-white bg-opacity-80 px-3 py-1 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 text-xs font-bold text-forest">
-                                            <i data-lucide="upload" class="w-4 h-4"></i> Change Banner
-                                        </div>
+                    <form onsubmit="saveProfile(event)" class="profile-editor-panel space-y-6">
+                        <div class="relative mb-8">
+                            <label class="custom-file-upload w-full block">
+                                <span class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">${nl ? 'Banner' : 'Profile banner'}</span>
+                                <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-banner-preview', 'bannerPic', true)">
+                                <div id="profile-banner-preview" class="w-full h-36 md:h-44 rounded-2xl bg-cover bg-center border border-parchmentDark flex items-center justify-center group" style="background-image: url('${bannerBg}')">
+                                    <div class="bg-white/90 px-3 py-1.5 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center gap-2 text-xs font-bold text-forest">
+                                        <i data-lucide="upload" class="w-4 h-4"></i> ${nl ? 'Banner wijzigen' : 'Change banner'}
                                     </div>
-                                </label>
-
-                                <label class="custom-file-upload absolute -bottom-8 left-6 z-10 block">
-                                    <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-avatar-preview', 'profilePic', true)">
-                                    <div id="profile-avatar-preview" class="w-24 h-24 rounded-full bg-cover bg-center border-4 border-white shadow-md flex items-center justify-center group" style="background-image: url('${profileBg}')">
-                                        <div class="bg-white bg-opacity-80 p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="camera" class="w-5 h-5 text-forest"></i></div>
-                                    </div>
-                                </label>
-                            </div>
-
-                            <div class="pt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Chef Name</label>
-                                    <input type="text" id="profile-name" value="${userSettings.name}" placeholder="Gordon Ramsay" class="${inputClass}">
                                 </div>
-                                <div>
-                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Default Country</label>
-                                    <input type="text" id="profile-country" value="${userSettings.country}" list="countries-list" placeholder="e.g. 🇮🇹 Italy" class="${inputClass}">
-                                </div>
-                            </div>
+                            </label>
 
+                            <label class="custom-file-upload absolute -bottom-6 left-5 z-10 block">
+                                <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-avatar-preview', 'profilePic', true)">
+                                <div id="profile-avatar-preview" class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-cover bg-center border-4 border-white shadow-md flex items-center justify-center group" style="background-image: url('${profileBg}')">
+                                    <div class="bg-white/90 p-1.5 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"><i data-lucide="camera" class="w-5 h-5 text-forest"></i></div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="pt-4 grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Short Bio</label>
-                                <textarea id="profile-bio" placeholder="Tell us about your cooking style..." class="${textareaClass}">${userSettings.bio}</textarea>
+                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2" for="profile-name">${nl ? 'Chefnaam' : 'Chef name'}</label>
+                                <input type="text" id="profile-name" value="${escapeHTML(userSettings.name || '')}" placeholder="Gordon Ramsay" class="${inputClass}">
                             </div>
+                            <div>
+                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2" for="profile-country">${nl ? 'Land' : 'Country'}</label>
+                                <input type="text" id="profile-country" value="${escapeHTML(userSettings.country || '')}" list="countries-list" placeholder="${nl ? 'bijv. Nederland' : 'e.g. Italy'}" class="${inputClass}">
+                            </div>
+                        </div>
 
-                            <div class="bg-accent bg-opacity-30 p-4 rounded-sm border border-sage border-opacity-20 flex justify-between items-center gap-4">
-                                <div>
-                                    <h4 class="font-bold text-forest flex items-center gap-2"><i data-lucide="globe" class="w-4 h-4 text-gold"></i> Public Profile</h4>
-                                    <p class="text-xs text-sage mt-1 font-semibold">Allow other users to visit your profile.</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="profile-public" class="sr-only peer" ${userSettings.isPublic ? 'checked' : ''}>
-                                    <div class="w-11 h-6 bg-parchmentDark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sage"></div>
-                                </label>
-                            </div>
+                        <div>
+                            <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2" for="profile-bio">${nl ? 'Korte bio' : 'Short bio'}</label>
+                            <textarea id="profile-bio" placeholder="${nl ? 'Vertel iets over jouw kookstijl…' : 'Tell us about your cooking style…'}" class="${textareaClass}">${escapeHTML(userSettings.bio || '')}</textarea>
+                        </div>
 
-                            <div class="pt-6 border-t border-accent mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                <button type="button" onclick="renderProfile()" class="${getAppButtonClasses('secondary')}">
-                                    <i data-lucide="arrow-left" class="h-4 w-4"></i>Cancel
-                                </button>
-                                <button type="submit" class="${getAppButtonClasses('primary', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="Save Profile" title="Save Profile">
-                                    <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Save Profile</span>
-                                </button>
+                        <div class="flex justify-between items-center gap-4 rounded-2xl border border-parchmentDark bg-white/70 p-4">
+                            <div>
+                                <h4 class="font-bold text-forest flex items-center gap-2"><i data-lucide="globe" class="w-4 h-4"></i>${nl ? 'Publiek profiel' : 'Public profile'}</h4>
+                                <p class="text-xs text-sage mt-1 font-semibold">${nl ? 'Laat anderen je profiel bezoeken vanuit Browse.' : 'Allow other cooks to visit your profile from Browse.'}</p>
                             </div>
-                        </form>
-                    </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="profile-public" class="sr-only peer" ${userSettings.isPublic ? 'checked' : ''}>
+                                <div class="w-11 h-6 bg-parchmentDark peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sage"></div>
+                            </label>
+                        </div>
+
+                        <div class="pt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <button type="button" onclick="renderProfile()" class="${getAppButtonClasses('secondary')}">
+                                <i data-lucide="arrow-left" class="h-4 w-4"></i>${nl ? 'Annuleren' : 'Cancel'}
+                            </button>
+                            <button type="submit" class="${getAppButtonClasses('primary', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="${nl ? 'Profiel opslaan' : 'Save profile'}" title="${nl ? 'Profiel opslaan' : 'Save profile'}">
+                                <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">${nl ? 'Opslaan' : 'Save profile'}</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
                 <datalist id="countries-list">${countriesList.map(c => `<option value="${c}"></option>`).join('')}</datalist>
             `;
