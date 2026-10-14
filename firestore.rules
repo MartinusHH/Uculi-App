@@ -42,6 +42,15 @@ service cloud.firestore {
         && !('publishBlocked' in request.resource.data)
         || isAdminEmail();
       allow delete: if isSelf(uid) || isAdminEmail();
+
+      match /private/agreement {
+        allow read: if isSelf(uid) || isAdminEmail();
+        allow create: if isSelf(uid)
+          && request.resource.data.keys().hasOnly(['acceptedAt', 'version'])
+          && request.resource.data.acceptedAt == request.time
+          && request.resource.data.version == '2026-10-10';
+        allow update, delete: if false;
+      }
     }
 
     match /published-recipes/{recipeId} {
@@ -74,7 +83,9 @@ service cloud.firestore {
 
     match /app-config/{docId} {
       allow read: if signedIn();
-      allow write: if isAdminEmail();
+      // Admin doc is managed manually (console/admin SDK) or by existing admins only.
+      allow create: if isAdminEmail();
+      allow update, delete: if isAdminEmail();
     }
 
     match /user-moderation/{uid} {
