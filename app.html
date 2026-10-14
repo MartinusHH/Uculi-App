@@ -13636,7 +13636,7 @@
                 <div id="legal-page" class="legal-page" data-legal-kind="${doc.id}">
                     <div class="legal-page-frame">
                         <header class="legal-page-header">
-                            <button type="button" class="legal-page-back" onclick="closeLegalDocument()">Terug</button>
+                            <button type="button" class="legal-page-back" onclick="closeLegalDocument()">${getActiveUiLanguage() === 'en' ? 'Back' : 'Terug'}</button>
                             <p class="legal-page-kicker">${doc.kicker}</p>
                             <h1 class="legal-page-title">${doc.title}</h1>
                         </header>
