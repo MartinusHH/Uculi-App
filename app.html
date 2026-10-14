@@ -16341,12 +16341,34 @@
                     </div>
                 `;
             } else if (filteredPublishedRecipes.length === 0) {
+                const emptyTitle = browseNl
+                    ? (normalizedQuery ? 'Geen treffers' : 'Nog geen gepubliceerde recepten')
+                    : (normalizedQuery ? 'No matches' : 'No published recipes yet');
+                const emptyBody = browseNl
+                    ? (normalizedQuery
+                        ? 'Probeer een andere zoekterm, of open je Index om zelf iets te publiceren.'
+                        : 'Browse vult zich zodra jij of anderen publiceren. Open een recept in je Index en kies Publish — of maak eerst een nieuw recept.')
+                    : (normalizedQuery
+                        ? 'Try another search, or open your Index to publish something yourself.'
+                        : 'Browse fills once you or others publish. Open a recipe in your Index and choose Publish — or create a new recipe first.');
+                const premiumHint = !hasPremiumAccess()
+                    ? (browseNl
+                        ? 'Publiceren is Premium (of Testmodus Premium tijdens soft launch).'
+                        : 'Publishing needs Premium (or Testmodus Premium during soft launch).')
+                    : '';
                 html += `
                     <div class="browse-empty">
-                        <h3>${browseNl ? (normalizedQuery ? 'Geen treffers' : 'Nog geen gepubliceerde recepten') : (normalizedQuery ? 'No matches' : 'No published recipes yet')}</h3>
-                        <p>${browseNl
-                            ? (normalizedQuery ? 'Probeer een andere zoekterm, of publiceer zelf een recept uit je Index.' : 'Wees de eerste: publiceer een recept uit je eigen verzameling.')
-                            : (normalizedQuery ? 'Try another search, or publish a recipe from your Index.' : 'Be the first to publish one from your own collection.')}</p>
+                        <h3>${emptyTitle}</h3>
+                        <p>${emptyBody}</p>
+                        ${premiumHint ? `<p class="profile-family-note" style="margin:0;">${premiumHint}</p>` : ''}
+                        <div class="profile-actions" style="margin-top:0.35rem;justify-content:flex-start;">
+                            <button type="button" onclick="renderList()" class="${getAppButtonClasses('primary', { size: 'lg' })}">
+                                <i data-lucide="book-open" class="w-4 h-4"></i>${browseNl ? 'Naar Index' : 'Open Index'}
+                            </button>
+                            <button type="button" onclick="renderAddForm()" class="${getAppButtonClasses('secondary', { size: 'lg' })}">
+                                <i data-lucide="plus" class="w-4 h-4"></i>${browseNl ? 'Nieuw recept' : 'New recipe'}
+                            </button>
+                        </div>
                     </div>
                 `;
             } else {
