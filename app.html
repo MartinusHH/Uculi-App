@@ -158,16 +158,17 @@
 
         #main-nav {
             position: fixed;
-            left: 50%;
-            bottom: 0.75rem;
-            width: min(calc(100vw - 1.5rem), 54rem);
+            left: 0.75rem;
+            right: 0.75rem;
+            bottom: calc(0.55rem + env(safe-area-inset-bottom, 0px));
+            width: auto;
             margin: 0;
-            transform: translateX(-50%);
-            border: 1px solid rgba(144, 152, 112, 0.18);
-            border-radius: 1.25rem;
-            background: rgba(255, 255, 255, 0.92);
+            transform: none;
+            border: 1px solid rgba(144, 152, 112, 0.16);
+            border-radius: 1.35rem;
+            background: rgba(255, 253, 249, 0.94);
             backdrop-filter: blur(16px);
-            box-shadow: 0 16px 34px rgba(28, 20, 16, 0.16);
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.14);
             z-index: 40;
         }
 
@@ -212,10 +213,10 @@
 
         .app-nav-inner {
             display: flex;
-            align-items: center;
+            align-items: stretch;
             justify-content: space-around;
-            gap: 0.2rem;
-            padding: 0.35rem;
+            gap: 0.15rem;
+            padding: 0.28rem;
         }
 
         .app-nav-button {
@@ -223,10 +224,11 @@
             display: flex;
             flex: 1 1 0;
             min-width: 0;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 0.2rem;
-            padding: 0.8rem 0.45rem 0.7rem;
+            gap: 0;
+            padding: 0.55rem 0.35rem;
             border-radius: 1rem;
             color: var(--text-muted);
             transition: transform 180ms ease, color 180ms ease, background-color 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
@@ -243,8 +245,8 @@
 
         .app-nav-button.is-active {
             color: var(--text-primary);
-            background: linear-gradient(180deg, rgba(251, 248, 243, 0.95), rgba(246, 241, 232, 0.92));
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 10px 18px rgba(28, 20, 16, 0.08);
+            background: rgba(246, 241, 232, 0.95);
+            box-shadow: none;
         }
 
         .app-nav-button.is-active i,
@@ -259,19 +261,20 @@
             content: "";
             position: absolute;
             left: 50%;
-            bottom: 0.28rem;
-            width: 1rem;
-            height: 0.16rem;
+            bottom: 0.22rem;
+            width: 0.85rem;
+            height: 0.14rem;
             transform: translateX(-50%);
             border-radius: 999px;
-            background: #8a7a70;
+            background: #929D75;
         }
 
         .app-nav-button svg {
-            width: 1.5rem;
-            height: 1.5rem;
+            width: 1.35rem;
+            height: 1.35rem;
         }
 
+        /* Phone: labels stay visually hidden for a clean icon bar */
         .app-nav-label {
             position: absolute;
             width: 1px;
@@ -408,17 +411,75 @@
             #main-header {
                 padding: calc(1.1rem + env(safe-area-inset-top, 0px)) 1.6rem 1.1rem;
             }
+        }
 
-            .app-nav-inner {
-                justify-content: center;
-                gap: 0.75rem;
-                padding: 0.55rem 0.7rem;
+        /* Laptop / PC: full-width bar with visible labels */
+        @media (min-width: 1024px) {
+            #app-content {
+                padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
             }
 
-            .app-nav-button {
-                flex: 0 1 auto;
-                min-width: 5.2rem;
-                padding: 0.85rem 0.95rem 0.75rem;
+            #main-nav {
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                border-radius: 0;
+                border-left: 0;
+                border-right: 0;
+                border-bottom: 0;
+                border-top: 1px solid rgba(144, 152, 112, 0.22);
+                background: rgba(251, 248, 243, 0.97);
+                box-shadow: 0 -8px 24px rgba(28, 20, 16, 0.06);
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+            }
+
+            #main-nav .app-nav-inner {
+                width: min(90rem, 100%);
+                margin-inline: auto;
+                justify-content: stretch;
+                gap: 0.35rem;
+                padding: 0.45rem 1.25rem 0.5rem;
+            }
+
+            #main-nav .app-nav-button {
+                flex: 1 1 0;
+                min-width: 0;
+                gap: 0.28rem;
+                min-height: 3.35rem;
+                padding: 0.45rem 0.75rem 0.5rem;
+                border-radius: 0.9rem;
+            }
+
+            #main-nav .app-nav-button.is-active {
+                background: rgba(255, 255, 255, 0.92);
+                box-shadow: inset 0 0 0 1px rgba(146, 157, 117, 0.28);
+            }
+
+            #main-nav .app-nav-button.is-active::after {
+                display: none;
+            }
+
+            #main-nav .app-nav-button svg {
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+
+            #main-nav .app-nav-label {
+                position: static;
+                width: auto;
+                height: auto;
+                margin: 0;
+                overflow: visible;
+                clip: auto;
+                white-space: nowrap;
+                border: 0;
+                color: inherit;
+                font-size: 0.68rem;
+                font-weight: 800;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                line-height: 1;
             }
         }
 
@@ -1136,24 +1197,24 @@
 
         @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
             body.desktop-nav-autohide-enabled #app-content {
-                padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+                padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
             }
 
             body.desktop-nav-autohide-enabled #main-nav {
-                transform: translateX(-50%) translateY(0);
+                transform: translateY(0);
                 opacity: 1;
-                transition: transform 220ms ease, opacity 220ms ease, box-shadow 220ms ease, width 220ms ease, background-color 220ms ease;
+                transition: transform 220ms ease, opacity 220ms ease, box-shadow 220ms ease, background-color 220ms ease;
             }
 
             body.desktop-nav-hidden #main-nav {
-                transform: translateX(-50%) translateY(calc(100% + 0.75rem));
+                transform: translateY(calc(100% + 0.25rem));
                 opacity: 0;
                 box-shadow: none;
             }
 
             body.desktop-nav-autohide-enabled #main-nav:hover,
             body.desktop-nav-autohide-enabled #main-nav:focus-within {
-                transform: translateX(-50%) translateY(0);
+                transform: translateY(0);
                 opacity: 1;
             }
         }
@@ -1398,49 +1459,52 @@
             }
 
             #main-nav {
-                position: fixed;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                width: auto;
-                transform: none;
-                border-radius: 0;
-                border-left: 0;
-                border-right: 0;
-                border-bottom: 0;
-                border-top: 1px solid rgba(144, 152, 112, 0.28);
-                background: rgba(246, 241, 232, 0.97);
-                box-shadow: none;
-                padding-bottom: env(safe-area-inset-bottom, 0px);
+                left: 0.7rem;
+                right: 0.7rem;
+                bottom: calc(0.45rem + env(safe-area-inset-bottom, 0px));
+                border-radius: 1.25rem;
+                border: 1px solid rgba(144, 152, 112, 0.16);
+                background: rgba(255, 253, 249, 0.95);
+                box-shadow: 0 12px 26px rgba(28, 20, 16, 0.14);
+                padding-bottom: 0;
             }
 
             #main-nav .app-nav-inner {
-                gap: 0.1rem;
-                padding: 0.12rem 0.35rem 0.08rem;
+                gap: 0.05rem;
+                padding: 0.22rem;
             }
 
             #main-nav .app-nav-button {
                 gap: 0;
-                min-height: 2.75rem;
-                padding: 0.28rem 0.15rem 0.34rem;
-                border-radius: 0.65rem;
+                min-height: 2.65rem;
+                padding: 0.4rem 0.2rem;
+                border-radius: 0.95rem;
                 background: transparent;
                 box-shadow: none;
             }
 
             #main-nav .app-nav-button.is-active {
-                background: transparent;
+                background: rgba(246, 241, 232, 0.96);
                 box-shadow: none;
             }
 
             #main-nav .app-nav-button.is-active::after {
-                bottom: 0.1rem;
+                bottom: 0.18rem;
             }
 
             #main-nav .app-nav-button i,
             #main-nav .app-nav-button svg {
-                width: 1.3rem;
-                height: 1.3rem;
+                width: 1.28rem;
+                height: 1.28rem;
+            }
+
+            #main-nav .app-nav-label {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
             }
 
             body.chrome-push #app-content {
@@ -2356,30 +2420,31 @@
         .notebook-chrome {
             display: flex;
             flex-direction: column;
-            gap: 0.7rem;
-            margin-bottom: 1.35rem;
+            gap: 0.55rem;
+            margin-bottom: 1rem;
         }
 
         .notebook-chrome-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 0.85rem;
+            gap: 0.65rem;
             width: 100%;
-            padding: 0.35rem;
-            border: 1px solid rgba(228, 215, 196, 0.95);
+            padding: 0.3rem;
+            border: 1px solid rgba(228, 215, 196, 0.85);
             border-radius: 1rem;
-            background: rgba(251, 248, 243, 0.9);
+            background: rgba(255, 253, 249, 0.96);
+            box-shadow: 0 8px 18px rgba(28, 20, 16, 0.04);
         }
 
         .notebook-chrome-group {
             display: inline-flex;
             align-items: center;
-            gap: 0.2rem;
+            gap: 0.15rem;
             min-width: 0;
-            padding: 0.15rem;
-            border-radius: 0.8rem;
-            background: rgba(255, 255, 255, 0.92);
+            padding: 0;
+            border-radius: 0;
+            background: transparent;
         }
 
         .notebook-chrome-kicker {
@@ -2388,6 +2453,7 @@
             justify-content: space-between;
             gap: 0.75rem;
             min-width: 0;
+            padding: 0 0.15rem;
         }
 
         .notebook-chrome-page {
@@ -2397,13 +2463,14 @@
 
         .notebook-chrome-bar button,
         .notebook-chrome-bar .notebook-note-control--cook {
-            flex: 0 0 2.75rem;
-            width: 2.75rem;
-            min-width: 2.75rem;
-            max-width: 2.75rem;
-            height: 2.75rem;
-            min-height: 2.75rem;
+            flex: 0 0 2.55rem;
+            width: 2.55rem;
+            min-width: 2.55rem;
+            max-width: 2.55rem;
+            height: 2.55rem;
+            min-height: 2.55rem;
             padding: 0;
+            border-radius: 0.8rem;
         }
 
         .notebook-cook-label {
@@ -2420,16 +2487,15 @@
 
         @media (min-width: 768px) {
             .notebook-chrome {
-                gap: 0.85rem;
-                margin-bottom: 1.6rem;
+                gap: 0.45rem;
+                margin-bottom: 1.15rem;
             }
 
             .notebook-chrome-bar {
                 width: 100%;
                 margin-left: 0;
-                padding: 0.4rem 0.5rem;
-                gap: 1rem;
-                background: #fff;
+                padding: 0.35rem 0.45rem;
+                gap: 0.85rem;
             }
 
             .notebook-chrome-page {
@@ -2438,6 +2504,29 @@
                 font-size: 0.68rem;
                 font-weight: 800;
                 letter-spacing: 0.16em;
+                text-transform: uppercase;
+            }
+
+            .notebook-chrome-bar .notebook-note-control--cook {
+                flex: 0 0 auto;
+                width: auto;
+                min-width: 2.55rem;
+                max-width: none;
+                padding: 0 0.9rem;
+                gap: 0.4rem;
+            }
+
+            .notebook-chrome-bar .notebook-cook-label {
+                position: static;
+                width: auto;
+                height: auto;
+                margin: 0;
+                overflow: visible;
+                clip: auto;
+                white-space: nowrap;
+                font-size: 0.68rem;
+                font-weight: 800;
+                letter-spacing: 0.12em;
                 text-transform: uppercase;
             }
         }
@@ -3573,7 +3662,19 @@
         }
 
         .cooking-mode-active .cook-mode-bar {
-            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 35;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 0 0 1rem;
+            padding: 0.7rem 0.85rem;
+            border: 1px solid rgba(200, 144, 80, 0.28);
+            border-radius: 1rem;
+            background: rgba(255, 253, 249, 0.97);
+            box-shadow: 0 10px 24px rgba(28, 20, 16, 0.08);
+            backdrop-filter: blur(10px);
         }
 
         .cooking-mode-exit-btn {
@@ -3592,6 +3693,19 @@
             position: static;
             flex: 0 0 auto;
             transform: none;
+            width: auto;
+            min-width: 2.75rem;
+            height: 2.75rem;
+            padding: 0 0.85rem;
+            gap: 0.4rem;
+            border-radius: 0.85rem;
+            border: 1px solid rgba(28, 20, 16, 0.12);
+            background: #fff;
+            color: #1c1410;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
         }
 
         .cook-mode-title {
@@ -3606,6 +3720,16 @@
             line-height: 1.15;
             text-overflow: ellipsis;
             white-space: nowrap;
+        }
+
+        .cook-mode-exit-label {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .cook-mode-exit-label {
+                display: inline;
+            }
         }
 
         .cooking-mode-active .detail-back-row,
@@ -16256,8 +16380,9 @@
 
             contentDiv.innerHTML = `
                 <div class="cook-mode-bar">
-                    <button onclick="toggleCookingMode(${recipe.id})" id="cooking-mode-exit-btn" class="cooking-mode-exit-btn header-icon-button" aria-label="Back to recipe">
+                    <button onclick="toggleCookingMode(${recipe.id})" id="cooking-mode-exit-btn" class="cooking-mode-exit-btn" aria-label="Stop cooking and go back">
                         <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                        <span class="cook-mode-exit-label">Stop</span>
                     </button>
                     <p class="cook-mode-title">${escapeHTML(recipe.title)}</p>
                 </div>
