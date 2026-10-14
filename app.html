@@ -3631,18 +3631,18 @@
 
         .cooking-mode-active #app-content {
             font-size: 1.1rem;
-            padding-top: 0.85rem;
+            padding-top: calc(4.85rem + env(safe-area-inset-top, 0px));
             padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
             max-width: min(72rem, 100%);
             margin-left: auto;
             margin-right: auto;
-            scroll-padding-top: 0.85rem;
+            scroll-padding-top: calc(5.25rem + env(safe-area-inset-top, 0px));
             scroll-padding-bottom: 2rem;
         }
 
         .cooking-mode-active #toast {
-            top: 4.9rem;
-            z-index: 110;
+            top: calc(5.4rem + env(safe-area-inset-top, 0px));
+            z-index: 130;
         }
 
         .cooking-mode-active .detail-shell {
@@ -3666,19 +3666,23 @@
         }
 
         .cooking-mode-active .cook-mode-bar {
-            position: sticky;
-            top: 0;
-            z-index: 35;
+            position: fixed;
+            top: calc(0.55rem + env(safe-area-inset-top, 0px));
+            left: 50%;
+            z-index: 120;
             display: flex;
             align-items: center;
-            gap: 0.85rem;
-            margin: 0 0 1.15rem;
-            padding: 0.65rem 0.75rem;
-            border: 1px solid rgba(28, 20, 16, 0.08);
+            gap: 0.75rem;
+            width: min(72rem, calc(100% - 1.25rem));
+            margin: 0;
+            padding: 0.6rem 0.7rem;
+            border: 1px solid rgba(28, 20, 16, 0.1);
             border-radius: 1.1rem;
-            background: rgba(255, 252, 247, 0.92);
-            box-shadow: 0 12px 28px rgba(28, 20, 16, 0.07);
+            background: rgba(255, 252, 247, 0.97);
+            box-shadow: 0 14px 32px rgba(28, 20, 16, 0.12);
             backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transform: translateX(-50%);
         }
 
         .cooking-mode-exit-btn {
@@ -3703,16 +3707,16 @@
             width: auto;
             min-width: 2.85rem;
             height: 2.85rem;
-            padding: 0 1rem;
-            gap: 0.45rem;
+            padding: 0 0.9rem;
+            gap: 0.4rem;
             border-radius: 0.9rem;
-            border: 1px solid rgba(28, 20, 16, 0.1);
+            border: 1px solid rgba(28, 20, 16, 0.12);
             background: #fffdf9;
             color: #1c1410;
             font-family: Outfit, sans-serif;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             font-weight: 800;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
         }
 
@@ -3723,7 +3727,7 @@
             overflow: hidden;
             color: #1c1410;
             font-family: Fraunces, serif;
-            font-size: clamp(1.2rem, 2.8vw, 1.85rem);
+            font-size: clamp(1.1rem, 2.8vw, 1.75rem);
             font-weight: 700;
             line-height: 1.15;
             text-overflow: ellipsis;
@@ -3731,16 +3735,22 @@
         }
 
         .cook-mode-exit-label {
-            display: none;
+            display: inline;
         }
 
         @media (min-width: 768px) {
-            .cook-mode-exit-label {
-                display: inline;
+            .cooking-mode-active .cook-mode-bar {
+                padding: 0.7rem 0.95rem;
             }
 
-            .cooking-mode-active .cook-mode-bar {
-                padding: 0.75rem 1rem;
+            .cooking-mode-active .cooking-mode-exit-btn {
+                padding: 0 1.05rem;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .cook-mode-exit-label-long {
+                display: none;
             }
         }
 
@@ -4004,6 +4014,28 @@
             margin-top: 0.9rem;
         }
 
+        .cook-leave-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 0.65rem;
+            padding: 0.7rem 0.85rem;
+            border: 0;
+            background: transparent;
+            color: #6d5f55;
+            font-family: Outfit, sans-serif;
+            font-size: 0.92rem;
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 0.18em;
+        }
+
+        .cook-leave-link:hover,
+        .cook-leave-link:focus-visible {
+            color: #1c1410;
+        }
+
         .cook-nav-btn,
         .cook-begin {
             display: inline-flex;
@@ -4248,8 +4280,8 @@
 
         @media (max-width: 767px) {
             body.chrome-push.cooking-mode-active #app-content {
-                padding-top: 0.85rem;
-                scroll-padding-top: 0.85rem;
+                padding-top: calc(4.85rem + env(safe-area-inset-top, 0px));
+                scroll-padding-top: calc(5.25rem + env(safe-area-inset-top, 0px));
             }
 
             .cooking-mode-active .detail-cooking-focus {
@@ -11916,6 +11948,12 @@
 
         function generateId() { return recipes.length > 0 ? Math.max(...recipes.map(r => r.id)) + 1 : 1; }
 
+        function exitCookingMode() {
+            if (!isCookingMode) return;
+            const id = cookSession?.recipeId || activeDetailRecipeId;
+            toggleCookingMode(id);
+        }
+
         function toggleCookingMode(recipeId = null) {
             const id = recipeId || activeDetailRecipeId;
             isCookingMode = !isCookingMode;
@@ -13768,6 +13806,12 @@
         }
 
         document.addEventListener('keydown', event => {
+            if (event.key === 'Escape' && isCookingMode) {
+                if (document.querySelector('.app-overlay:not(.hidden)')) return;
+                event.preventDefault();
+                exitCookingMode();
+                return;
+            }
             if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
             if (currentView !== 'index' || indexViewMode !== 'book' || !notebookCoverOpen) return;
             const activeTag = document.activeElement?.tagName;
@@ -16644,10 +16688,10 @@
             }
 
             contentDiv.innerHTML = `
-                <div class="cook-mode-bar">
-                    <button onclick="toggleCookingMode(${recipe.id})" id="cooking-mode-exit-btn" class="cooking-mode-exit-btn" aria-label="Stop cooking and go back">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                        <span class="cook-mode-exit-label">Stop cooking</span>
+                <div class="cook-mode-bar" role="banner" aria-label="Cooking mode controls">
+                    <button type="button" onclick="exitCookingMode()" id="cooking-mode-exit-btn" class="cooking-mode-exit-btn" aria-label="Stop cooking and go back to the recipe">
+                        <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
+                        <span class="cook-mode-exit-label">Stop<span class="cook-mode-exit-label-long"> cooking</span></span>
                     </button>
                     <p class="cook-mode-title">${escapeHTML(recipe.title)}</p>
                 </div>
@@ -16849,6 +16893,9 @@
                                 <i data-lucide="chevron-right" class="w-5 h-5"></i>
                             </button>
                         </div>
+                        <button type="button" class="cook-leave-link" onclick="exitCookingMode()">
+                            Leave cooking mode
+                        </button>
                     </section>
                 `;
             }
