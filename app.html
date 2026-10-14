@@ -1271,23 +1271,52 @@
             overflow-wrap: anywhere;
         }
 
-        .profile-place {
+        .profile-place,
+        button.profile-place {
+            display: inline-block;
             margin: 0.35rem 0 0;
+            padding: 0;
+            border: 0;
+            background: transparent;
             color: #8a7a70;
+            font: inherit;
             font-size: 0.72rem;
             font-weight: 800;
             letter-spacing: 0.16em;
             line-height: 1.35;
             text-transform: uppercase;
+            text-align: inherit;
+            cursor: pointer;
         }
 
-        .profile-bio {
+        .profile-bio,
+        button.profile-bio {
+            display: block;
             margin: 0.55rem auto 0;
             max-width: 42ch;
+            padding: 0;
+            border: 0;
+            background: transparent;
             color: #5c5148;
+            font: inherit;
             font-size: 0.95rem;
             font-weight: 600;
             line-height: 1.45;
+            text-align: inherit;
+            cursor: pointer;
+        }
+
+        .profile-place.is-placeholder,
+        .profile-bio.is-placeholder {
+            color: #a8988c;
+            font-style: italic;
+            letter-spacing: 0.04em;
+            text-transform: none;
+            font-weight: 600;
+        }
+
+        .profile-place.is-placeholder {
+            font-size: 0.8rem;
         }
 
         .profile-chips {
@@ -1365,8 +1394,8 @@
 
         @media (min-width: 900px) {
             .profile-layout {
-                grid-template-columns: minmax(18rem, 0.95fr) minmax(0, 1.25fr);
-                gap: 1.15rem;
+                grid-template-columns: minmax(20rem, 0.9fr) minmax(0, 1.35fr);
+                gap: 1rem 1.25rem;
                 align-items: start;
             }
 
@@ -1376,26 +1405,27 @@
             }
 
             .profile-banner {
-                height: 11rem;
+                height: 9.5rem;
             }
 
             .profile-identity {
-                grid-template-columns: 7.5rem minmax(0, 1fr);
+                grid-template-columns: 6.75rem minmax(0, 1fr);
                 align-items: start;
                 justify-items: stretch;
-                gap: 1.15rem 1.25rem;
+                gap: 0.85rem 1.1rem;
                 margin-top: 0;
-                padding: 0 1.35rem 1.35rem;
+                padding: 0 1.25rem 1.2rem;
                 text-align: left;
             }
 
             .profile-avatar {
-                width: 7.5rem;
-                height: 7.5rem;
-                margin-top: -3.25rem;
+                width: 6.75rem;
+                height: 6.75rem;
+                margin-top: -2.85rem;
             }
 
-            .profile-bio {
+            .profile-bio,
+            button.profile-bio {
                 margin-left: 0;
                 margin-right: 0;
             }
@@ -1407,21 +1437,25 @@
 
             .profile-side {
                 display: grid;
-                gap: 1rem;
+                gap: 0.9rem;
             }
 
             .profile-family-panel,
             .profile-editor-panel {
-                padding: 1.25rem 1.35rem;
+                padding: 1.15rem 1.25rem;
             }
 
             .profile-stats {
-                gap: 0.75rem;
+                gap: 0.65rem;
             }
 
             .profile-stat {
-                padding: 1rem 0.85rem;
+                padding: 0.9rem 0.8rem;
                 text-align: left;
+            }
+
+            .profile-name {
+                font-size: clamp(1.9rem, 2.4vw, 2.35rem);
             }
         }
 
@@ -13252,6 +13286,10 @@
                 : 'You can already create and join families with name + tag + pin. Full family-cloud sync for every member lands in a later round.';
 
             const optionsLabel = userSettings.language === 'nl' ? 'Opties' : 'Options';
+            const hasCountry = Boolean(String(userSettings.country || '').trim());
+            const hasBio = Boolean(String(userSettings.bio || '').trim());
+            const placeText = hasCountry ? userSettings.country : t.setCountry;
+            const bioText = hasBio ? userSettings.bio : t.addBio;
             const primaryFamily = (userFamilies || []).find(f => !f.removedMembers?.some(m => m.userId === currentUser?.uid));
             const primaryFamilyChip = primaryFamily
                 ? (() => {
@@ -13264,13 +13302,13 @@
                 <div class="profile-sheet">
                     <div class="profile-layout">
                         <section class="profile-hero">
-                            <div class="profile-banner" style="background-image: url('${bannerBg}')"></div>
+                            <div class="profile-banner" style="background-image: url(&quot;${bannerBg}&quot;)"></div>
                             <div class="profile-identity">
-                                <div class="profile-avatar" style="background-image: url('${profileBg}')" role="img" aria-label="${escapeHTML(userSettings.name || t.yourProfile)}"></div>
+                                <div class="profile-avatar" style="background-image: url(&quot;${profileBg}&quot;)" role="img" aria-label="${escapeHTML(userSettings.name || t.yourProfile)}"></div>
                                 <div class="profile-copy">
                                     <h2 class="profile-name">${escapeHTML(userSettings.name || t.yourProfile)}</h2>
-                                    <p class="profile-place">${escapeHTML(userSettings.country || t.setCountry)}</p>
-                                    <p class="profile-bio" title="${escapeHTML(userSettings.bio || t.addBio)}">${escapeHTML(userSettings.bio || t.addBio)}</p>
+                                    <button type="button" class="profile-place ${hasCountry ? '' : 'is-placeholder'}" onclick="renderProfileEditor()">${escapeHTML(placeText)}</button>
+                                    <button type="button" class="profile-bio ${hasBio ? '' : 'is-placeholder'}" onclick="renderProfileEditor()" title="${escapeHTML(bioText)}">${escapeHTML(bioText)}</button>
                                     <div class="profile-chips">
                                         <span class="shop-stat">
                                             <i data-lucide="${userSettings.isPublic ? 'globe' : 'lock'}" class="h-3.5 w-3.5"></i>
@@ -16194,9 +16232,9 @@
                 <div class="profile-sheet">
                     <div class="profile-layout">
                     <section class="profile-hero">
-                        <div class="profile-banner" style="background-image: url('${displayBanner}')"></div>
+                        <div class="profile-banner" style="background-image: url(&quot;${displayBanner}&quot;)"></div>
                         <div class="profile-identity">
-                            <div class="profile-avatar" style="background-image: url('${displayPhoto}')"></div>
+                            <div class="profile-avatar" style="background-image: url(&quot;${displayPhoto}&quot;)"></div>
                             <div class="profile-copy">
                                 <h2 class="profile-name">${escapeHTML(displayName)}</h2>
                                 <p class="profile-place">${escapeHTML(displayCountry)}</p>
