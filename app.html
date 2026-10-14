@@ -333,9 +333,53 @@
         }
 
         .settings-sheet {
-            max-width: 40rem;
+            max-width: 42rem;
             margin: 0 auto;
             background: transparent;
+        }
+
+        .settings-hero {
+            display: grid;
+            gap: 0.35rem;
+            margin-bottom: 1rem;
+            padding: 0 0.15rem;
+        }
+
+        .settings-hero h2 {
+            margin: 0;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.7rem, 3vw, 2.35rem);
+            font-weight: 700;
+            color: #1c1410;
+            line-height: 1.1;
+        }
+
+        .settings-hero p {
+            margin: 0;
+            color: #8a7a70;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .settings-grid {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .settings-panel {
+            padding: 0.85rem 0.15rem 0.35rem;
+            border: 0;
+            background: transparent;
+        }
+
+        .settings-panel-kicker {
+            margin: 0 0 0.35rem;
+            color: #8a7a70;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
         }
 
         .settings-row {
@@ -359,9 +403,7 @@
         }
 
         .settings-divider {
-            height: 1px;
-            margin: 0.2rem 0;
-            background: rgba(144, 152, 112, 0.35);
+            display: none;
         }
 
         .settings-select {
@@ -375,13 +417,107 @@
         }
 
         .settings-actions {
-            padding: 0.15rem 0 0.45rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0 0.2rem;
+        }
+
+        .settings-actions.button-pair {
+            width: 100%;
+        }
+
+        .settings-legal {
+            display: grid;
+            gap: 0.15rem;
         }
 
         button.settings-row {
             width: 100%;
             background: transparent;
             text-align: left;
+        }
+
+        .header-icon-label {
+            display: none;
+        }
+
+        @media (min-width: 900px) {
+            .settings-sheet {
+                max-width: none;
+                width: 100%;
+                padding: 0.25rem 0 1.5rem;
+            }
+
+            .settings-hero {
+                margin-bottom: 1.35rem;
+                max-width: 40rem;
+            }
+
+            .settings-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1rem 1.15rem;
+                align-items: start;
+            }
+
+            .settings-panel {
+                padding: 1.15rem 1.2rem 1.05rem;
+                border: 1px solid rgba(28, 20, 16, 0.08);
+                border-radius: 1.25rem;
+                background:
+                    linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+                box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
+            }
+
+            .settings-panel--wide {
+                grid-column: 1 / -1;
+            }
+
+            .settings-panel .settings-actions.button-pair {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.65rem;
+            }
+
+            .settings-panel .settings-actions.button-pair > button,
+            .settings-panel .settings-actions.button-pair > label {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .settings-prefs {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.35rem 1.25rem;
+            }
+
+            .settings-prefs .settings-row--full {
+                grid-column: 1 / -1;
+            }
+
+            .settings-legal {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.35rem 1rem;
+            }
+
+            #main-header #header-back,
+            #main-header #header-help,
+            #main-header #header-open-settings {
+                width: auto;
+                min-width: 2.75rem;
+                padding: 0 0.9rem;
+                gap: 0.4rem;
+            }
+
+            .header-icon-label {
+                display: inline;
+                font-family: Outfit, sans-serif;
+                font-size: 0.72rem;
+                font-weight: 800;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
         }
 
         .settings-disclosure {
@@ -1513,9 +1649,27 @@
                 padding: 0.15rem 0.75rem 0.75rem;
             }
 
+            .settings-sheet > .settings-hero h2,
             .settings-sheet > h2 {
                 font-size: 1.2rem;
                 padding-bottom: 0;
+            }
+
+            .settings-hero {
+                margin-bottom: 0.55rem;
+            }
+
+            .settings-hero p {
+                font-size: 0.82rem;
+            }
+
+            .settings-panel-kicker {
+                margin-bottom: 0.15rem;
+                font-size: 0.66rem;
+            }
+
+            .header-icon-label {
+                display: none !important;
             }
 
             .settings-row {
@@ -2068,7 +2222,7 @@
             padding: 0.7rem 1rem;
         }
 
-        .notebook-overview-slim .index-overview-head > .flex {
+        .notebook-overview-slim .index-overview-layout {
             gap: 0.75rem;
         }
 
@@ -2129,10 +2283,8 @@
                 display: none;
             }
 
-            .notebook-overview-slim .index-overview-head > .flex {
-                flex-direction: row;
+            .notebook-overview-slim .index-overview-layout {
                 align-items: center;
-                justify-content: space-between;
             }
 
             .notebook-overview-slim .index-overview-head h2 {
@@ -2674,10 +2826,15 @@
             .notebook-chrome-bar button,
             .notebook-chrome-bar .notebook-note-control--cook {
                 flex: 0 0 auto;
+                flex-direction: row;
+                flex-wrap: nowrap;
                 width: auto;
                 min-width: 2.55rem;
                 max-width: none;
-                padding: 0 0.8rem;
+                height: 2.7rem;
+                min-height: 2.7rem;
+                padding: 0 0.85rem;
+                white-space: nowrap;
             }
 
             .notebook-chrome-bar .notebook-tool-label,
@@ -4497,7 +4654,8 @@
         
         <header id="main-header" class="text-forest transition-all" translate="no">
             <button id="header-back" type="button" onclick="handleTopBackAction()" class="header-icon-button" hidden aria-label="Back">
-                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i>
+                <span class="header-icon-label">Back</span>
             </button>
             <div class="app-header-brand">
                 <div class="app-header-mark">
@@ -4518,10 +4676,12 @@
                     <span id="undo-delete-label">Undo</span>
                 </button>
                 <button id="header-help" type="button" onclick="showUsageGuide()" class="header-icon-button" hidden aria-label="Help" title="Help">
-                    <i data-lucide="info" class="w-5 h-5"></i>
+                    <i data-lucide="info" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="header-icon-label">Help</span>
                 </button>
                 <button id="header-open-settings" type="button" onclick="renderSettings()" class="header-icon-button" aria-label="Opties" title="Opties">
-                    <i data-lucide="settings-2" class="w-5 h-5"></i>
+                    <i data-lucide="settings-2" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="header-icon-label">Opties</span>
                 </button>
                 <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="flex h-10 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
                     <i data-lucide="plus" class="w-4 h-4"></i> <span class="header-add-label">Add Recipe</span>
@@ -13045,71 +13205,104 @@
             const offerCloudSignIn = !isCloudAccountUid(currentUser?.uid);
             contentDiv.innerHTML = `
                 <div class="settings-sheet push-sheet">
-                    <h2 class="px-1 pb-1 font-fantasy text-2xl font-bold text-forest">Opties</h2>
-                    <div class="settings-row">
-                        <span>Plan</span>
-                        <span class="settings-status">${escapeHTML(billingMeta.badge || '')}</span>
+                    <header class="settings-hero">
+                        <h2>Opties</h2>
+                        <p>${settingsNl ? 'Plan, account en archiefvoorkeuren op één plek.' : 'Plan, account, and archive preferences in one place.'}</p>
+                    </header>
+                    <div class="settings-grid">
+                        <section class="settings-panel">
+                            <p class="settings-panel-kicker">Plan</p>
+                            <div class="settings-row">
+                                <span>${settingsNl ? 'Huidig plan' : 'Current plan'}</span>
+                                <span class="settings-status">${escapeHTML(billingMeta.badge || '')}</span>
+                            </div>
+                            <div class="settings-actions button-pair">
+                                <button type="button" onclick="showPlansModal()" class="${getAppButtonClasses('accent', { size: 'sm' })}">
+                                    <i data-lucide="crown" class="w-4 h-4"></i>${settingsNl ? 'Bekijk plannen' : 'View Plans'}
+                                </button>
+                                ${billingMeta.state === 'preview'
+                                    ? `<button type="button" onclick="resetPremiumPreviewAccess()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>${settingsNl ? 'Reset preview' : 'Reset preview'}</button>`
+                                    : `<button type="button" onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${purchaseRestoreLabel}" title="${purchaseRestoreLabel}"><i data-lucide="shield-check" class="w-4 h-4"></i>${purchaseRestoreLabel}</button>`}
+                            </div>
+                        </section>
+
+                        <section class="settings-panel">
+                            <p class="settings-panel-kicker">Account</p>
+                            <form id="settings-form" onsubmit="saveSettings(event)" class="space-y-1">
+                                <div class="settings-row">
+                                    <span>Account</span>
+                                    <span class="settings-status">${escapeHTML(accountStatus)}</span>
+                                </div>
+                                ${offerCloudSignIn ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
+                                <div class="settings-actions button-pair">
+                                    <button type="submit" class="${getAppButtonClasses('primary', { size: 'sm' })}">
+                                        <i data-lucide="save" class="w-4 h-4"></i>${settingsNl ? 'Opslaan' : 'Save'}
+                                    </button>
+                                    ${isAuthenticated
+                                        ? `<button type="button" onclick="signOut()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="log-out" class="w-4 h-4"></i>${settingsNl ? 'Uitloggen' : 'Sign Out'}</button>`
+                                        : `<button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { size: 'sm' })} auth-gate-social auth-gate-action-locked"><i data-lucide="log-in" class="w-4 h-4"></i>Google</button>`}
+                                </div>
+                                ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'sm' })} auth-gate-social auth-gate-action-locked"><i data-lucide="link" class="w-4 h-4"></i>${settingsNl ? 'Koppel Google' : 'Link Google'}</button></div>` : ''}
+
+                                <p class="settings-panel-kicker" style="margin-top:1rem;">${settingsNl ? 'Voorkeuren' : 'Preferences'}</p>
+                                <div class="settings-prefs">
+                                    <label class="settings-row">
+                                        <span>${settingsNl ? 'Maten' : 'Measurement'}</span>
+                                        <select id="settings-measurement" class="settings-select">
+                                            <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>Metric</option>
+                                            <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>Imperial</option>
+                                        </select>
+                                    </label>
+                                    <label class="settings-row">
+                                        <span>${settingsNl ? 'Taal' : 'Language'}</span>
+                                        <select id="settings-language" class="settings-select">
+                                            <option value="en" ${userSettings.language === 'en' ? 'selected' : ''}>English</option>
+                                            <option value="nl" ${userSettings.language === 'nl' ? 'selected' : ''}>Nederlands</option>
+                                            <option value="fr" ${userSettings.language === 'fr' ? 'selected' : ''}>Français</option>
+                                            <option value="de" ${userSettings.language === 'de' ? 'selected' : ''}>Deutsch</option>
+                                            <option value="es" ${userSettings.language === 'es' ? 'selected' : ''}>Español</option>
+                                        </select>
+                                    </label>
+                                    <label class="settings-row settings-row--full">
+                                        <span>Auto-publish</span>
+                                        <input type="checkbox" id="settings-auto-publish" ${userSettings.autoPublish ? 'checked' : ''}>
+                                    </label>
+                                </div>
+                            </form>
+                        </section>
+
+                        <section class="settings-panel">
+                            <p class="settings-panel-kicker">Backup</p>
+                            <div class="settings-row">
+                                <span>Backup</span>
+                                <span class="settings-status">${backupStatus}</span>
+                            </div>
+                            <div class="settings-actions button-pair">
+                                <button type="button" onclick="${backupDownloadLocked ? "showPremiumModal('download backups')" : 'exportAllAsJSON()'}" class="${getAppButtonClasses(backupDownloadLocked ? 'locked' : 'secondary', { size: 'sm' })}" aria-label="${backupDownloadLabel}" title="${backupDownloadLabel}">
+                                    <i data-lucide="${backupDownloadLocked ? 'lock' : 'download'}" class="w-4 h-4"></i><span>${backupDownloadLabel}</span>
+                                </button>
+                                ${backupRestoreLocked
+                                    ? `<button type="button" onclick="showPremiumModal('restore backups')" class="${getAppButtonClasses('locked', { size: 'sm' })}" aria-label="${backupRestoreLabel}" title="${backupRestoreLabel}"><i data-lucide="lock" class="w-4 h-4"></i><span>${backupRestoreLabel}</span></button>`
+                                    : `<label class="${getAppButtonClasses('secondary', { size: 'sm' })} cursor-pointer" aria-label="${backupRestoreLabel}" title="${backupRestoreLabel}"><i data-lucide="upload" class="w-4 h-4"></i><span>${backupRestoreLabel}</span><input type="file" accept=".json" onchange="importFromJSON(event)" style="display: none;"></label>`}
+                            </div>
+                        </section>
+
+                        <section class="settings-panel">
+                            <p class="settings-panel-kicker">${settingsNl ? 'Juridisch' : 'Legal'}</p>
+                            <div class="settings-legal">
+                                <button type="button" onclick="showPrivacyPolicy()" class="settings-row">
+                                    <span>Privacybeleid</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 text-sage"></i>
+                                </button>
+                                <button type="button" onclick="showTermsOfUse()" class="settings-row">
+                                    <span>Gebruiksvoorwaarden</span>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 text-sage"></i>
+                                </button>
+                            </div>
+                        </section>
+
+                        ${isCurrentUserAdmin() ? `<section class="settings-panel settings-panel--wide"><p class="settings-panel-kicker">Admin</p>${adminManagementContent}</section>` : ''}
                     </div>
-                    <div class="settings-actions button-pair">
-                        <button type="button" onclick="showPlansModal()" class="${getAppButtonClasses('accent', { size: 'sm' })}">View Plans</button>
-                        ${billingMeta.state === 'preview'
-                            ? `<button type="button" onclick="resetPremiumPreviewAccess()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">Reset</button>`
-                            : `<button type="button" onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${purchaseRestoreLabel}" title="${purchaseRestoreLabel}">${purchaseRestoreLabel}</button>`}
-                    </div>
-                    <div class="settings-divider"></div>
-                    <form id="settings-form" onsubmit="saveSettings(event)">
-                    <div class="settings-row">
-                        <span>Account</span>
-                        <span class="settings-status">${escapeHTML(accountStatus)}</span>
-                    </div>
-                    ${offerCloudSignIn ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
-                    <div class="settings-actions button-pair">
-                        <button type="submit" class="${getAppButtonClasses('primary', { size: 'sm' })}">Save</button>
-                        ${isAuthenticated
-                            ? `<button type="button" onclick="signOut()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">Sign Out</button>`
-                            : `<button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { size: 'sm' })} auth-gate-social auth-gate-action-locked">Google</button>`}
-                    </div>
-                    ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'sm' })} auth-gate-social auth-gate-action-locked">Google</button></div>` : ''}
-                    <div class="settings-divider"></div>
-                        <label class="settings-row">
-                            <span>Measurement</span>
-                            <select id="settings-measurement" class="settings-select">
-                                <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>Metric</option>
-                                <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>Imperial</option>
-                            </select>
-                        </label>
-                        <label class="settings-row">
-                            <span>Language</span>
-                            <select id="settings-language" class="settings-select">
-                                <option value="en" ${userSettings.language === 'en' ? 'selected' : ''}>English</option>
-                                <option value="nl" ${userSettings.language === 'nl' ? 'selected' : ''}>Nederlands</option>
-                                <option value="fr" ${userSettings.language === 'fr' ? 'selected' : ''}>Français</option>
-                                <option value="de" ${userSettings.language === 'de' ? 'selected' : ''}>Deutsch</option>
-                                <option value="es" ${userSettings.language === 'es' ? 'selected' : ''}>Español</option>
-                            </select>
-                        </label>
-                        <label class="settings-row">
-                            <span>Auto-publish</span>
-                            <input type="checkbox" id="settings-auto-publish" ${userSettings.autoPublish ? 'checked' : ''}>
-                        </label>
-                    </form>
-                    <div class="settings-divider"></div>
-                    <div class="settings-row">
-                        <span>Backup</span>
-                        <span class="settings-status">${backupStatus}</span>
-                    </div>
-                    <div class="settings-actions button-pair">
-                        <button type="button" onclick="${backupDownloadLocked ? "showPremiumModal('download backups')" : 'exportAllAsJSON()'}" class="${getAppButtonClasses(backupDownloadLocked ? 'locked' : 'secondary', { size: 'sm' })} phone-save-icon" aria-label="${backupDownloadLabel}" title="${backupDownloadLabel}">
-                            <i data-lucide="download" class="w-4 h-4"></i><span class="phone-icon-label">Download</span>
-                        </button>
-                        ${backupRestoreLocked
-                            ? `<button type="button" onclick="showPremiumModal('restore backups')" class="${getAppButtonClasses('locked', { size: 'sm' })} phone-save-icon" aria-label="${backupRestoreLabel}" title="${backupRestoreLabel}"><i data-lucide="upload" class="w-4 h-4"></i><span class="phone-icon-label">${backupRestoreLabel}</span></button>`
-                            : `<label class="${getAppButtonClasses('secondary', { size: 'sm' })} phone-save-icon cursor-pointer" aria-label="${backupRestoreLabel}" title="${backupRestoreLabel}"><i data-lucide="upload" class="w-4 h-4"></i><span class="phone-icon-label">${backupRestoreLabel}</span><input type="file" accept=".json" onchange="importFromJSON(event)" style="display: none;"></label>`}
-                    </div>
-                    <div class="settings-divider"></div>
-                    <button type="button" onclick="showPrivacyPolicy()" class="settings-row">Privacybeleid</button>
-                    <button type="button" onclick="showTermsOfUse()" class="settings-row">Gebruiksvoorwaarden</button>
-                    ${isCurrentUserAdmin() ? `<div class="settings-divider"></div><div class="pt-2">${adminManagementContent}</div>` : ''}
                 </div>
             `;
             lucide.createIcons();
