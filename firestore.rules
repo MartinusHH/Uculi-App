@@ -83,18 +83,8 @@ service cloud.firestore {
 
     match /app-config/{docId} {
       allow read: if signedIn();
-      // First signed-in user may create the admin doc once (local/emulator bootstrap).
-      // After that only listed admin emails can change it.
-      allow create: if isAdminEmail() || (
-        docId == 'admin'
-        && signedIn()
-        && authEmail() != ''
-        && !exists(/databases/$(database)/documents/app-config/admin)
-        && request.resource.data.keys().hasAll(['enabledEmails'])
-        && request.resource.data.enabledEmails is list
-        && request.resource.data.enabledEmails.size() == 1
-        && request.resource.data.enabledEmails[0] == authEmail()
-      );
+      // Admin doc is managed manually (console/admin SDK) or by existing admins only.
+      allow create: if isAdminEmail();
       allow update, delete: if isAdminEmail();
     }
 

@@ -7953,7 +7953,7 @@
                 return;
             }
 
-            ensureInitialAdminBootstrap();
+            // Admins come only from app-config/admin in Firestore (set manually); no client bootstrap.
             loadAdminConfigFromCloud();
             loadCurrentUserModerationStatusFromCloud();
 
@@ -8579,7 +8579,11 @@
 
             try {
                 const snapshot = await firebase.firestore().collection('app-config').doc('admin').get();
-                if (!snapshot.exists) return;
+                if (!snapshot.exists) {
+                    adminConfig = getDefaultAdminConfig();
+                    persistAdminConfigLocally();
+                    return;
+                }
 
                 const cloudConfig = normalizeAdminConfig(snapshot.data() || {});
                 adminConfig = cloudConfig;
@@ -8589,17 +8593,6 @@
             }
         }
 
-        function ensureInitialAdminBootstrap() {
-            if (adminConfig.enabledEmails.length > 0) return;
-            const email = getCurrentUserEmail();
-            if (!email) return;
-
-            adminConfig.enabledEmails = [email];
-            adminConfig.lastUpdatedAt = new Date().toISOString();
-            persistAdminConfigLocally();
-            syncAdminConfigToCloud();
-            showToast('Admin bootstrap completed for your account.', 'shield-check');
-        }
 
         function updateAdminConfig(patch = {}) {
             adminConfig = normalizeAdminConfig({
@@ -15614,6 +15607,22 @@
             `;
         }
 
+        function escapeAttrSafe(value = '') {
+            return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+        }
+
+        // Keep the live search input element across re-renders so focus/caret survive typing.
+        function handleRecipeSearchInput(inputEl) {
+            searchQuery = inputEl.value;
+            const selStart = inputEl.selectionStart;
+            const selEnd = inputEl.selectionEnd;
+            renderList();
+            const freshEl = document.getElementById('recipe-search-input');
+            if (freshEl && freshEl !== inputEl) freshEl.replaceWith(inputEl);
+            inputEl.focus({ preventScroll: true });
+            try { inputEl.setSelectionRange(selStart, selEnd); } catch (e) {}
+        }
+
         function renderList() {
             chromeBackAction = null;
             chromePeer = 'index';
@@ -15771,7 +15780,7 @@
                             ${isSearchVisible ? `
                                 <div class="relative">
                                     <i data-lucide="search" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-sage opacity-70"></i>
-                                    <input type="text" placeholder="Search by title, ingredient, or occasion..." value="${searchQuery}" oninput="searchQuery = this.value; renderList()" class="w-full h-11 rounded-xl border border-accent bg-parchment px-12 text-base font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:bg-white">
+                                    <input type="text" placeholder="Search by title, ingredient, or occasion..." id="recipe-search-input" value="${escapeAttrSafe(searchQuery)}" oninput="handleRecipeSearchInput(this)" class="w-full h-11 rounded-xl border border-accent bg-parchment px-12 text-base font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:bg-white">
                                 </div>
                             ` : ''}
 
