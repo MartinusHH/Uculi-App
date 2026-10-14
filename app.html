@@ -1107,6 +1107,7 @@
             background-color: #929D75 !important;
             border-color: #929D75 !important;
             color: #1c1410 !important;
+            opacity: 1;
         }
 
         button.auth-gate-social,
@@ -13529,13 +13530,13 @@
                     id: 'terms',
                     kicker: 'Gebruiksvoorwaarden',
                     title: 'Gebruiksvoorwaarden',
-                    intro: 'Deze gebruiksvoorwaarden leggen uit hoe je Uculi op dit apparaat gebruikt.',
+                    intro: 'Deze voorwaarden leggen uit hoe je Uculi gebruikt, met of zonder account.',
                     sections: [
                         ['Toegestaan gebruik', 'Voeg geen schadelijk, haatdragend, expliciet, illegaal of beledigend materiaal toe.'],
-                        ['Jouw recepten', 'Jij blijft eigenaar van recepten en notities die je schrijft. Uculi bewaart ze lokaal voor je account op dit apparaat.'],
-                        ['Account', 'Jij bent verantwoordelijk voor de naam, het e-mailadres en de recepten onder je login.'],
+                        ['Jouw recepten', 'Jij blijft eigenaar van recepten en notities die je schrijft. Zonder account blijven ze in je browser. Met een account worden ze opgeslagen in Google Firebase, project mholt-uculi.'],
+                        ['Account', 'Je logt in met e-mail en wachtwoord, of met Google. Bij Google gebruiken we alleen je naam en je e-mailadres. Jij bent verantwoordelijk voor de naam, het e-mailadres en de recepten onder je login.'],
                         ['Geen medisch advies', 'Uculi is een receptenschrift. Het geeft geen medisch, voedings- of allergieadvies.'],
-                        ['Wijzigingen', `Het schrift kan veranderen om betrouwbaar en veilig te blijven. Deze voorwaarden zijn versie ${AGREEMENT_VERSION}.`]
+                        ['Wijzigingen', `Het schrift kan veranderen om betrouwbaar en veilig te blijven. Deze voorwaarden zijn versie ${AGREEMENT_VERSION}. Vragen? Mail naar mholt.apps@gmail.com.`]
                     ]
                 };
             }
@@ -13543,13 +13544,13 @@
                 id: 'privacy',
                 kicker: 'Privacy',
                 title: 'Privacybeleid',
-                intro: 'Dit beleid legt uit wat Uculi op dit apparaat bewaart.',
+                intro: 'Dit beleid legt uit wat Uculi bewaart, en waar dat staat.',
                 sections: [
-                    ['Wat wordt bewaard', 'Je naam, e-mail, recepten, notities en instellingen blijven in deze browser bij je account.'],
-                    ['Waarom', 'Zodat je je eigen recepten kunt openen, bewerken en verwijderen zonder ze naar een live clouddienst te sturen.'],
-                    ['Jouw keuzes', 'Je kunt recepten bewerken of verwijderen, uitloggen en de opgeslagen gegevens van deze browser wissen.'],
-                    ['Cloud', 'Live synchronisatie, publiceren en gedeelde families horen niet bij dit lokale schrift.'],
-                    ['Rechten', 'Je kunt inzage, correctie, export of verwijdering vragen van de gegevens die voor je account zijn opgeslagen.']
+                    ['Zonder account', 'Zonder account blijft alles lokaal in je browser op dit apparaat. Er gaat dan niets naar een server.'],
+                    ['Met een account', 'Met een account worden je gegevens opgeslagen in Google Firebase, project mholt-uculi. Dat geldt voor Firestore en voor Authentication. Inloggen kan met e-mail en wachtwoord, of met Google. Bij Google gebruiken we alleen je naam en je e-mailadres.'],
+                    ['Akkoordmoment', 'Maak je een account, dan bewaren we ook het moment waarop je akkoord ging. Dat staat in Firestore op users/{uid}/private/agreement, met de voorwaardenversie en het tijdstip.'],
+                    ['Jouw keuzes', 'Je kunt recepten bewerken of verwijderen en uitloggen. Zonder account wis je de gegevens in deze browser. Met een account kun je inzage, correctie of verwijdering vragen van wat in Firebase staat.'],
+                    ['Verantwoordelijke', 'Uculi is een app van Mholt. Voor vragen over je gegevens mail je naar mholt.apps@gmail.com.']
                 ]
             };
         }
