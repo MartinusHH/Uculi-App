@@ -16974,7 +16974,7 @@
                     html += `
                         <article onclick="renderDetail(${recipe.id})" class="index-list-card relative" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();renderDetail(${recipe.id});}">
                             ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-gold bg-white text-gold shadow-sm"><i data-lucide="alert-circle" class="h-4 w-4"></i></button>` : ''}
-                            <div class="index-list-media" style="background-image: url('${cssUrl(recipe.profile || defaultPlaceholderProfile)}')"></div>
+                            <div class="index-list-media" style="background-image: ${cssUrl(recipe.profile || defaultPlaceholderProfile)}"></div>
                             <div class="index-list-body">
                                 <h3 class="truncate">${escapeHTML(recipe.title || 'Untitled')}</h3>
                                 <div class="index-card-meta">
@@ -17002,7 +17002,7 @@
                     html += `
                         <article onclick="renderDetail(${recipe.id})" class="index-card relative" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();renderDetail(${recipe.id});}">
                             ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-gold bg-white text-gold shadow-sm"><i data-lucide="alert-circle" class="h-5 w-5"></i></button>` : ''}
-                            <div class="index-card-media" style="background-image: url('${cssUrl(recipe.profile || defaultPlaceholderProfile)}')"></div>
+                            <div class="index-card-media" style="background-image: ${cssUrl(recipe.profile || defaultPlaceholderProfile)}"></div>
                             <div class="index-card-body">
                                 <h3>${escapeHTML(recipe.title || 'Untitled')}</h3>
                                 <div class="index-card-meta">
