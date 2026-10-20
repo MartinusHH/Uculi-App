@@ -11650,355 +11650,460 @@
             reader.readAsText(file);
         }
 
-        async function exportRecipeAsPDF(recipeId) {
-            if (requirePremiumFeature('recipePdfExport')) {
-                return;
-            }
+        let isPdfExportInProgress = false;
 
-            const recipe = recipes.find(r => r.id === recipeId);
-            if (!recipe) return;
+        function normalizePdfText(value, fallback = '') {
+            const normalized = String(value ?? fallback)
+                .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+                .replace(/[\u{1F300}-\u{1FAFF}]/gu, '')
+                .replace(/\u00A0/g, ' ')
+                .normalize('NFKD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[\u201C\u201D]/g, '"')
+                .replace(/[\u2018\u2019]/g, "'")
+                .replace(/[\u2013\u2014]/g, '-')
+                .replace(/•/g, '-')
+                .replace(/°/g, ' deg')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .replace(/[^\x20-\x7E]/g, '')
+                .trim();
+            return normalized || fallback;
+        }
 
-            const normalizePdfText = (value, fallback = '') => {
-                const normalized = String(value ?? fallback)
-                    .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
-                    .replace(/[\u{1F300}-\u{1FAFF}]/gu, '')
-                    .replace(/\u00A0/g, ' ')
-                    .normalize('NFKD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .replace(/[“”]/g, '"')
-                    .replace(/[‘’]/g, "'")
-                    .replace(/[–—]/g, '-')
-                    .replace(/•/g, '-')
-                    .replace(/°/g, ' deg')
-                    .replace(/\s+/g, ' ')
-                    .trim()
-                    .replace(/[^\x20-\x7E]/g, '')
-                    .trim();
-                return normalized || fallback;
-            };
+        function getPdfExportDateLabel() {
+            return new Date().toLocaleDateString(getActiveUiLanguage() === 'nl' ? 'nl-NL' : 'en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
 
-            const filename = `${normalizePdfText(recipe.title, 'recipe').replace(/[\\/:*?"<>|]+/g, '-').trim() || 'recipe'}.pdf`;
+        function sanitizePdfFilename(value, fallback = 'uculi') {
+            return `${normalizePdfText(value, fallback).replace(/[\\/:*?"<>|]+/g, '-').trim() || fallback}.pdf`;
+        }
+
+        function getPdfSharedStyles() {
+            return `
+                .pdf-shell {
+                    width: 794px;
+                    box-sizing: border-box;
+                    padding: 40px 44px 54px;
+                    background: #ffffff;
+                    color: #1c1410;
+                    font-family: "Outfit", Arial, sans-serif;
+                }
+                .pdf-recipe-block + .pdf-recipe-block {
+                    page-break-before: always;
+                    break-before: page;
+                    margin-top: 12px;
+                }
+                .pdf-hero,
+                .pdf-book-cover {
+                    border: 1px solid #EFEFEF;
+                    border-radius: 28px;
+                    overflow: hidden;
+                    background: linear-gradient(135deg, #ffffff 0%, #faf6ee 52%, #f3ece0 100%);
+                    box-shadow: 0 18px 34px rgba(28, 20, 16, 0.08);
+                }
+                .pdf-brand {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 24px;
+                    padding: 26px 28px 20px;
+                    border-bottom: 1px solid #EFEFEF;
+                }
+                .pdf-brand-left {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                }
+                .pdf-brand-mark {
+                    width: 52px;
+                    height: 52px;
+                    border-radius: 16px;
+                    background: #1c1410;
+                    color: #ffffff;
+                    position: relative;
+                    box-shadow: 0 10px 22px rgba(28, 20, 16, 0.16);
+                }
+                .pdf-brand-book,
+                .pdf-brand-book::before,
+                .pdf-brand-book::after {
+                    position: absolute;
+                    content: '';
+                    box-sizing: border-box;
+                }
+                .pdf-brand-book {
+                    top: 14px;
+                    left: 25px;
+                    width: 1px;
+                    height: 20px;
+                    background: rgba(255,255,255,0.92);
+                }
+                .pdf-brand-book::before,
+                .pdf-brand-book::after {
+                    top: 0;
+                    width: 10px;
+                    height: 18px;
+                    border: 2px solid rgba(255,255,255,0.92);
+                    border-radius: 3px;
+                }
+                .pdf-brand-book::before {
+                    right: 2px;
+                    border-right: 0;
+                }
+                .pdf-brand-book::after {
+                    left: 2px;
+                    border-left: 0;
+                }
+                .pdf-brand-kicker {
+                    margin: 0;
+                    font-size: 11px;
+                    font-weight: 700;
+                    letter-spacing: 0.28em;
+                    text-transform: uppercase;
+                    color: #8a7a70;
+                }
+                .pdf-brand-title {
+                    margin: 6px 0 0;
+                    font-family: "Fraunces", serif;
+                    font-size: 40px;
+                    line-height: 0.95;
+                    color: #1c1410;
+                }
+                .pdf-brand-subtitle {
+                    margin: 6px 0 0;
+                    font-size: 12px;
+                    font-weight: 700;
+                    letter-spacing: 0.14em;
+                    text-transform: uppercase;
+                    color: #8a7a70;
+                }
+                .pdf-brand-meta { text-align: right; }
+                .pdf-brand-chip {
+                    display: inline-block;
+                    padding: 6px 12px;
+                    border-radius: 999px;
+                    border: 1px solid #d8d0c1;
+                    background: rgba(255,255,255,0.9);
+                    font-size: 10px;
+                    font-weight: 800;
+                    letter-spacing: 0.18em;
+                    text-transform: uppercase;
+                    color: #1c1410;
+                }
+                .pdf-brand-meta p {
+                    margin: 10px 0 0;
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #8a7a70;
+                }
+                .pdf-hero-body,
+                .pdf-book-cover-body { padding: 28px; }
+                .pdf-recipe-title,
+                .pdf-book-title {
+                    margin: 0;
+                    font-family: "Fraunces", serif;
+                    font-size: 44px;
+                    line-height: 0.94;
+                    color: #1c1410;
+                }
+                .pdf-book-title { font-size: 48px; }
+                .pdf-metadata,
+                .pdf-book-lede {
+                    margin: 14px 0 0;
+                    font-size: 14px;
+                    font-weight: 700;
+                    letter-spacing: 0.08em;
+                    text-transform: uppercase;
+                    color: #8a7a70;
+                }
+                .pdf-book-lede {
+                    letter-spacing: 0.04em;
+                    text-transform: none;
+                    line-height: 1.55;
+                }
+                .pdf-stat-grid {
+                    display: grid;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 12px;
+                    margin-top: 22px;
+                }
+                .pdf-stat-card {
+                    border-radius: 18px;
+                    border: 1px solid #EFEFEF;
+                    background: rgba(255,255,255,0.86);
+                    padding: 14px 16px;
+                }
+                .pdf-stat-card p { margin: 0; }
+                .pdf-stat-label {
+                    font-size: 10px;
+                    font-weight: 800;
+                    letter-spacing: 0.2em;
+                    text-transform: uppercase;
+                    color: #8a7a70;
+                }
+                .pdf-stat-value {
+                    margin-top: 8px;
+                    font-size: 24px;
+                    font-family: "Fraunces", serif;
+                    font-weight: 700;
+                    color: #1c1410;
+                }
+                .pdf-section { margin-top: 24px; }
+                .pdf-section-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 14px;
+                }
+                .pdf-section-title {
+                    margin: 0;
+                    font-family: "Fraunces", serif;
+                    font-size: 30px;
+                    color: #1c1410;
+                }
+                .pdf-section-rule {
+                    flex: 1;
+                    height: 1px;
+                    background: linear-gradient(90deg, rgba(200, 144, 80,0.8), rgba(200, 144, 80,0.25));
+                }
+                .pdf-card {
+                    border-radius: 22px;
+                    border: 1px solid #EFEFEF;
+                    background: #ffffff;
+                    padding: 20px 22px;
+                    box-shadow: 0 12px 24px rgba(28, 20, 16, 0.05);
+                }
+                .pdf-ingredients,
+                .pdf-instructions,
+                .pdf-toc {
+                    padding: 0;
+                    margin: 0;
+                }
+                .pdf-ingredients,
+                .pdf-toc { list-style: none; }
+                .pdf-ingredient-item,
+                .pdf-instruction-item,
+                .pdf-toc-item {
+                    margin: 0;
+                    padding: 10px 0;
+                    border-bottom: 1px solid #EFEFEF;
+                    font-size: 16px;
+                    line-height: 1.55;
+                    color: #1c1410;
+                    font-weight: 600;
+                }
+                .pdf-ingredient-item:last-child,
+                .pdf-instruction-item:last-child,
+                .pdf-toc-item:last-child { border-bottom: 0; }
+                .pdf-toc-item span {
+                    color: #8a7a70;
+                    font-size: 12px;
+                    letter-spacing: 0.12em;
+                    text-transform: uppercase;
+                    margin-right: 10px;
+                }
+                .pdf-note-card {
+                    background: #fbf7ef;
+                    border-color: #eadfca;
+                }
+                .pdf-note-copy {
+                    margin: 0;
+                    font-size: 16px;
+                    line-height: 1.65;
+                    color: #1c1410;
+                }
+            `;
+        }
+
+        function buildPdfBrandHeaderHtml({ chipLabel, exportDate, kicker = 'Recipe notebook' }) {
+            return `
+                <div class="pdf-brand">
+                    <div class="pdf-brand-left">
+                        <div class="pdf-brand-mark"><span class="pdf-brand-book"></span></div>
+                        <div>
+                            <p class="pdf-brand-kicker">${escapeHTML(kicker)}</p>
+                            <h1 class="pdf-brand-title">Uculi</h1>
+                            <p class="pdf-brand-subtitle">A Sneezing Donkey product</p>
+                        </div>
+                    </div>
+                    <div class="pdf-brand-meta">
+                        <span class="pdf-brand-chip">${escapeHTML(chipLabel)}</span>
+                        <p>Exported ${escapeHTML(exportDate)}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function buildRecipePdfBodyHtml(recipe, options = {}) {
+            const nl = getActiveUiLanguage() === 'nl';
+            const showBrand = options.showBrand !== false;
+            const exportDate = options.exportDate || getPdfExportDateLabel();
+            const chipLabel = options.chipLabel || (nl ? 'Recept-export' : 'Recipe export');
             const metadata = [
-                `By ${normalizePdfText(recipe.author, 'Unknown author')}`,
-                normalizePdfText(recipe.country, 'Unknown country')
+                `${nl ? 'Door' : 'By'} ${normalizePdfText(recipe.author, nl ? 'Onbekende kok' : 'Unknown author')}`,
+                normalizePdfText(recipe.country, nl ? 'Onbekend land' : 'Unknown country')
             ].filter(Boolean).join(' | ');
             const statItems = [
-                recipe.prepTime ? { label: 'Prep', value: `${recipe.prepTime}m` } : null,
-                recipe.cookTime ? { label: 'Cook', value: `${recipe.cookTime}m` } : null,
-                recipe.servings ? { label: 'Serves', value: `${recipe.servings}` } : null,
-                recipe.difficulty ? { label: 'Level', value: normalizePdfText(recipe.difficulty) } : null
+                recipe.prepTime ? { label: nl ? 'Voor' : 'Prep', value: `${recipe.prepTime}m` } : null,
+                recipe.cookTime ? { label: nl ? 'Koken' : 'Cook', value: `${recipe.cookTime}m` } : null,
+                recipe.servings ? { label: nl ? 'Personen' : 'Serves', value: `${recipe.servings}` } : null,
+                recipe.difficulty ? { label: nl ? 'Niveau' : 'Level', value: normalizePdfText(recipe.difficulty) } : null
             ].filter(Boolean);
             const ingredientLines = (recipe.ingredients || []).map(ingredient => normalizePdfText(applyMeasurementSystem(ingredient))).filter(Boolean);
             const instructionLines = (recipe.instructions || []).map(step => normalizePdfText(applyMeasurementSystem(getRecipeInstructionText(step)))).filter(Boolean);
             const notesLines = recipe.personalNotes ? normalizePdfText(applyMeasurementSystem(recipe.personalNotes)) : '';
             const tipsLines = recipe.tips ? normalizePdfText(applyMeasurementSystem(recipe.tips)) : '';
-            const exportDate = new Date().toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-            });
 
-            const buildRecipePdfTemplate = () => `
-                <style>
-                    .pdf-shell {
-                        width: 794px;
-                        box-sizing: border-box;
-                        padding: 40px 44px 54px;
-                        background: #ffffff;
-                        color: #1c1410;
-                        font-family: "Outfit", Arial, sans-serif;
-                    }
-                    .pdf-hero {
-                        border: 1px solid #EFEFEF;
-                        border-radius: 28px;
-                        overflow: hidden;
-                        background: linear-gradient(135deg, #ffffff 0%, #faf6ee 52%, #f3ece0 100%);
-                        box-shadow: 0 18px 34px rgba(28, 20, 16, 0.08);
-                    }
-                    .pdf-brand {
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        gap: 24px;
-                        padding: 26px 28px 20px;
-                        border-bottom: 1px solid #EFEFEF;
-                    }
-                    .pdf-brand-left {
-                        display: flex;
-                        align-items: center;
-                        gap: 16px;
-                    }
-                    .pdf-brand-mark {
-                        width: 52px;
-                        height: 52px;
-                        border-radius: 16px;
-                        background: #1c1410;
-                        color: #ffffff;
-                        position: relative;
-                        box-shadow: 0 10px 22px rgba(28, 20, 16, 0.16);
-                    }
-                    .pdf-brand-book,
-                    .pdf-brand-book::before,
-                    .pdf-brand-book::after {
-                        position: absolute;
-                        content: '';
-                        box-sizing: border-box;
-                    }
-                    .pdf-brand-book {
-                        top: 14px;
-                        left: 25px;
-                        width: 1px;
-                        height: 20px;
-                        background: rgba(255,255,255,0.92);
-                    }
-                    .pdf-brand-book::before,
-                    .pdf-brand-book::after {
-                        top: 0;
-                        width: 10px;
-                        height: 18px;
-                        border: 2px solid rgba(255,255,255,0.92);
-                        border-radius: 3px;
-                    }
-                    .pdf-brand-book::before {
-                        right: 2px;
-                        border-right: 0;
-                    }
-                    .pdf-brand-book::after {
-                        left: 2px;
-                        border-left: 0;
-                    }
-                    .pdf-brand-kicker {
-                        margin: 0;
-                        font-size: 11px;
-                        font-weight: 700;
-                        letter-spacing: 0.28em;
-                        text-transform: uppercase;
-                        color: #8a7a70;
-                    }
-                    .pdf-brand-title {
-                        margin: 6px 0 0;
-                        font-family: "Fraunces", serif;
-                        font-size: 40px;
-                        line-height: 0.95;
-                        color: #1c1410;
-                    }
-                    .pdf-brand-subtitle {
-                        margin: 6px 0 0;
-                        font-size: 12px;
-                        font-weight: 700;
-                        letter-spacing: 0.14em;
-                        text-transform: uppercase;
-                        color: #8a7a70;
-                    }
-                    .pdf-brand-meta {
-                        text-align: right;
-                    }
-                    .pdf-brand-chip {
-                        display: inline-block;
-                        padding: 6px 12px;
-                        border-radius: 999px;
-                        border: 1px solid #d8d0c1;
-                        background: rgba(255,255,255,0.9);
-                        font-size: 10px;
-                        font-weight: 800;
-                        letter-spacing: 0.18em;
-                        text-transform: uppercase;
-                        color: #1c1410;
-                    }
-                    .pdf-brand-meta p {
-                        margin: 10px 0 0;
-                        font-size: 12px;
-                        font-weight: 700;
-                        color: #8a7a70;
-                    }
-                    .pdf-hero-body {
-                        padding: 28px;
-                    }
-                    .pdf-recipe-title {
-                        margin: 0;
-                        font-family: "Fraunces", serif;
-                        font-size: 44px;
-                        line-height: 0.94;
-                        color: #1c1410;
-                    }
-                    .pdf-metadata {
-                        margin: 14px 0 0;
-                        font-size: 14px;
-                        font-weight: 700;
-                        letter-spacing: 0.08em;
-                        text-transform: uppercase;
-                        color: #8a7a70;
-                    }
-                    .pdf-stat-grid {
-                        display: grid;
-                        grid-template-columns: repeat(${Math.max(1, Math.min(4, statItems.length || 1))}, minmax(0, 1fr));
-                        gap: 12px;
-                        margin-top: 22px;
-                    }
-                    .pdf-stat-card {
-                        border-radius: 18px;
-                        border: 1px solid #EFEFEF;
-                        background: rgba(255,255,255,0.86);
-                        padding: 14px 16px;
-                    }
-                    .pdf-stat-card p {
-                        margin: 0;
-                    }
-                    .pdf-stat-label {
-                        font-size: 10px;
-                        font-weight: 800;
-                        letter-spacing: 0.2em;
-                        text-transform: uppercase;
-                        color: #8a7a70;
-                    }
-                    .pdf-stat-value {
-                        margin-top: 8px;
-                        font-size: 24px;
-                        font-family: "Fraunces", serif;
-                        font-weight: 700;
-                        color: #1c1410;
-                    }
-                    .pdf-section {
-                        margin-top: 24px;
-                    }
-                    .pdf-section-header {
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        gap: 12px;
-                        margin-bottom: 14px;
-                    }
-                    .pdf-section-title {
-                        margin: 0;
-                        font-family: "Fraunces", serif;
-                        font-size: 30px;
-                        color: #1c1410;
-                    }
-                    .pdf-section-rule {
-                        flex: 1;
-                        height: 1px;
-                        background: linear-gradient(90deg, rgba(200, 144, 80,0.8), rgba(200, 144, 80,0.25));
-                    }
-                    .pdf-card {
-                        border-radius: 22px;
-                        border: 1px solid #EFEFEF;
-                        background: #ffffff;
-                        padding: 20px 22px;
-                        box-shadow: 0 12px 24px rgba(28, 20, 16, 0.05);
-                    }
-                    .pdf-ingredients,
-                    .pdf-instructions {
-                        padding: 0;
-                        margin: 0;
-                    }
-                    .pdf-ingredients {
-                        list-style: none;
-                    }
-                    .pdf-ingredient-item,
-                    .pdf-instruction-item {
-                        margin: 0;
-                        padding: 10px 0;
-                        border-bottom: 1px solid #EFEFEF;
-                        font-size: 16px;
-                        line-height: 1.55;
-                        color: #1c1410;
-                    }
-                    .pdf-ingredient-item:last-child,
-                    .pdf-instruction-item:last-child {
-                        border-bottom: 0;
-                    }
-                    .pdf-note-card {
-                        background: #fbf7ef;
-                        border-color: #eadfca;
-                    }
-                    .pdf-note-copy {
-                        margin: 0;
-                        font-size: 16px;
-                        line-height: 1.65;
-                        color: #1c1410;
-                    }
-                </style>
+            return `
+                <section class="pdf-hero">
+                    ${showBrand ? buildPdfBrandHeaderHtml({ chipLabel, exportDate, kicker: nl ? 'Schrift' : 'Recipe notebook' }) : ''}
+                    <div class="pdf-hero-body">
+                        <h2 class="pdf-recipe-title">${escapeHTML(normalizePdfText(recipe.title, nl ? 'Naamloos recept' : 'Untitled recipe'))}</h2>
+                        <p class="pdf-metadata">${escapeHTML(metadata)}</p>
+                        ${statItems.length ? `
+                            <div class="pdf-stat-grid" style="grid-template-columns: repeat(${Math.max(1, Math.min(4, statItems.length))}, minmax(0, 1fr));">
+                                ${statItems.map(item => `
+                                    <div class="pdf-stat-card">
+                                        <p class="pdf-stat-label">${escapeHTML(item.label)}</p>
+                                        <p class="pdf-stat-value">${escapeHTML(item.value)}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </section>
+
+                <section class="pdf-section">
+                    <div class="pdf-section-header">
+                        <h3 class="pdf-section-title">${nl ? 'Ingrediënten' : 'Ingredients'}</h3>
+                        <div class="pdf-section-rule"></div>
+                    </div>
+                    <div class="pdf-card">
+                        <ul class="pdf-ingredients">
+                            ${ingredientLines.length
+                                ? ingredientLines.map(item => `<li class="pdf-ingredient-item">${escapeHTML(item)}</li>`).join('')
+                                : `<li class="pdf-ingredient-item">${nl ? 'Geen ingrediënten' : 'No ingredients'}</li>`}
+                        </ul>
+                    </div>
+                </section>
+
+                <section class="pdf-section">
+                    <div class="pdf-section-header">
+                        <h3 class="pdf-section-title">${nl ? 'Bereiding' : 'Instructions'}</h3>
+                        <div class="pdf-section-rule"></div>
+                    </div>
+                    <div class="pdf-card">
+                        <ol class="pdf-instructions">
+                            ${instructionLines.length
+                                ? instructionLines.map(item => `<li class="pdf-instruction-item">${escapeHTML(item)}</li>`).join('')
+                                : `<li class="pdf-instruction-item">${nl ? 'Geen stappen' : 'No steps'}</li>`}
+                        </ol>
+                    </div>
+                </section>
+
+                ${tipsLines ? `
+                    <section class="pdf-section">
+                        <div class="pdf-section-header">
+                            <h3 class="pdf-section-title">${nl ? 'Tips van de kok' : "Chef's Notes"}</h3>
+                            <div class="pdf-section-rule"></div>
+                        </div>
+                        <div class="pdf-card pdf-note-card">
+                            <p class="pdf-note-copy">${escapeHTML(tipsLines)}</p>
+                        </div>
+                    </section>
+                ` : ''}
+
+                ${notesLines ? `
+                    <section class="pdf-section">
+                        <div class="pdf-section-header">
+                            <h3 class="pdf-section-title">${nl ? 'Jouw notities' : 'Your Notes'}</h3>
+                            <div class="pdf-section-rule"></div>
+                        </div>
+                        <div class="pdf-card pdf-note-card">
+                            <p class="pdf-note-copy">${escapeHTML(notesLines)}</p>
+                        </div>
+                    </section>
+                ` : ''}
+            `;
+        }
+
+        function buildSingleRecipePdfHtml(recipe) {
+            const nl = getActiveUiLanguage() === 'nl';
+            return `
+                <style>${getPdfSharedStyles()}</style>
                 <div class="pdf-shell">
-                    <section class="pdf-hero">
-                        <div class="pdf-brand">
-                            <div class="pdf-brand-left">
-                                <div class="pdf-brand-mark"><span class="pdf-brand-book"></span></div>
-                                <div>
-                                    <p class="pdf-brand-kicker">Recipe notebook</p>
-                                    <h1 class="pdf-brand-title">Uculi</h1>
-                                    <p class="pdf-brand-subtitle">A Sneezing Donkey product</p>
-                                </div>
-                            </div>
-                            <div class="pdf-brand-meta">
-                                <span class="pdf-brand-chip">Uniform recipe export</span>
-                                <p>Exported ${exportDate}</p>
-                            </div>
-                        </div>
-                        <div class="pdf-hero-body">
-                            <h2 class="pdf-recipe-title">${escapeHTML(normalizePdfText(recipe.title, 'Untitled recipe'))}</h2>
-                            <p class="pdf-metadata">${escapeHTML(metadata)}</p>
-                            ${statItems.length > 0 ? `
-                                <div class="pdf-stat-grid">
-                                    ${statItems.map(item => `
-                                        <div class="pdf-stat-card">
-                                            <p class="pdf-stat-label">${escapeHTML(item.label)}</p>
-                                            <p class="pdf-stat-value">${escapeHTML(item.value)}</p>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            ` : ''}
-                        </div>
-                    </section>
-
-                    <section class="pdf-section">
-                        <div class="pdf-section-header">
-                            <h3 class="pdf-section-title">Ingredients</h3>
-                            <div class="pdf-section-rule"></div>
-                        </div>
-                        <div class="pdf-card">
-                            <ul class="pdf-ingredients">
-                                ${ingredientLines.map(item => `<li class="pdf-ingredient-item">${escapeHTML(item)}</li>`).join('')}
-                            </ul>
-                        </div>
-                    </section>
-
-                    <section class="pdf-section">
-                        <div class="pdf-section-header">
-                            <h3 class="pdf-section-title">Instructions</h3>
-                            <div class="pdf-section-rule"></div>
-                        </div>
-                        <div class="pdf-card">
-                            <ol class="pdf-instructions">
-                                ${instructionLines.map(item => `<li class="pdf-instruction-item">${escapeHTML(item)}</li>`).join('')}
-                            </ol>
-                        </div>
-                    </section>
-
-                    ${tipsLines ? `
-                        <section class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">Chef's Notes</h3>
-                                <div class="pdf-section-rule"></div>
-                            </div>
-                            <div class="pdf-card pdf-note-card">
-                                <p class="pdf-note-copy">${escapeHTML(tipsLines)}</p>
-                            </div>
-                        </section>
-                    ` : ''}
-
-                    ${notesLines ? `
-                        <section class="pdf-section">
-                            <div class="pdf-section-header">
-                                <h3 class="pdf-section-title">Your Notes</h3>
-                                <div class="pdf-section-rule"></div>
-                            </div>
-                            <div class="pdf-card pdf-note-card">
-                                <p class="pdf-note-copy">${escapeHTML(notesLines)}</p>
-                            </div>
-                        </section>
-                    ` : ''}
+                    ${buildRecipePdfBodyHtml(recipe, {
+                        chipLabel: nl ? 'Recept-export' : 'Recipe export',
+                        exportDate: getPdfExportDateLabel()
+                    })}
                 </div>
             `;
+        }
+
+        function buildNotebookBookPdfHtml(recipeList = []) {
+            const nl = getActiveUiLanguage() === 'nl';
+            const exportDate = getPdfExportDateLabel();
+            const count = recipeList.length;
+            const coverTitle = nl ? 'Jouw receptenboek' : 'Your recipe notebook';
+            const coverLede = nl
+                ? `${count} recept${count === 1 ? '' : 'en'} uit je Uculi-schrift, klaar om te printen of te delen.`
+                : `${count} recipe${count === 1 ? '' : 's'} from your Uculi notebook, ready to print or share.`;
+
+            return `
+                <style>${getPdfSharedStyles()}</style>
+                <div class="pdf-shell">
+                    <section class="pdf-book-cover">
+                        ${buildPdfBrandHeaderHtml({
+                            chipLabel: nl ? 'Boek-export' : 'Book export',
+                            exportDate,
+                            kicker: nl ? 'Schrift' : 'Notebook'
+                        })}
+                        <div class="pdf-book-cover-body">
+                            <h2 class="pdf-book-title">${escapeHTML(coverTitle)}</h2>
+                            <p class="pdf-book-lede">${escapeHTML(coverLede)}</p>
+                            <div class="pdf-section" style="margin-top:28px;">
+                                <div class="pdf-section-header">
+                                    <h3 class="pdf-section-title">${nl ? 'Inhoud' : 'Contents'}</h3>
+                                    <div class="pdf-section-rule"></div>
+                                </div>
+                                <div class="pdf-card">
+                                    <ol class="pdf-toc">
+                                        ${recipeList.map((recipe, index) => `
+                                            <li class="pdf-toc-item">
+                                                <span>${String(index + 1).padStart(2, '0')}</span>
+                                                ${escapeHTML(normalizePdfText(recipe.title, nl ? 'Naamloos recept' : 'Untitled recipe'))}
+                                            </li>
+                                        `).join('')}
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    ${recipeList.map(recipe => `
+                        <div class="pdf-recipe-block">
+                            ${buildRecipePdfBodyHtml(recipe, {
+                                showBrand: true,
+                                chipLabel: nl ? 'Recept in boek' : 'Book recipe',
+                                exportDate
+                            })}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function downloadPdfFromHtml(html, filename) {
+            const nl = getActiveUiLanguage() === 'nl';
+            if (typeof html2pdf !== 'function') {
+                showToast(nl ? 'PDF-export laadt nog. Probeer zo opnieuw.' : 'PDF export is still loading. Try again in a moment.', 'info');
+                return false;
+            }
 
             const seedElement = document.createElement('div');
             seedElement.textContent = 'seed';
@@ -12018,7 +12123,7 @@
             templateRoot.style.background = '#ffffff';
             templateRoot.style.pointerEvents = 'none';
             templateRoot.style.zIndex = '-1';
-            templateRoot.innerHTML = buildRecipePdfTemplate();
+            templateRoot.innerHTML = html;
             document.body.appendChild(templateRoot);
 
             try {
@@ -12040,7 +12145,6 @@
                 const pageWidth = pdf.internal.pageSize.getWidth();
                 const pageHeight = pdf.internal.pageSize.getHeight();
                 const margin = 18;
-                const bottomMargin = 18;
 
                 const drawPageFooter = (pageNumber, totalPages) => {
                     const footerY = pageHeight - 10;
@@ -12051,7 +12155,7 @@
                     pdf.setFontSize(8);
                     pdf.setTextColor(144, 152, 112);
                     pdf.text('Uculi · A Sneezing Donkey product', margin, footerY);
-                    pdf.text(`Page ${pageNumber} of ${totalPages}`, pageWidth - margin, footerY, { align: 'right' });
+                    pdf.text(`${nl ? 'Pagina' : 'Page'} ${pageNumber} ${nl ? 'van' : 'of'} ${totalPages}`, pageWidth - margin, footerY, { align: 'right' });
                 };
 
                 if (document.fonts?.ready) {
@@ -12059,7 +12163,7 @@
                 }
                 await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-                await new Promise((resolve, reject) => {
+                await new Promise((resolve) => {
                     pdf.html(templateRoot, {
                         x: 0,
                         y: 0,
@@ -12068,7 +12172,7 @@
                         windowWidth: 794,
                         autoPaging: 'text',
                         html2canvas: {
-                            scale: 1.2,
+                            scale: 1.15,
                             useCORS: true,
                             backgroundColor: '#FFFFFF',
                             logging: false
@@ -12084,15 +12188,124 @@
                 }
 
                 pdf.save(filename);
-                showToast('PDF downloaded!', 'download');
-            } catch (error) {
-                console.error(error);
-                showToast('PDF export failed', 'alert-circle');
+                return true;
             } finally {
                 templateRoot.remove();
                 seedElement.remove();
             }
         }
+
+        function getNotebookExportRecipes() {
+            const ids = Array.isArray(currentIndexRecipeIds) && currentIndexRecipeIds.length
+                ? currentIndexRecipeIds
+                : (recipes || []).map(recipe => recipe.id);
+            return ids
+                .map(id => (recipes || []).find(recipe => recipe.id === id))
+                .filter(Boolean);
+        }
+
+        async function exportRecipeAsPDF(recipeId) {
+            if (requirePremiumFeature('recipePdfExport')) {
+                return;
+            }
+
+            const nl = getActiveUiLanguage() === 'nl';
+            const recipe = recipes.find(r => r.id === recipeId);
+            if (!recipe) {
+                showToast(nl ? 'Recept niet gevonden.' : 'Recipe not found.', 'alert-circle');
+                return;
+            }
+
+            if (isPdfExportInProgress) {
+                showToast(nl ? 'PDF wordt nog gemaakt…' : 'PDF export already in progress…', 'info');
+                return;
+            }
+
+            isPdfExportInProgress = true;
+            showToast(nl ? 'PDF van dit recept wordt gemaakt…' : 'Preparing recipe PDF…', 'download');
+
+            try {
+                const ok = await downloadPdfFromHtml(
+                    buildSingleRecipePdfHtml(recipe),
+                    sanitizePdfFilename(recipe.title, 'recipe')
+                );
+                if (ok) showToast(nl ? 'Recept-PDF gedownload.' : 'Recipe PDF downloaded.', 'download');
+            } catch (error) {
+                console.error(error);
+                showToast(nl ? 'PDF-export mislukt.' : 'PDF export failed.', 'alert-circle');
+            } finally {
+                isPdfExportInProgress = false;
+            }
+        }
+
+        async function exportNotebookBookAsPDF() {
+            if (requirePremiumFeature('recipePdfExport')) {
+                return;
+            }
+
+            const nl = getActiveUiLanguage() === 'nl';
+            const recipeList = getNotebookExportRecipes();
+            if (!recipeList.length) {
+                showToast(nl ? 'Geen recepten om te exporteren.' : 'No recipes to export.', 'info');
+                return;
+            }
+
+            if (isPdfExportInProgress) {
+                showToast(nl ? 'PDF wordt nog gemaakt…' : 'PDF export already in progress…', 'info');
+                return;
+            }
+
+            isPdfExportInProgress = true;
+            showToast(
+                nl
+                    ? `Boek-PDF wordt gemaakt (${recipeList.length} recept${recipeList.length === 1 ? '' : 'en'})…`
+                    : `Preparing book PDF (${recipeList.length} recipe${recipeList.length === 1 ? '' : 's'})…`,
+                'download'
+            );
+
+            try {
+                const ok = await downloadPdfFromHtml(
+                    buildNotebookBookPdfHtml(recipeList),
+                    sanitizePdfFilename(nl ? 'uculi-receptenboek' : 'uculi-recipe-notebook', 'uculi-notebook')
+                );
+                if (ok) showToast(nl ? 'Boek-PDF gedownload.' : 'Book PDF downloaded.', 'download');
+            } catch (error) {
+                console.error(error);
+                showToast(nl ? 'Boek-PDF mislukt.' : 'Book PDF export failed.', 'alert-circle');
+            } finally {
+                isPdfExportInProgress = false;
+            }
+        }
+
+        function getNotebookPdfActionLabels() {
+            const nl = getActiveUiLanguage() === 'nl';
+            const premium = accountHasPremiumPlan();
+            return {
+                recipe: premium
+                    ? (nl ? 'PDF recept' : 'Recipe PDF')
+                    : (nl ? 'PDF recept (Premium)' : 'Recipe PDF (Premium)'),
+                book: premium
+                    ? (nl ? 'PDF boek' : 'Book PDF')
+                    : (nl ? 'PDF boek (Premium)' : 'Book PDF (Premium)'),
+                recipeAction: premium
+                    ? 'exportCurrentNotebookRecipeAsPDF()'
+                    : "showPremiumModal('recipePdfExport')",
+                bookAction: premium
+                    ? 'exportNotebookBookAsPDF()'
+                    : "showPremiumModal('recipePdfExport')"
+            };
+        }
+
+        function exportCurrentNotebookRecipeAsPDF() {
+            const recipeId = currentIndexRecipeIds[notebookPageIndex];
+            if (!recipeId) {
+                const nl = getActiveUiLanguage() === 'nl';
+                showToast(nl ? 'Geen recept open in het schrift.' : 'No notebook recipe is open.', 'info');
+                return;
+            }
+            exportRecipeAsPDF(recipeId);
+        }
+
 
         const contentDiv = document.getElementById('app-content');
         const bodySurface = document.getElementById('body');
@@ -15771,6 +15984,7 @@
             const safeRecipeAuthor = escapeHTML(recipe.author || 'Chef');
             const dietText = (recipe.diet || []).length > 0 ? escapeHTML(recipe.diet.join(' · ')) : 'No diet tags';
             const notebookCookActionLabel = totalInstructions > 0 ? 'Start cooking' : 'Open recipe';
+            const pdfActions = getNotebookPdfActionLabels();
             const notebookRecipeSpreads = getNotebookRecipeSpreads(recipe);
             notebookSpreadPageIndex = Math.max(0, Math.min(notebookSpreadPageIndex, notebookRecipeSpreads.length - 1));
             const currentSpread = notebookRecipeSpreads[notebookSpreadPageIndex] || notebookRecipeSpreads[0];
@@ -16033,6 +16247,9 @@
                                         <button onclick="openNotebookCover()" class="${getAppButtonClasses('primary', { size: 'lg' })} rounded-2xl shadow-[0_16px_28px_rgba(45,77,52,0.24)]" translate="no">
                                             <i data-lucide="book-open" class="h-4 w-4"></i>Open notebook
                                         </button>
+                                        <button type="button" onclick="${pdfActions.bookAction}" class="${getAppButtonClasses(accountHasPremiumPlan() ? 'secondary' : 'locked', { size: 'lg' })} rounded-2xl" title="${pdfActions.book}" aria-label="${pdfActions.book}">
+                                            <i data-lucide="${accountHasPremiumPlan() ? 'file-down' : 'lock'}" class="h-4 w-4"></i>${pdfActions.book}
+                                        </button>
                                     </div>
                                     <p class="notebook-landing-hint notebook-landing-hint-desktop">Click the cover or the button to open the full spread.</p>
                                     <p class="notebook-landing-hint notebook-landing-hint-touch">Tap the cover to open the full spread.</p>
@@ -16080,6 +16297,16 @@
                                 <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook relative inline-flex items-center justify-center gap-2 rounded-lg text-xs font-bold uppercase tracking-wider text-white" data-notebook-note-control="open-cook">
                                     <i data-lucide="chef-hat" class="h-4 w-4"></i>
                                     <span class="notebook-cook-label">Cook</span>
+                                </button>
+                            </div>
+                            <div class="notebook-chrome-group" role="group" aria-label="PDF export">
+                                <button type="button" title="${pdfActions.recipe}" aria-label="${pdfActions.recipe}" onclick="${pdfActions.recipeAction}" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg ${accountHasPremiumPlan() ? 'text-forest' : 'text-sage'} transition-all hover:bg-surface-muted hover:text-forest">
+                                    <i data-lucide="${accountHasPremiumPlan() ? 'file-text' : 'lock'}" class="h-4 w-4 ${accountHasPremiumPlan() ? '' : 'text-gold'}"></i>
+                                    <span class="notebook-tool-label">PDF</span>
+                                </button>
+                                <button type="button" title="${pdfActions.book}" aria-label="${pdfActions.book}" onclick="${pdfActions.bookAction}" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg ${accountHasPremiumPlan() ? 'text-forest' : 'text-sage'} transition-all hover:bg-surface-muted hover:text-forest">
+                                    <i data-lucide="${accountHasPremiumPlan() ? 'files' : 'lock'}" class="h-4 w-4 ${accountHasPremiumPlan() ? '' : 'text-gold'}"></i>
+                                    <span class="notebook-tool-label">Book</span>
                                 </button>
                             </div>
                         </div>
@@ -18529,8 +18756,8 @@
                         ? renderDetailIconAction('Share', 'share-2', `shareRecipe(${recipe.id})`, 'secondary', '', true)
                         : renderDetailIconAction('Share', 'lock', "showPremiumModal('recipeSharing')", 'muted', '', true)}
                     ${accountHasPremiumPlan()
-                        ? renderDetailIconAction('Export', 'download', `exportRecipeAsPDF(${recipe.id})`, 'secondary', '', true)
-                        : renderDetailIconAction('Export', 'lock', "showPremiumModal('recipePdfExport')", 'muted', '', true)}
+                        ? renderDetailIconAction(userSettings.language === 'nl' ? 'PDF' : 'PDF', 'file-down', `exportRecipeAsPDF(${recipe.id})`, 'secondary', '', true)
+                        : renderDetailIconAction(userSettings.language === 'nl' ? 'PDF' : 'PDF', 'lock', "showPremiumModal('recipePdfExport')", 'muted', '', true)}
                     ${isSavedCommunityRecipe ? '' : renderDetailIconAction(publishActionLabel, publishActionIcon, `publishRecipe(${recipe.id})`, publishDetailVariant, '', true)}
                     ${canAdminForceOffline ? renderDetailIconAction('Admin: offline now', 'shield-x', `adminForceOfflineRecipe(${recipe.id})`, 'danger', '', true) : ''}
                     ${deletionVoteProgress
