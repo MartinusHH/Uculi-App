@@ -1088,6 +1088,12 @@
             outline: none;
         }
 
+        #recipe-search-input,
+        .browse-search input {
+            user-select: text;
+            -webkit-user-select: text;
+        }
+
         .browse-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -16128,16 +16134,69 @@
             return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
         }
 
+        function isSelectAllShortcut(event) {
+            if (!event) return false;
+            const key = String(event.key || '').toLowerCase();
+            const isA = key === 'a' || event.code === 'KeyA' || event.keyCode === 65;
+            if (!isA || event.altKey || event.shiftKey) return false;
+            return Boolean(event.ctrlKey || event.metaKey);
+        }
+
+        function selectAllInTextField(field) {
+            if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) return false;
+            if (field.disabled) return false;
+            field.focus({ preventScroll: true });
+            try {
+                field.setSelectionRange(0, field.value.length);
+            } catch (error) {
+                field.select();
+            }
+            return true;
+        }
+
+        // Ctrl/Cmd+A in app search fields must select the field text (not the page), phone + desktop.
+        function handleAppSearchFieldKeydown(event) {
+            if (!isSelectAllShortcut(event)) return;
+            const field = event.target;
+            if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) return;
+            event.preventDefault();
+            event.stopPropagation();
+            selectAllInTextField(field);
+        }
+
+        function restoreLiveSearchField(inputEl, fieldId, selStart, selEnd) {
+            if (!(inputEl instanceof HTMLInputElement)) return;
+            const freshEl = document.getElementById(fieldId);
+            if (freshEl && freshEl !== inputEl) freshEl.replaceWith(inputEl);
+            inputEl.focus({ preventScroll: true });
+            try {
+                const max = inputEl.value.length;
+                const start = Math.max(0, Math.min(Number(selStart) || 0, max));
+                const end = Math.max(0, Math.min(Number(selEnd) || 0, max));
+                inputEl.setSelectionRange(start, end);
+            } catch (error) {}
+        }
+
         // Keep the live search input element across re-renders so focus/caret survive typing.
         function handleRecipeSearchInput(inputEl) {
             searchQuery = inputEl.value;
             const selStart = inputEl.selectionStart;
             const selEnd = inputEl.selectionEnd;
             renderList();
-            const freshEl = document.getElementById('recipe-search-input');
-            if (freshEl && freshEl !== inputEl) freshEl.replaceWith(inputEl);
-            inputEl.focus({ preventScroll: true });
-            try { inputEl.setSelectionRange(selStart, selEnd); } catch (e) {}
+            restoreLiveSearchField(inputEl, 'recipe-search-input', selStart, selEnd);
+        }
+
+        let browseSearchRenderToken = 0;
+
+        function handleBrowseSearchInput(inputEl) {
+            browseQuery = inputEl.value;
+            const selStart = inputEl.selectionStart;
+            const selEnd = inputEl.selectionEnd;
+            const renderToken = ++browseSearchRenderToken;
+            Promise.resolve(renderBrowse()).finally(() => {
+                if (renderToken !== browseSearchRenderToken) return;
+                restoreLiveSearchField(inputEl, 'browse-search-input', selStart, selEnd);
+            });
         }
 
         function renderList() {
@@ -16297,7 +16356,7 @@
                             ${isSearchVisible ? `
                                 <div class="relative">
                                     <i data-lucide="search" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-sage opacity-70"></i>
-                                    <input type="text" placeholder="Search by title, ingredient, or occasion..." id="recipe-search-input" value="${escapeAttrSafe(searchQuery)}" oninput="handleRecipeSearchInput(this)" class="w-full h-11 rounded-xl border border-accent bg-parchment px-12 text-base font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:bg-white">
+                                    <input type="text" placeholder="Search by title, ingredient, or occasion..." id="recipe-search-input" value="${escapeAttrSafe(searchQuery)}" oninput="handleRecipeSearchInput(this)" onkeydown="handleAppSearchFieldKeydown(event)" class="w-full h-11 rounded-xl border border-accent bg-parchment px-12 text-base font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:bg-white">
                                 </div>
                             ` : ''}
 
@@ -16951,7 +17010,7 @@
                     </div>
                     <div class="browse-search">
                         <i data-lucide="search" class="h-5 w-5 shrink-0 text-sage opacity-70"></i>
-                        <input type="text" placeholder="${searchPlaceholder}" value="${escapeHTML(browseQuery)}" oninput="browseQuery = this.value; renderBrowse()" aria-label="${browseNl ? 'Zoeken in Browse' : 'Search Browse'}">
+                        <input type="text" id="browse-search-input" placeholder="${searchPlaceholder}" value="${escapeHTML(browseQuery)}" oninput="handleBrowseSearchInput(this)" onkeydown="handleAppSearchFieldKeydown(event)" aria-label="${browseNl ? 'Zoeken in Browse' : 'Search Browse'}">
                     </div>
                 </div>
             `;
