@@ -7183,7 +7183,8 @@
         }
 
         function cssUrl(value = '') {
-            return `url("${String(value || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"')}")`;
+            // Prefer single quotes so the value is safe inside style="..." attributes.
+            return `url('${String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')`;
         }
 
         function showTemporaryFeatureOffline(featureName, detail = '') {
