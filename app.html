@@ -6380,11 +6380,45 @@
             cloudSync: 'use cloud sync',
             notebookMode: 'use notebook mode',
             recipePdfExport: 'download recipe PDFs',
-            recipeSharing: 'share recipes'
+            recipeSharing: 'share recipes',
+            recipeLimit: 'add more than 3 recipes',
+            publishRecipes: 'publish recipes',
+            createFamilies: 'create families',
+            notebookCovers: 'customize notebook covers',
+            stickyNotes: 'use sticky notes'
         };
+        let accountPlanLoadPromise = null;
+        let accountPlanLoadedAt = '';
 
         function hasPremiumBillingStatus(status) {
             return ['preview', 'active', 'grace', 'restored'].includes(String(status || '').toLowerCase());
+        }
+
+        function getAccountPlan() {
+            return normalizeBillingProfile(userSettings.billing);
+        }
+
+        function resolvePremiumFeatureKey(featureKeyOrName = '') {
+            const raw = String(featureKeyOrName || '').trim();
+            if (!raw) return 'premium';
+            if (premiumFeatureLabels[raw]) return raw;
+
+            const normalized = raw.toLowerCase();
+            const aliasMap = {
+                'add more than 3 recipes': 'recipeLimit',
+                'recipe limit': 'recipeLimit',
+                'use cloud sync': 'cloudSync',
+                'use notebook mode': 'notebookMode',
+                'download recipe pdfs': 'recipePdfExport',
+                'share recipes': 'recipeSharing',
+                'download backups': 'backupDownload',
+                'restore backups': 'backupRestore',
+                'publish recipes': 'publishRecipes',
+                'create families': 'createFamilies',
+                'customize notebook covers': 'notebookCovers',
+                'use sticky notes': 'stickyNotes'
+            };
+            return aliasMap[normalized] || raw;
         }
 
         function syncBillingStateWithPremiumFlag() {
@@ -6411,9 +6445,98 @@
             return isDeveloperBypassSession() && !isProductionUculiHost() && isLocalDeveloperPreviewContext();
         }
 
-        function hasPremiumAccess() {
+        // Enige plan-check per account: Firestore billing (lokaal gespiegeld) of Testmodus.
+        function accountHasPremiumPlan() {
             if (isLocalTestPremiumSession()) return true;
-            return hasPremiumBillingStatus(normalizeBillingProfile(userSettings.billing).status) || Boolean(userSettings.premium);
+            return hasPremiumBillingStatus(getAccountPlan().status);
+        }
+
+        function hasPremiumAccess() {
+            return accountHasPremiumPlan();
+        }
+
+        function countLocalRecipes() {
+            return (recipes || []).filter(recipe => recipe.source === 'local').length;
+        }
+
+        function canAddLocalRecipe() {
+            return accountHasPremiumPlan() || countLocalRecipes() < freeLocalRecipeLimit;
+        }
+
+        async function persistAccountPlanToFirestore(billingProfile = userSettings.billing) {
+            if (isDeveloperBypassSession()) return false;
+            if (!isAuthenticated || !firebaseInitialized || !currentUser?.uid) return false;
+
+            try {
+                const billing = normalizeBillingProfile(billingProfile);
+                await firebase.firestore().collection('users').doc(currentUser.uid).set({
+                    billing,
+                    updatedAt: new Date()
+                }, { merge: true });
+                accountPlanLoadedAt = billing.lastSyncedAt || new Date().toISOString();
+                return true;
+            } catch (error) {
+                console.error('Account plan persist error:', error);
+                return false;
+            }
+        }
+
+        async function loadAccountPlanFromFirestore() {
+            if (isDeveloperBypassSession()) {
+                syncBillingStateWithPremiumFlag();
+                return getAccountPlan();
+            }
+
+            if (!isAuthenticated || !firebaseInitialized || !currentUser?.uid) {
+                syncBillingStateWithPremiumFlag();
+                return getAccountPlan();
+            }
+
+            if (accountPlanLoadPromise) {
+                return accountPlanLoadPromise;
+            }
+
+            accountPlanLoadPromise = (async () => {
+                try {
+                    const snapshot = await firebase.firestore().collection('users').doc(currentUser.uid).get();
+                    const remoteData = snapshot.exists ? (snapshot.data() || {}) : {};
+                    const remoteBilling = remoteData.billing && typeof remoteData.billing === 'object'
+                        ? remoteData.billing
+                        : null;
+
+                    if (remoteBilling) {
+                        userSettings.billing = normalizeBillingProfile({
+                            ...getDefaultBillingProfile(),
+                            ...remoteBilling,
+                            lastSyncedAt: remoteBilling.lastSyncedAt || new Date().toISOString()
+                        });
+                    } else {
+                        const seededBilling = normalizeBillingProfile({
+                            ...getDefaultBillingProfile(),
+                            lastSyncedAt: new Date().toISOString()
+                        });
+                        userSettings.billing = seededBilling;
+                        await persistAccountPlanToFirestore(seededBilling);
+                    }
+
+                    syncBillingStateWithPremiumFlag();
+                    accountPlanLoadedAt = userSettings.billing.lastSyncedAt || new Date().toISOString();
+
+                    if (currentUser?.uid) {
+                        localStorage.setItem(getScopedStorageKey(legacyRecipeSettingsStorageKey), JSON.stringify(userSettings));
+                    }
+
+                    return getAccountPlan();
+                } catch (error) {
+                    console.error('Account plan load error:', error);
+                    syncBillingStateWithPremiumFlag();
+                    return getAccountPlan();
+                } finally {
+                    accountPlanLoadPromise = null;
+                }
+            })();
+
+            return accountPlanLoadPromise;
         }
 
         function isBillingCheckoutReady() {
@@ -6499,9 +6622,9 @@
             return {
                 state: 'free',
                 badge: 'Free Plan',
-                summary: 'Free stays local-only with up to 3 recipes on this device and 1 image upload/15m. Premium unlocks notebook mode, 15 uploads/day, sharing, downloads, cloud sync, publishing, and families.',
-                sourceLabel: 'Local free tier',
-                actionLabel: 'Unlock Local Premium Preview'
+                summary: 'Free includes up to 3 recipes on this account. Premium unlocks notebook mode, sharing, PDF export, cloud sync, publishing, and families.',
+                sourceLabel: accountPlanLoadedAt ? 'Account plan' : 'Account free tier',
+                actionLabel: 'Unlock Premium'
             };
         }
 
@@ -6540,9 +6663,9 @@
                 return;
             }
 
-            if (hasPremiumAccess()) {
+            if (accountHasPremiumPlan()) {
                 closeModal();
-                showToast('Premium access is already active on this device.', 'crown');
+                showToast('Premium is already active on this account.', 'crown');
                 return;
             }
 
@@ -6558,8 +6681,9 @@
             });
             userSettings.premium = true;
             saveData();
+            persistAccountPlanToFirestore(userSettings.billing);
             closeModal();
-            showToast('Premium preview unlocked on this device.', 'crown');
+            showToast('Premium preview unlocked on this account.', 'crown');
             refreshCurrentViewAfterBillingChange();
         }
 
@@ -6574,6 +6698,7 @@
                 lastRestoreAttemptAt: new Date().toISOString()
             });
             saveData();
+            persistAccountPlanToFirestore(userSettings.billing);
 
             showToast('Restore is currently unavailable. Please try again later.', 'shield-check');
         }
@@ -6585,8 +6710,12 @@
             }
 
             userSettings.premium = false;
-            userSettings.billing = getDefaultBillingProfile();
+            userSettings.billing = normalizeBillingProfile({
+                ...getDefaultBillingProfile(),
+                lastSyncedAt: new Date().toISOString()
+            });
             saveData();
+            persistAccountPlanToFirestore(userSettings.billing);
             closeModal();
             showToast('Premium preview removed. Back on Free plan.', 'rotate-ccw');
             refreshCurrentViewAfterBillingChange();
@@ -7502,7 +7631,7 @@
             });
         }
 
-        function openCoverEditor() { if(!hasPremiumAccess()) { showPremiumModal("customize notebook covers"); return; }
+        function openCoverEditor() { if(requireAccountPlan('notebookCovers')) return;
             closeCompetingSheets();
             draftNotebookCover = JSON.parse(JSON.stringify(normalizeNotebookCover(userSettings.notebookCover)));
             const modal = document.getElementById('cover-editor-modal');
@@ -7909,7 +8038,7 @@
             });
         }
 
-        function openNotebookStickyNotesEditor(recipeId) { if(!hasPremiumAccess()) { showPremiumModal("use sticky notes"); return; }
+        function openNotebookStickyNotesEditor(recipeId) { if(requireAccountPlan('stickyNotes')) return;
             const recipe = recipes.find(item => item.id === recipeId);
             if (!recipe) return;
 
@@ -10328,6 +10457,9 @@
                         document.getElementById('app-landing')?.remove();
                         sessionStorage.setItem(landingSessionKey, '1');
                         dismissAuthLoadingScreen();
+                        loadAccountPlanFromFirestore()
+                            .then(() => refreshCurrentViewAfterBillingChange())
+                            .catch(error => console.error('Account plan refresh error:', error));
                         loadFamiliesFromFirestore();
                         setTimeout(() => checkFamilyRemovals(), 1000);
                         bootstrapShoppingListCloud().catch(error => console.error('Shopping cloud bootstrap error:', error));
@@ -10554,6 +10686,7 @@
                     isPublic: enforceProfileOffline ? false : userSettings.isPublic,
                     preferredLanguage: userSettings.language || 'en',
                     familyBookIds: (userFamilies || []).map(family => family.id).filter(Boolean),
+                    billing: getAccountPlan(),
                     updatedAt: new Date()
                 }, { merge: true });
 
@@ -10958,7 +11091,7 @@
             return false;
         }
 
-        async function publishRecipe(recipeId, options = {}) { if(!hasPremiumAccess()) { showPremiumModal("publish recipes"); return; }
+        async function publishRecipe(recipeId, options = {}) { if(requireAccountPlan('publishRecipes')) return;
             if (!isAuthenticated || !firebaseInitialized || !currentUser) {
                 showToast('Sign in to publish recipes', 'alert-circle');
                 return false;
@@ -13951,11 +14084,11 @@
             const backupContent = `
                 <p class="mb-4 text-sm font-semibold text-sage">${backupDownloadLocked ? 'Backup tools unlock with paid access.' : 'Download or restore your archive here.'}</p>
                 <div class="${settingsActionGridClass}">
-                    <button onclick="${backupDownloadLocked ? "showPremiumModal('download backups')" : 'exportAllAsJSON()'}" class="${backupDownloadLocked ? getAppButtonClasses('locked', { fullWidth: true, size: 'lg' }) : getAppButtonClasses('accent', { fullWidth: true, size: 'lg' })}">
+                    <button onclick="${backupDownloadLocked ? "showPremiumModal('backupDownload')" : 'exportAllAsJSON()'}" class="${backupDownloadLocked ? getAppButtonClasses('locked', { fullWidth: true, size: 'lg' }) : getAppButtonClasses('accent', { fullWidth: true, size: 'lg' })}">
                         <i data-lucide="${backupDownloadLocked ? 'lock' : 'download'}" class="w-4 h-4"></i> ${backupDownloadLocked ? 'Premium Backup Download' : 'Download Backup'}
                     </button>
                     ${backupRestoreLocked
-                        ? `<button onclick="showPremiumModal('restore backups')" class="${getAppButtonClasses('locked', { fullWidth: true, size: 'lg' })}"><i data-lucide="lock" class="w-4 h-4"></i> Premium Backup Restore</button>`
+                        ? `<button onclick="showPremiumModal('backupRestore')" class="${getAppButtonClasses('locked', { fullWidth: true, size: 'lg' })}"><i data-lucide="lock" class="w-4 h-4"></i> Premium Backup Restore</button>`
                         : `<label class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} cursor-pointer"><i data-lucide="upload" class="w-4 h-4"></i> Restore Backup<input type="file" accept=".json" onchange="importFromJSON(event)" style="display: none;"></label>`}
                 </div>
                 <p class="mt-4 text-[10px] italic text-sage">Backups include recipes, favorites, ratings, and settings.</p>
@@ -13975,7 +14108,7 @@
                     <p class="mt-4 text-sm font-semibold text-sage">${cloudSyncLocked ? 'Your account is ready. Premium still unlocks cloud sync, publishing, and family collaboration.' : 'Your account is ready for cloud sync and publishing.'}</p>
                     <div class="mt-4 ${settingsActionGridClass}">
                         ${cloudSyncLocked
-                            ? `<button onclick="showPremiumModal('use cloud sync')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}"><i data-lucide="crown" class="w-4 h-4"></i> Premium Details</button>`
+                            ? `<button onclick="showPremiumModal('cloudSync')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}"><i data-lucide="crown" class="w-4 h-4"></i> Premium Details</button>`
                             : `<button onclick="renderBrowse()" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}"><i data-lucide="cloud" class="w-4 h-4"></i> Open Browse</button>`}
                         <button onclick="signOut()" class="${getAppButtonClasses('danger', { fullWidth: true, size: 'lg' })}">
                             <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
@@ -13992,7 +14125,7 @@
                         </button>
                         ${firebaseInitialized
                             ? (cloudSyncLocked
-                                ? `<button onclick="showPremiumModal('use cloud sync')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}"><i data-lucide="crown" class="w-4 h-4"></i> Premium Details</button>`
+                                ? `<button onclick="showPremiumModal('cloudSync')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}"><i data-lucide="crown" class="w-4 h-4"></i> Premium Details</button>`
                                 : `<button onclick="renderBrowse()" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}"><i data-lucide="cloud" class="w-4 h-4"></i> Open Browse</button>`)
                             : cloudSetupSecondaryAction}
                     </div>
@@ -14228,11 +14361,11 @@
                                 <span class="settings-status">${backupStatus}</span>
                             </div>
                             <div class="settings-actions button-pair">
-                                <button type="button" onclick="${backupDownloadLocked ? "showPremiumModal('download backups')" : 'exportAllAsJSON()'}" class="${getAppButtonClasses(backupDownloadLocked ? 'locked' : 'secondary', { size: 'sm' })}" aria-label="${backupDownloadLabel}" title="${backupDownloadLabel}">
+                                <button type="button" onclick="${backupDownloadLocked ? "showPremiumModal('backupDownload')" : 'exportAllAsJSON()'}" class="${getAppButtonClasses(backupDownloadLocked ? 'locked' : 'secondary', { size: 'sm' })}" aria-label="${backupDownloadLabel}" title="${backupDownloadLabel}">
                                     <i data-lucide="${backupDownloadLocked ? 'lock' : 'download'}" class="w-4 h-4"></i><span>${backupDownloadLabel}</span>
                                 </button>
                                 ${backupRestoreLocked
-                                    ? `<button type="button" onclick="showPremiumModal('restore backups')" class="${getAppButtonClasses('locked', { size: 'sm' })}" aria-label="${backupRestoreLabel}" title="${backupRestoreLabel}"><i data-lucide="lock" class="w-4 h-4"></i><span>${backupRestoreLabel}</span></button>`
+                                    ? `<button type="button" onclick="showPremiumModal('backupRestore')" class="${getAppButtonClasses('locked', { size: 'sm' })}" aria-label="${backupRestoreLabel}" title="${backupRestoreLabel}"><i data-lucide="lock" class="w-4 h-4"></i><span>${backupRestoreLabel}</span></button>`
                                     : `<label class="${getAppButtonClasses('secondary', { size: 'sm' })} cursor-pointer" aria-label="${backupRestoreLabel}" title="${backupRestoreLabel}"><i data-lucide="upload" class="w-4 h-4"></i><span>${backupRestoreLabel}</span><input type="file" accept=".json" onchange="importFromJSON(event)" style="display: none;"></label>`}
                             </div>
                         </section>
@@ -15231,7 +15364,7 @@
             }
         }
 
-        function openNotebookStickyNoteMenu(recipeId, noteIndex) { if(!hasPremiumAccess()) { showPremiumModal("use sticky notes"); return; }
+        function openNotebookStickyNoteMenu(recipeId, noteIndex) { if(requireAccountPlan('stickyNotes')) return;
             if (activeNotebookStickyNoteMenu?.recipeId === recipeId && activeNotebookStickyNoteMenu?.noteIndex === noteIndex) {
                 focusNotebookStickyNoteEditor(recipeId, noteIndex);
                 return;
@@ -16123,8 +16256,8 @@
                                         <i data-lucide="book-copy" class="h-4 w-4"></i>${resultLabel}
                                     </p>
                                     <div class="index-plan-note quiet-panel mt-4 rounded-2xl border border-parchmentDark bg-white/90 px-4 py-3 shadow-sm max-w-xl">
-                                        <p class="index-plan-kicker text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${premiumActive ? billingMeta.badge : `Free plan: ${localRecipeCount}/${freeLocalRecipeLimit} local recipes used`}</p>
-                                        <p class="index-plan-detail mt-1 text-sm font-semibold leading-relaxed text-forest">${premiumActive ? billingMeta.summary : `${freeRecipeSlotsRemaining} free slot${freeRecipeSlotsRemaining === 1 ? '' : 's'} left on this device. Premium unlocks notebook mode, sharing, downloads, cloud sync, and families.`}</p>
+                                        <p class="index-plan-kicker text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${premiumActive ? billingMeta.badge : `Free plan: ${localRecipeCount}/${freeLocalRecipeLimit} recipes on this account`}</p>
+                                        <p class="index-plan-detail mt-1 text-sm font-semibold leading-relaxed text-forest">${premiumActive ? billingMeta.summary : `${freeRecipeSlotsRemaining} free slot${freeRecipeSlotsRemaining === 1 ? '' : 's'} left. Premium unlocks notebook, sync, sharing, and PDF.`}</p>
                                     </div>
                                 `}
                             </div>
@@ -17282,12 +17415,12 @@
                         </div>
                         <ul class="space-y-2">
                             ${featureRow(checkIcon, 'Up to 3 recipes')}
-                            ${featureRow(checkIcon, 'Notebook mode')}
-                            ${featureRow(checkIcon, 'Cloud sync (read)')}
                             ${featureRow(lockIcon, 'Unlimited recipes')}
-                            ${featureRow(lockIcon, 'Publish & share recipes')}
-                            ${featureRow(lockIcon, 'Family sharing')}
+                            ${featureRow(lockIcon, 'Notebook / schrift')}
+                            ${featureRow(lockIcon, 'Cloud sync')}
+                            ${featureRow(lockIcon, 'Share recipes')}
                             ${featureRow(lockIcon, 'PDF export')}
+                            ${featureRow(lockIcon, 'Publish & families')}
                             ${featureRow(lockIcon, 'Backup & restore')}
                         </ul>
                     </div>
@@ -17303,9 +17436,10 @@
                         <ul class="space-y-2">
                             ${featureRow(checkIcon, 'Everything in Free')}
                             ${featureRow(checkIcon, 'Unlimited recipes')}
-                            ${featureRow(checkIcon, 'Publish & share recipes')}
-                            ${featureRow(checkIcon, 'Family sharing')}
-                            ${featureRow(checkIcon, 'PDF export')}
+                            ${featureRow(checkIcon, 'Notebook / schrift')}
+                            ${featureRow(checkIcon, 'Cloud sync')}
+                            ${featureRow(checkIcon, 'Share & PDF export')}
+                            ${featureRow(checkIcon, 'Publish & families')}
                             ${featureRow(checkIcon, 'Backup & restore')}
                         </ul>
                         <p class="text-xs text-sage font-semibold">Billing available once checkout is live.</p>
@@ -17331,38 +17465,181 @@
             `);
         }
 
+        function getAccountUpgradeCopy(featureKeyOrName = '') {
+            const nl = getActiveUiLanguage() === 'nl';
+            const featureKey = resolvePremiumFeatureKey(featureKeyOrName);
+            const used = countLocalRecipes();
+            const copyByKey = {
+                recipeLimit: nl ? {
+                    title: 'Gratis limiet bereikt',
+                    kicker: 'Free plan',
+                    headline: 'Je hebt 3 recepten bereikt',
+                    body: `Dit account staat op Free (${used}/${freeLocalRecipeLimit} recepten). Upgrade naar Premium voor onbeperkte recepten plus schrift, synchroniseren, delen en PDF.`,
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Free limit reached',
+                    kicker: 'Free plan',
+                    headline: 'You have reached 3 recipes',
+                    body: `This account is on Free (${used}/${freeLocalRecipeLimit} recipes). Upgrade to Premium for unlimited recipes plus notebook, sync, sharing, and PDF.`,
+                    primary: 'View Premium',
+                    secondary: 'Not now'
+                },
+                notebookMode: nl ? {
+                    title: 'Premium: Schrift',
+                    kicker: 'Notebook',
+                    headline: 'Schrift is een Premium-functie',
+                    body: 'Het receptenschrift, covers en sticky notes horen bij Premium op dit account.',
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Premium: Notebook',
+                    kicker: 'Notebook',
+                    headline: 'Notebook mode is Premium',
+                    body: 'The recipe notebook, covers, and sticky notes unlock with Premium on this account.',
+                    primary: 'View Premium',
+                    secondary: 'Not now'
+                },
+                cloudSync: nl ? {
+                    title: 'Premium: Synchroniseren',
+                    kicker: 'Cloud sync',
+                    headline: 'Synchroniseren is Premium',
+                    body: 'Cloud sync houdt dit account bij over apparaten. Dat zit in Premium.',
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Premium: Sync',
+                    kicker: 'Cloud sync',
+                    headline: 'Cloud sync is Premium',
+                    body: 'Sync keeps this account up to date across devices. That unlocks with Premium.',
+                    primary: 'View Premium',
+                    secondary: 'Not now'
+                },
+                recipeSharing: nl ? {
+                    title: 'Premium: Delen',
+                    kicker: 'Share',
+                    headline: 'Delen is Premium',
+                    body: 'Recepten delen vanaf dit account vraagt om Premium.',
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Premium: Share',
+                    kicker: 'Share',
+                    headline: 'Sharing is Premium',
+                    body: 'Sharing recipes from this account unlocks with Premium.',
+                    primary: 'View Premium',
+                    secondary: 'Not now'
+                },
+                recipePdfExport: nl ? {
+                    title: 'Premium: PDF',
+                    kicker: 'Export',
+                    headline: 'PDF-export is Premium',
+                    body: 'Recepten als PDF downloaden hoort bij Premium op dit account.',
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Premium: PDF',
+                    kicker: 'Export',
+                    headline: 'PDF export is Premium',
+                    body: 'Downloading recipes as PDF unlocks with Premium on this account.',
+                    primary: 'View Premium',
+                    secondary: 'Not now'
+                }
+            };
+
+            if (copyByKey[featureKey]) {
+                return { featureKey, ...copyByKey[featureKey] };
+            }
+
+            const featureLabel = premiumFeatureLabels[featureKey] || String(featureKeyOrName || (nl ? 'deze functie' : 'this feature'));
+            return nl ? {
+                featureKey,
+                title: 'Upgrade naar Premium',
+                kicker: 'Account plan',
+                headline: 'Deze functie is Premium',
+                body: `Premium is nodig om ${featureLabel}. Het plan van dit account bepaalt wat openstaat.`,
+                primary: 'Bekijk Premium',
+                secondary: 'Nu niet'
+            } : {
+                featureKey,
+                title: 'Upgrade to Premium',
+                kicker: 'Account plan',
+                headline: 'This feature is Premium',
+                body: `Premium is required to ${featureLabel}. Your account plan controls what is unlocked.`,
+                primary: 'View Premium',
+                secondary: 'Not now'
+            };
+        }
+
         function showPremiumModal(featureName) {
             trackLaunchEvent('premiumModalOpened');
-            createModal("Premium Coming Soon", `
-                <div class="p-6 text-center bg-white">
-                    <div class="w-16 h-16 bg-gold bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-gold">
-                        <i data-lucide="sparkles" class="w-8 h-8 text-gold"></i>
-                    </div>
-                    <h3 class="text-2xl font-fantasy font-bold text-forest mb-2">Premium functions are coming soon</h3>
-                    <p class="text-sage mb-6 text-sm font-semibold">${escapeHTML(`Premium is required to ${featureName}`)}. Billing, backend entitlements, and the final Premium package are still in development, so this feature stays temporarily unavailable in the public app.</p>
-                    
-                    <div class="space-y-3 text-left bg-parchment p-4 rounded-md border border-parchmentDark mb-6">
-                        <p class="flex items-center gap-2 text-sm text-forest font-bold"><i data-lucide="clock-3" class="w-4 h-4 text-gold"></i> Temporary public message while Premium is being finalized</p>
-                        <p class="flex items-center gap-2 text-sm text-forest font-bold"><i data-lucide="shield-check" class="w-4 h-4 text-gold"></i> Prevents unfinished billing or entitlement flows from leaking into production</p>
-                        <p class="flex items-center gap-2 text-sm text-forest font-bold"><i data-lucide="crown" class="w-4 h-4 text-gold"></i> Local Premium preview remains reserved for explicit testing only</p>
-                    </div>
+            const copy = getAccountUpgradeCopy(featureName);
+            const isRecipeLimit = copy.featureKey === 'recipeLimit';
+            const perkItems = getActiveUiLanguage() === 'nl'
+                ? [
+                    'Onbeperkte recepten',
+                    'Schrift / notebook',
+                    'Synchroniseren',
+                    'Delen & PDF'
+                ]
+                : [
+                    'Unlimited recipes',
+                    'Notebook mode',
+                    'Cloud sync',
+                    'Share & PDF'
+                ];
 
-                    <p class="mb-4 text-xs font-semibold leading-relaxed text-sage">Premium features will return once billing, restore, backend validation, and access control are all live end-to-end.</p>
-
-                    <button onclick="closeModal()" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} mb-3">
-                        Understood
-                    </button>
+            createModal(copy.title, `
+                <div class="overflow-hidden rounded-2xl border border-parchmentDark bg-gradient-to-br from-parchment via-white to-accent/40">
+                    <div class="border-b border-parchmentDark bg-white/80 px-5 py-5 md:px-6">
+                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-gold">${escapeHTML(copy.kicker)}</p>
+                        <h3 class="mt-2 font-fantasy text-3xl font-bold leading-tight text-forest">${escapeHTML(copy.headline)}</h3>
+                        <p class="mt-3 max-w-xl text-sm font-semibold leading-relaxed text-sage">${escapeHTML(copy.body)}</p>
+                    </div>
+                    <div class="space-y-4 px-5 py-5 md:px-6">
+                        <div class="rounded-2xl border border-parchmentDark bg-white/90 p-4 shadow-sm">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sage">${isRecipeLimit ? (getActiveUiLanguage() === 'nl' ? 'Met Premium krijg je' : 'Premium unlocks') : (getActiveUiLanguage() === 'nl' ? 'Inbegrepen bij Premium' : 'Included with Premium')}</p>
+                            <ul class="mt-3 grid gap-2 sm:grid-cols-2">
+                                ${perkItems.map(item => `
+                                    <li class="flex items-center gap-2 text-sm font-bold text-forest">
+                                        <i data-lucide="check" class="h-4 w-4 flex-shrink-0 text-gold"></i>
+                                        <span>${escapeHTML(item)}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        <div class="flex flex-col gap-3 sm:flex-row">
+                            <button type="button" onclick="closeModal(); showPlansModal();" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
+                                <i data-lucide="crown" class="h-4 w-4"></i>${escapeHTML(copy.primary)}
+                            </button>
+                            <button type="button" onclick="closeModal()" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}">
+                                ${escapeHTML(copy.secondary)}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             `);
         }
 
-        function requirePremiumFeature(featureKey) {
-            const featureName = premiumFeatureLabels[featureKey] || 'use this feature';
-            if (hasPremiumAccess()) {
+        function requireAccountPlan(featureKey) {
+            if (accountHasPremiumPlan()) {
                 return false;
             }
 
-            showPremiumModal(featureName);
+            showPremiumModal(featureKey);
+            return true;
+        }
+
+        function requirePremiumFeature(featureKey) {
+            return requireAccountPlan(featureKey);
+        }
+
+        function requireFreeRecipeSlot() {
+            if (canAddLocalRecipe()) {
+                return false;
+            }
+
+            showPremiumModal('recipeLimit');
             return true;
         }
 
@@ -17538,7 +17815,7 @@
             saveData();
         }
 
-        function showCreateFamilyModal() { if(!hasPremiumAccess()) { showPremiumModal("create families"); return; }
+        function showCreateFamilyModal() { if(requireAccountPlan('createFamilies')) return;
             if (isCurrentUserFamilyReadOnly() || isCurrentUserSociallyIsolated()) {
                 showToast('Family changes are disabled for your account.', 'alert-circle', true);
                 return;
@@ -18189,12 +18466,12 @@
                     </button>
                     ${primarySupportAction}
                     ${!isSavedCommunityRecipe && versionHistoryCount > 0 ? renderDetailIconAction(`History (${versionHistoryCount})`, 'history', `showRecipeVersionHistory(${recipe.id})`, 'secondary', '', true) : ''}
-                    ${hasPremiumAccess()
+                    ${accountHasPremiumPlan()
                         ? renderDetailIconAction('Share', 'share-2', `shareRecipe(${recipe.id})`, 'secondary', '', true)
-                        : renderDetailIconAction('Share', 'lock', "showPremiumModal('share recipes')", 'muted', '', true)}
-                    ${hasPremiumAccess()
+                        : renderDetailIconAction('Share', 'lock', "showPremiumModal('recipeSharing')", 'muted', '', true)}
+                    ${accountHasPremiumPlan()
                         ? renderDetailIconAction('Export', 'download', `exportRecipeAsPDF(${recipe.id})`, 'secondary', '', true)
-                        : renderDetailIconAction('Export', 'lock', "showPremiumModal('download recipe PDFs')", 'muted', '', true)}
+                        : renderDetailIconAction('Export', 'lock', "showPremiumModal('recipePdfExport')", 'muted', '', true)}
                     ${isSavedCommunityRecipe ? '' : renderDetailIconAction(publishActionLabel, publishActionIcon, `publishRecipe(${recipe.id})`, publishDetailVariant, '', true)}
                     ${canAdminForceOffline ? renderDetailIconAction('Admin: offline now', 'shield-x', `adminForceOfflineRecipe(${recipe.id})`, 'danger', '', true) : ''}
                     ${deletionVoteProgress
@@ -18545,9 +18822,7 @@
 
         function renderAddForm(recipeId = null) {
             activeDetailRecipeId = null;
-            const localRecipesCount = recipes.filter(recipe => recipe.source === 'local').length;
-            if (!recipeId && !hasPremiumAccess() && localRecipesCount >= freeLocalRecipeLimit) {
-                showPremiumModal('add more than 3 recipes');
+            if (!recipeId && requireFreeRecipeSlot()) {
                 renderList();
                 return;
             }
@@ -19591,9 +19866,7 @@
 
             const existingRecipe = editingRecipeId ? recipes.find(recipe => recipe.id === editingRecipeId) : null;
             const shouldPublishAfterSave = explicitPublishAfterSave || (userSettings.autoPublish === true && (!existingRecipe || existingRecipe.source !== 'published'));
-            const localRecipesCount = recipes.filter(recipe => recipe.source === 'local').length;
-            if (!existingRecipe && !hasPremiumAccess() && localRecipesCount >= freeLocalRecipeLimit) {
-                showPremiumModal('add more than 3 recipes');
+            if (!existingRecipe && requireFreeRecipeSlot()) {
                 return;
             }
 
