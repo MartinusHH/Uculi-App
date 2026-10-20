@@ -81,6 +81,69 @@ service cloud.firestore {
       );
     }
 
+    function shoppingAuthEmail() {
+      return authEmail() != '' ? authEmail().lower() : '';
+    }
+
+    function isShoppingListOwner() {
+      return signedIn() && resource.data.ownerId == request.auth.uid;
+    }
+
+    function isShoppingListMember() {
+      return signedIn() && request.auth.uid in resource.data.memberIds;
+    }
+
+    function isShoppingListPendingInvitee() {
+      return signedIn()
+        && shoppingAuthEmail() != ''
+        && shoppingAuthEmail() in resource.data.pendingInviteEmails;
+    }
+
+    function shoppingOwnerUnchanged() {
+      return request.resource.data.ownerId == resource.data.ownerId;
+    }
+
+    function shoppingAcceptingInvite() {
+      return isShoppingListPendingInvitee()
+        && shoppingOwnerUnchanged()
+        && request.auth.uid in request.resource.data.memberIds
+        && !(request.auth.uid in resource.data.memberIds)
+        && request.resource.data.memberIds.size() == resource.data.memberIds.size() + 1
+        && !(shoppingAuthEmail() in request.resource.data.pendingInviteEmails);
+    }
+
+    function shoppingMemberContentOnlyUpdate() {
+      return isShoppingListMember()
+        && shoppingOwnerUnchanged()
+        && request.resource.data.memberIds == resource.data.memberIds
+        && request.resource.data.pendingInviteEmails == resource.data.pendingInviteEmails
+        && request.resource.data.memberEmails == resource.data.memberEmails;
+    }
+
+    match /shopping-lists/{listId} {
+      allow read: if isShoppingListOwner()
+        || isShoppingListMember()
+        || isShoppingListPendingInvitee()
+        || isAdminEmail();
+
+      allow create: if signedIn()
+        && listId == request.auth.uid
+        && request.resource.data.ownerId == request.auth.uid
+        && request.auth.uid in request.resource.data.memberIds
+        && shoppingAuthEmail() != ''
+        && shoppingAuthEmail() in request.resource.data.memberEmails
+        && request.resource.data.pendingInviteEmails is list;
+
+      allow update: if signedIn() && shoppingOwnerUnchanged() && (
+        isShoppingListOwner()
+        || shoppingMemberContentOnlyUpdate()
+        || shoppingAcceptingInvite()
+        || isAdminEmail()
+      );
+
+      allow delete: if isShoppingListOwner() || isAdminEmail();
+    }
+
     match /app-config/{docId} {
       allow read: if signedIn();
       // Admin doc is managed manually (console/admin SDK) or by existing admins only.
