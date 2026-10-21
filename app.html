@@ -6239,7 +6239,7 @@
         }
 
         async function loadCurrentUserModerationStatusFromCloud() {
-            if (!firebaseInitialized || !isAuthenticated || !currentUser?.uid) {
+            if (!firebaseInitialized || !isAuthenticated || !currentUser?.uid || isDeveloperBypassSession() || !isCloudAccountUid(currentUser.uid)) {
                 currentUserModerationStatus = getDefaultModerationStatus();
                 return;
             }
@@ -10091,7 +10091,7 @@
         }
 
         async function loadAdminConfigFromCloud() {
-            if (!firebaseInitialized || !isAuthenticated || !currentUser) return;
+            if (!firebaseInitialized || !isAuthenticated || !currentUser || isDeveloperBypassSession() || !isCloudAccountUid(currentUser?.uid)) return;
 
             try {
                 const snapshot = await firebase.firestore().collection('app-config').doc('admin').get();
@@ -11820,11 +11820,20 @@
             let isVegetarian = !combinedText.match(/chicken|beef|pork|meat|fish|salmon|shrimp|pollo|carne|pescado|poulet|viande|poisson/);
             let isVegan = isVegetarian && !combinedText.match(/cheese|milk|butter|egg|cream|queso|leche|mantequilla|huevo|fromage|lait|beurre|oeuf/);
 
-            document.getElementById('r-prepTime').value = prepMins;
-            document.getElementById('r-cookTime').value = cookMins;
-            document.getElementById('r-servings').value = servings;
-            document.getElementById('r-difficulty').value = diff;
-            document.getElementById('r-cuisine').value = cuisine;
+            const prepEl = document.getElementById('r-prepTime');
+            const cookEl = document.getElementById('r-cookTime');
+            const servingsEl = document.getElementById('r-servings');
+            const difficultyEl = document.getElementById('r-difficulty');
+            const cuisineEl = document.getElementById('r-cuisine');
+            if (!prepEl || !cookEl || !servingsEl || !difficultyEl || !cuisineEl) {
+                showToast(userSettings.language === 'nl' ? 'Receptformulier is niet beschikbaar.' : 'Recipe form is not available.', 'alert-circle');
+                return;
+            }
+            prepEl.value = prepMins;
+            cookEl.value = cookMins;
+            servingsEl.value = servings;
+            difficultyEl.value = diff;
+            cuisineEl.value = cuisine;
 
             const dietCheckboxes = document.querySelectorAll('.diet-checkbox');
             dietCheckboxes.forEach(cb => {
@@ -14478,12 +14487,30 @@
         }
 
         function getRecipeDetailLocationLabel(recipe) {
-            if (recipe?.source === 'published') return 'Saved from Browse';
+            const nl = userSettings.language === 'nl';
+            if (recipe?.source === 'published') return nl ? 'Opgeslagen uit Browse' : 'Saved from Browse';
 
             const family = getRecipeFamily(recipe);
             if (family) return family.label;
 
-            return 'Created by you';
+            return nl ? 'Door jou gemaakt' : 'Created by you';
+        }
+
+        function getRecipeAuthorLabel(recipe) {
+            const nl = userSettings.language === 'nl';
+            const raw = String(recipe?.author ?? '').trim();
+            if (raw) return raw;
+            const profileName = String(userSettings?.name || currentUser?.displayName || '').trim();
+            if (profileName) return profileName;
+            return nl ? 'Onbekende kok' : 'Unknown chef';
+        }
+
+        function getRecipeCountryLabel(recipe, { fallback = true } = {}) {
+            const nl = userSettings.language === 'nl';
+            const raw = String(recipe?.country ?? '').trim();
+            if (raw) return raw;
+            if (!fallback) return '';
+            return nl ? 'Onbekend land' : 'Unknown country';
         }
 
         function getNotebookRecipeMoodLabel(recipe) {
@@ -15238,10 +15265,18 @@
                 showToast('Profile editing is disabled while your account is under permanent social restriction.', 'alert-circle', true);
                 return;
             }
-            userSettings.name = document.getElementById('profile-name').value;
-            userSettings.country = document.getElementById('profile-country').value;
-            userSettings.bio = document.getElementById('profile-bio').value;
-            userSettings.isPublic = document.getElementById('profile-public').checked;
+            const nameEl = document.getElementById('profile-name');
+            const countryEl = document.getElementById('profile-country');
+            const bioEl = document.getElementById('profile-bio');
+            const publicEl = document.getElementById('profile-public');
+            if (!nameEl || !countryEl || !bioEl || !publicEl) {
+                showToast(userSettings.language === 'nl' ? 'Profielformulier is niet beschikbaar.' : 'Profile form is not available.', 'alert-circle');
+                return;
+            }
+            userSettings.name = nameEl.value;
+            userSettings.country = countryEl.value;
+            userSettings.bio = bioEl.value;
+            userSettings.isPublic = Boolean(publicEl.checked);
             saveData();
             showToast('Profile saved successfully!', 'user-check');
             renderProfile();
@@ -16100,9 +16135,16 @@
 
         function saveSettings(e) {
             e.preventDefault();
-            userSettings.measurementSystem = document.getElementById('settings-measurement').value;
-            changeGlobalLanguage(document.getElementById('settings-language')?.value || 'en', { silent: true });
-            userSettings.autoPublish = document.getElementById('settings-auto-publish').checked;
+            const measurementEl = document.getElementById('settings-measurement');
+            const languageEl = document.getElementById('settings-language');
+            const autoPublishEl = document.getElementById('settings-auto-publish');
+            if (!measurementEl || !languageEl || !autoPublishEl) {
+                showToast(userSettings.language === 'nl' ? 'Instellingenformulier is niet beschikbaar.' : 'Settings form is not available.', 'alert-circle');
+                return;
+            }
+            userSettings.measurementSystem = measurementEl.value;
+            changeGlobalLanguage(languageEl.value || 'en', { silent: true });
+            userSettings.autoPublish = Boolean(autoPublishEl.checked);
             delete userSettings.themeMode;
 
             saveData();
@@ -19796,12 +19838,11 @@
                         <div class="detail-hero-frame">
                             <div class="detail-hero-portrait" style="background-image: ${cssUrl(headerBg)}"></div>
                             <div class="detail-hero-copy">
-                                <p class="detail-hero-kicker">${recipeLocationLabel}</p>
-                                <h2 class="detail-hero-title">${recipe.title}</h2>
+                                <p class="detail-hero-kicker">${escapeHTML(recipeLocationLabel)}</p>
+                                <h2 class="detail-hero-title">${escapeHTML(recipe.title || (userSettings.language === 'nl' ? 'Naamloos recept' : 'Untitled recipe'))}</h2>
                                 <div class="detail-hero-meta">
-                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${recipe.author}</span>
-                                    <span>|</span>
-                                    <span class="flex items-center gap-1"><i data-lucide="map-pinned" class="w-4 h-4"></i> ${recipe.country || 'Unknown'}</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${escapeHTML(getRecipeAuthorLabel(recipe))}</span>
+                                    ${getRecipeCountryLabel(recipe, { fallback: false }) ? `<span>|</span><span class="flex items-center gap-1"><i data-lucide="map-pinned" class="w-4 h-4"></i> ${escapeHTML(getRecipeCountryLabel(recipe))}</span>` : ''}
                                     ${isSavedCommunityRecipe ? `<span>|</span><span class="flex items-center gap-1"><i data-lucide="heart" class="w-4 h-4"></i> Community save${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
                                     ${!isSavedCommunityRecipe && recipe.publishedId ? `<span>|</span><span class="flex items-center gap-1"><i data-lucide="${recipeIsLive ? 'cloud' : 'cloud-off'}" class="w-4 h-4"></i> ${recipeIsLive ? 'Live in Browse' : 'Removed from Browse'}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
                                 </div>
@@ -20379,7 +20420,7 @@
 
         function addDraftIngredient() {
             const input = document.getElementById('new-ingredient');
-            if(input.value.trim() === '') return;
+            if (!input || input.value.trim() === '') return;
             draftIngredients.push(input.value.trim());
             input.value = '';
             renderDraftIngredients();
@@ -20388,9 +20429,11 @@
         function removeDraftIngredient(index) { draftIngredients.splice(index, 1); renderDraftIngredients(); }
 
         function renderDraftIngredients() {
-            document.getElementById('draft-ingredients-list').innerHTML = draftIngredients.map((ing, i) => `
+            const list = document.getElementById('draft-ingredients-list');
+            if (!list) return;
+            list.innerHTML = draftIngredients.map((ing, i) => `
                 <li class="flex justify-between items-center bg-white min-h-[48px] px-4 rounded-sm border border-parchmentDark shadow-sm text-sm font-semibold text-forest">
-                    <span class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-gold rounded-full"></div> ${ing}</span>
+                    <span class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-gold rounded-full"></div> ${escapeHTML(ing)}</span>
                     <button type="button" onclick="removeDraftIngredient(${i})" class="text-red-400 hover:text-red-600 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                 </li>
             `).join('');
@@ -21080,7 +21123,7 @@
 
         function addDraftStep() {
             const input = document.getElementById('new-step');
-            if(input.value.trim() === '') return;
+            if (!input || input.value.trim() === '') return;
             const minutesInput = document.getElementById('new-step-minutes');
             const typed = Number.parseInt(minutesInput?.value || '', 10);
             const minutes = Math.max(1, Math.min(240, Number.isInteger(typed) ? typed : (readStepMinutes(input.value) || 1)));
@@ -21129,7 +21172,9 @@
         }
 
         function renderDraftSteps() {
-            document.getElementById('draft-steps-list').innerHTML = draftSteps.map((step, i) => {
+            const list = document.getElementById('draft-steps-list');
+            if (!list) return;
+            list.innerHTML = draftSteps.map((step, i) => {
                 const stepText = getRecipeInstructionText(step);
                 const stepImage = getRecipeInstructionImage(step);
                 const stepMinutes = getRecipeInstructionMinutes(step) || 1;
@@ -21139,7 +21184,7 @@
                         <div class="flex items-start gap-3">
                             <span class="bg-sage text-white w-6 h-6 flex items-center justify-center rounded-sm text-xs font-bold flex-shrink-0 mt-0.5">${i + 1}</span>
                             <div class="flex-1 pt-0.5">
-                                <p class="leading-relaxed">${stepText}</p>
+                                <p class="leading-relaxed">${escapeHTML(stepText)}</p>
                                 ${stepImage ? `<div class="mt-3 overflow-hidden rounded-md border border-parchmentDark bg-parchment"><img src="${stepImage}" alt="Draft step ${i + 1}" class="h-40 w-full object-cover"></div>` : ''}
                                 <label class="mt-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-sage">
                                     Minutes
@@ -21182,15 +21227,29 @@
                 return;
             }
 
-            const titleValue = document.getElementById('r-title').value;
-            const notesValue = document.getElementById('r-tips').value;
-            const manualCategory = document.getElementById('r-category').value;
+            const titleEl = document.getElementById('r-title');
+            const tipsEl = document.getElementById('r-tips');
+            const categoryEl = document.getElementById('r-category');
+            const authorEl = document.getElementById('r-author');
+            const countryEl = document.getElementById('r-country');
+            const prepEl = document.getElementById('r-prepTime');
+            const cookEl = document.getElementById('r-cookTime');
+            const servingsEl = document.getElementById('r-servings');
+            const difficultyEl = document.getElementById('r-difficulty');
+            const cuisineEl = document.getElementById('r-cuisine');
+            if (!titleEl || !tipsEl || !categoryEl || !authorEl || !countryEl || !prepEl || !cookEl || !servingsEl || !difficultyEl || !cuisineEl) {
+                showToast(userSettings.language === 'nl' ? 'Receptformulier is niet beschikbaar.' : 'Recipe form is not available.', 'alert-circle');
+                return;
+            }
+            const titleValue = titleEl.value;
+            const notesValue = tipsEl.value;
+            const manualCategory = categoryEl.value;
             const selectedMealTypes = Array.from(document.querySelectorAll('.meal-type-btn[data-selected="true"]')).map(btn => btn.dataset.mealType).filter(Boolean);
-            const manualPrepTime = parseInt(document.getElementById('r-prepTime').value) || 0;
-            const manualCookTime = parseInt(document.getElementById('r-cookTime').value) || 0;
-            const manualServings = parseInt(document.getElementById('r-servings').value) || 4;
-            const manualDifficulty = document.getElementById('r-difficulty').value || '';
-            const manualCuisine = document.getElementById('r-cuisine').value || '';
+            const manualPrepTime = parseInt(prepEl.value) || 0;
+            const manualCookTime = parseInt(cookEl.value) || 0;
+            const manualServings = parseInt(servingsEl.value) || 4;
+            const manualDifficulty = difficultyEl.value || '';
+            const manualCuisine = cuisineEl.value || '';
             const selectedFamilyId = document.getElementById('r-family-book')?.value || '';
             const selectedFamily = getFamilyById(selectedFamilyId);
             if ((isCurrentUserFamilyReadOnly() || isCurrentUserSociallyIsolated()) && selectedFamily?.id) {
@@ -21201,11 +21260,11 @@
                 ...existingRecipe,
                 id: existingRecipe?.id || generateId(),
                 title: titleValue,
-                author: document.getElementById('r-author').value || 'Unknown',
+                author: authorEl.value || userSettings.name || 'Unknown',
                 source: existingRecipe?.source || 'local',
                 category: manualCategory,
                 mealType: selectedMealTypes,
-                country: document.getElementById('r-country').value,
+                country: countryEl.value,
                 familyId: selectedFamily?.id || '',
                 familyName: selectedFamily?.name || '',
                 familyColorKey: selectedFamily?.colorKey || '',
@@ -21227,10 +21286,10 @@
                 versionHistory: existingRecipe ? getUpdatedRecipeVersionHistory(existingRecipe, {
                     ...existingRecipe,
                     title: titleValue,
-                    author: document.getElementById('r-author').value || 'Unknown',
+                    author: authorEl.value || userSettings.name || 'Unknown',
                     category: manualCategory,
                     mealType: selectedMealTypes,
-                    country: document.getElementById('r-country').value,
+                    country: countryEl.value,
                     familyId: selectedFamily?.id || '',
                     familyName: selectedFamily?.name || '',
                     familyColorKey: selectedFamily?.colorKey || '',
@@ -21297,8 +21356,17 @@
 
             const recipe = recipes.find(r => r.id === id);
             if (!recipe) return;
-            const shareText = `Check out this recipe: ${recipe.title}!\n\nIngredients:\n- ${recipe.ingredients.join('\n- ')}\n\nLet's cook!`;
-            if (navigator.share) navigator.share({ title: recipe.title, text: shareText }).catch(() => copyToClipboard(shareText));
+            const ingredientLines = (Array.isArray(recipe.ingredients) ? recipe.ingredients : [])
+                .map(item => {
+                    if (typeof item === 'string') return item.trim();
+                    if (item && typeof item === 'object') {
+                        return String(item.label || item.name || item.text || '').trim();
+                    }
+                    return String(item || '').trim();
+                })
+                .filter(Boolean);
+            const shareText = `Check out this recipe: ${recipe.title || 'Uculi'}!\n\nIngredients:\n- ${ingredientLines.join('\n- ') || '—'}\n\nLet's cook!`;
+            if (navigator.share) navigator.share({ title: recipe.title || 'Uculi', text: shareText }).catch(() => copyToClipboard(shareText));
             else copyToClipboard(shareText);
         }
 
