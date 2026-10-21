@@ -8784,23 +8784,41 @@
             }
         }
 
-        function shoppingListDocToLocalState(data = {}, listId = '') {
-            const ownerId = String(data.ownerId || '');
-            const memberEmails = Array.isArray(data.memberEmails) ? data.memberEmails.map(email => String(email || '').toLowerCase()) : [];
+        function shoppingMembersFromDoc(data = {}) {
+            if (Array.isArray(data.members) && data.members.length) {
+                return data.members.map(member => ({
+                    uid: String(member?.uid || ''),
+                    email: String(member?.email || '').trim().toLowerCase(),
+                    name: String(member?.name || member?.email || member?.uid || 'Member').trim()
+                })).filter(member => member.uid);
+            }
+            const memberEmails = Array.isArray(data.memberEmails)
+                ? data.memberEmails.map(email => String(email || '').trim().toLowerCase())
+                : [];
             const memberIds = Array.isArray(data.memberIds) ? data.memberIds.map(String) : [];
-            const sharedMembers = memberIds.map((uid, index) => ({
+            return memberIds.map((uid, index) => ({
                 uid,
                 email: memberEmails[index] || '',
                 name: uid === currentUser?.uid
                     ? (userSettings.name || currentUser?.displayName || 'You')
                     : (memberEmails[index] || 'Member')
+            })).filter(member => member.uid);
+        }
+
+        function shoppingListDocToLocalState(data = {}, listId = '') {
+            const ownerId = String(data.ownerId || '');
+            const sharedMembers = shoppingMembersFromDoc(data).map(member => ({
+                ...member,
+                name: member.uid === currentUser?.uid
+                    ? (userSettings.name || currentUser?.displayName || member.name || 'You')
+                    : (member.name || member.email || 'Member')
             }));
             return normalizeShoppingListState({
                 items: data.items || [],
                 collaborators: data.collaborators || [],
                 syncMode: 'cloud',
                 cloudListId: listId || data.id || '',
-                ownedCloudListId: ownerId,
+                ownedCloudListId: ownerId || listId || '',
                 isCloudOwner: ownerId === currentUser?.uid,
                 pendingInviteEmails: data.pendingInviteEmails || [],
                 sharedMembers,
@@ -8808,24 +8826,37 @@
             });
         }
 
-        function buildShoppingListCloudPayload(list = userSettings.shoppingList) {
+        function buildShoppingListCloudPayload(list = userSettings.shoppingList, { asOwner = true } = {}) {
             const normalized = normalizeShoppingListState(list);
-            const ownerEmail = getShoppingAuthEmail();
-            const ownerId = currentUser.uid;
+            const ownerEmail = asOwner ? getShoppingAuthEmail() : String(normalized.sharedMembers?.find(member => member.uid === (normalized.ownedCloudListId || normalized.cloudListId))?.email || getShoppingAuthEmail());
+            const ownerId = asOwner ? currentUser.uid : String(normalized.ownedCloudListId || normalized.cloudListId || currentUser.uid);
             const membersByUid = new Map();
-            membersByUid.set(ownerId, ownerEmail);
+            const ownerName = asOwner
+                ? (userSettings.name || currentUser.displayName || 'You')
+                : (normalized.sharedMembers?.find(member => member.uid === ownerId)?.name || 'Owner');
+            membersByUid.set(ownerId, {
+                uid: ownerId,
+                email: String(ownerEmail || '').trim().toLowerCase(),
+                name: ownerName
+            });
             (normalized.sharedMembers || []).forEach(member => {
                 const uid = String(member?.uid || '');
                 if (!uid) return;
-                const email = String(member?.email || membersByUid.get(uid) || '').trim().toLowerCase();
-                membersByUid.set(uid, email);
+                const prev = membersByUid.get(uid) || {};
+                membersByUid.set(uid, {
+                    uid,
+                    email: String(member?.email || prev.email || '').trim().toLowerCase(),
+                    name: String(member?.name || prev.name || member?.email || uid).trim() || uid
+                });
             });
+            const members = Array.from(membersByUid.values());
             return {
                 id: normalized.cloudListId || ownerId,
                 ownerId,
-                ownerEmail,
-                memberIds: Array.from(membersByUid.keys()),
-                memberEmails: Array.from(membersByUid.values()),
+                ownerEmail: String(membersByUid.get(ownerId)?.email || ownerEmail || '').trim().toLowerCase(),
+                memberIds: members.map(member => member.uid),
+                memberEmails: members.map(member => member.email),
+                members,
                 pendingInviteEmails: normalized.pendingInviteEmails || [],
                 items: normalized.items || [],
                 collaborators: normalized.collaborators || [],
@@ -8833,7 +8864,7 @@
             };
         }
 
-        async function ensureOwnedShoppingListCloud() {
+        async function ensureOwnedShoppingListCloud({ activate = false } = {}) {
             if (!canUseShoppingListCloud()) return null;
             const db = firebase.firestore();
             const listId = currentUser.uid;
@@ -8841,7 +8872,12 @@
             const snap = await ref.get();
             if (!snap.exists) {
                 const seed = normalizeShoppingListState({
-                    ...userSettings.shoppingList,
+                    items: activate || userSettings.shoppingList?.syncMode !== 'cloud'
+                        ? (userSettings.shoppingList?.items || [])
+                        : [],
+                    collaborators: activate || userSettings.shoppingList?.syncMode !== 'cloud'
+                        ? (userSettings.shoppingList?.collaborators || [])
+                        : [],
                     syncMode: 'cloud',
                     cloudListId: listId,
                     ownedCloudListId: listId,
@@ -8853,19 +8889,34 @@
                     }],
                     pendingInviteEmails: []
                 });
-                const payload = buildShoppingListCloudPayload(seed);
+                const payload = buildShoppingListCloudPayload(seed, { asOwner: true });
                 await ref.set(payload, { merge: true });
-                shoppingCloudApplyingRemote = true;
-                userSettings.shoppingList = shoppingListDocToLocalState(payload, listId);
-                shoppingCloudApplyingRemote = false;
-                saveData();
+                if (activate) {
+                    shoppingCloudApplyingRemote = true;
+                    userSettings.shoppingList = shoppingListDocToLocalState(payload, listId);
+                    shoppingCloudApplyingRemote = false;
+                    saveData();
+                }
                 return listId;
             }
-            shoppingCloudApplyingRemote = true;
-            userSettings.shoppingList = shoppingListDocToLocalState(snap.data() || {}, listId);
-            shoppingCloudApplyingRemote = false;
-            saveData();
+            if (activate) {
+                shoppingCloudApplyingRemote = true;
+                userSettings.shoppingList = shoppingListDocToLocalState(snap.data() || {}, listId);
+                shoppingCloudApplyingRemote = false;
+                saveData();
+            }
             return listId;
+        }
+
+        async function loadShoppingListCloudDoc(listId, { activate = true } = {}) {
+            if (!canUseShoppingListCloud() || !listId) return null;
+            const ref = firebase.firestore().collection('shopping-lists').doc(String(listId));
+            const snap = await ref.get();
+            if (!snap.exists) return null;
+            if (activate) {
+                applyShoppingListRemoteDoc(snap.id, snap.data() || {});
+            }
+            return snap;
         }
 
         function applyShoppingListRemoteDoc(listId, data) {
@@ -8903,13 +8954,22 @@
             const email = getShoppingAuthEmail();
             if (!email) return;
             shoppingInviteQueryUnsub = firebase.firestore()
-                .collection('shopping-lists')
-                .where('pendingInviteEmails', 'array-contains', email)
+                .collection('shopping-list-invites')
+                .where('inviteeEmail', '==', email)
                 .onSnapshot(snapshot => {
                     const invites = [];
                     snapshot.forEach(doc => {
-                        if (doc.id === currentUser.uid) return;
-                        invites.push({ id: doc.id, ...(doc.data() || {}) });
+                        const data = doc.data() || {};
+                        const listId = String(data.listId || '');
+                        if (!listId || listId === currentUser.uid) return;
+                        invites.push({
+                            id: listId,
+                            inviteDocId: doc.id,
+                            ownerId: data.ownerId || listId,
+                            ownerEmail: data.ownerEmail || '',
+                            inviteeEmail: data.inviteeEmail || email,
+                            createdAt: data.createdAt || ''
+                        });
                     });
                     window.__pendingShoppingInvites = invites;
                     if (currentView === 'shopping') renderShoppingList();
@@ -8918,20 +8978,47 @@
                 });
         }
 
+        function shoppingListInviteDocId(listId, inviteeEmail) {
+            const email = String(inviteeEmail || '').trim().toLowerCase();
+            return `${String(listId || '')}__${email.replace(/[^a-z0-9._+-]+/g, '_')}`;
+        }
+
+        async function upsertShoppingListInviteDoc(listId, inviteeEmail) {
+            const email = String(inviteeEmail || '').trim().toLowerCase();
+            const inviteId = shoppingListInviteDocId(listId, email);
+            const ref = firebase.firestore().collection('shopping-list-invites').doc(inviteId);
+            const existing = await ref.get();
+            if (existing.exists) return inviteId;
+            await ref.set({
+                listId: String(listId),
+                ownerId: currentUser.uid,
+                ownerEmail: getShoppingAuthEmail(),
+                inviteeEmail: email,
+                createdAt: new Date().toISOString()
+            });
+            return inviteId;
+        }
+
+        async function deleteShoppingListInviteDoc(listId, inviteeEmail) {
+            const inviteId = shoppingListInviteDocId(listId, inviteeEmail);
+            await firebase.firestore().collection('shopping-list-invites').doc(inviteId).delete().catch(() => null);
+        }
+
         async function pushShoppingListToCloud() {
             if (!canUseShoppingListCloud() || shoppingCloudApplyingRemote) return;
             const list = normalizeShoppingListState(userSettings.shoppingList);
             if (list.syncMode !== 'cloud' || !list.cloudListId) return;
-            if (!list.isCloudOwner && !(list.sharedMembers || []).some(member => member.uid === currentUser.uid)) {
-                // Non-owner members can still write items; cloud payload must preserve membership arrays from server.
-            }
+            const isMember = list.isCloudOwner
+                || (list.sharedMembers || []).some(member => member.uid === currentUser.uid);
+            if (!isMember) return;
             const db = firebase.firestore();
             const ref = db.collection('shopping-lists').doc(String(list.cloudListId));
-            if (list.isCloudOwner) {
-                const payload = buildShoppingListCloudPayload(list);
+            if (list.isCloudOwner && list.cloudListId === currentUser.uid) {
+                const payload = buildShoppingListCloudPayload(list, { asOwner: true });
                 await ref.set(payload, { merge: true });
                 return;
             }
+            // Members may only patch content fields; membership stays server-owned.
             await ref.set({
                 items: list.items || [],
                 collaborators: list.collaborators || [],
@@ -8960,18 +9047,57 @@
             }
         }
 
+        async function resolveActiveShoppingListId() {
+            const ownedId = currentUser.uid;
+            const local = normalizeShoppingListState(userSettings.shoppingList);
+            const preferredId = String(local.cloudListId || '').trim();
+            if (pendingShoppingInviteListId && pendingShoppingInviteListId !== ownedId) {
+                return pendingShoppingInviteListId;
+            }
+            if (preferredId && preferredId !== ownedId) {
+                try {
+                    const snap = await firebase.firestore().collection('shopping-lists').doc(preferredId).get();
+                    if (snap.exists) {
+                        const data = snap.data() || {};
+                        const memberIds = Array.isArray(data.memberIds) ? data.memberIds.map(String) : [];
+                        if (memberIds.includes(currentUser.uid) || String(data.ownerId || '') === currentUser.uid) {
+                            return preferredId;
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Preferred shopping list unavailable:', error);
+                }
+            }
+            return ownedId;
+        }
+
         async function bootstrapShoppingListCloud() {
             if (!canUseShoppingListCloud()) {
                 stopShoppingListRealtime();
                 return;
             }
             try {
-                const listId = await ensureOwnedShoppingListCloud();
-                if (pendingShoppingInviteListId && pendingShoppingInviteListId !== listId) {
-                    await acceptShoppingListInvite(pendingShoppingInviteListId);
+                await ensureOwnedShoppingListCloud({ activate: false });
+                if (pendingShoppingInviteListId && pendingShoppingInviteListId !== currentUser.uid) {
+                    const accepted = await acceptShoppingListInvite(pendingShoppingInviteListId);
                     pendingShoppingInviteListId = '';
-                } else if (listId) {
-                    subscribeShoppingListRealtime(listId);
+                    if (accepted) {
+                        subscribePendingShoppingInvites();
+                        return;
+                    }
+                }
+                const activeId = await resolveActiveShoppingListId();
+                if (activeId === currentUser.uid) {
+                    await ensureOwnedShoppingListCloud({ activate: true });
+                    subscribeShoppingListRealtime(activeId);
+                } else {
+                    const loaded = await loadShoppingListCloudDoc(activeId, { activate: true });
+                    if (loaded) {
+                        subscribeShoppingListRealtime(activeId);
+                    } else {
+                        await ensureOwnedShoppingListCloud({ activate: true });
+                        subscribeShoppingListRealtime(currentUser.uid);
+                    }
                 }
                 subscribePendingShoppingInvites();
             } catch (error) {
@@ -8995,7 +9121,8 @@
                 return false;
             }
 
-            await ensureOwnedShoppingListCloud();
+            await ensureOwnedShoppingListCloud({ activate: true });
+            subscribeShoppingListRealtime(currentUser.uid);
             const list = normalizeShoppingListState(userSettings.shoppingList);
             if (!list.isCloudOwner || list.cloudListId !== currentUser.uid) {
                 showToast(nl ? 'Alleen de eigenaar kan mensen uitnodigen.' : 'Only the owner can invite people.', 'alert-circle', true);
@@ -9012,8 +9139,10 @@
                 pendingInviteEmails: pending,
                 updatedAt: new Date().toISOString()
             }, { merge: true });
+            await upsertShoppingListInviteDoc(currentUser.uid, email);
 
             userSettings.shoppingList.pendingInviteEmails = pending;
+            userSettings.shoppingList.syncMode = 'cloud';
             saveData();
 
             const link = shoppingListInviteLink(currentUser.uid);
@@ -9021,8 +9150,39 @@
             const body = encodeURIComponent(nl
                 ? `Je bent uitgenodigd voor een gedeelde boodschappenlijst op Uculi.\n\n1. Log in met ${email}\n2. Open deze link:\n${link}\n\nWijzigingen zijn realtime zichtbaar.`
                 : `You're invited to a shared shopping list on Uculi.\n\n1. Sign in as ${email}\n2. Open this link:\n${link}\n\nChanges sync in realtime.`);
-            window.location.href = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+            // Prefer compose without navigating away from the app when possible.
+            const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+            try {
+                const opened = window.open(mailtoUrl, '_blank');
+                if (!opened) window.location.href = mailtoUrl;
+            } catch (error) {
+                window.location.href = mailtoUrl;
+            }
             showToast(nl ? 'Uitnodiging klaargezet in je e-mail.' : 'Invite drafted in your email app.', 'mail');
+            if (currentView === 'shopping') renderShoppingList();
+            return true;
+        }
+
+        async function revokeShoppingListInvite(emailAddress) {
+            const nl = userSettings.language === 'nl';
+            if (!canUseShoppingListCloud()) return false;
+            const email = String(emailAddress || '').trim().toLowerCase();
+            if (!email) return false;
+            await ensureOwnedShoppingListCloud({ activate: true });
+            const list = normalizeShoppingListState(userSettings.shoppingList);
+            if (!list.isCloudOwner || list.cloudListId !== currentUser.uid) {
+                showToast(nl ? 'Alleen de eigenaar kan uitnodigingen intrekken.' : 'Only the owner can revoke invites.', 'alert-circle', true);
+                return false;
+            }
+            const pending = (list.pendingInviteEmails || []).filter(value => value !== email);
+            await firebase.firestore().collection('shopping-lists').doc(currentUser.uid).set({
+                pendingInviteEmails: pending,
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+            await deleteShoppingListInviteDoc(currentUser.uid, email);
+            userSettings.shoppingList.pendingInviteEmails = pending;
+            saveData();
+            showToast(nl ? 'Uitnodiging ingetrokken.' : 'Invite revoked.', 'mail');
             if (currentView === 'shopping') renderShoppingList();
             return true;
         }
@@ -9035,6 +9195,7 @@
             }
             const targetId = String(listId || '').trim();
             if (!targetId) return false;
+            await ensureOwnedShoppingListCloud({ activate: false });
             const email = getShoppingAuthEmail();
             const db = firebase.firestore();
             const ref = db.collection('shopping-lists').doc(targetId);
@@ -9044,9 +9205,11 @@
                 return false;
             }
             const data = snap.data() || {};
-            const pending = Array.isArray(data.pendingInviteEmails) ? data.pendingInviteEmails.map(value => String(value).toLowerCase()) : [];
-            const memberIds = Array.isArray(data.memberIds) ? data.memberIds.map(String) : [];
-            const memberEmails = Array.isArray(data.memberEmails) ? data.memberEmails.map(value => String(value).toLowerCase()) : [];
+            const pending = Array.isArray(data.pendingInviteEmails)
+                ? data.pendingInviteEmails.map(value => String(value).toLowerCase())
+                : [];
+            const members = shoppingMembersFromDoc(data);
+            const memberIds = Array.isArray(data.memberIds) ? data.memberIds.map(String) : members.map(member => member.uid);
             if (memberIds.includes(currentUser.uid)) {
                 subscribeShoppingListRealtime(targetId);
                 applyShoppingListRemoteDoc(targetId, data);
@@ -9060,13 +9223,32 @@
                 return false;
             }
 
+            const nextMembers = [
+                ...members.filter(member => member.uid !== currentUser.uid),
+                {
+                    uid: currentUser.uid,
+                    email,
+                    name: userSettings.name || currentUser.displayName || email
+                }
+            ];
+            const nextPending = pending.filter(value => value !== email);
             await ref.set({
-                memberIds: [...memberIds, currentUser.uid],
-                memberEmails: Array.from(new Set([...memberEmails, email])),
-                pendingInviteEmails: pending.filter(value => value !== email),
+                memberIds: nextMembers.map(member => member.uid),
+                memberEmails: nextMembers.map(member => member.email),
+                members: nextMembers,
+                pendingInviteEmails: nextPending,
                 updatedAt: new Date().toISOString()
             }, { merge: true });
+            await deleteShoppingListInviteDoc(targetId, email);
 
+            const refreshed = await ref.get();
+            applyShoppingListRemoteDoc(targetId, refreshed.data() || {
+                ...data,
+                memberIds: nextMembers.map(member => member.uid),
+                memberEmails: nextMembers.map(member => member.email),
+                members: nextMembers,
+                pendingInviteEmails: nextPending
+            });
             subscribeShoppingListRealtime(targetId);
             sessionStorage.removeItem('uculi-shopping-invite');
             pendingShoppingInviteListId = '';
@@ -9077,9 +9259,23 @@
 
         async function openOwnedShoppingList() {
             if (!canUseShoppingListCloud()) return;
-            const listId = await ensureOwnedShoppingListCloud();
+            const listId = await ensureOwnedShoppingListCloud({ activate: true });
             if (listId) subscribeShoppingListRealtime(listId);
             if (currentView === 'shopping') renderShoppingList();
+        }
+
+        async function leaveSharedShoppingList() {
+            const nl = userSettings.language === 'nl';
+            if (!canUseShoppingListCloud()) return false;
+            const list = normalizeShoppingListState(userSettings.shoppingList);
+            if (list.isCloudOwner || !list.cloudListId || list.cloudListId === currentUser.uid) {
+                showToast(nl ? 'Je bekijkt al je eigen lijst.' : 'You are already on your own list.', 'info');
+                return false;
+            }
+            // Members cannot rewrite membership under rules; switching back to owned list is enough.
+            await openOwnedShoppingList();
+            showToast(nl ? 'Terug op je eigen lijst.' : 'Back on your own list.', 'arrow-left');
+            return true;
         }
 
         function showShoppingListInviteModal() {
@@ -17348,7 +17544,7 @@
                         ${shoppingList.isCloudOwner
                             ? `<span class="shop-stat"><i data-lucide="crown" class="h-4 w-4"></i>${shopNl ? 'Jouw lijst' : 'Your list'}</span>`
                             : `<span class="shop-stat"><i data-lucide="users" class="h-4 w-4"></i>${shopNl ? 'Gedeelde lijst' : 'Shared list'}</span>
-                               <button type="button" onclick="openOwnedShoppingList()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="arrow-left" class="h-4 w-4"></i>${shopNl ? 'Naar mijn lijst' : 'Back to my list'}</button>`}
+                               <button type="button" onclick="leaveSharedShoppingList()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="arrow-left" class="h-4 w-4"></i>${shopNl ? 'Naar mijn lijst' : 'Back to my list'}</button>`}
                         ${sharedMemberCount ? `<span class="shop-stat"><i data-lucide="user-round" class="h-4 w-4"></i>${sharedMemberCount} ${shopNl ? 'deelnemers' : 'members'}</span>` : ''}
                         ${pendingInviteCount && shoppingList.isCloudOwner ? `<span class="shop-stat"><i data-lucide="mail" class="h-4 w-4"></i>${pendingInviteCount} ${shopNl ? 'openstaand' : 'pending'}</span>` : ''}
                     </div>
@@ -17360,6 +17556,9 @@
                     ${shoppingList.isCloudOwner && pendingInviteCount ? `<div class="mb-3 flex flex-wrap gap-2">${(shoppingList.pendingInviteEmails || []).map(email => `
                         <span class="inline-flex items-center gap-2 rounded-full border border-dashed border-parchmentDark bg-parchment px-3 py-2 text-xs font-bold text-sage">
                             <i data-lucide="mail" class="h-4 w-4"></i>${escapeHTML(email)} · ${shopNl ? 'wacht op acceptatie' : 'awaiting accept'}
+                            <button type="button" onclick='revokeShoppingListInvite(${JSON.stringify(String(email))})' class="inline-flex h-6 w-6 items-center justify-center rounded-full border border-parchmentDark bg-white text-sage" aria-label="${shopNl ? 'Intrekken' : 'Revoke'}" title="${shopNl ? 'Intrekken' : 'Revoke'}">
+                                <i data-lucide="x" class="h-3.5 w-3.5"></i>
+                            </button>
                         </span>
                     `).join('')}</div>` : ''}
                 `;
