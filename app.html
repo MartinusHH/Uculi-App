@@ -2347,6 +2347,8 @@
             }
 
             #app-content .screen-sheet,
+            #app-content .detail-sheet,
+            #app-content .editor-sheet,
             body.chrome-push:not(.cooking-mode-active) .push-sheet,
             body.chrome-push:not(.cooking-mode-active) .detail-shell {
                 background-color: transparent;
@@ -2426,11 +2428,18 @@
                 letter-spacing: 0.1em;
             }
 
+            body.chrome-push:not(.cooking-mode-active) .detail-panel,
+            body.chrome-push:not(.cooking-mode-active) .editor-panel,
+            body.chrome-push:not(.cooking-mode-active) .detail-hero-shell {
+                border-radius: 1rem;
+                box-shadow: 0 10px 20px rgba(28, 20, 16, 0.04);
+            }
+
             body.chrome-push:not(.cooking-mode-active) .detail-meta-grid,
             body.chrome-push:not(.cooking-mode-active) .detail-ingredients-panel {
-                background-color: transparent;
-                border-width: 0;
-                box-shadow: none;
+                background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+                border-width: 1px;
+                box-shadow: 0 10px 20px rgba(28, 20, 16, 0.04);
             }
 
             body.chrome-push .settings-sheet {
@@ -4588,6 +4597,238 @@
         }
 
         /* Receptfoto, terugknop en titel blijven aparte lagen. De foto zakt niet over de tekst. */
+        .detail-sheet,
+        .editor-sheet {
+            max-width: none;
+            width: 100%;
+            margin: 0 auto 2rem;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+            overflow: visible;
+        }
+
+        .editor-sheet {
+            max-width: 48rem;
+        }
+
+        .editor-hero {
+            display: grid;
+            gap: 0.35rem;
+            margin-bottom: 1rem;
+        }
+
+        .editor-hero h2 {
+            margin: 0;
+            color: #1c1410;
+            font-family: Fraunces, serif;
+            font-size: clamp(1.8rem, 3vw, 2.45rem);
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .editor-hero p {
+            margin: 0;
+            color: #8a7a70;
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+            max-width: 48ch;
+        }
+
+        .editor-layout {
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .editor-panel,
+        .detail-panel {
+            padding: 1rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1.25rem;
+            background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
+        }
+
+        .editor-panel-kicker,
+        .detail-panel-kicker {
+            margin: 0 0 0.75rem;
+            color: #8a7a70;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .detail-content-shell {
+            display: grid;
+            gap: 0.9rem;
+            padding: 0;
+        }
+
+        .detail-meta-grid.detail-panel {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.85rem;
+            margin: 0;
+        }
+
+        .detail-meta-item {
+            text-align: center;
+        }
+
+        .detail-meta-item .detail-meta-label {
+            margin-top: 0.2rem;
+            color: #8a7a70;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .detail-meta-item .detail-meta-value {
+            margin-top: 0.15rem;
+            color: #1c1410;
+            font-size: 1.05rem;
+            font-weight: 800;
+        }
+
+        .detail-toolbar-row {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .detail-status-chips {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .detail-chip {
+            display: inline-flex;
+            align-items: center;
+            min-height: 1.7rem;
+            padding: 0.2rem 0.65rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 999px;
+            background: rgba(255, 253, 249, 0.92);
+            color: #5c5148;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .detail-step {
+            display: flex;
+            gap: 0.9rem;
+            align-items: flex-start;
+            padding: 0.95rem 1rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1.1rem;
+            background: rgba(255, 253, 249, 0.92);
+            transition: background-color 0.18s ease, border-color 0.18s ease;
+        }
+
+        .detail-step:hover {
+            border-color: rgba(146, 157, 117, 0.35);
+            background: rgba(246, 241, 232, 0.98);
+        }
+
+        .detail-step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            flex-shrink: 0;
+            border-radius: 0.7rem;
+            background: #929D75;
+            color: #1c1410;
+            font-size: 0.82rem;
+            font-weight: 800;
+            box-shadow: 0 8px 16px rgba(28, 20, 16, 0.08);
+            cursor: pointer;
+        }
+
+        .detail-ingredient-row {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.75rem 0.85rem;
+            border: 1px solid rgba(28, 20, 16, 0.06);
+            border-radius: 0.9rem;
+            background: rgba(255, 253, 249, 0.92);
+        }
+
+        .detail-notes-callout {
+            border-left: 3px solid #c89050;
+        }
+
+        .detail-scale-control {
+            display: flex;
+            height: 3rem;
+            width: 100%;
+            align-items: center;
+            border: 1px solid rgba(28, 20, 16, 0.1);
+            border-radius: 0.95rem;
+            background: #fffdf9;
+            box-shadow: 0 8px 16px rgba(28, 20, 16, 0.04);
+        }
+
+        .detail-scale-control button {
+            flex: 1 1 0;
+            height: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #8a7a70;
+            font-size: 1.1rem;
+            font-weight: 800;
+            background: transparent;
+        }
+
+        .detail-scale-control button:hover {
+            color: #1c1410;
+            background: rgba(246, 241, 232, 0.9);
+        }
+
+        .detail-scale-control #scale-display {
+            min-width: 4.5rem;
+            height: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 0.5rem;
+            border-left: 1px solid rgba(28, 20, 16, 0.08);
+            border-right: 1px solid rgba(28, 20, 16, 0.08);
+            color: #1c1410;
+            font-size: 0.82rem;
+            font-weight: 800;
+        }
+
+        @media (min-width: 768px) {
+            .editor-sheet {
+                max-width: none;
+            }
+
+            .editor-panel,
+            .detail-panel {
+                padding: 1.15rem 1.25rem 1.2rem;
+            }
+
+            .detail-meta-grid.detail-panel {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+            }
+
+            .detail-toolbar-row {
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: center;
+            }
+        }
+
         .detail-back-row {
             position: relative;
             z-index: 3;
@@ -4596,7 +4837,11 @@
         .detail-hero-shell {
             position: relative;
             overflow: hidden;
+            margin-bottom: 0.9rem;
+            border: 1px solid rgba(28, 20, 16, 0.1);
+            border-radius: 1.25rem;
             background: #1c1410;
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.08);
         }
 
         .detail-hero-wash,
@@ -4689,13 +4934,12 @@
         }
 
         .detail-hero-spacer {
-            height: 0.85rem;
-            background: #fbf8f3;
+            display: none;
         }
 
         @media (min-width: 768px) {
             .detail-hero-shell {
-                overflow: visible;
+                overflow: hidden;
             }
 
             .detail-hero-frame {
@@ -4703,14 +4947,14 @@
                 flex-direction: row;
                 align-items: flex-end;
                 gap: 1.1rem;
-                padding: 1.6rem 1.75rem 0.9rem;
+                padding: 1.6rem 1.75rem 1.35rem;
                 text-align: left;
             }
 
             .detail-hero-portrait {
                 width: 7rem;
                 height: 7rem;
-                margin-bottom: -1.8rem;
+                margin-bottom: 0;
                 border-width: 3px;
             }
 
@@ -4721,10 +4965,6 @@
             .detail-hero-meta {
                 justify-content: flex-start;
                 font-size: 0.82rem;
-            }
-
-            .detail-hero-spacer {
-                height: 2.15rem;
             }
         }
 
@@ -4769,6 +5009,7 @@
 
         .cooking-mode-active .detail-hero-shell,
         .cooking-mode-active .detail-meta-grid,
+        .cooking-mode-active .detail-toolbar-row,
         .cooking-mode-active .detail-status-chips,
         .cooking-mode-active .detail-secondary-section,
         .cooking-mode-active .detail-rating-panel,
@@ -17589,72 +17830,82 @@
             const ownedLocalRecipe = getLocalRecipeByPublishedId(recipe.id);
             const canAdminForceOfflinePublished = isCurrentUserAdmin() && recipe.publicationState !== 'retracted';
 
-            contentDiv.innerHTML = `
-                <div class="push-sheet bg-white rounded-sm shadow-sm mb-6 border border-parchmentDark relative w-full overflow-hidden">
-                    <div class="absolute top-4 left-4 right-4 flex justify-end z-10 pointer-events-none">
-                        ${owned ? `
-                            <div class="pointer-events-auto flex flex-wrap items-center justify-end gap-2">
-                                ${ownedLocalRecipe ? `<button onclick="renderDetail(${ownedLocalRecipe.id})" class="${getAppButtonClasses('secondary', { size: 'lg' })} border-2 border-white shadow-xl"><i data-lucide="book-open" class="w-4 h-4"></i>Open local</button>` : ''}
-                                ${canAdminForceOfflinePublished ? `<button onclick="adminForceUnpublishByPublishedId('${recipe.id}', 'admin-force-browse-detail')" class="${getAppButtonClasses('danger', { size: 'lg' })} border-2 border-white shadow-xl"><i data-lucide="shield-x" class="w-4 h-4"></i>Admin offline now</button>` : ''}
-                                <span class="inline-flex items-center rounded-full bg-white px-4 py-3 text-xs font-bold uppercase tracking-[0.24em] text-sage shadow-xl border border-white">Published by you${versionLabel ? ` · ${versionLabel}` : ''}</span>
-                            </div>
-                        ` : `
-                            <div class="pointer-events-auto flex flex-wrap items-center justify-end gap-2">
-                                ${recipe.authorId ? `<button onclick="renderPublicProfile('${recipe.authorId}', '${escapeHTML((recipe.authorName || recipe.author || 'Chef').replace(/'/g, "&#39;"))}')" class="${getAppButtonClasses('secondary', { size: 'lg' })} border-2 border-white shadow-xl"><i data-lucide="user-round" class="w-4 h-4"></i>View profile</button>` : ''}
-                                ${!familyAuthored ? `<button onclick="togglePublishedRecipeLike('${recipe.id}', 'detail')" class="${getAppButtonClasses(hasUserLikedPublishedRecipe(recipe) ? 'danger' : 'secondary', { size: 'lg' })} border-2 border-white shadow-xl"><i data-lucide="heart" class="w-5 h-5 ${hasUserLikedPublishedRecipe(recipe) ? 'fill-current' : ''}"></i>Like (${getPublishedRecipeLikeCount(recipe)})</button>
-                                <button onclick="toggleSavedPublishedRecipe('${recipe.id}', 'detail')" class="${getAppButtonClasses(saved ? 'danger' : 'secondary', { size: 'lg' })} border-2 border-white shadow-xl"><i data-lucide="bookmark" class="w-5 h-5"></i>${saved ? 'Saved to Index' : 'Save to Index'}</button>
-                                ` : `<span class="inline-flex items-center rounded-full bg-white px-4 py-3 text-xs font-bold uppercase tracking-[0.24em] text-sage shadow-xl border border-white">Family recipe</span>`}
-                                <button onclick="openReportModal({ reportType: 'published-recipe', targetUserId: '${recipe.authorId || ''}', targetName: '${escapeHTML(String(recipe.authorName || recipe.author || 'Chef').replace(/'/g, "&#39;"))}', targetPublishedRecipeId: '${recipe.id}', targetRecipeTitle: '${escapeHTML(String(recipe.title || 'Untitled').replace(/'/g, "&#39;"))}' })" class="${getAppButtonClasses('secondary', { size: 'lg' })} border-2 border-white shadow-xl"><i data-lucide="flag" class="w-4 h-4"></i>Report</button>
-                                ${canAdminForceOfflinePublished ? `<button onclick="adminForceUnpublishByPublishedId('${recipe.id}', 'admin-force-browse-detail')" class="${getAppButtonClasses('danger', { size: 'lg' })} border-2 border-white shadow-xl"><i data-lucide="shield-x" class="w-4 h-4"></i>Admin offline now</button>` : ''}
-                            </div>
-                        `}
-                    </div>
+            const publishedActionsMarkup = owned ? `
+                <div class="detail-actions action-row">
+                    ${ownedLocalRecipe ? `<button onclick="renderDetail(${ownedLocalRecipe.id})" class="${getAppButtonClasses('secondary', { size: 'md' })}"><i data-lucide="book-open" class="w-4 h-4"></i>Open local</button>` : ''}
+                    ${canAdminForceOfflinePublished ? `<button onclick="adminForceUnpublishByPublishedId('${recipe.id}', 'admin-force-browse-detail')" class="${getAppButtonClasses('danger', { size: 'md' })}"><i data-lucide="shield-x" class="w-4 h-4"></i>Admin offline now</button>` : ''}
+                    <span class="detail-chip">Published by you${versionLabel ? ` · ${versionLabel}` : ''}</span>
+                </div>
+            ` : `
+                <div class="detail-actions action-row">
+                    ${recipe.authorId ? `<button onclick="renderPublicProfile('${recipe.authorId}', '${escapeHTML((recipe.authorName || recipe.author || 'Chef').replace(/'/g, "&#39;"))}')" class="${getAppButtonClasses('secondary', { size: 'md' })}"><i data-lucide="user-round" class="w-4 h-4"></i>View profile</button>` : ''}
+                    ${!familyAuthored ? `<button onclick="togglePublishedRecipeLike('${recipe.id}', 'detail')" class="${getAppButtonClasses(hasUserLikedPublishedRecipe(recipe) ? 'danger' : 'secondary', { size: 'md' })}"><i data-lucide="heart" class="w-4 h-4 ${hasUserLikedPublishedRecipe(recipe) ? 'fill-current' : ''}"></i>Like (${getPublishedRecipeLikeCount(recipe)})</button>
+                    <button onclick="toggleSavedPublishedRecipe('${recipe.id}', 'detail')" class="${getAppButtonClasses(saved ? 'danger' : 'secondary', { size: 'md' })}"><i data-lucide="bookmark" class="w-4 h-4"></i>${saved ? 'Saved to Index' : 'Save to Index'}</button>
+                    ` : `<span class="detail-chip">Family recipe</span>`}
+                    <button onclick="openReportModal({ reportType: 'published-recipe', targetUserId: '${recipe.authorId || ''}', targetName: '${escapeHTML(String(recipe.authorName || recipe.author || 'Chef').replace(/'/g, "&#39;"))}', targetPublishedRecipeId: '${recipe.id}', targetRecipeTitle: '${escapeHTML(String(recipe.title || 'Untitled').replace(/'/g, "&#39;"))}' })" class="${getAppButtonClasses('secondary', { size: 'md' })}"><i data-lucide="flag" class="w-4 h-4"></i>Report</button>
+                    ${canAdminForceOfflinePublished ? `<button onclick="adminForceUnpublishByPublishedId('${recipe.id}', 'admin-force-browse-detail')" class="${getAppButtonClasses('danger', { size: 'md' })}"><i data-lucide="shield-x" class="w-4 h-4"></i>Admin offline now</button>` : ''}
+                </div>
+            `;
 
-                    <div class="w-full h-48 md:h-64 relative overflow-hidden bg-forest">
-                        <div class="absolute inset-0 bg-cover bg-center opacity-40 blur-sm scale-110" style="background-image: url('${headerBg}')"></div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-forest to-transparent opacity-80"></div>
-                        <div class="absolute bottom-0 left-0 w-full p-6 md:p-10 flex flex-col md:flex-row items-center md:items-end gap-6 text-center md:text-left">
-                            <div class="w-32 h-32 md:w-40 md:h-40 rounded-sm border-4 border-white shadow-2xl bg-cover bg-center flex-shrink-0 z-10 transform translate-y-12 md:translate-y-16" style="background-image: url('${recipe.profile || defaultPlaceholderProfile}')"></div>
-                            <div class="text-white z-10 pb-2 md:pb-0">
-                                <h2 class="font-fantasy font-bold text-4xl md:text-5xl mb-2 text-shadow-sm drop-shadow-md">${recipe.title}</h2>
-                                <div class="flex items-center justify-center md:justify-start gap-4 text-xs md:text-sm font-bold uppercase tracking-wider opacity-90">
-                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${recipe.authorName || recipe.author || 'Chef'}</span><span>|</span><span class="flex items-center gap-1">${recipe.country || 'Community'}</span>${versionLabel ? `<span>|</span><span class="flex items-center gap-1">${versionLabel}</span>` : ''}
+            contentDiv.innerHTML = `
+                <div class="detail-shell detail-sheet relative w-full">
+                    <div class="detail-hero-shell">
+                        <div class="detail-hero-wash" aria-hidden="true">
+                            <div class="detail-hero-wash-image" style="background-image: ${cssUrl(headerBg)}"></div>
+                        </div>
+                        <div class="detail-hero-frame">
+                            <div class="detail-hero-portrait" style="background-image: ${cssUrl(recipe.profile || defaultPlaceholderProfile)}"></div>
+                            <div class="detail-hero-copy">
+                                <p class="detail-hero-kicker">${owned ? 'Published by you' : 'Community recipe'}${versionLabel ? ` · ${versionLabel}` : ''}</p>
+                                <h2 class="detail-hero-title">${recipe.title}</h2>
+                                <div class="detail-hero-meta">
+                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${recipe.authorName || recipe.author || 'Chef'}</span>
+                                    <span>|</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="map-pinned" class="w-4 h-4"></i> ${recipe.country || 'Community'}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="h-16 md:h-20 w-full bg-white"></div>
+                    <div class="detail-content-shell">
+                        ${(recipe.prepTime || recipe.cookTime || recipe.servings || recipe.difficulty || recipe.cuisine) ? `
+                        <div class="detail-meta-grid detail-panel">
+                            ${recipe.prepTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Prep</div><div class="detail-meta-value">${recipe.prepTime}m</div></div>` : ''}
+                            ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Cook</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
+                            ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Servings</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
+                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Difficulty</div><div class="detail-meta-value">${recipe.difficulty}</div></div>` : ''}
+                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Cuisine</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
+                        </div>` : ''}
 
-                    <div class="p-6 md:p-10">
-                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8 p-4 bg-accent bg-opacity-30 rounded-md border border-sage border-opacity-10">
-                            ${recipe.prepTime ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Prep</div><div class="text-lg font-bold text-forest">${recipe.prepTime}m</div></div>` : ''}
-                            ${recipe.cookTime ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Cook</div><div class="text-lg font-bold text-forest">${recipe.cookTime}m</div></div>` : ''}
-                            ${recipe.servings ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Servings</div><div class="text-lg font-bold text-forest">${recipe.servings}</div></div>` : ''}
-                            ${recipe.difficulty ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Difficulty</div><div class="text-lg font-bold text-forest">${recipe.difficulty}</div></div>` : ''}
-                            ${recipe.cuisine ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Cuisine</div><div class="text-lg font-bold text-forest">${recipe.cuisine}</div></div>` : ''}
+                        <div class="detail-toolbar-row detail-panel">
+                            <div class="detail-status-chips">
+                                ${(recipe.diet && recipe.diet.length > 0) ? recipe.diet.map(d => `<span class="detail-chip">${d}</span>`).join('') : ''}
+                                ${versionLabel ? `<span class="detail-chip">${versionLabel}</span>` : ''}
+                            </div>
+                            ${publishedActionsMarkup}
                         </div>
-                        ${(recipe.diet && recipe.diet.length > 0) || versionLabel ? `<div class="mb-6 flex flex-wrap gap-2">${recipe.diet && recipe.diet.length > 0 ? `<span class="text-xs uppercase font-bold text-sage">Diet:</span>${recipe.diet.map(d => `<span class="text-[10px] bg-gold bg-opacity-20 text-sage font-bold px-2 py-1 rounded-sm">${d}</span>`).join('')}` : ''}${versionLabel ? `<span class="text-[10px] bg-white text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-[0.16em] border border-parchmentDark">${versionLabel}</span>` : ''}</div>` : ''}
 
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-                            <div class="md:col-span-1 bg-accent bg-opacity-30 p-6 rounded-md border border-sage border-opacity-10 h-fit">
-                                <h3 class="font-bold font-fantasy text-2xl flex items-center text-forest mb-6 pb-3 border-b border-sage border-opacity-20"><i data-lucide="shopping-basket" class="w-6 h-6 mr-2 text-gold"></i> Ingredients</h3>
+                        <div class="detail-layout-grid grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+                            <div class="detail-ingredients-panel detail-panel md:col-span-1 h-fit">
+                                <p class="detail-panel-kicker">Ingredients</p>
+                                <h3 class="font-bold font-fantasy text-2xl flex items-center text-forest mb-5"><i data-lucide="shopping-basket" class="w-6 h-6 mr-2 text-gold"></i> Shopping list</h3>
                                 <ul class="text-sm space-y-2">
-                                    ${(recipe.ingredients || []).map(ing => `<li class="flex items-center bg-white rounded-md shadow-sm border border-transparent p-3"><span class="text-forest font-semibold text-sm leading-snug">${applyMeasurementSystem(ing)}</span></li>`).join('')}
+                                    ${(recipe.ingredients || []).map(ing => `<li class="detail-ingredient-row"><span class="text-forest font-semibold text-sm leading-snug">${applyMeasurementSystem(ing)}</span></li>`).join('')}
                                 </ul>
                             </div>
 
-                            <div class="md:col-span-2">
-                                <h3 class="font-bold font-fantasy text-3xl mb-6 flex items-center text-forest border-b border-accent pb-3"><i data-lucide="list-ordered" class="w-7 h-7 mr-3 text-gold"></i> Instructions</h3>
-                                <ol class="space-y-4">
+                            <div class="detail-instructions-panel detail-panel md:col-span-2">
+                                <p class="detail-panel-kicker">Method</p>
+                                <h3 class="font-bold font-fantasy text-2xl md:text-3xl mb-5 flex items-center text-forest"><i data-lucide="list-ordered" class="w-7 h-7 mr-3 text-gold"></i> Instructions</h3>
+                                <ol class="space-y-3">
                                     ${(recipe.instructions || []).map((step, index) => {
                                         const stepImage = getRecipeInstructionImage(step);
                                         return `
-                                            <li class="flex gap-4 items-start p-4 rounded-md border border-sage border-opacity-10 bg-white">
-                                                <span class="flex items-center justify-center w-8 h-8 rounded-sm bg-sage text-white font-bold text-sm shadow-sm flex-shrink-0">${index + 1}</span>
-                                                <div class="flex-1">
+                                            <li class="detail-step">
+                                                <span class="detail-step-num">${index + 1}</span>
+                                                <div class="flex-1 min-w-0">
                                                     <p class="text-forest font-medium text-base leading-relaxed pt-1">${applyMeasurementSystem(getRecipeInstructionText(step))}</p>
-                                                    ${stepImage ? `<div class="mt-4 overflow-hidden rounded-md border border-parchmentDark bg-parchment"><img src="${stepImage}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''}
+                                                    ${stepImage ? `<div class="mt-4 overflow-hidden rounded-xl border border-parchmentDark bg-parchment"><img src="${stepImage}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''}
                                                 </div>
                                             </li>
                                         `;
@@ -17664,8 +17915,9 @@
                         </div>
 
                         ${recipe.tips ? `
-                            <div class="mt-12 w-full bg-sage bg-opacity-10 p-6 md:p-8 rounded-md border-l-4 border-gold shadow-inner">
-                                <h3 class="font-bold font-fantasy text-2xl mb-4 flex items-center text-forest"><i data-lucide="lightbulb" class="w-6 h-6 mr-2 text-gold"></i> Chef's Notes</h3>
+                            <div class="detail-secondary-section detail-panel detail-notes-callout">
+                                <p class="detail-panel-kicker">Chef notes</p>
+                                <h3 class="font-bold font-fantasy text-2xl mb-3 flex items-center text-forest"><i data-lucide="lightbulb" class="w-6 h-6 mr-2 text-gold"></i> Chef's Notes</h3>
                                 <p class="text-base font-semibold text-forest leading-relaxed">${applyMeasurementSystem(recipe.tips)}</p>
                             </div>
                         ` : ''}
@@ -19011,8 +19263,8 @@
                     </button>
                     <p class="cook-mode-title">${escapeHTML(recipe.title)}</p>
                 </div>
-                <div class="detail-shell push-sheet bg-white rounded-sm shadow-sm mb-6 border border-parchmentDark relative w-full">
-                    <div class="detail-hero-shell rounded-t-sm">
+                <div class="detail-shell detail-sheet relative w-full">
+                    <div class="detail-hero-shell">
                         <div class="detail-hero-wash" aria-hidden="true">
                             <div class="detail-hero-wash-image" style="background-image: ${cssUrl(headerBg)}"></div>
                         </div>
@@ -19032,42 +19284,41 @@
                         </div>
                     </div>
 
-                    <div class="detail-hero-spacer"></div>
-
-                    <div class="detail-content-shell p-4 md:p-10">
+                    <div class="detail-content-shell">
                         ${isCookingMode ? renderCookStage(recipe) : ''}
-                        <div class="detail-meta-grid grid grid-cols-1 gap-4 mb-6 rounded-md border border-sage border-opacity-10 bg-accent bg-opacity-30 p-4 sm:grid-cols-2 md:grid-cols-5">
-                            ${recipe.prepTime ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Prep</div><div class="text-lg font-bold text-forest">${recipe.prepTime}m</div></div>` : ''}
-                            ${recipe.cookTime ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Cook</div><div class="text-lg font-bold text-forest">${recipe.cookTime}m</div></div>` : ''}
-                            ${recipe.servings ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Servings</div><div class="text-lg font-bold text-forest">${recipe.servings}</div></div>` : ''}
-                            ${recipe.difficulty ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Difficulty</div><div class="text-lg font-bold text-forest">${recipe.difficulty}</div></div>` : ''}
-                            ${recipe.cuisine ? `<div class="text-center"><div class="flex justify-center mb-2"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="text-xs uppercase font-bold text-sage">Cuisine</div><div class="text-lg font-bold text-forest">${recipe.cuisine}</div></div>` : ''}
-                        </div>
+                        ${(recipe.prepTime || recipe.cookTime || recipe.servings || recipe.difficulty || recipe.cuisine) ? `
+                        <div class="detail-meta-grid detail-panel">
+                            ${recipe.prepTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Prep</div><div class="detail-meta-value">${recipe.prepTime}m</div></div>` : ''}
+                            ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Cook</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
+                            ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Servings</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
+                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Difficulty</div><div class="detail-meta-value">${recipe.difficulty}</div></div>` : ''}
+                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Cuisine</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
+                        </div>` : ''}
 
-                        <div class="mb-6 grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
-                            <div class="detail-status-chips flex flex-wrap items-center gap-2">
-                                <span class="text-[10px] bg-white text-sage font-bold px-2.5 py-1.5 rounded-sm uppercase tracking-[0.24em] border border-parchmentDark">${recipe.category || 'Recipe'}</span>
-                                ${recipe.diet && recipe.diet.length > 0 ? recipe.diet.map(d => `<span class="text-[10px] bg-gold bg-opacity-20 text-sage font-bold px-2.5 py-1.5 rounded-sm uppercase tracking-[0.16em]">${d}</span>`).join('') : ''}
+                        <div class="detail-toolbar-row detail-panel">
+                            <div class="detail-status-chips">
+                                <span class="detail-chip">${recipe.category || 'Recipe'}</span>
+                                ${recipe.diet && recipe.diet.length > 0 ? recipe.diet.map(d => `<span class="detail-chip">${d}</span>`).join('') : ''}
                                 ${recipeFamilyChip}
-                                ${isSavedCommunityRecipe ? `<span class="text-[10px] bg-forest bg-opacity-10 text-forest font-bold px-2.5 py-1.5 rounded-sm uppercase tracking-[0.16em] border border-forest border-opacity-10">Saved community recipe${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
-                                ${!isSavedCommunityRecipe && recipe.publishedId ? `<span class="text-[10px] ${recipeIsLive ? 'bg-forest bg-opacity-10 text-forest border-forest border-opacity-10' : 'bg-white text-sage border-parchmentDark'} font-bold px-2.5 py-1.5 rounded-sm uppercase tracking-[0.16em] border">${recipeIsLive ? 'Live in Browse' : 'Removed from Browse'}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
-                                ${!isSavedCommunityRecipe && recipeHasUnpublishedChanges ? `<span class="text-[10px] bg-gold bg-opacity-15 text-forest font-bold px-2.5 py-1.5 rounded-sm uppercase tracking-[0.16em] border border-gold border-opacity-30">Local changes not published</span>` : ''}
-                                ${savedRecipeIsOutdated ? `<span class="text-[10px] bg-gold bg-opacity-15 text-forest font-bold px-2.5 py-1.5 rounded-sm uppercase tracking-[0.16em] border border-gold border-opacity-30">Newer author version ${latestPublishedVersionLabel}</span>` : ''}
-                                ${savedRecipeSourceRetracted ? `<span class="text-[10px] bg-white text-sage font-bold px-2.5 py-1.5 rounded-sm uppercase tracking-[0.16em] border border-parchmentDark">Original removed from Browse</span>` : ''}
-                                ${deletionVoteProgress ? `<span class="text-[10px] bg-coral bg-opacity-10 text-coral font-bold px-2.5 py-1.5 rounded-sm uppercase tracking-[0.16em] border border-coral border-opacity-30">Deletion vote ${deletionVoteProgress.approved}/${deletionVoteProgress.total}</span>` : ''}
+                                ${isSavedCommunityRecipe ? `<span class="detail-chip">Saved community recipe${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
+                                ${!isSavedCommunityRecipe && recipe.publishedId ? `<span class="detail-chip">${recipeIsLive ? 'Live in Browse' : 'Removed from Browse'}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
+                                ${!isSavedCommunityRecipe && recipeHasUnpublishedChanges ? `<span class="detail-chip">Local changes not published</span>` : ''}
+                                ${savedRecipeIsOutdated ? `<span class="detail-chip">Newer author version ${latestPublishedVersionLabel}</span>` : ''}
+                                ${savedRecipeSourceRetracted ? `<span class="detail-chip">Original removed from Browse</span>` : ''}
+                                ${deletionVoteProgress ? `<span class="detail-chip">Deletion vote ${deletionVoteProgress.approved}/${deletionVoteProgress.total}</span>` : ''}
                             </div>
                             ${detailActionButtonsMarkup}
                         </div>
 
                         ${savedRecipeIsOutdated && activeSavedRecipeUpdateNoticeId === recipe.id ? `
-                            <div class="detail-secondary-section mb-8 rounded-md border border-gold border-opacity-40 bg-gold bg-opacity-10 p-4 shadow-sm">
+                            <div class="detail-secondary-section detail-panel detail-notes-callout">
                                 <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                                     <div class="flex gap-3">
                                         <div class="mt-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white text-gold shadow-sm">
                                             <i data-lucide="alert-circle" class="h-5 w-5"></i>
                                         </div>
                                         <div>
-                                            <p class="text-xs font-bold uppercase tracking-[0.24em] text-sage">Author update available</p>
+                                            <p class="detail-panel-kicker">Author update available</p>
                                             <p class="mt-1 text-sm font-semibold text-forest">The author has published a newer version ${latestPublishedVersionLabel || ''}. Your saved copy stays on ${recipeVersionLabel || 'v1.00'} and will not change automatically.</p>
                                             <p class="mt-2 text-sm font-semibold text-sage">If you want the latest author changes, remove this saved copy from your Index and save the Browse version again.</p>
                                         </div>
@@ -19079,27 +19330,28 @@
                             </div>
                         ` : ''}
 
-                        <div class="detail-layout-grid grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-12">
-                            <div class="detail-ingredients-panel md:col-span-1 bg-accent bg-opacity-30 p-4 md:p-6 rounded-md border border-sage border-opacity-10 h-fit">
-                                <div class="mb-6 flex flex-col gap-4 border-b border-sage border-opacity-20 pb-4">
+                        <div class="detail-layout-grid grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+                            <div class="detail-ingredients-panel detail-panel md:col-span-1 h-fit">
+                                <div class="mb-5 flex flex-col gap-4 border-b border-parchmentDark/60 pb-4">
                                     <div class="flex items-start justify-between gap-3">
                                         <div class="min-w-0">
-                                            <h3 class="font-bold font-fantasy text-2xl flex items-center text-forest"><i data-lucide="shopping-basket" class="w-6 h-6 mr-2 text-gold"></i> Ingredients</h3>
+                                            <p class="detail-panel-kicker" style="margin:0;">Ingredients</p>
+                                            <h3 class="font-bold font-fantasy text-2xl flex items-center text-forest mt-1"><i data-lucide="shopping-basket" class="w-6 h-6 mr-2 text-gold"></i> Scale & shop</h3>
                                             <p class="mt-2 text-sm font-semibold text-sage">Scale the recipe or send the list to Shop.</p>
                                         </div>
                                         ${(() => {
                                             const hasIngredientsInList = userSettings.shoppingList.items.some(item => 
                                                 !item.checked && (item.sourceRecipeIds || []).includes(recipe.id)
                                             );
-                                            return `<button type="button" onclick="toggleRecipeIngredientsInShoppingList(${recipe.id}, false); renderDetail(${recipe.id});" class="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border shadow-sm transition-all ${hasIngredientsInList ? 'bg-forest border-forest text-white hover:bg-coral hover:border-coral' : 'bg-white border-parchmentDark text-gold hover:shadow-md hover:text-forest'}" title="${hasIngredientsInList ? 'Remove ingredients from list' : 'Add all ingredients to shopping list'}"><i data-lucide="shopping-basket" class="h-5 w-5"></i></button>`;
+                                            return `<button type="button" onclick="toggleRecipeIngredientsInShoppingList(${recipe.id}, false); renderDetail(${recipe.id});" class="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border shadow-sm transition-all ${hasIngredientsInList ? 'bg-forest border-forest text-white hover:bg-coral hover:border-coral' : 'bg-white border-parchmentDark text-gold hover:shadow-md hover:text-forest'}" title="${hasIngredientsInList ? 'Remove ingredients from list' : 'Add all ingredients to shopping list'}"><i data-lucide="shopping-basket" class="h-5 w-5"></i></button>`;
                                         })()}
                                     </div>
-                                    <div class="flex h-12 w-full items-center rounded-xl border border-parchmentDark bg-white shadow-sm" translate="no">
-                                        <button onclick="updateScale(-0.5, ${recipe.id})" class="flex-1 h-full flex items-center justify-center text-sage hover:text-forest font-bold text-lg rounded-l-xl hover:bg-parchment transition-colors">-</button>
-                                        <span id="scale-display" class="font-bold text-forest text-sm min-w-[4rem] text-center border-x border-parchmentDark h-full flex items-center justify-center px-2">${formatScaleLabel(recipe)}</span>
-                                        <button onclick="updateScale(0.5, ${recipe.id})" class="flex-1 h-full flex items-center justify-center text-sage hover:text-forest font-bold text-lg rounded-r-xl hover:bg-parchment transition-colors">+</button>
+                                    <div class="detail-scale-control" translate="no">
+                                        <button type="button" onclick="updateScale(-0.5, ${recipe.id})" aria-label="Decrease scale">-</button>
+                                        <span id="scale-display">${formatScaleLabel(recipe)}</span>
+                                        <button type="button" onclick="updateScale(0.5, ${recipe.id})" aria-label="Increase scale">+</button>
                                     </div>
-                                    <button onclick="toggleMeasurementSystem(${recipe.id})" title="Toggle Metric / Imperial" class="flex h-10 w-full items-center justify-center gap-2 rounded-xl border font-bold text-xs uppercase tracking-wider shadow-sm transition-all ${(userSettings.measurementSystem || 'Metric') === 'Imperial' ? 'border-forest bg-forest text-white' : 'border-parchmentDark bg-white text-forest hover:border-gold'}">
+                                    <button onclick="toggleMeasurementSystem(${recipe.id})" title="Toggle Metric / Imperial" class="${getAppButtonClasses((userSettings.measurementSystem || 'Metric') === 'Imperial' ? 'primary' : 'secondary', { fullWidth: true, size: 'md' })}">
                                         <i data-lucide="ruler" class="h-4 w-4"></i>
                                         ${(userSettings.measurementSystem || 'Metric') === 'Imperial' ? 'Imperial — switch to Metric' : 'Metric — switch to Imperial'}
                                     </button>
@@ -19109,9 +19361,10 @@
                                 </ul>
                             </div>
 
-                            <div id="instructions-section-${recipe.id}" class="detail-instructions-panel md:col-span-2">
-                                <h3 class="font-bold font-fantasy text-3xl mb-6 flex items-center text-forest border-b border-accent pb-3"><i data-lucide="list-ordered" class="w-7 h-7 mr-3 text-gold"></i> Instructions</h3>
-                                <ol class="space-y-4">
+                            <div id="instructions-section-${recipe.id}" class="detail-instructions-panel detail-panel md:col-span-2">
+                                <p class="detail-panel-kicker">Method</p>
+                                <h3 class="font-bold font-fantasy text-2xl md:text-3xl mb-5 flex items-center text-forest"><i data-lucide="list-ordered" class="w-7 h-7 mr-3 text-gold"></i> Instructions</h3>
+                                <ol class="space-y-3">
                                     ${(recipe.instructions || []).map((step, index) => {
                                         const isChecked = recipe.checkedSteps?.includes(index);
                                         const checkedClass = isChecked ? 'line-through opacity-40' : '';
@@ -19120,14 +19373,14 @@
                                         const stepImage = getRecipeInstructionImage(step);
 
                                         return `
-                                            <li class="recipe-step-${recipe.id} flex gap-4 items-start p-4 rounded-md transition-all duration-300 hover:bg-accent hover:bg-opacity-30 border border-transparent hover:border-sage hover:border-opacity-20 ${checkedClass} group" data-step-index="${index}">
+                                            <li class="recipe-step-${recipe.id} detail-step ${checkedClass} group" data-step-index="${index}">
                                                 <div class="flex-shrink-0 relative">
-                                                    <span onclick="toggleItemCheck(${recipe.id}, 'step', ${index}, this.closest('li'))" class="flex items-center justify-center w-8 h-8 rounded-sm bg-sage text-white font-bold text-sm shadow-sm cursor-pointer hover:bg-forest transition-colors">${index + 1}</span>
+                                                    <span onclick="toggleItemCheck(${recipe.id}, 'step', ${index}, this.closest('li'))" class="detail-step-num">${index + 1}</span>
                                                     <div class="absolute -top-1 -right-1 bg-gold rounded-full p-0.5 text-white shadow-sm check-icon transition-opacity ${iconClass}"><i data-lucide="check" class="w-3 h-3"></i></div>
                                                 </div>
-                                                <div class="flex-1">
+                                                <div class="flex-1 min-w-0">
                                                     <p onclick="toggleItemCheck(${recipe.id}, 'step', ${index}, this.closest('li'))" class="text-forest font-medium text-base leading-relaxed pt-1 cursor-pointer">${finalStep}</p>
-                                                    ${stepImage ? `<div class="mt-4 overflow-hidden rounded-md border border-parchmentDark bg-parchment"><img src="${stepImage}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''}
+                                                    ${stepImage ? `<div class="mt-4 overflow-hidden rounded-xl border border-parchmentDark bg-parchment"><img src="${stepImage}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''}
                                                 </div>
                                             </li>
                                         `;
@@ -19137,15 +19390,19 @@
                         </div>
 
                         ${recipe.tips ? `
-                            <div class="detail-secondary-section mt-12 w-full bg-sage bg-opacity-10 p-6 md:p-8 rounded-md border-l-4 border-gold shadow-inner">
-                                <h3 class="font-bold font-fantasy text-2xl mb-4 flex items-center text-forest"><i data-lucide="lightbulb" class="w-6 h-6 mr-2 text-gold"></i> Chef's Notes & Secrets</h3>
+                            <div class="detail-secondary-section detail-panel detail-notes-callout">
+                                <p class="detail-panel-kicker">Chef notes</p>
+                                <h3 class="font-bold font-fantasy text-2xl mb-3 flex items-center text-forest"><i data-lucide="lightbulb" class="w-6 h-6 mr-2 text-gold"></i> Chef's Notes & Secrets</h3>
                                 <p class="text-base font-semibold text-forest leading-relaxed">${applyMeasurementSystem(recipe.tips)}</p>
                             </div>
                         ` : ''}
 
-                        <div class="detail-notes-panel mt-8 p-6 bg-sage bg-opacity-5 rounded-md border border-sage border-opacity-10">
+                        <div class="detail-notes-panel detail-panel">
                             <div class="flex items-center justify-between mb-3">
-                                <h3 class="font-bold font-fantasy text-lg flex items-center text-forest"><i data-lucide="sticky-note" class="w-5 h-5 mr-2 text-gold"></i> Your Notes</h3>
+                                <div>
+                                    <p class="detail-panel-kicker" style="margin:0;">Personal</p>
+                                    <h3 class="font-bold font-fantasy text-lg flex items-center text-forest mt-1"><i data-lucide="sticky-note" class="w-5 h-5 mr-2 text-gold"></i> Your Notes</h3>
+                                </div>
                                 <button onclick="openNotesEditor(${recipe.id})" class="text-sage hover:text-gold transition-colors p-2">
                                     <i data-lucide="edit" class="w-5 h-5"></i>
                                 </button>
@@ -19329,8 +19586,8 @@
                 const textColorClass = inShoppingList ? 'text-gold' : 'text-forest';
 
                 return `
-                    <li onclick="toggleItemCheck(${recipe.id}, 'ingredient', ${index}, this)" class="flex items-center cursor-pointer transition-all duration-300 p-3 bg-white rounded-md shadow-sm border border-transparent hover:border-sage ${checkedClass}">
-                        <div class="w-6 h-6 rounded-sm border-2 border-gold flex items-center justify-center mr-3 flex-shrink-0 text-gold transition-colors bg-white">
+                    <li onclick="toggleItemCheck(${recipe.id}, 'ingredient', ${index}, this)" class="detail-ingredient-row cursor-pointer ${checkedClass}">
+                        <div class="w-6 h-6 rounded-md border-2 border-gold flex items-center justify-center flex-shrink-0 text-gold transition-colors bg-white">
                             <i data-lucide="check" class="check-icon w-4 h-4 transition-opacity ${iconClass}"></i>
                         </div>
                         <span class="${textColorClass} font-semibold text-sm leading-snug">${finalIng}</span>
@@ -19382,79 +19639,88 @@
             }).join('');
 
             contentDiv.innerHTML = `
-                <div class="push-sheet bg-white p-6 md:p-10 rounded-sm shadow-sm mb-6 border border-parchmentDark max-w-4xl mx-auto">
+                <div class="editor-sheet">
+                    <header class="editor-hero">
+                        <h2>${formTitle}</h2>
+                        <p>${editorGuidance}</p>
+                    </header>
 
-                    <div class="mb-6">
-                        <h2 class="font-fantasy font-bold text-3xl text-forest">${formTitle}</h2>
-                    </div>
-                    
-                    <form id="add-recipe-form" class="space-y-8" onsubmit="saveRecipe(event)">
-                        <div class="flex flex-col items-center mb-8 bg-accent bg-opacity-30 p-6 rounded-md border border-sage border-opacity-10">
-                            <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-4">Meal Presentation Photo</label>
-                            <label class="custom-file-upload">
-                                <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-preview', 'draftProfile', false)">
-                                <div id="profile-preview" class="w-40 h-40 border-2 border-dashed border-sage rounded-sm flex flex-col items-center justify-center bg-white hover:bg-accent transition-colors bg-cover bg-center text-sage shadow-inner">
-                                    <i data-lucide="camera" class="w-8 h-8 mb-2"></i><span class="text-xs font-bold uppercase tracking-wider">Upload</span>
-                                </div>
-                            </label>
-                        </div>
+                    <form id="add-recipe-form" class="editor-layout" onsubmit="saveRecipe(event)">
+                        <section class="editor-panel">
+                            <p class="editor-panel-kicker">Presentation</p>
+                            <div class="flex flex-col items-center">
+                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-4">Meal Presentation Photo</label>
+                                <label class="custom-file-upload">
+                                    <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-preview', 'draftProfile', false)">
+                                    <div id="profile-preview" class="w-40 h-40 border-2 border-dashed border-sage rounded-2xl flex flex-col items-center justify-center bg-white hover:bg-accent transition-colors bg-cover bg-center text-sage shadow-inner">
+                                        <i data-lucide="camera" class="w-8 h-8 mb-2"></i><span class="text-xs font-bold uppercase tracking-wider">Upload</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </section>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-accent bg-opacity-30 rounded-md border border-sage border-opacity-10">
-                            <div class="md:col-span-2"><label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Recipe Title</label><input type="text" id="r-title" required class="${inputClass}"></div>
-                            <div><label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Author</label><input type="text" id="r-author" value="${userSettings.name}" class="${inputClass}"></div>
-                            <div>
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Category</label>
-                                <select id="r-category" required class="${inputClass}">
-                                    <option value="Cooking">Cooking</option><option value="Baking">Baking</option>
-                                    <option value="Dessert">Dessert</option><option value="Drink">Drink</option>
-                                </select>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Country / Origin</label>
-                                <input type="text" id="r-country" list="countries-list" placeholder="Typ of selecteer een land..." value="${userSettings.country}" class="${inputClass}">
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Meal Type (max 2)</label>
-                                <div class="flex flex-wrap gap-2">
-                                    ${mealTypeOptions.map(option => `<button type="button" onclick="toggleMealTypeBtn(this)" data-meal-type="${option}" data-selected="false" class="meal-type-btn rounded-full border border-sage border-opacity-20 bg-white px-4 py-2 text-xs font-bold text-sage transition-all hover:border-gold hover:text-forest">${option}</button>`).join('')}
-                                </div>
-                                <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">Select up to 2 meal moments.</p>
-                            </div>
-                            <div class="md:col-span-2">
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Assign to Family Book</label>
-                                <select id="r-family-book" class="${inputClass}">
-                                    ${familyOptionsMarkup}
-                                </select>
-                                <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">${familyHelperText}</p>
-                                <p class="mt-2 text-xs font-semibold text-forest opacity-80">This assignment is saved with the recipe and drives the family label, color, and shared-book placement.</p>
-                                ${recipeFamily && !activeFamilies.some(family => family.id === recipeFamily.id) ? `<p class="mt-2 text-xs font-semibold text-coral">This recipe currently references ${escapeHTML(recipeFamily.label)}. Save it again after choosing a new family if you want to move it.</p>` : ''}
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div>
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-3 flex items-center gap-2 border-b border-accent pb-2"><i data-lucide="shopping-basket" class="w-4 h-4"></i> Ingredients</label>
-                                <ul id="draft-ingredients-list" class="mb-3 space-y-2"></ul>
-                                <div class="flex gap-2">
-                                    <input type="text" id="new-ingredient" placeholder="e.g. 500g Flour" onkeypress="if(event.key === 'Enter') { event.preventDefault(); addDraftIngredient(); }" class="${inputClass} flex-1">
-                                    <button type="button" onclick="addDraftIngredient()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="Add ingredient"><i data-lucide="plus" class="w-5 h-5"></i></button>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-3 flex items-center gap-2 border-b border-accent pb-2"><i data-lucide="list-ordered" class="w-4 h-4"></i> Instructions</label>
-                                <ul id="draft-steps-list" class="mb-3 space-y-2"></ul>
-                                <div class="flex gap-2 items-start">
-                                    <textarea id="new-step" placeholder="Describe the next step..." class="${textareaClass} flex-1 !min-h-[48px] !h-12 py-3"></textarea>
-                                    <input type="number" id="new-step-minutes" min="1" max="240" value="1" inputmode="numeric" aria-label="Minutes for this step" class="${inputClass} !w-20">
-                                    <button type="button" onclick="addDraftStep()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="Add step"><i data-lucide="plus" class="w-5 h-5"></i></button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="rounded-md border border-sage border-opacity-10 bg-accent bg-opacity-20 overflow-hidden">
-                            <button type="button" onclick="toggleRecipeDetails()" class="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-white hover:bg-opacity-50 transition-colors">
+                        <section class="editor-panel">
+                            <p class="editor-panel-kicker">Basics</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div class="md:col-span-2"><label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Recipe Title</label><input type="text" id="r-title" required class="${inputClass}"></div>
+                                <div><label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Author</label><input type="text" id="r-author" value="${userSettings.name}" class="${inputClass}"></div>
                                 <div>
-                                    <p id="recipe-details-toggle-label" class="text-sm font-bold uppercase tracking-[0.24em] text-sage">Optional Details</p>
+                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Category</label>
+                                    <select id="r-category" required class="${inputClass}">
+                                        <option value="Cooking">Cooking</option><option value="Baking">Baking</option>
+                                        <option value="Dessert">Dessert</option><option value="Drink">Drink</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Country / Origin</label>
+                                    <input type="text" id="r-country" list="countries-list" placeholder="Typ of selecteer een land..." value="${userSettings.country}" class="${inputClass}">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Meal Type (max 2)</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        ${mealTypeOptions.map(option => `<button type="button" onclick="toggleMealTypeBtn(this)" data-meal-type="${option}" data-selected="false" class="meal-type-btn rounded-full border border-sage border-opacity-20 bg-white px-4 py-2 text-xs font-bold text-sage transition-all hover:border-gold hover:text-forest">${option}</button>`).join('')}
+                                    </div>
+                                    <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">Select up to 2 meal moments.</p>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Assign to Family Book</label>
+                                    <select id="r-family-book" class="${inputClass}">
+                                        ${familyOptionsMarkup}
+                                    </select>
+                                    <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">${familyHelperText}</p>
+                                    <p class="mt-2 text-xs font-semibold text-forest opacity-80">This assignment is saved with the recipe and drives the family label, color, and shared-book placement.</p>
+                                    ${recipeFamily && !activeFamilies.some(family => family.id === recipeFamily.id) ? `<p class="mt-2 text-xs font-semibold text-coral">This recipe currently references ${escapeHTML(recipeFamily.label)}. Save it again after choosing a new family if you want to move it.</p>` : ''}
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="editor-panel">
+                            <p class="editor-panel-kicker">Method</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-3 flex items-center gap-2 border-b border-parchmentDark/60 pb-2"><i data-lucide="shopping-basket" class="w-4 h-4"></i> Ingredients</label>
+                                    <ul id="draft-ingredients-list" class="mb-3 space-y-2"></ul>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="new-ingredient" placeholder="e.g. 500g Flour" onkeypress="if(event.key === 'Enter') { event.preventDefault(); addDraftIngredient(); }" class="${inputClass} flex-1">
+                                        <button type="button" onclick="addDraftIngredient()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="Add ingredient"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-3 flex items-center gap-2 border-b border-parchmentDark/60 pb-2"><i data-lucide="list-ordered" class="w-4 h-4"></i> Instructions</label>
+                                    <ul id="draft-steps-list" class="mb-3 space-y-2"></ul>
+                                    <div class="flex gap-2 items-start">
+                                        <textarea id="new-step" placeholder="Describe the next step..." class="${textareaClass} flex-1 !min-h-[48px] !h-12 py-3"></textarea>
+                                        <input type="number" id="new-step-minutes" min="1" max="240" value="1" inputmode="numeric" aria-label="Minutes for this step" class="${inputClass} !w-20">
+                                        <button type="button" onclick="addDraftStep()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="Add step"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="editor-panel overflow-hidden">
+                            <button type="button" onclick="toggleRecipeDetails()" class="w-full flex items-center justify-between gap-4 text-left">
+                                <div>
+                                    <p id="recipe-details-toggle-label" class="editor-panel-kicker" style="margin:0;">Optional Details</p>
                                     <p id="recipe-details-toggle-hint" class="mt-1 text-sm font-semibold text-forest opacity-80">Open this for prep time, servings, cuisine, diet, and chef's notes.</p>
                                 </div>
                                 <div class="flex items-center gap-3 text-sage">
@@ -19463,7 +19729,7 @@
                                 </div>
                             </button>
 
-                            <div id="recipe-details-panel" class="hidden border-t border-sage border-opacity-10 p-5 md:p-6 space-y-6 bg-white bg-opacity-70">
+                            <div id="recipe-details-panel" class="hidden border-t border-parchmentDark/60 mt-4 pt-5 space-y-6">
                                 <div>
                                     <p class="text-xs font-bold uppercase tracking-[0.24em] text-sage">Recipe Details</p>
                                     <p class="mt-1 text-sm font-semibold text-forest opacity-80">Everything here stays manual and fully editable in both modes.</p>
@@ -19518,15 +19784,17 @@
 
                                 <p class="text-xs text-sage font-semibold italic">Optional details stay tucked away by default for a calmer editor, but nothing is hidden behind Simple Mode anymore.</p>
                             </div>
-                        </div>
+                        </section>
 
-                        <div class="pt-8 flex flex-col gap-4 border-t border-accent mt-4 sm:flex-row sm:items-center sm:justify-between">
-                            <button type="button" onclick="cancelRecipeEditor()" class="${getAppButtonClasses('secondary', { size: 'lg' })}" translate="no">Cancel</button>
-                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-                                <button type="submit" onclick="recipeSubmitAction = 'save'" class="${getAppButtonClasses('accent', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="${escapeHTML(submitLabel)}" title="${escapeHTML(submitLabel)}" translate="no"><i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">${submitLabel}</span></button>
-                                <button type="submit" onclick="recipeSubmitAction = 'publish'" class="${getAppButtonClasses('primary', { size: 'lg' })} min-w-[180px]" translate="no"><i data-lucide="cloud-upload" class="w-4 h-4"></i> ${publishSubmitLabel}</button>
+                        <section class="editor-panel">
+                            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                                <button type="button" onclick="cancelRecipeEditor()" class="${getAppButtonClasses('secondary', { size: 'lg' })}" translate="no">Cancel</button>
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                                    <button type="submit" onclick="recipeSubmitAction = 'save'" class="${getAppButtonClasses('accent', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="${escapeHTML(submitLabel)}" title="${escapeHTML(submitLabel)}" translate="no"><i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">${submitLabel}</span></button>
+                                    <button type="submit" onclick="recipeSubmitAction = 'publish'" class="${getAppButtonClasses('primary', { size: 'lg' })} min-w-[180px]" translate="no"><i data-lucide="cloud-upload" class="w-4 h-4"></i> ${publishSubmitLabel}</button>
+                                </div>
                             </div>
-                        </div>
+                        </section>
                     </form>
                 </div>
                 <datalist id="countries-list">${countriesList.map(c => `<option value="${c}"></option>`).join('')}</datalist>
