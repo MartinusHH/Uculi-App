@@ -4268,6 +4268,8 @@
             border-radius: 999px;
             background: var(--cover-spine, linear-gradient(180deg, rgba(102, 74, 33, 0.72), rgba(72, 54, 29, 0.92)));
             box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.15);
+            z-index: 4;
+            pointer-events: none;
         }
 
         .notebook-cover-panel:hover {
@@ -4362,6 +4364,34 @@
             backdrop-filter: blur(8px);
         }
 
+        .notebook-cover-face {
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            overflow: hidden;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            background: var(--cover-surface, linear-gradient(145deg, #f4e7d2 0%, #e4cfae 42%, #c4a57a 100%));
+            color: inherit;
+            transform-style: preserve-3d;
+        }
+
+        .notebook-cover-face.is-front {
+            transform: rotateY(0deg);
+            z-index: 2;
+        }
+
+        .notebook-cover-face.is-back {
+            transform: rotateY(180deg);
+            z-index: 1;
+        }
+
+        .notebook-cover-face.is-back .notebook-cover-back-copy {
+            position: absolute;
+            inset: auto 1.25rem 1.4rem 2.75rem;
+            z-index: 6;
+        }
+
         .notebook-cover-sticker {
             border: 1px solid rgba(255, 255, 255, 0.45);
             box-shadow: 0 14px 24px rgba(28, 20, 16, 0.16);
@@ -4378,6 +4408,38 @@
             filter: drop-shadow(0 10px 14px rgba(73, 55, 27, 0.18));
         }
 
+        .notebook-cover-sticker.is-photo {
+            position: relative;
+            padding: 0.35rem;
+            background: linear-gradient(180deg, #fffaf2 0%, #f3e6d0 100%);
+            border: 1px solid rgba(145, 118, 70, 0.22);
+            box-shadow: 0 12px 22px rgba(28, 20, 16, 0.16);
+            backdrop-filter: none;
+        }
+
+        .notebook-cover-sticker-photo {
+            width: 100%;
+            height: 100%;
+            border-radius: 0.7rem;
+            background-color: rgba(146, 157, 117, 0.18);
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            box-shadow: inset 0 0 0 1px rgba(88, 62, 31, 0.08);
+        }
+
+        .notebook-cover-sticker-photo.is-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6f7a56;
+            font-size: 0.55rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            background-image: linear-gradient(135deg, rgba(255,253,246,0.9), rgba(236,226,208,0.85));
+        }
+
         .notebook-cover-sticker-tape {
             position: absolute;
             top: 0.45rem;
@@ -4388,6 +4450,8 @@
             border: 1px solid rgba(145, 118, 70, 0.16);
             box-shadow: 0 2px 6px rgba(67, 50, 25, 0.12);
             opacity: 0.94;
+            z-index: 2;
+            pointer-events: none;
         }
 
         .notebook-cover-sticker-tape.left {
@@ -6490,6 +6554,7 @@
         let notebookCoverOpen = false;
         let notebookPageTurnDirection = 0;
         let draftNotebookCover = null;
+        let draftCoverPreviewFace = 'front';
         let activeNotebookStickyNoteMenu = null;
         let currentIndexRecipeIds = [];
         let categoryFilter = "";
@@ -7442,17 +7507,94 @@
             ]);
         }
 
-        function getDefaultNotebookCoverSticker(seed = 0) {
-            const presets = [
-                { text: 'SOUP', emoji: '🥣', color: 'blue', background: 'solid', x: 80, y: 20, size: 'md', rotation: -6 },
-                { text: 'COSY', emoji: '✨', color: 'gold', background: 'solid', x: 24, y: 78, size: 'sm', rotation: 5 },
-                { text: 'HOME', emoji: '🏡', color: 'sage', background: 'solid', x: 76, y: 78, size: 'md', rotation: -3 }
+        function getDefaultNotebookCoverSticker(seed = 0, kind = 'text', face = 'front') {
+            const safeKind = ['text', 'emoji', 'photo'].includes(kind) ? kind : 'text';
+            const safeFace = face === 'back' ? 'back' : 'front';
+            const textPresets = [
+                { text: 'SOUP', color: 'blue', background: 'solid', x: 80, y: 20, size: 'md', rotation: -6 },
+                { text: 'COSY', color: 'gold', background: 'solid', x: 24, y: 78, size: 'sm', rotation: 5 },
+                { text: 'HOME', color: 'sage', background: 'solid', x: 76, y: 78, size: 'md', rotation: -3 }
             ];
-            const preset = presets[seed % presets.length];
+            const emojiPresets = [
+                { emoji: '🥣', color: 'blue', background: 'none', x: 78, y: 22, size: 'md', rotation: -8 },
+                { emoji: '✨', color: 'gold', background: 'none', x: 24, y: 76, size: 'sm', rotation: 6 },
+                { emoji: '🏡', color: 'sage', background: 'none', x: 74, y: 78, size: 'md', rotation: -4 }
+            ];
+            const photoPresets = [
+                { color: 'cream', background: 'solid', x: 72, y: 28, size: 'md', rotation: -5 },
+                { color: 'cream', background: 'solid', x: 28, y: 70, size: 'sm', rotation: 4 },
+                { color: 'cream', background: 'solid', x: 76, y: 74, size: 'md', rotation: -3 }
+            ];
+            const preset = safeKind === 'emoji'
+                ? emojiPresets[seed % emojiPresets.length]
+                : safeKind === 'photo'
+                    ? photoPresets[seed % photoPresets.length]
+                    : textPresets[seed % textPresets.length];
             return {
                 id: `cover-sticker-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+                kind: safeKind,
+                face: safeFace,
+                text: '',
+                emoji: '',
+                photo: '',
+                color: 'gold',
+                background: 'solid',
+                size: 'md',
+                rotation: 0,
+                x: 50,
+                y: 50,
                 ...preset
             };
+        }
+
+        function inferNotebookCoverStickerKind(sticker) {
+            if (['text', 'emoji', 'photo'].includes(sticker?.kind)) return sticker.kind;
+            if (String(sticker?.photo || '').trim()) return 'photo';
+            const hasEmoji = Boolean(String(sticker?.emoji || '').trim());
+            const hasText = Boolean(String(sticker?.text || '').trim());
+            if (hasEmoji && !hasText) return 'emoji';
+            return 'text';
+        }
+
+        function normalizeNotebookCoverSticker(sticker, index = 0) {
+            const kind = inferNotebookCoverStickerKind(sticker);
+            const face = sticker?.face === 'back' ? 'back' : 'front';
+            const defaults = getDefaultNotebookCoverSticker(index, kind, face);
+            const coordinates = getNotebookCoverStickerCoordinates(sticker?.position || defaults.position);
+            const colors = ['gold', 'blue', 'coral', 'sage', 'lilac', 'cream'];
+            const sizes = ['sm', 'md', 'lg'];
+            const next = {
+                ...defaults,
+                ...(sticker || {}),
+                id: sticker?.id || defaults.id,
+                kind,
+                face,
+                rotation: Number(sticker?.rotation ?? defaults.rotation) || 0,
+                background: sticker?.background === 'none' ? 'none' : 'solid',
+                color: colors.includes(sticker?.color) ? sticker.color : defaults.color,
+                size: sizes.includes(sticker?.size) ? sticker.size : defaults.size,
+                x: Number.isFinite(Number(sticker?.x)) ? Number(sticker.x) : coordinates.x,
+                y: Number.isFinite(Number(sticker?.y)) ? Number(sticker.y) : coordinates.y,
+                text: String(sticker?.text ?? defaults.text ?? ''),
+                emoji: String(sticker?.emoji ?? defaults.emoji ?? ''),
+                photo: String(sticker?.photo ?? '')
+            };
+
+            if (kind === 'text') {
+                next.emoji = '';
+                next.photo = '';
+            } else if (kind === 'emoji') {
+                next.text = '';
+                next.photo = '';
+                if (!next.emoji.trim()) next.emoji = defaults.emoji || '✨';
+            } else {
+                next.text = '';
+                next.emoji = '';
+                next.background = 'solid';
+                next.color = 'cream';
+            }
+
+            return next;
         }
 
         function getNotebookCoverStickerEmojiOptions() {
@@ -7523,16 +7665,7 @@
             nextCover.emblemShiftY = clampNotebookCoverNumber(cover?.emblemShiftY, -10, 10, 0);
             nextCover.titleScale = clampNotebookCoverNumber(cover?.titleScale, 0.8, 1.4, 1);
             nextCover.titleFont = titleFonts.includes(cover?.titleFont) ? cover.titleFont : 'fraunces';
-            nextCover.stickers = incomingStickers.map((sticker, index) => ({
-                ...getDefaultNotebookCoverSticker(index),
-                ...(sticker || {}),
-                id: sticker?.id || `cover-sticker-${Date.now()}-${index}`,
-                rotation: Number(sticker?.rotation ?? getDefaultNotebookCoverSticker(index).rotation),
-                emoji: sticker?.emoji ?? getDefaultNotebookCoverSticker(index).emoji ?? '',
-                background: sticker?.background === 'none' ? 'none' : 'solid',
-                x: Number.isFinite(Number(sticker?.x)) ? Number(sticker.x) : getNotebookCoverStickerCoordinates(sticker?.position || getDefaultNotebookCoverSticker(index).position).x,
-                y: Number.isFinite(Number(sticker?.y)) ? Number(sticker.y) : getNotebookCoverStickerCoordinates(sticker?.position || getDefaultNotebookCoverSticker(index).position).y
-            }));
+            nextCover.stickers = incomingStickers.map((sticker, index) => normalizeNotebookCoverSticker(sticker, index));
             return nextCover;
         }
 
@@ -7649,8 +7782,8 @@
             return positions[position] || positions['top-right'];
         }
 
-        function getNotebookCoverStickerSize(size, isEmojiOnly = false, isTransparent = false) {
-            if (isEmojiOnly) {
+        function getNotebookCoverStickerSize(size, kind = 'text', isTransparent = false) {
+            if (kind === 'emoji') {
                 if (isTransparent) {
                     const floatingEmojiSizes = {
                         sm: 'h-12 w-12 text-3xl',
@@ -7668,6 +7801,15 @@
                 };
 
                 return emojiSizes[size] || emojiSizes.md;
+            }
+
+            if (kind === 'photo') {
+                const photoSizes = {
+                    sm: 'h-14 w-14',
+                    md: 'h-[4.75rem] w-[4.75rem]',
+                    lg: 'h-24 w-24'
+                };
+                return photoSizes[size] || photoSizes.md;
             }
 
             const sizes = {
@@ -7945,27 +8087,51 @@
             return `--cover-surface:${palette.surface};--cover-spine:${palette.spine};--cover-plate:${palette.plate};--cover-plate-border:${palette.plateBorder};--cover-ink:${palette.ink};border-color:${palette.border};color:${palette.ink};background:${palette.surface};`;
         }
 
-        function renderNotebookCoverStickers(cover, isEditorPreview = false) {
+        function renderNotebookCoverStickers(cover, isEditorPreview = false, face = 'front') {
+            const safeFace = face === 'back' ? 'back' : 'front';
             return (cover.stickers || []).map((sticker, index) => {
-                const stickerPalette = getNotebookCoverStickerPalette(sticker.color);
-                const rawStickerText = (sticker.text || '').trim();
-                const stickerEmoji = escapeHTML((sticker.emoji || '').trim());
-                const stickerText = escapeHTML(rawStickerText || (!stickerEmoji ? 'STICKER' : ''));
-                const isEmojiOnly = Boolean(stickerEmoji && !rawStickerText);
-                const isTransparent = sticker.background === 'none';
-                const stickerSizeClass = getNotebookCoverStickerSize(sticker.size, isEmojiOnly, isTransparent);
-                const stickerX = Math.max(8, Math.min(92, Number(sticker.x) || 50));
-                const stickerY = Math.max(10, Math.min(90, Number(sticker.y) || 50));
+                const normalized = normalizeNotebookCoverSticker(sticker, index);
+                if (normalized.face !== safeFace) return '';
+
+                const kind = normalized.kind;
+                const stickerPalette = getNotebookCoverStickerPalette(normalized.color);
+                const isTransparent = kind !== 'photo' && normalized.background === 'none';
+                const stickerSizeClass = getNotebookCoverStickerSize(normalized.size, kind, isTransparent);
+                const stickerX = Math.max(8, Math.min(92, Number(normalized.x) || 50));
+                const stickerY = Math.max(10, Math.min(90, Number(normalized.y) || 50));
                 const wrapperClasses = isEditorPreview ? 'cover-editor-preview-sticker' : '';
-                const stickerTone = isTransparent && !isEmojiOnly ? `text-shadow:0 1px 2px rgba(255,255,255,0.28);` : '';
-                return `
-                    <div class="absolute ${wrapperClasses}" data-cover-sticker-index="${index}" style="left:${stickerX}%; top:${stickerY}%; transform:translate(-50%, -50%);">
-                        <div class="notebook-cover-sticker ${isTransparent ? 'is-transparent' : ''} rounded-2xl font-bold uppercase tracking-[0.18em] ${stickerSizeClass} ${isEmojiOnly ? 'flex items-center justify-center' : ''}" style="background:${isTransparent ? 'transparent' : stickerPalette.bg};color:${stickerPalette.text};transform:rotate(${Number(sticker.rotation) || 0}deg);${stickerTone}">
-                            <span class="inline-flex items-center ${isEmojiOnly ? '' : 'gap-2'} leading-none">
-                                ${stickerEmoji ? `<span class="${isEmojiOnly ? 'text-[1em]' : 'text-base'}" aria-hidden="true">${stickerEmoji}</span>` : ''}
-                                ${stickerText ? `<span>${stickerText}</span>` : ''}
-                            </span>
+                const rotation = Number(normalized.rotation) || 0;
+
+                let stickerInner = '';
+                if (kind === 'photo') {
+                    const photo = String(normalized.photo || '').trim();
+                    stickerInner = `
+                        <div class="notebook-cover-sticker is-photo rounded-2xl ${stickerSizeClass}" style="transform:rotate(${rotation}deg);">
+                            <span class="notebook-cover-sticker-tape left" aria-hidden="true"></span>
+                            <span class="notebook-cover-sticker-tape right" aria-hidden="true"></span>
+                            <div class="notebook-cover-sticker-photo ${photo ? '' : 'is-empty'}" ${photo ? `style="background-image:${cssUrl(photo)};"` : ''} aria-hidden="true">${photo ? '' : 'Foto'}</div>
                         </div>
+                    `;
+                } else if (kind === 'emoji') {
+                    const stickerEmoji = escapeHTML((normalized.emoji || '').trim() || '✨');
+                    stickerInner = `
+                        <div class="notebook-cover-sticker ${isTransparent ? 'is-transparent is-floating-emoji' : ''} rounded-2xl font-bold uppercase tracking-[0.18em] ${stickerSizeClass} flex items-center justify-center" style="background:${isTransparent ? 'transparent' : stickerPalette.bg};color:${stickerPalette.text};transform:rotate(${rotation}deg);">
+                            <span class="text-[1em] leading-none" aria-hidden="true">${stickerEmoji}</span>
+                        </div>
+                    `;
+                } else {
+                    const stickerText = escapeHTML((normalized.text || '').trim() || 'STICKER');
+                    const stickerTone = isTransparent ? `text-shadow:0 1px 2px rgba(255,255,255,0.28);` : '';
+                    stickerInner = `
+                        <div class="notebook-cover-sticker ${isTransparent ? 'is-transparent' : ''} rounded-2xl font-bold uppercase tracking-[0.18em] ${stickerSizeClass}" style="background:${isTransparent ? 'transparent' : stickerPalette.bg};color:${stickerPalette.text};transform:rotate(${rotation}deg);${stickerTone}">
+                            <span class="inline-flex items-center leading-none"><span>${stickerText}</span></span>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="absolute ${wrapperClasses}" data-cover-sticker-index="${index}" data-cover-sticker-kind="${kind}" data-cover-sticker-face="${safeFace}" style="left:${stickerX}%; top:${stickerY}%; transform:translate(-50%, -50%);">
+                        ${stickerInner}
                     </div>
                 `;
             }).join('');
@@ -8008,7 +8174,7 @@
             return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths}</svg>`;
         }
 
-        function renderNotebookCoverFace(cover, previewRecipe, totalPages, isEditorPreview = false) {
+        function renderNotebookCoverFrontInner(cover, isEditorPreview = false) {
             const safeCover = normalizeNotebookCover(cover);
             const title = escapeHTML((safeCover.title || '').trim());
             const subtitle = escapeHTML((safeCover.subtitle || '').trim());
@@ -8036,8 +8202,46 @@
                     </div>
 
                     <div class="absolute inset-0 z-10">
-                        ${renderNotebookCoverStickers(safeCover, isEditorPreview)}
+                        ${renderNotebookCoverStickers(safeCover, isEditorPreview, 'front')}
                     </div>
+                </div>
+            `;
+        }
+
+        function renderNotebookCoverBackInner(cover, isEditorPreview = false) {
+            const safeCover = normalizeNotebookCover(cover);
+            const spineLabel = escapeHTML((safeCover.spineLabel || '').trim());
+            const backStickers = (safeCover.stickers || []).filter(sticker => normalizeNotebookCoverSticker(sticker).face === 'back');
+
+            return `
+                <div class="ml-10 relative h-full md:ml-12">
+                    <div class="notebook-cover-back-copy cover-face-copy" data-cover-font="${safeCover.titleFont}">
+                        ${spineLabel ? `<div class="notebook-cover-plate inline-flex items-center rounded-full px-4 py-2 text-[10px] font-bold uppercase tracking-[0.3em] shadow-sm">${spineLabel}</div>` : ''}
+                        <p class="mt-3 text-[10px] font-bold uppercase tracking-[0.22em] opacity-70">${backStickers.length ? 'Achterkant' : 'Achterkant · voeg stickers toe'}</p>
+                    </div>
+                    <div class="absolute inset-0 z-10">
+                        ${renderNotebookCoverStickers(safeCover, isEditorPreview, 'back')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderNotebookCoverFace(cover, previewRecipe, totalPages, isEditorPreview = false, previewFace = 'front') {
+            const safeCover = normalizeNotebookCover(cover);
+            const showBack = previewFace === 'back';
+
+            if (isEditorPreview) {
+                return showBack
+                    ? renderNotebookCoverBackInner(safeCover, true)
+                    : renderNotebookCoverFrontInner(safeCover, true);
+            }
+
+            return `
+                <div class="notebook-cover-face is-front" data-cover-face="front">
+                    ${renderNotebookCoverFrontInner(safeCover, false)}
+                </div>
+                <div class="notebook-cover-face is-back" data-cover-face="back" aria-hidden="true">
+                    ${renderNotebookCoverBackInner(safeCover, false)}
                 </div>
             `;
         }
@@ -8120,6 +8324,7 @@
         function openCoverEditor() { if(requireAccountPlan('notebookCovers')) return;
             closeCompetingSheets();
             draftNotebookCover = JSON.parse(JSON.stringify(normalizeNotebookCover(userSettings.notebookCover)));
+            draftCoverPreviewFace = 'front';
             const modal = document.getElementById('cover-editor-modal');
             if (!modal) return;
             renderCoverEditor();
@@ -8133,6 +8338,12 @@
             modal.classList.add('hidden', 'opacity-0');
             modal.firstElementChild?.classList.add('scale-95');
             draftNotebookCover = null;
+            draftCoverPreviewFace = 'front';
+        }
+
+        function setDraftCoverPreviewFace(face) {
+            draftCoverPreviewFace = face === 'back' ? 'back' : 'front';
+            renderCoverEditor();
         }
 
         function setDraftCoverField(field, value) {
@@ -8147,7 +8358,7 @@
             const previewRecipe = recipes.find(recipe => recipe.id === currentIndexRecipeIds[notebookPageIndex]) || recipes[0] || null;
             const totalPages = Math.max(1, currentIndexRecipeIds.length || recipes.length || 1);
             preview.setAttribute('style', getNotebookCoverPanelStyle(draftNotebookCover));
-            preview.innerHTML = renderNotebookCoverFace(draftNotebookCover, previewRecipe, totalPages, true);
+            preview.innerHTML = renderNotebookCoverFace(draftNotebookCover, previewRecipe, totalPages, true, draftCoverPreviewFace);
             attachCoverEditorInteractions();
             scheduleNotebookCoverTextFit(preview);
         }
@@ -8291,21 +8502,77 @@
             `;
         }
 
-        function addDraftCoverSticker() {
+        function addDraftCoverSticker(kind = 'text') {
             if (!draftNotebookCover) return;
             if (draftNotebookCover.stickers.length >= 6) {
                 showToast('Maximum 6 cover stickers', 'stickers');
                 return;
             }
 
-            draftNotebookCover.stickers.push(getDefaultNotebookCoverSticker(draftNotebookCover.stickers.length));
+            const safeKind = ['text', 'emoji', 'photo'].includes(kind) ? kind : 'text';
+            const face = draftCoverPreviewFace === 'back' ? 'back' : 'front';
+            draftNotebookCover.stickers.push(getDefaultNotebookCoverSticker(draftNotebookCover.stickers.length, safeKind, face));
             renderCoverEditor();
         }
 
         function updateDraftCoverSticker(index, field, value) {
             if (!draftNotebookCover?.stickers?.[index]) return;
-            draftNotebookCover.stickers[index][field] = field === 'rotation' ? Number(value) : value;
+            const sticker = draftNotebookCover.stickers[index];
+            if (field === 'kind') {
+                const nextKind = ['text', 'emoji', 'photo'].includes(value) ? value : 'text';
+                draftNotebookCover.stickers[index] = normalizeNotebookCoverSticker({
+                    ...sticker,
+                    kind: nextKind,
+                    text: nextKind === 'text' ? (sticker.text || 'SOUP') : '',
+                    emoji: nextKind === 'emoji' ? (sticker.emoji || '✨') : '',
+                    photo: nextKind === 'photo' ? (sticker.photo || '') : '',
+                    background: nextKind === 'emoji' ? (sticker.background || 'none') : 'solid'
+                }, index);
+            } else if (field === 'face') {
+                sticker.face = value === 'back' ? 'back' : 'front';
+                draftCoverPreviewFace = sticker.face;
+            } else if (field === 'rotation') {
+                sticker.rotation = Number(value);
+            } else {
+                sticker[field] = value;
+            }
+            draftNotebookCover.stickers[index] = normalizeNotebookCoverSticker(draftNotebookCover.stickers[index], index);
             renderCoverEditor();
+        }
+
+        function uploadDraftCoverStickerPhoto(index, event) {
+            const file = event?.target?.files?.[0];
+            if (!file || !draftNotebookCover?.stickers?.[index]) return;
+
+            const reader = new FileReader();
+            reader.onload = loadEvent => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_SIZE = 480;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > height) {
+                        if (width > MAX_SIZE) {
+                            height *= MAX_SIZE / width;
+                            width = MAX_SIZE;
+                        }
+                    } else if (height > MAX_SIZE) {
+                        width *= MAX_SIZE / height;
+                        height = MAX_SIZE;
+                    }
+                    canvas.width = Math.max(1, Math.round(width));
+                    canvas.height = Math.max(1, Math.round(height));
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    draftNotebookCover.stickers[index].kind = 'photo';
+                    draftNotebookCover.stickers[index].photo = canvas.toDataURL('image/jpeg', 0.82);
+                    draftNotebookCover.stickers[index] = normalizeNotebookCoverSticker(draftNotebookCover.stickers[index], index);
+                    renderCoverEditor();
+                };
+                img.src = loadEvent.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         function updateDraftCoverStickerPosition(index, x, y) {
@@ -8384,16 +8651,25 @@
                 { key: 'sunflower', label: 'Sunflower' }
             ];
 
+            const previewFace = draftCoverPreviewFace === 'back' ? 'back' : 'front';
+            const kindLabels = { text: 'Tekst', emoji: 'Emoji', photo: 'Foto' };
+
             body.innerHTML = `
                 <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr,0.9fr]">
                     <div class="rounded-[28px] border border-parchmentDark bg-accent bg-opacity-40 p-5 md:p-6">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Live preview</p>
-                        <div class="notebook-cover-shell notebook-book-cover-frame mt-5">
-                            <div id="cover-editor-preview-surface" class="notebook-book-cover-surface notebook-cover-panel overflow-hidden rounded-[32px] border px-7 py-7 text-[#1c1410] md:px-10 md:py-10" style="${getNotebookCoverPanelStyle(draftNotebookCover)}">
-                                ${renderNotebookCoverFace(draftNotebookCover, previewRecipe, totalPages, true)}
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Live preview</p>
+                            <div class="inline-flex rounded-full border border-parchmentDark bg-white p-1 shadow-sm" role="group" aria-label="Kaftzijde">
+                                <button type="button" onclick="setDraftCoverPreviewFace('front')" class="cover-look-choice ${previewFace === 'front' ? 'is-active' : ''}" aria-pressed="${previewFace === 'front' ? 'true' : 'false'}">Voorkant</button>
+                                <button type="button" onclick="setDraftCoverPreviewFace('back')" class="cover-look-choice ${previewFace === 'back' ? 'is-active' : ''}" aria-pressed="${previewFace === 'back' ? 'true' : 'false'}">Achterkant</button>
                             </div>
                         </div>
-                        <p class="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-sage opacity-80">Drag stickers directly on the preview to place them on the cover.</p>
+                        <div class="notebook-cover-shell notebook-book-cover-frame mt-5">
+                            <div id="cover-editor-preview-surface" class="notebook-book-cover-surface notebook-cover-panel rounded-[32px] border px-7 py-7 text-[#1c1410] md:px-10 md:py-10" style="${getNotebookCoverPanelStyle(draftNotebookCover)}">
+                                ${renderNotebookCoverFace(draftNotebookCover, previewRecipe, totalPages, true, previewFace)}
+                            </div>
+                        </div>
+                        <p class="mt-3 text-[10px] font-bold uppercase tracking-[0.2em] text-sage opacity-80">Sleep stickers op de preview. Schakel tussen voor- en achterkant.</p>
                     </div>
 
                     <div class="space-y-5">
@@ -8434,74 +8710,124 @@
                         </div>
 
                         <div class="rounded-xl border border-parchmentDark bg-white p-4">
-                            <div class="flex items-center justify-between gap-3 mb-4">
+                            <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
                                 <div>
                                     <p class="text-xs font-bold uppercase tracking-[0.22em] text-sage">Cover Stickers</p>
-                                    <p class="text-[10px] text-sage mt-1 font-semibold">Add up to 6 stickers for a more personal front cover.</p>
+                                    <p class="text-[10px] text-sage mt-1 font-semibold">Tekst, emoji of foto · max. 6 · voor- of achterkant.</p>
                                 </div>
-                                <button type="button" onclick="addDraftCoverSticker()" class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-4 text-[10px] font-bold uppercase tracking-[0.18em] text-sage shadow-sm">
-                                    <i data-lucide="plus" class="w-4 h-4"></i> Add sticker
-                                </button>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" onclick="addDraftCoverSticker('text')" class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-sage shadow-sm">
+                                        <i data-lucide="type" class="w-4 h-4"></i> Tekst
+                                    </button>
+                                    <button type="button" onclick="addDraftCoverSticker('emoji')" class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-sage shadow-sm">
+                                        <i data-lucide="smile" class="w-4 h-4"></i> Emoji
+                                    </button>
+                                    <button type="button" onclick="addDraftCoverSticker('photo')" class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-3 text-[10px] font-bold uppercase tracking-[0.14em] text-sage shadow-sm">
+                                        <i data-lucide="image" class="w-4 h-4"></i> Foto
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="space-y-4">
-                                ${draftNotebookCover.stickers.length > 0 ? draftNotebookCover.stickers.map((sticker, index) => `
+                                ${draftNotebookCover.stickers.length > 0 ? draftNotebookCover.stickers.map((sticker, index) => {
+                                    const normalized = normalizeNotebookCoverSticker(sticker, index);
+                                    const kind = normalized.kind;
+                                    return `
                                     <div class="rounded-xl border border-parchmentDark bg-accent bg-opacity-25 p-4 space-y-4">
                                         <div class="flex items-center justify-between gap-3">
-                                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-sage">Sticker ${index + 1}</p>
+                                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-sage">Sticker ${index + 1} · ${kindLabels[kind] || kind}</p>
                                             <button type="button" onclick="removeDraftCoverSticker(${index})" class="w-9 h-9 rounded-full border border-parchmentDark bg-white text-sage flex items-center justify-center shadow-sm">
                                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                                             </button>
                                         </div>
 
-                                        <div>
-                                            <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Sticker Text</label>
-                                            <input type="text" maxlength="18" value="${escapeHTML(sticker.text || '')}" oninput="updateDraftCoverSticker(${index}, 'text', this.value)" class="${inputClass}" placeholder="SOUP CLUB">
-                                            <p class="mt-1 text-[10px] font-semibold text-sage">Leave this empty if you want an emoji-only sticker.</p>
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Soort</label>
+                                                <select onchange="updateDraftCoverSticker(${index}, 'kind', this.value)" class="${inputClass}">
+                                                    <option value="text" ${kind === 'text' ? 'selected' : ''}>Tekst</option>
+                                                    <option value="emoji" ${kind === 'emoji' ? 'selected' : ''}>Emoji</option>
+                                                    <option value="photo" ${kind === 'photo' ? 'selected' : ''}>Foto</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Kant</label>
+                                                <select onchange="updateDraftCoverSticker(${index}, 'face', this.value)" class="${inputClass}">
+                                                    <option value="front" ${normalized.face !== 'back' ? 'selected' : ''}>Voorkant</option>
+                                                    <option value="back" ${normalized.face === 'back' ? 'selected' : ''}>Achterkant</option>
+                                                </select>
+                                            </div>
                                         </div>
 
-                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        ${kind === 'text' ? `
+                                            <div>
+                                                <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Tekst</label>
+                                                <input type="text" maxlength="18" value="${escapeHTML(normalized.text || '')}" oninput="updateDraftCoverSticker(${index}, 'text', this.value)" class="${inputClass}" placeholder="SOUP CLUB">
+                                            </div>
+                                        ` : ''}
+
+                                        ${kind === 'emoji' ? `
                                             <div>
                                                 <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Emoji</label>
                                                 <select onchange="updateDraftCoverSticker(${index}, 'emoji', this.value)" class="${inputClass}">
-                                                    ${stickerEmojiOptions.map(option => `<option value="${escapeHTML(option.value)}" ${sticker.emoji === option.value ? 'selected' : ''}>${option.label}</option>`).join('')}
+                                                    ${stickerEmojiOptions.filter(option => option.value).map(option => `<option value="${escapeHTML(option.value)}" ${normalized.emoji === option.value ? 'selected' : ''}>${option.label}</option>`).join('')}
                                                 </select>
                                             </div>
+                                        ` : ''}
+
+                                        ${kind === 'photo' ? `
                                             <div>
-                                                <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Color</label>
-                                                <select onchange="updateDraftCoverSticker(${index}, 'color', this.value)" class="${inputClass}">
-                                                    <option value="gold" ${sticker.color === 'gold' ? 'selected' : ''}>Gold</option>
-                                                    <option value="blue" ${sticker.color === 'blue' ? 'selected' : ''}>Blue</option>
-                                                    <option value="coral" ${sticker.color === 'coral' ? 'selected' : ''}>Coral</option>
-                                                    <option value="sage" ${sticker.color === 'sage' ? 'selected' : ''}>Sage</option>
-                                                    <option value="lilac" ${sticker.color === 'lilac' ? 'selected' : ''}>Lilac</option>
-                                                    <option value="cream" ${sticker.color === 'cream' ? 'selected' : ''}>Cream</option>
-                                                </select>
+                                                <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Foto</label>
+                                                <div class="flex flex-wrap items-center gap-3">
+                                                    <div class="h-16 w-16 rounded-xl border border-parchmentDark bg-white shadow-sm overflow-hidden" style="${normalized.photo ? `background-image:${cssUrl(normalized.photo)};background-size:cover;background-position:center;` : ''}">
+                                                        ${normalized.photo ? '' : '<div class="flex h-full w-full items-center justify-center text-[10px] font-bold uppercase tracking-[0.16em] text-sage">Leeg</div>'}
+                                                    </div>
+                                                    <label class="custom-file-upload inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-4 text-[10px] font-bold uppercase tracking-[0.16em] text-sage shadow-sm">
+                                                        <i data-lucide="upload" class="w-4 h-4"></i> Kies foto
+                                                        <input type="file" accept="image/*" class="hidden" onchange="uploadDraftCoverStickerPhoto(${index}, event)">
+                                                    </label>
+                                                </div>
                                             </div>
+                                        ` : ''}
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            ${kind !== 'photo' ? `
+                                                <div>
+                                                    <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Kleur</label>
+                                                    <select onchange="updateDraftCoverSticker(${index}, 'color', this.value)" class="${inputClass}">
+                                                        <option value="gold" ${normalized.color === 'gold' ? 'selected' : ''}>Gold</option>
+                                                        <option value="blue" ${normalized.color === 'blue' ? 'selected' : ''}>Blue</option>
+                                                        <option value="coral" ${normalized.color === 'coral' ? 'selected' : ''}>Coral</option>
+                                                        <option value="sage" ${normalized.color === 'sage' ? 'selected' : ''}>Sage</option>
+                                                        <option value="lilac" ${normalized.color === 'lilac' ? 'selected' : ''}>Lilac</option>
+                                                        <option value="cream" ${normalized.color === 'cream' ? 'selected' : ''}>Cream</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Achtergrond</label>
+                                                    <select onchange="updateDraftCoverSticker(${index}, 'background', this.value)" class="${inputClass}">
+                                                        <option value="solid" ${normalized.background !== 'none' ? 'selected' : ''}>Sticker</option>
+                                                        <option value="none" ${normalized.background === 'none' ? 'selected' : ''}>Transparant</option>
+                                                    </select>
+                                                </div>
+                                            ` : ''}
                                             <div>
-                                                <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Background</label>
-                                                <select onchange="updateDraftCoverSticker(${index}, 'background', this.value)" class="${inputClass}">
-                                                    <option value="solid" ${sticker.background !== 'none' ? 'selected' : ''}>Sticker</option>
-                                                    <option value="none" ${sticker.background === 'none' ? 'selected' : ''}>Transparent</option>
-                                                </select>
-                                                <p class="mt-1 text-[10px] font-semibold text-sage">Transparent works especially well for emoji-only stickers.</p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Size</label>
+                                                <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Grootte</label>
                                                 <select onchange="updateDraftCoverSticker(${index}, 'size', this.value)" class="${inputClass}">
-                                                    <option value="sm" ${sticker.size === 'sm' ? 'selected' : ''}>Small</option>
-                                                    <option value="md" ${sticker.size === 'md' ? 'selected' : ''}>Medium</option>
-                                                    <option value="lg" ${sticker.size === 'lg' ? 'selected' : ''}>Large</option>
+                                                    <option value="sm" ${normalized.size === 'sm' ? 'selected' : ''}>Small</option>
+                                                    <option value="md" ${normalized.size === 'md' ? 'selected' : ''}>Medium</option>
+                                                    <option value="lg" ${normalized.size === 'lg' ? 'selected' : ''}>Large</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Rotation</label>
-                                                <input type="range" min="-18" max="18" step="3" value="${Number(sticker.rotation) || 0}" oninput="updateDraftCoverSticker(${index}, 'rotation', this.value)" class="w-full accent-[#c89050] mt-3">
-                                                <p class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-sage">${Number(sticker.rotation) || 0}°</p>
+                                                <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Rotatie</label>
+                                                <input type="range" min="-18" max="18" step="3" value="${Number(normalized.rotation) || 0}" oninput="updateDraftCoverSticker(${index}, 'rotation', this.value)" class="w-full accent-[#c89050] mt-3">
+                                                <p class="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-sage">${Number(normalized.rotation) || 0}°</p>
                                             </div>
                                         </div>
                                     </div>
-                                `).join('') : '<div class="rounded-xl border border-dashed border-parchmentDark p-4 text-sm font-semibold text-sage">No stickers yet. Add one to start decorating your cover.</div>'}
+                                `;
+                                }).join('') : '<div class="rounded-xl border border-dashed border-parchmentDark p-4 text-sm font-semibold text-sage">Nog geen stickers. Kies tekst, emoji of foto om te beginnen.</div>'}
                             </div>
                         </div>
                     </div>
@@ -16909,7 +17235,7 @@
                             <div class="notebook-landing-stage">
                                 <div class="notebook-landing-cover-column">
                                     <div class="notebook-cover-shell notebook-book-cover-frame notebook-landing-cover-frame">
-                                        <div id="notebook-cover-surface" class="notebook-book-cover-surface notebook-cover-panel notebook-landing-cover-surface overflow-hidden rounded-[32px] border px-6 py-6 text-[#1c1410] md:px-8 md:py-8" style="${getNotebookCoverPanelStyle(coverConfig)}" role="button" tabindex="0" aria-label="Open notebook" data-cover-openable="true" onclick="openNotebookCover()" onkeydown="if (event.target !== event.currentTarget) return; if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openNotebookCover(); }">
+                                        <div id="notebook-cover-surface" class="notebook-book-cover-surface notebook-cover-panel notebook-landing-cover-surface rounded-[32px] border px-6 py-6 text-[#1c1410] md:px-8 md:py-8" style="${getNotebookCoverPanelStyle(coverConfig)}" role="button" tabindex="0" aria-label="Open notebook" data-cover-openable="true" onclick="openNotebookCover()" onkeydown="if (event.target !== event.currentTarget) return; if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openNotebookCover(); }">
                                             ${renderNotebookCoverFace(coverConfig, recipe, totalPages, false)}
                                         </div>
                                     </div>
