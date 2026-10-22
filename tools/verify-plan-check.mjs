@@ -17,7 +17,26 @@ page.setDefaultTimeout(20000);
 await page.goto(URL, { waitUntil: 'networkidle0' });
 await page.waitForFunction(() => typeof window.accountHasPremiumPlan === 'function' && typeof window.showPremiumModal === 'function');
 
-// In bypass, plan check should report premium (testmodus)
+// Soft launch: PREMIUM_ENABLED=false keeps every feature open.
+const softLaunch = await page.evaluate(() => {
+  const flagOff = window.PREMIUM_ENABLED === false;
+  const unlocked = accountHasPremiumPlan() === true
+    && hasPremiumAccess() === true
+    && canAddLocalRecipe() === true
+    && requireFreeRecipeSlot() === false
+    && requirePremiumFeature('recipeSharing') === false
+    && requirePremiumFeature('backupDownload') === false
+    && requirePremiumFeature('backupRestore') === false;
+  showPlansModal();
+  showPremiumModal('recipeLimit');
+  const text = document.body.innerText;
+  const hidesPremiumCtas = !/View Premium|Bekijk Premium|Coming soon/i.test(text);
+  closeModal?.();
+  return { flagOff, unlocked, hidesPremiumCtas };
+});
+
+// In bypass, plan check should report premium (testmodus) even when enforcement is on.
+await page.evaluate(() => { window.PREMIUM_ENABLED = true; });
 const bypassPremium = await page.evaluate(() => ({
   hasPlan: accountHasPremiumPlan(),
   hasAccess: hasPremiumAccess(),
@@ -25,8 +44,13 @@ const bypassPremium = await page.evaluate(() => ({
   plan: getAccountPlan()
 }));
 
-// Force free-plan UI path and show limit upgrade modal
+// Force free-plan UI path and show limit upgrade modal (enforcement on)
 await page.evaluate(() => {
+  window.PREMIUM_ENABLED = true;
+  window.__origIsLocalTestPremiumSession = window.isLocalTestPremiumSession;
+  window.__origAccountHasPremiumPlan = window.accountHasPremiumPlan;
+  window.__origHasPremiumAccess = window.hasPremiumAccess;
+  window.__origCanAddLocalRecipe = window.canAddLocalRecipe;
   window.isLocalTestPremiumSession = () => false;
   window.accountHasPremiumPlan = () => false;
   window.hasPremiumAccess = () => false;
@@ -98,7 +122,29 @@ const gateResult = await page.evaluate(() => {
   };
 });
 
-fs.writeFileSync(`${OUT}/plan-check-verify.json`, JSON.stringify({ bypassPremium, limitSnippet: limitText.slice(0, 800), gateResult }, null, 2));
-console.log(JSON.stringify({ bypassPremium, gateResult, limitHasUpgrade: /Gratis limiet|3 recepten/.test(limitText) }, null, 2));
+// Soft-launch flag restores unlock when flipped back off.
+const softLaunchRestore = await page.evaluate(() => {
+  if (window.__origIsLocalTestPremiumSession) window.isLocalTestPremiumSession = window.__origIsLocalTestPremiumSession;
+  if (window.__origAccountHasPremiumPlan) window.accountHasPremiumPlan = window.__origAccountHasPremiumPlan;
+  if (window.__origHasPremiumAccess) window.hasPremiumAccess = window.__origHasPremiumAccess;
+  if (window.__origCanAddLocalRecipe) window.canAddLocalRecipe = window.__origCanAddLocalRecipe;
+  window.PREMIUM_ENABLED = false;
+  closeModal?.();
+  return {
+    unlockedAgain: accountHasPremiumPlan() === true
+      && requirePremiumFeature('recipeSharing') === false
+      && requireFreeRecipeSlot() === false
+  };
+});
+
+fs.writeFileSync(`${OUT}/plan-check-verify.json`, JSON.stringify({ softLaunch, bypassPremium, limitSnippet: limitText.slice(0, 800), gateResult, softLaunchRestore }, null, 2));
+console.log(JSON.stringify({
+  softLaunch,
+  bypassPremium,
+  gateResult,
+  softLaunchRestore,
+  limitHasUpgrade: /Gratis limiet|3 recepten/.test(limitText),
+  softLaunchOk: softLaunch.flagOff && softLaunch.unlocked && softLaunch.hidesPremiumCtas && softLaunchRestore.unlockedAgain
+}, null, 2));
 
 await browser.close();

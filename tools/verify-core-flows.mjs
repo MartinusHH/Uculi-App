@@ -379,8 +379,33 @@ try {
   await phoneRecipe.close();
 
   // ---------- PREMIUM ----------
+  // Soft launch default: PREMIUM_ENABLED=false unlocks everything (Stripe not live).
+  const softLaunch = await loginPage.evaluate(() => {
+    const flagOff = window.PREMIUM_ENABLED === false;
+    const unlocked = accountHasPremiumPlan() === true
+      && canAddLocalRecipe() === true
+      && requirePremiumFeature('recipeSharing') === false
+      && requirePremiumFeature('recipePdfExport') === false
+      && requirePremiumFeature('notebookMode') === false
+      && requirePremiumFeature('backupDownload') === false
+      && requirePremiumFeature('backupRestore') === false
+      && requireFreeRecipeSlot() === false;
+    showPlansModal();
+    showPremiumModal('recipeSharing');
+    const text = document.body.innerText;
+    const hidesPremiumCtas = !/View Premium|Bekijk Premium|Coming soon/i.test(text);
+    closeModal?.();
+    return { flagOff, unlocked, hidesPremiumCtas, hasFlag: typeof window.PREMIUM_ENABLED === 'boolean' };
+  });
+  log(
+    'premium: soft launch unlocks all features (PREMIUM_ENABLED=false)',
+    softLaunch.flagOff && softLaunch.unlocked && softLaunch.hidesPremiumCtas,
+    JSON.stringify(softLaunch)
+  );
+
+  // When enforcement is on, free users are gated again.
   const premium = await loginPage.evaluate(() => {
-    // Force free
+    window.PREMIUM_ENABLED = true;
     const real = accountHasPremiumPlan;
     accountHasPremiumPlan = () => false;
     hasPremiumAccess = () => false;
@@ -392,11 +417,11 @@ try {
     closeModal?.();
     accountHasPremiumPlan = real;
     hasPremiumAccess = real;
+    window.PREMIUM_ENABLED = false;
     const premiumAgain = accountHasPremiumPlan();
-    // Emulator signed-in user is free unless billing set — that's ok
     return { shareBlocked, pdfBlocked, notebookBlocked, modalVisible, premiumAgain, hasFn: typeof accountHasPremiumPlan === 'function' };
   });
-  log('premium: free user gated on share/pdf/notebook', premium.shareBlocked && premium.pdfBlocked && premium.notebookBlocked && premium.modalVisible, JSON.stringify(premium));
+  log('premium: free user gated on share/pdf/notebook when PREMIUM_ENABLED', premium.shareBlocked && premium.pdfBlocked && premium.notebookBlocked && premium.modalVisible, JSON.stringify(premium));
 
   // Testmodus premium path
   const bypassPage = await browser.newPage();
@@ -505,8 +530,9 @@ try {
   }, invitee.idToken, 'PATCH');
   log('share: invitee accepts', accept.status === 200, `status=${accept.status}`);
 
-  // Recipe share gate for free signed-in user
+  // Recipe share gate for free signed-in user (only when premium is enforced)
   await loginPage.evaluate(() => {
+    window.PREMIUM_ENABLED = true;
     accountHasPremiumPlan = () => false;
     hasPremiumAccess = () => false;
     if (recipes[0]) shareRecipe(recipes[0].id);
@@ -514,9 +540,12 @@ try {
   await sleep(400);
   const shareGate = await loginPage.evaluate(() => {
     const text = document.body.innerText.toLowerCase();
-    return /premium|upgrade|delen|share/.test(text);
+    const gated = /premium|upgrade|delen|share/.test(text);
+    closeModal?.();
+    window.PREMIUM_ENABLED = false;
+    return gated;
   });
-  log('share: recipe share shows premium gate when free', shareGate);
+  log('share: recipe share shows premium gate when PREMIUM_ENABLED', shareGate);
   await loginPage.screenshot({ path: `${ART}/core-recipe-share-gate.png`, fullPage: false });
 
   // UI shopping share controls when cloud owner

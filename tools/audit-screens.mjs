@@ -234,10 +234,28 @@ async function auditViewport(name, width, height) {
       });
     });
 
-    // Premium gate while free
+    // Soft launch: premium UI/CTAs stay hidden while PREMIUM_ENABLED=false
+    await probeScreen(page, name, 'premium-soft-launch', async () => {
+      const soft = await page.evaluate(() => {
+        const flagOff = window.PREMIUM_ENABLED === false;
+        showPlansModal();
+        showPremiumModal('recipeSharing');
+        const text = document.body.innerText;
+        const hidesCtas = !/View Premium|Bekijk Premium|Coming soon/i.test(text);
+        closeModal?.();
+        return { flagOff, hidesCtas, unlocked: typeof accountHasPremiumPlan === 'function' ? accountHasPremiumPlan() === true : false };
+      });
+      if (!soft.flagOff || !soft.hidesCtas || !soft.unlocked) {
+        note(name, 'premium-soft-launch', 'error', `soft launch not open: ${JSON.stringify(soft)}`);
+      }
+    });
+
+    // Premium gate while free (only when enforcement is enabled)
     await probeScreen(page, name, 'premium-gate', async () => {
       await page.evaluate(() => {
         window.__origPremium = accountHasPremiumPlan;
+        window.__origPremiumEnabled = window.PREMIUM_ENABLED;
+        window.PREMIUM_ENABLED = true;
         accountHasPremiumPlan = () => false;
         hasPremiumAccess = () => false;
         showPremiumModal('recipeSharing');
@@ -248,6 +266,7 @@ async function auditViewport(name, width, height) {
       await page.evaluate(() => {
         if (typeof closeModal === 'function') closeModal();
         if (window.__origPremium) accountHasPremiumPlan = window.__origPremium;
+        window.PREMIUM_ENABLED = window.__origPremiumEnabled === true;
       });
     });
 

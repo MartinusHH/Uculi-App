@@ -6936,9 +6936,15 @@
         const publicationRetractionDelayMs = 24 * 60 * 60 * 1000;
         const recipeDeleteUndoWindowMs = 5 * 60 * 1000;
         const freeLocalRecipeLimit = 3;
+        // Soft launch: Stripe is not live — keep all premium locks off until this is true.
+        window.PREMIUM_ENABLED = false;
         const supportedAppLanguages = ['en', 'nl', 'fr', 'de', 'es'];
         const globalUiLanguageStorageKey = 'uculiPreferredUiLanguage';
         const uiLanguageQueryParam = 'lang';
+
+        function isPremiumEnforced() {
+            return window.PREMIUM_ENABLED === true;
+        }
 
         function resolveSupportedLanguage(languageCode = '') {
             const normalized = String(languageCode || '').trim().toLowerCase();
@@ -7343,7 +7349,9 @@
         }
 
         // Enige plan-check per account: Firestore billing (lokaal gespiegeld) of Testmodus.
+        // When PREMIUM_ENABLED is false, everyone is unlocked (Stripe not live yet).
         function accountHasPremiumPlan() {
+            if (!isPremiumEnforced()) return true;
             if (isLocalTestPremiumSession()) return true;
             return hasPremiumBillingStatus(getAccountPlan().status);
         }
@@ -7357,6 +7365,7 @@
         }
 
         function canAddLocalRecipe() {
+            if (!isPremiumEnforced()) return true;
             return accountHasPremiumPlan() || countLocalRecipes() < freeLocalRecipeLimit;
         }
 
@@ -7513,6 +7522,19 @@
                         : 'Premium access was restored from a linked account state.',
                     sourceLabel: billing.entitlementSource || 'Restore flow',
                     actionLabel: hasLifetimePlan ? 'Lifetime Restored' : 'Premium Restored'
+                };
+            }
+
+            if (!isPremiumEnforced()) {
+                const nl = getActiveUiLanguage() === 'nl';
+                return {
+                    state: 'soft-launch',
+                    badge: nl ? 'Soft launch' : 'Soft launch',
+                    summary: nl
+                        ? 'Tijdens soft launch staan alle functies open, inclusief backup. Betaalde Premium via Stripe komt later.'
+                        : 'During soft launch every feature is open, including backup. Paid Premium via Stripe comes later.',
+                    sourceLabel: 'Soft launch',
+                    actionLabel: nl ? 'Alles open' : 'Full access'
                 };
             }
 
@@ -15793,9 +15815,11 @@
             const billingMeta = getBillingStatusMeta();
             const billingReady = isBillingCheckoutReady();
             const restoreReady = isBillingRestoreReady();
-            const backupDownloadLocked = !premiumActive;
-            const backupRestoreLocked = !premiumActive;
-            const cloudSyncLocked = !premiumActive;
+            const settingsNl = userSettings.language === 'nl';
+            // Soft launch (PREMIUM_ENABLED=false): never lock backup/cloud UI.
+            const backupDownloadLocked = isPremiumEnforced() && !premiumActive;
+            const backupRestoreLocked = isPremiumEnforced() && !premiumActive;
+            const cloudSyncLocked = isPremiumEnforced() && !premiumActive;
             const settingsPreferencesGridClass = 'grid grid-cols-1 gap-5 md:grid-cols-2';
             const settingsActionGridClass = 'grid grid-cols-1 gap-4 md:grid-cols-2';
             const infoActionGridClass = 'grid grid-cols-1 gap-4 md:grid-cols-2';
@@ -15859,12 +15883,14 @@
                             <p class="mt-1 text-sm font-semibold text-sage">${billingMeta.summary}</p>
                         </div>
                         <div class="grid w-full gap-3 md:w-auto md:grid-cols-2">
+                            ${isPremiumEnforced() ? `
                             <button onclick="showPlansModal()" class="${getAppButtonClasses('accent', { fullWidth: true, size: 'lg' })}">
                                 <i data-lucide="crown" class="w-4 h-4"></i> View Plans
                             </button>
+                            ` : ''}
                             ${billingMeta.state === 'preview'
                                 ? `<button onclick="resetPremiumPreviewAccess()" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset Preview</button>`
-                                : `<button onclick="showBillingRestoreSetupStatusModal('settings-billing')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}"><i data-lucide="shield-check" class="w-4 h-4"></i> Restore</button>`}
+                                : (isPremiumEnforced() ? `<button onclick="showBillingRestoreSetupStatusModal('settings-billing')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}"><i data-lucide="shield-check" class="w-4 h-4"></i> Restore</button>` : '')}
                         </div>
                     </div>
                 </section>
@@ -15959,12 +15985,14 @@
                         <p class="mt-1 text-sm font-semibold text-sage">${billingMeta.summary}</p>
                     </div>
                     <div class="${settingsActionGridClass}">
+                        ${isPremiumEnforced() ? `
                         <button onclick="${billingReady ? "startPremiumUpgradeFlow('settings-billing')" : "showPlansModal()"}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
                             <i data-lucide="${billingReady ? 'credit-card' : 'crown'}" class="w-4 h-4"></i> ${billingReady ? 'Change Plan' : 'View Plans'}
                         </button>
                         <button onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}">
                             <i data-lucide="shield-check" class="w-4 h-4"></i> Restore Purchase
                         </button>
+                        ` : `<p class="text-sm font-semibold text-sage md:col-span-2">${settingsNl ? 'Betaalde plannen verschijnen hier zodra Stripe live is.' : 'Paid plans will appear here once Stripe is live.'}</p>`}
                     </div>
                 </div>
             `;
@@ -16043,8 +16071,7 @@
             `;
 
             const accountStatus = currentUser?.email || userSettings.email || userSettings.name || 'Lokaal';
-            const backupStatus = premiumActive ? 'Ready' : 'Premium';
-            const settingsNl = userSettings.language === 'nl';
+            const backupStatus = (!isPremiumEnforced() || premiumActive) ? 'Ready' : 'Premium';
             const purchaseRestoreLabel = settingsNl ? 'Herstel aankoop' : 'Restore purchase';
             const backupRestoreLabel = settingsNl ? 'Herstel backup' : 'Restore backup';
             const backupDownloadLabel = settingsNl ? 'Backup downloaden' : 'Download backup';
@@ -16063,12 +16090,14 @@
                                 <span class="settings-status">${escapeHTML(billingMeta.badge || '')}</span>
                             </div>
                             <div class="settings-actions button-pair">
+                                ${isPremiumEnforced() ? `
                                 <button type="button" onclick="showPlansModal()" class="${getAppButtonClasses('accent', { size: 'sm' })}">
                                     <i data-lucide="crown" class="w-4 h-4"></i>${settingsNl ? 'Bekijk plannen' : 'View Plans'}
                                 </button>
+                                ` : ''}
                                 ${billingMeta.state === 'preview'
                                     ? `<button type="button" onclick="resetPremiumPreviewAccess()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="rotate-ccw" class="w-4 h-4"></i>${settingsNl ? 'Reset preview' : 'Reset preview'}</button>`
-                                    : `<button type="button" onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${purchaseRestoreLabel}" title="${purchaseRestoreLabel}"><i data-lucide="shield-check" class="w-4 h-4"></i>${purchaseRestoreLabel}</button>`}
+                                    : (isPremiumEnforced() ? `<button type="button" onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${purchaseRestoreLabel}" title="${purchaseRestoreLabel}"><i data-lucide="shield-check" class="w-4 h-4"></i>${purchaseRestoreLabel}</button>` : '')}
                             </div>
                         </section>
 
@@ -17992,7 +18021,7 @@
             const freeRecipeSlotsRemaining = Math.max(0, freeLocalRecipeLimit - localRecipeCount);
             const premiumActive = hasPremiumAccess();
             const billingMeta = getBillingStatusMeta();
-            const notebookModeLocked = !premiumActive;
+            const notebookModeLocked = isPremiumEnforced() && !premiumActive;
             const isNotebookMode = indexViewMode === 'book';
             const isSearchVisible = !isNotebookMode && showListSearch;
             const isFilterVisible = !isNotebookMode && showListFilters;
@@ -18076,10 +18105,17 @@
                                 <p class="index-hero-kicker" style="margin-top:0.55rem;display:inline-flex;align-items:center;gap:0.4rem;letter-spacing:0.14em;">
                                     <i data-lucide="book-copy" class="h-4 w-4"></i>${resultLabel}
                                 </p>
+                                ${isPremiumEnforced() ? `
                                 <div class="index-plan-note">
                                     <p class="index-plan-kicker">${premiumActive ? billingMeta.badge : `Free plan: ${localRecipeCount}/${freeLocalRecipeLimit} recipes on this account`}</p>
                                     <p class="index-plan-detail">${premiumActive ? billingMeta.summary : `${freeRecipeSlotsRemaining} free slot${freeRecipeSlotsRemaining === 1 ? '' : 's'} left. Premium unlocks notebook, sync, sharing, and PDF.`}</p>
                                 </div>
+                                ` : `
+                                <div class="index-plan-note">
+                                    <p class="index-plan-kicker">${escapeHTML(billingMeta.badge)}</p>
+                                    <p class="index-plan-detail">${escapeHTML(billingMeta.summary)}</p>
+                                </div>
+                                `}
                             `}
                         </div>
                         ${indexToolbarMarkup}
@@ -19199,6 +19235,7 @@
         });
 
         function showPlansModal() {
+            if (!isPremiumEnforced()) return;
             trackLaunchEvent('plansModalOpened');
             const planCardBase = 'rounded-2xl border p-5 flex flex-col gap-3';
             const checkIcon = `<i data-lucide="check" class="w-4 h-4 text-gold flex-shrink-0"></i>`;
@@ -19373,6 +19410,7 @@
         }
 
         function showPremiumModal(featureName) {
+            if (!isPremiumEnforced()) return;
             trackLaunchEvent('premiumModalOpened');
             const copy = getAccountUpgradeCopy(featureName);
             const isRecipeLimit = copy.featureKey === 'recipeLimit';
@@ -19423,6 +19461,7 @@
         }
 
         function requireAccountPlan(featureKey) {
+            if (!isPremiumEnforced()) return false;
             if (accountHasPremiumPlan()) {
                 return false;
             }
@@ -19436,6 +19475,7 @@
         }
 
         function requireFreeRecipeSlot() {
+            if (!isPremiumEnforced()) return false;
             if (canAddLocalRecipe()) {
                 return false;
             }
