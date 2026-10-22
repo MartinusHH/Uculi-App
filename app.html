@@ -53,6 +53,9 @@
             --brand-gold: #c89050;
             --brand-ink: #1c1410;
             --touch-min: 2.75rem; /* 44px — WCAG / Apple HIG minimum */
+            /* Floating #main-nav clearance (pill + bottom offset + breathing room) */
+            --app-nav-clearance: calc(6rem + env(safe-area-inset-bottom, 0px));
+            --app-nav-clearance-phone: calc(6.75rem + env(safe-area-inset-bottom, 0px));
 
             /* 8px spacing scale (0.25rem = 4px half-step) */
             --space-1: 0.25rem;
@@ -222,7 +225,7 @@
         #app-content {
             max-width: 100%;
             overflow-x: clip;
-            padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+            padding-bottom: var(--app-nav-clearance);
             transition: padding-bottom 220ms ease;
         }
 
@@ -718,6 +721,10 @@
                 padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
             }
 
+            .editor-actions-panel {
+                scroll-margin-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px));
+            }
+
             #main-nav {
                 left: 0;
                 right: 0;
@@ -975,12 +982,35 @@
             line-height: 1.45;
         }
 
-        .index-filters-panel {
+        .index-discovery {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
             margin: 0 0 1rem;
+        }
+
+        /* Search stays first in the stack so filter chips / filter controls never shove it down. */
+        .index-search-slot {
+            order: 0;
+            flex: 0 0 auto;
+        }
+
+        .index-discovery > .index-filters-panel,
+        .index-discovery > .index-active-filters {
+            order: 1;
+        }
+
+        .index-filters-panel {
+            margin: 0;
             padding: 1rem;
             border: 1px solid rgba(28, 20, 16, 0.08);
             border-radius: 1.25rem;
             background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+            box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
+        }
+
+        .index-search-slot .browse-search {
+            max-width: none;
             box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
         }
 
@@ -2504,7 +2534,16 @@
             }
 
             #app-content {
-                padding-bottom: calc(4.35rem + env(safe-area-inset-bottom, 0px));
+                padding-bottom: var(--app-nav-clearance-phone);
+            }
+
+            .editor-sheet {
+                padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+            }
+
+            .editor-actions-panel {
+                scroll-margin-bottom: var(--app-nav-clearance-phone);
+                padding-bottom: 0.25rem;
             }
 
             #app-content .screen-sheet,
@@ -2810,7 +2849,7 @@
             }
 
             #app-content {
-                padding: 0.45rem 0.7rem calc(4.35rem + env(safe-area-inset-bottom, 0px));
+                padding: 0.45rem 0.7rem var(--app-nav-clearance-phone);
             }
 
             #app-content h2,
@@ -4841,6 +4880,12 @@
 
         .editor-sheet {
             max-width: 48rem;
+            /* Keep Save & Publish clear of the floating bottom nav on short viewports. */
+            padding-bottom: var(--space-4);
+        }
+
+        .editor-actions-panel {
+            scroll-margin-bottom: var(--app-nav-clearance);
         }
 
         .editor-hero {
@@ -16726,7 +16771,7 @@
         function toggleListSearchVisibility() {
             if (indexViewMode === 'book') {
                 showListSearch = true;
-                showListFilters = false;
+                // Keep search above filters; do not force-close an open filter block.
                 showDietFilters = false;
                 showDietGuide = false;
                 indexViewMode = 'cards';
@@ -16738,20 +16783,14 @@
                 return;
             }
 
-            const nextVisibility = !showListSearch;
-            showListSearch = nextVisibility;
-            if (nextVisibility) {
-                showListFilters = false;
-                showDietFilters = false;
-                showDietGuide = false;
-            }
+            showListSearch = !showListSearch;
             renderList();
         }
 
         function toggleListFiltersVisibility() {
             if (indexViewMode === 'book') {
                 showListFilters = true;
-                showListSearch = false;
+                // Search stays available in its fixed slot above the filter block.
                 showDietFilters = false;
                 showDietGuide = false;
                 indexViewMode = 'cards';
@@ -16765,9 +16804,7 @@
 
             const nextVisibility = !showListFilters;
             showListFilters = nextVisibility;
-            if (nextVisibility) {
-                showListSearch = false;
-            } else {
+            if (!nextVisibility) {
                 showDietFilters = false;
                 showDietGuide = false;
             }
@@ -18028,7 +18065,7 @@
             const showNotebookOverviewCard = !isNotebookMode || !notebookCoverOpen;
             const notebookOverviewSlimClass = (isNotebookMode && !notebookCoverOpen) ? ' notebook-overview-slim' : '';
             const activeFiltersMarkup = activeFilters.length > 0 ? `
-                <div class="index-filters-panel">
+                <div class="index-filters-panel index-active-filters">
                     <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="index-hero-kicker" style="margin:0;">Active</span>
@@ -18037,6 +18074,14 @@
                         <button onclick="resetRecipeFilters()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
                             <i data-lucide="rotate-ccw" class="h-4 w-4"></i>Clear filters
                         </button>
+                    </div>
+                </div>
+            ` : '';
+            const searchSlotMarkup = isSearchVisible ? `
+                <div class="index-search-slot">
+                    <div class="browse-search">
+                        <i data-lucide="search" class="h-5 w-5 shrink-0 text-sage opacity-70"></i>
+                        <input type="text" placeholder="Search by title, ingredient, or occasion..." id="recipe-search-input" value="${escapeAttrSafe(searchQuery)}" oninput="handleRecipeSearchInput(this)" onkeydown="handleAppSearchFieldKeydown(event)" aria-label="Search recipes">
                     </div>
                 </div>
             ` : '';
@@ -18060,6 +18105,125 @@
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-forest">${option}</p>
                 <p class="mt-2 text-xs font-semibold leading-relaxed text-sage">${dietDescriptions[option] || ''}</p>
             </div>`).join('');
+            const filterControlsMarkup = isFilterVisible ? `
+                <div class="index-filters-panel space-y-5">
+                    <div>
+                        <p class="index-hero-kicker">Source</p>
+                        <p class="mt-1 text-sm font-semibold text-sage">Toggle between recipes you wrote and recipes you saved from Browse.</p>
+                        <div class="mt-4 flex flex-wrap gap-2">
+                            ${sourceFilterButtonsMarkup}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Category</label>
+                            <div class="relative">
+                                <select onchange="categoryFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
+                                    <option value="">All categories</option>
+                                    <option value="Baking" ${categoryFilter === 'Baking' ? 'selected' : ''}>Baking</option>
+                                    <option value="Cooking" ${categoryFilter === 'Cooking' ? 'selected' : ''}>Cooking</option>
+                                    <option value="Dessert" ${categoryFilter === 'Dessert' ? 'selected' : ''}>Dessert</option>
+                                    <option value="Drink" ${categoryFilter === 'Drink' ? 'selected' : ''}>Drink</option>
+                                </select>
+                                <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Difficulty</label>
+                            <div class="relative">
+                                <select onchange="difficultyFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
+                                    <option value="">All levels</option>
+                                    <option value="Easy" ${difficultyFilter === 'Easy' ? 'selected' : ''}>Easy</option>
+                                    <option value="Medium" ${difficultyFilter === 'Medium' ? 'selected' : ''}>Medium</option>
+                                    <option value="Hard" ${difficultyFilter === 'Hard' ? 'selected' : ''}>Hard</option>
+                                </select>
+                                <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Cuisine</label>
+                            <div class="relative">
+                                <select onchange="cuisineFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
+                                    <option value="">All cuisines</option>
+                                    <option value="European" ${cuisineFilter === 'European' ? 'selected' : ''}>European</option>
+                                    <option value="Asian" ${cuisineFilter === 'Asian' ? 'selected' : ''}>Asian</option>
+                                    <option value="Italian" ${cuisineFilter === 'Italian' ? 'selected' : ''}>Italian</option>
+                                    <option value="Mediterranean" ${cuisineFilter === 'Mediterranean' ? 'selected' : ''}>Mediterranean</option>
+                                    <option value="American" ${cuisineFilter === 'American' ? 'selected' : ''}>American</option>
+                                    <option value="Mexican" ${cuisineFilter === 'Mexican' ? 'selected' : ''}>Mexican</option>
+                                </select>
+                                <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Meal type</label>
+                            <div class="relative">
+                                <select onchange="mealTypeFilter = this.value ? [this.value] : []; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
+                                    <option value="">All meal types</option>
+                                    ${mealTypeOptions.map(opt => `<option value="${opt}" ${mealTypeFilter.includes(opt) ? 'selected' : ''}>${opt}</option>`).join('')}
+                                </select>
+                                <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Quick view</label>
+                            <button onclick="showFavoritesOnly = !showFavoritesOnly; renderList()" class="flex h-11 w-full items-center justify-between rounded-xl border px-4 text-sm font-semibold shadow-sm transition-all ${showFavoritesOnly ? 'border-forest bg-forest text-white shadow-md' : 'border-sage border-opacity-20 bg-white text-forest hover:border-gold hover:shadow-md'}">
+                                <span class="flex items-center gap-2">
+                                    <i data-lucide="heart" class="h-4 w-4 ${showFavoritesOnly ? 'fill-current' : ''}"></i>
+                                    ${showFavoritesOnly ? 'Favorites only' : 'Show favorites'}
+                                </span>
+                                <i data-lucide="chevron-right" class="h-4 w-4 opacity-60"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="rounded-xl border border-accent bg-accent bg-opacity-40 p-4">
+                        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Diets</p>
+                                <p class="mt-1 text-sm font-semibold text-sage">Use diet tags only when you want to narrow results by dietary fit.</p>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="toggleDietFiltersVisibility()" class="${getAppButtonClasses(showDietFilters ? 'primary' : 'secondary')}">
+                                    <i data-lucide="leaf" class="h-4 w-4"></i>Diets
+                                    <span class="rounded-full px-2 py-0.5 text-[10px] ${showDietFilters ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'}">${selectedDietSummary}</span>
+                                    <i data-lucide="${showDietFilters ? 'chevron-up' : 'chevron-down'}" class="h-4 w-4"></i>
+                                </button>
+                                ${showDietFilters ? `<button onclick="toggleDietGuide()" class="${getAppButtonClasses('secondary')}"><i data-lucide="info" class="h-4 w-4"></i>${showDietGuide ? 'Hide guide' : 'Diet guide'}</button>` : ''}
+                                <button onclick="resetRecipeFilters()" class="${getAppButtonClasses('secondary')}">
+                                    <i data-lucide="rotate-ccw" class="h-4 w-4"></i>Reset all
+                                </button>
+                            </div>
+                        </div>
+
+                        ${showDietFilters ? `
+                            <div class="mt-4 border-t border-sage border-opacity-10 pt-4">
+                                <p class="text-xs font-semibold leading-relaxed text-sage">Recipes must satisfy every selected diet. Stricter tags still count, so Vegan also matches Vegetarian, and Keto also matches Low-carb.</p>
+                                <div class="mt-4 flex flex-wrap gap-2">
+                                    ${dietFilterButtonsMarkup}
+                                </div>
+                                ${showDietGuide ? `
+                                    <div class="mt-4 grid gap-3 border-t border-sage border-opacity-10 pt-4 md:grid-cols-2 xl:grid-cols-3">
+                                        ${dietGuideMarkup}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            ` : '';
+            const discoveryMarkup = (!isNotebookMode && (isSearchVisible || isFilterVisible || activeFilters.length > 0)) ? `
+                <div class="index-discovery">
+                    ${searchSlotMarkup}
+                    ${activeFiltersMarkup}
+                    ${filterControlsMarkup}
+                </div>
+            ` : '';
 
             const indexToolbarMarkup = `
                 <div class="index-toolbar">
@@ -18121,131 +18285,7 @@
                         ${indexToolbarMarkup}
                     </div>
 
-                    ${isNotebookMode ? '' : activeFiltersMarkup}
-
-                    ${(isSearchVisible || isFilterVisible) ? `
-                        <div class="index-filters-panel space-y-5">
-                            ${isSearchVisible ? `
-                                <div class="browse-search" style="max-width:none;">
-                                    <i data-lucide="search" class="h-5 w-5 shrink-0 text-sage opacity-70"></i>
-                                    <input type="text" placeholder="Search by title, ingredient, or occasion..." id="recipe-search-input" value="${escapeAttrSafe(searchQuery)}" oninput="handleRecipeSearchInput(this)" onkeydown="handleAppSearchFieldKeydown(event)" aria-label="Search recipes">
-                                </div>
-                            ` : ''}
-
-                            ${isFilterVisible ? `
-                                <div class="space-y-5">
-                                    <div>
-                                        <p class="index-hero-kicker">Source</p>
-                                        <p class="mt-1 text-sm font-semibold text-sage">Toggle between recipes you wrote and recipes you saved from Browse.</p>
-                                        <div class="mt-4 flex flex-wrap gap-2">
-                                            ${sourceFilterButtonsMarkup}
-                                        </div>
-                                    </div>
-
-                                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-                                        <div class="space-y-2">
-                                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Category</label>
-                                            <div class="relative">
-                                                <select onchange="categoryFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
-                                                    <option value="">All categories</option>
-                                                    <option value="Baking" ${categoryFilter === 'Baking' ? 'selected' : ''}>Baking</option>
-                                                    <option value="Cooking" ${categoryFilter === 'Cooking' ? 'selected' : ''}>Cooking</option>
-                                                    <option value="Dessert" ${categoryFilter === 'Dessert' ? 'selected' : ''}>Dessert</option>
-                                                    <option value="Drink" ${categoryFilter === 'Drink' ? 'selected' : ''}>Drink</option>
-                                                </select>
-                                                <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="space-y-2">
-                                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Difficulty</label>
-                                            <div class="relative">
-                                                <select onchange="difficultyFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
-                                                    <option value="">All levels</option>
-                                                    <option value="Easy" ${difficultyFilter === 'Easy' ? 'selected' : ''}>Easy</option>
-                                                    <option value="Medium" ${difficultyFilter === 'Medium' ? 'selected' : ''}>Medium</option>
-                                                    <option value="Hard" ${difficultyFilter === 'Hard' ? 'selected' : ''}>Hard</option>
-                                                </select>
-                                                <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="space-y-2">
-                                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Cuisine</label>
-                                            <div class="relative">
-                                                <select onchange="cuisineFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
-                                                    <option value="">All cuisines</option>
-                                                    <option value="European" ${cuisineFilter === 'European' ? 'selected' : ''}>European</option>
-                                                    <option value="Asian" ${cuisineFilter === 'Asian' ? 'selected' : ''}>Asian</option>
-                                                    <option value="Italian" ${cuisineFilter === 'Italian' ? 'selected' : ''}>Italian</option>
-                                                    <option value="Mediterranean" ${cuisineFilter === 'Mediterranean' ? 'selected' : ''}>Mediterranean</option>
-                                                    <option value="American" ${cuisineFilter === 'American' ? 'selected' : ''}>American</option>
-                                                    <option value="Mexican" ${cuisineFilter === 'Mexican' ? 'selected' : ''}>Mexican</option>
-                                                </select>
-                                                <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="space-y-2">
-                                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Meal type</label>
-                                            <div class="relative">
-                                                <select onchange="mealTypeFilter = this.value ? [this.value] : []; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
-                                                    <option value="">All meal types</option>
-                                                    ${mealTypeOptions.map(opt => `<option value="${opt}" ${mealTypeFilter.includes(opt) ? 'selected' : ''}>${opt}</option>`).join('')}
-                                                </select>
-                                                <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
-                                            </div>
-                                        </div>
-
-                                        <div class="space-y-2">
-                                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Quick view</label>
-                                            <button onclick="showFavoritesOnly = !showFavoritesOnly; renderList()" class="flex h-11 w-full items-center justify-between rounded-xl border px-4 text-sm font-semibold shadow-sm transition-all ${showFavoritesOnly ? 'border-forest bg-forest text-white shadow-md' : 'border-sage border-opacity-20 bg-white text-forest hover:border-gold hover:shadow-md'}">
-                                                <span class="flex items-center gap-2">
-                                                    <i data-lucide="heart" class="h-4 w-4 ${showFavoritesOnly ? 'fill-current' : ''}"></i>
-                                                    ${showFavoritesOnly ? 'Favorites only' : 'Show favorites'}
-                                                </span>
-                                                <i data-lucide="chevron-right" class="h-4 w-4 opacity-60"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div class="rounded-xl border border-accent bg-accent bg-opacity-40 p-4">
-                                        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                                            <div>
-                                                <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Diets</p>
-                                                <p class="mt-1 text-sm font-semibold text-sage">Use diet tags only when you want to narrow results by dietary fit.</p>
-                                            </div>
-                                            <div class="flex flex-wrap gap-2">
-                                                <button onclick="toggleDietFiltersVisibility()" class="${getAppButtonClasses(showDietFilters ? 'primary' : 'secondary')}">
-                                                    <i data-lucide="leaf" class="h-4 w-4"></i>Diets
-                                                    <span class="rounded-full px-2 py-0.5 text-[10px] ${showDietFilters ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'}">${selectedDietSummary}</span>
-                                                    <i data-lucide="${showDietFilters ? 'chevron-up' : 'chevron-down'}" class="h-4 w-4"></i>
-                                                </button>
-                                                ${showDietFilters ? `<button onclick="toggleDietGuide()" class="${getAppButtonClasses('secondary')}"><i data-lucide="info" class="h-4 w-4"></i>${showDietGuide ? 'Hide guide' : 'Diet guide'}</button>` : ''}
-                                                <button onclick="resetRecipeFilters()" class="${getAppButtonClasses('secondary')}">
-                                                    <i data-lucide="rotate-ccw" class="h-4 w-4"></i>Reset all
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        ${showDietFilters ? `
-                                            <div class="mt-4 border-t border-sage border-opacity-10 pt-4">
-                                                <p class="text-xs font-semibold leading-relaxed text-sage">Recipes must satisfy every selected diet. Stricter tags still count, so Vegan also matches Vegetarian, and Keto also matches Low-carb.</p>
-                                                <div class="mt-4 flex flex-wrap gap-2">
-                                                    ${dietFilterButtonsMarkup}
-                                                </div>
-                                                ${showDietGuide ? `
-                                                    <div class="mt-4 grid gap-3 border-t border-sage border-opacity-10 pt-4 md:grid-cols-2 xl:grid-cols-3">
-                                                        ${dietGuideMarkup}
-                                                    </div>
-                                                ` : ''}
-                                            </div>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                            ` : ''}
-                        </div>
-                    ` : ''}
+                    ${discoveryMarkup}
                 </div>
             ` : '';
 
@@ -20840,7 +20880,7 @@
                             </div>
                         </section>
 
-                        <section class="editor-panel">
+                        <section class="editor-panel editor-actions-panel">
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <button type="button" onclick="cancelRecipeEditor()" class="${getAppButtonClasses('secondary', { size: 'lg' })}" translate="no">Cancel</button>
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
