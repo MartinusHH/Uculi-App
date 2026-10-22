@@ -86,6 +86,15 @@
             --control-h-lg: 3.5rem;   /* 56 */
             --radius-control: 0.75rem; /* 12 */
             --radius-panel: 1rem;      /* 16 */
+
+            /* Calm motion */
+            --motion-fast: 160ms;
+            --motion-med: 240ms;
+            --motion-slow: 320ms;
+            --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+            --ease-out: cubic-bezier(0.2, 0.72, 0.18, 1);
+            --skeleton-base: rgba(228, 215, 196, 0.55);
+            --skeleton-shine: rgba(255, 253, 249, 0.75);
         }
 
         html {
@@ -5916,6 +5925,176 @@
         .skiptranslate iframe, .goog-te-banner-frame { display: none !important; visibility: hidden !important; }
         #goog-gt-tt { display: none !important; visibility: hidden !important; }
         .goog-text-highlight { background-color: transparent !important; box-shadow: none !important; }
+
+        /* Soft view / overlay / skeleton motion */
+        .app-overlay {
+            transition: opacity var(--motion-med) var(--ease-soft);
+        }
+
+        .app-overlay .app-modal-panel {
+            transition: transform var(--motion-med) var(--ease-soft), opacity var(--motion-med) var(--ease-soft);
+        }
+
+        .app-overlay.opacity-0 .app-modal-panel {
+            transform: translateY(10px) scale(0.98);
+            opacity: 0.96;
+        }
+
+        @media (min-width: 640px) {
+            .app-overlay.opacity-0 .app-modal-panel {
+                transform: translateY(8px) scale(0.97);
+            }
+        }
+
+        .app-view-enter {
+            animation: appViewEnter var(--motion-med) var(--ease-soft) both;
+        }
+
+        @keyframes appViewEnter {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        .app-skeleton {
+            display: grid;
+            gap: 1rem;
+            padding: 0.15rem 0 1rem;
+            pointer-events: none;
+        }
+
+        .skeleton-block {
+            position: relative;
+            overflow: hidden;
+            background: var(--skeleton-base);
+            border-radius: 0.85rem;
+        }
+
+        .skeleton-block::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(100deg, transparent 0%, var(--skeleton-shine) 45%, transparent 90%);
+            animation: skeletonShimmer 1.35s var(--ease-soft) infinite;
+        }
+
+        @keyframes skeletonShimmer {
+            100% { transform: translateX(100%); }
+        }
+
+        .skeleton-hero { display: grid; gap: 0.65rem; }
+        .skeleton-title { width: min(16rem, 70%); height: 1.75rem; border-radius: 0.65rem; }
+        .skeleton-line { width: min(22rem, 88%); height: 0.7rem; border-radius: 999px; }
+        .skeleton-line.short { width: min(12rem, 55%); }
+        .skeleton-toolbar { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+        .skeleton-chip { width: 5.5rem; height: 2.75rem; border-radius: 0.85rem; }
+        .skeleton-grid { display: grid; grid-template-columns: 1fr; gap: 0.85rem; }
+
+        @media (min-width: 768px) {
+            .skeleton-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .skeleton-grid.is-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        }
+
+        .skeleton-card {
+            display: grid;
+            gap: 0.75rem;
+            padding: 0.85rem;
+            border: 1px solid rgba(28, 20, 16, 0.06);
+            border-radius: 1.15rem;
+            background: rgba(255, 253, 249, 0.72);
+        }
+
+        .skeleton-media { width: 100%; aspect-ratio: 4 / 3; border-radius: 0.9rem; }
+        .skeleton-panel {
+            display: grid;
+            gap: 0.75rem;
+            padding: 1rem 1.1rem;
+            border: 1px solid rgba(28, 20, 16, 0.06);
+            border-radius: 1.15rem;
+            background: rgba(255, 253, 249, 0.72);
+        }
+
+        .skeleton-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            min-height: 2.75rem;
+        }
+
+        .auth-loading-dots {
+            display: flex;
+            gap: 0.4rem;
+            margin-top: 0.35rem;
+        }
+
+        .auth-loading-dots span {
+            width: 0.45rem;
+            height: 0.45rem;
+            border-radius: 999px;
+            background: rgba(28, 20, 16, 0.22);
+            animation: authPulse 1.1s var(--ease-soft) infinite;
+        }
+
+        .auth-loading-dots span:nth-child(2) { animation-delay: 120ms; }
+        .auth-loading-dots span:nth-child(3) { animation-delay: 240ms; }
+
+        @keyframes authPulse {
+            0%, 100% { opacity: 0.35; transform: translateY(0); }
+            50% { opacity: 0.9; transform: translateY(-2px); }
+        }
+
+        #auth-loading-screen {
+            transition: opacity var(--motion-med) var(--ease-soft);
+        }
+
+        #toast {
+            transition: opacity var(--motion-med) var(--ease-soft), transform var(--motion-med) var(--ease-soft);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            :root {
+                --motion-fast: 0ms;
+                --motion-med: 0ms;
+                --motion-slow: 0ms;
+            }
+
+            .app-view-enter,
+            .notebook-book-spread-surface.is-turning-forward,
+            .notebook-book-spread-surface.is-turning-backward,
+            .notebook-book-spread-surface.is-turning-blocked-forward,
+            .notebook-book-spread-surface.is-turning-blocked-back {
+                animation: none !important;
+            }
+
+            .skeleton-block::after,
+            .auth-loading-dots span {
+                animation: none !important;
+            }
+
+            .skeleton-block::after { display: none; }
+
+            .app-overlay,
+            .app-overlay .app-modal-panel,
+            #auth-loading-screen,
+            #toast,
+            #main-nav,
+            .floating-back-button,
+            button:not(:disabled),
+            .custom-file-upload {
+                transition-duration: 0.01ms !important;
+            }
+
+            button:not(:disabled):hover,
+            .custom-file-upload:hover {
+                transform: none;
+            }
+
+            .app-overlay.opacity-0 .app-modal-panel {
+                transform: none;
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body class="font-body text-forest min-h-screen selection:bg-gold selection:text-white transition-all duration-300" id="body">
@@ -6007,16 +6186,18 @@
         <main id="app-content" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 transition-all relative"></main>
 
         <!-- Auth loading screen: visible until Firebase resolves session -->
-        <div id="auth-loading-screen" class="fixed inset-0 z-[160] flex flex-col items-center justify-center bg-[#FBF8F1]">
+        <div id="auth-loading-screen" class="fixed inset-0 z-[160] flex flex-col items-center justify-center bg-[#FBF8F1]" role="status" aria-live="polite" aria-busy="true" aria-label="Laden">
             <div class="flex flex-col items-center gap-5">
                 <div class="h-14 w-14 overflow-hidden rounded-2xl bg-paper shadow-lg">
-                    <img src="assets/uculi-boekje.jpg" alt="Uculi" class="brand-boekje" />
+                    <img src="assets/uculi-boekje.jpg" alt="" class="brand-boekje" />
                 </div>
                 <span class="font-fantasy text-2xl font-bold text-forest tracking-wide">Uculi</span>
-                <div class="flex gap-1.5 mt-2">
-                    <span class="h-2 w-2 rounded-full bg-forest/30 animate-bounce" style="animation-delay:0ms"></span>
-                    <span class="h-2 w-2 rounded-full bg-forest/30 animate-bounce" style="animation-delay:120ms"></span>
-                    <span class="h-2 w-2 rounded-full bg-forest/30 animate-bounce" style="animation-delay:240ms"></span>
+                <div class="auth-loading-dots" aria-hidden="true">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="mt-1 flex w-40 flex-col items-center gap-2" aria-hidden="true">
+                    <div class="skeleton-block skeleton-line" style="width:100%;height:0.4rem;"></div>
+                    <div class="skeleton-block skeleton-line short" style="height:0.35rem;"></div>
                 </div>
             </div>
         </div>
@@ -8494,17 +8675,16 @@
             const modal = document.getElementById('cover-editor-modal');
             if (!modal) return;
             renderCoverEditor();
-            modal.classList.remove('hidden', 'opacity-0');
-            modal.firstElementChild?.classList.remove('scale-95');
+            openAppOverlay(modal);
         }
 
         function closeCoverEditor() {
             const modal = document.getElementById('cover-editor-modal');
             if (!modal) return;
-            modal.classList.add('hidden', 'opacity-0');
-            modal.firstElementChild?.classList.add('scale-95');
-            draftNotebookCover = null;
-            draftCoverPreviewFace = 'front';
+            closeAppOverlay(modal).then(() => {
+                draftNotebookCover = null;
+                draftCoverPreviewFace = 'front';
+            });
         }
 
         function setDraftCoverPreviewFace(face) {
@@ -10996,9 +11176,22 @@
         function dismissAuthLoadingScreen() {
             const el = document.getElementById('auth-loading-screen');
             if (!el) return;
+            el.setAttribute('aria-busy', 'false');
             el.style.opacity = '0';
-            el.style.transition = 'opacity 0.25s ease';
-            setTimeout(() => el.remove(), 280);
+            const wait = motionDuration(240);
+            if (!wait) {
+                el.remove();
+                return;
+            }
+            setTimeout(() => el.remove(), wait);
+        }
+
+        function markViewEnter() {
+            const root = contentDiv?.firstElementChild;
+            if (!root || prefersReducedMotion()) return;
+            root.classList.remove('app-view-enter');
+            void root.offsetWidth;
+            root.classList.add('app-view-enter');
         }
 
         function resetAuthenticatedUserState() {
@@ -11283,6 +11476,7 @@
             `;
 
             lucide.createIcons();
+            markViewEnter();
             syncAuthGateButtons();
         }
 
@@ -13487,6 +13681,7 @@
         const bodySurface = document.getElementById('body');
         const mainNav = document.getElementById('main-nav');
         const desktopNavAutoHideMedia = window.matchMedia('(min-width: 1024px) and (hover: hover) and (pointer: fine)');
+        const reducedMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
         const toastEl = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
         let toastHideTimer = null;
@@ -13496,6 +13691,104 @@
         let desktopNavHideTimer = null;
         let desktopNavLastScrollTop = 0;
         let desktopNavLastPointerAt = 0;
+        const overlayCloseTimers = new WeakMap();
+
+        function prefersReducedMotion() {
+            return reducedMotionMedia.matches;
+        }
+
+        function motionDuration(ms) {
+            return prefersReducedMotion() ? 0 : ms;
+        }
+
+        function paintAppView(html, options = {}) {
+            if (!contentDiv) return null;
+            contentDiv.innerHTML = html;
+            contentDiv.setAttribute('aria-busy', options.busy ? 'true' : 'false');
+            if (options.overflowY !== undefined) contentDiv.style.overflowY = options.overflowY;
+            const root = contentDiv.firstElementChild;
+            if (root) {
+                root.classList.remove('app-view-enter');
+                if (options.animate !== false && !prefersReducedMotion()) {
+                    void root.offsetWidth;
+                    root.classList.add('app-view-enter');
+                }
+            }
+            if (options.icons !== false) {
+                try { lucide.createIcons(); } catch (_) { /* ignore */ }
+            }
+            return contentDiv;
+        }
+
+        function getViewSkeletonMarkup(kind = 'cards') {
+            const nl = userSettings?.language === 'nl';
+            const label = nl ? 'Laden…' : 'Loading…';
+            const card = `<div class="skeleton-card"><div class="skeleton-block skeleton-media"></div><div class="skeleton-block skeleton-line"></div><div class="skeleton-block skeleton-line short"></div></div>`;
+            const panel = `<div class="skeleton-panel"><div class="skeleton-block skeleton-line short"></div><div class="skeleton-row"><div class="skeleton-block skeleton-line" style="width:40%;"></div><div class="skeleton-block skeleton-chip" style="width:6.5rem;"></div></div></div>`;
+            if (kind === 'settings') {
+                return `<div class="app-skeleton settings-sheet" aria-busy="true" aria-live="polite" aria-label="${label}"><div class="skeleton-hero"><div class="skeleton-block skeleton-title"></div><div class="skeleton-block skeleton-line"></div></div>${panel}${panel}</div>`;
+            }
+            if (kind === 'profile') {
+                return `<div class="app-skeleton profile-sheet" aria-busy="true" aria-live="polite" aria-label="${label}"><div class="skeleton-panel" style="padding:0;overflow:hidden;"><div class="skeleton-block" style="height:7rem;border-radius:1.15rem 1.15rem 0 0;"></div><div style="padding:1rem 1.1rem 1.2rem;display:grid;gap:0.65rem;justify-items:center;"><div class="skeleton-block" style="width:5.5rem;height:5.5rem;border-radius:999px;margin-top:-2.75rem;"></div><div class="skeleton-block skeleton-title" style="width:10rem;"></div><div class="skeleton-block skeleton-line short"></div></div></div><div class="skeleton-grid is-three">${card}${card}${card}</div></div>`;
+            }
+            if (kind === 'shop') {
+                return `<div class="app-skeleton shop-sheet" aria-busy="true" aria-live="polite" aria-label="${label}"><div class="skeleton-hero"><div class="skeleton-block skeleton-title"></div><div class="skeleton-block skeleton-line"></div></div><div class="skeleton-toolbar"><div class="skeleton-block skeleton-chip" style="width:7rem;"></div><div class="skeleton-block skeleton-chip"></div></div>${panel}${panel}</div>`;
+            }
+            return `<div class="app-skeleton screen-sheet" aria-busy="true" aria-live="polite" aria-label="${label}"><div class="skeleton-hero"><div class="skeleton-block skeleton-title"></div><div class="skeleton-block skeleton-line"></div></div><div class="skeleton-toolbar"><div class="skeleton-block skeleton-chip"></div><div class="skeleton-block skeleton-chip"></div><div class="skeleton-block skeleton-chip" style="margin-left:auto;"></div></div><div class="skeleton-grid is-three">${card}${card}${card}</div></div>`;
+        }
+
+        function showViewSkeleton(kind = 'cards') {
+            paintAppView(getViewSkeletonMarkup(kind), { animate: false, busy: true, icons: false });
+        }
+
+        function openAppOverlay(modal) {
+            if (!modal) return;
+            const panel = modal.querySelector('.app-modal-panel') || modal.firstElementChild;
+            const pending = overlayCloseTimers.get(modal);
+            if (pending) {
+                clearTimeout(pending);
+                overlayCloseTimers.delete(modal);
+            }
+            modal.classList.remove('hidden', 'is-closing');
+            modal.classList.add('opacity-0');
+            panel?.classList.add('scale-95');
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    modal.classList.remove('opacity-0');
+                    panel?.classList.remove('scale-95');
+                });
+            });
+        }
+
+        function closeAppOverlay(modal, { remove = false } = {}) {
+            if (!modal) return Promise.resolve();
+            const panel = modal.querySelector('.app-modal-panel') || modal.firstElementChild;
+            const pending = overlayCloseTimers.get(modal);
+            if (pending) {
+                clearTimeout(pending);
+                overlayCloseTimers.delete(modal);
+            }
+            modal.classList.add('opacity-0', 'is-closing');
+            panel?.classList.add('scale-95');
+            const finish = () => {
+                overlayCloseTimers.delete(modal);
+                modal.classList.add('hidden');
+                modal.classList.remove('is-closing');
+                if (remove) modal.remove();
+            };
+            const wait = motionDuration(240);
+            if (!wait) {
+                finish();
+                return Promise.resolve();
+            }
+            return new Promise((resolve) => {
+                const timer = setTimeout(() => {
+                    finish();
+                    resolve();
+                }, wait);
+                overlayCloseTimers.set(modal, timer);
+            });
+        }
 
         function setActiveNav(view) {
             currentView = view;
@@ -13778,7 +14071,7 @@
                 toastEl.classList.add('opacity-0', '-translate-y-4');
                 document.body.classList.remove('toast-open');
                 document.documentElement.style.removeProperty('--toast-clearance');
-            }, 3000);
+            }, prefersReducedMotion() ? 2200 : 3000);
         }
 
         function showCloudSetupStatusModal(origin = 'app') {
@@ -15190,6 +15483,7 @@
             setActiveNav('profile');
             ensurePublishedRecipesCacheLoaded();
             if (firebaseInitialized && !hasLoadedPublishedRecipesCache && !isLoadingPublishedRecipesCache) {
+                showViewSkeleton('profile');
                 isLoadingPublishedRecipesCache = true;
                 loadPublishedRecipes().finally(() => {
                     isLoadingPublishedRecipesCache = false;
@@ -15197,6 +15491,7 @@
                         renderProfile();
                     }
                 });
+                return;
             }
 
             const t = getProfileI18n();
@@ -15330,6 +15625,7 @@
                 </div>
             `;
             lucide.createIcons();
+            markViewEnter();
             initFamilySortable();
         }
 
@@ -15422,6 +15718,7 @@
                 <datalist id="countries-list">${countriesList.map(c => `<option value="${c}"></option>`).join('')}</datalist>
             `;
             lucide.createIcons();
+            markViewEnter();
         }
 
         function saveProfile(e) {
@@ -15858,6 +16155,7 @@
                 </div>
             `;
             lucide.createIcons();
+            markViewEnter();
             syncAuthGateButtons();
         }
 
@@ -18004,9 +18302,7 @@
                 });
                 html += '</div>';
             }
-            contentDiv.innerHTML = html;
-            contentDiv.style.overflowY = 'auto';
-            lucide.createIcons();
+            paintAppView(html, { overflowY: 'auto' });
             if (indexViewMode === 'book' && filteredRecipes.length > 0) {
                 attachNotebookInteractions();
                 requestAnimationFrame(syncNotebookViewportHeight);
@@ -18204,6 +18500,7 @@
             `;
 
             lucide.createIcons();
+            markViewEnter();
 
             requestAnimationFrame(placeNotebookToastClearance);
 
@@ -18410,6 +18707,10 @@
 
             maybeRunAutomaticDuplicateCleanup();
 
+            if (firebaseInitialized && !hasLoadedPublishedRecipesCache) {
+                showViewSkeleton('cards');
+            }
+
             const remoteRecipes = firebaseInitialized ? await loadPublishedRecipes() : [];
             const normalizedQuery = browseQuery.trim().toLowerCase();
             const savedPublishedCount = recipes.filter(recipe => recipe.source === 'published').length;
@@ -18539,8 +18840,7 @@
                 html += '</div>';
             }
 
-            contentDiv.innerHTML = html;
-            lucide.createIcons();
+            paintAppView(html);
         }
 
         function renderPublishedRecipeDetail(publishedRecipeId) {
@@ -18863,9 +19163,7 @@
         }
 
         function closeTimer() {
-            const modal = document.getElementById('timer-modal');
-            if (!modal) return;
-            modal.classList.add('hidden', 'opacity-0');
+            closeAppOverlay(document.getElementById('timer-modal'));
         }
 
         async function requestCookWakeLock() {
@@ -19151,11 +19449,13 @@
         };
 
         function closeCompetingSheets() {
-            document.querySelectorAll('.app-overlay[id^="dynamic-modal-"]').forEach(node => node.remove());
+            document.querySelectorAll('.app-overlay[id^="dynamic-modal-"]').forEach(node => {
+                closeAppOverlay(node, { remove: true });
+            });
             ['notes-modal', 'cover-editor-modal', 'timer-modal'].forEach(id => {
                 const node = document.getElementById(id);
-                if (!node) return;
-                node.classList.add('hidden', 'opacity-0');
+                if (!node || node.classList.contains('hidden')) return;
+                closeAppOverlay(node);
             });
         }
 
@@ -19163,8 +19463,8 @@
             closeCompetingSheets();
             const modalId = 'dynamic-modal-' + Date.now();
             const modalHtml = `
-                <div id="${modalId}" class="app-overlay fixed inset-0 bg-black bg-opacity-60 hidden opacity-0 transition-opacity z-[180] flex">
-                    <div class="app-modal-panel max-w-3xl w-full scale-95 transition-transform" id="${modalId}-content">
+                <div id="${modalId}" class="app-overlay fixed inset-0 bg-black bg-opacity-60 hidden opacity-0 z-[180] flex" role="dialog" aria-modal="true">
+                    <div class="app-modal-panel max-w-3xl w-full scale-95" id="${modalId}-content">
                         <div class="p-4 md:p-6 border-b border-parchmentDark flex items-center justify-between bg-parchment shrink-0">
                             <h2 class="font-serif font-bold text-xl md:text-2xl text-forest">${title}</h2>
                             <button onclick="closeModal('${modalId}')" class="${getAppButtonClasses('secondary', { iconOnly: true })}" aria-label="Close dialog">
@@ -19198,15 +19498,7 @@
             lucide.createIcons();
             
             const modal = document.getElementById(modalId);
-            const content = document.getElementById(`${modalId}-content`);
-            
-            requestAnimationFrame(() => {
-                modal.classList.remove('hidden');
-                requestAnimationFrame(() => {
-                    modal.classList.remove('opacity-0');
-                    content.classList.remove('scale-95');
-                });
-            });
+            openAppOverlay(modal);
 
             modal.addEventListener('click', (e) => {
                 if (e.target === modal) closeModal(modalId);
@@ -19223,19 +19515,12 @@
                 : (requested?.closest?.('.app-overlay[id^="dynamic-modal-"]') || modals[modals.length - 1]);
             
             if (targetModal) {
-                const content = document.getElementById(`${targetModal.id}-content`);
-                targetModal.classList.add('opacity-0');
-                if (content) content.classList.add('scale-95');
-
                 Object.keys(window)
                     .filter(key => key.startsWith(`dynamic-modal-btn-${targetModal.id}-`))
                     .forEach(key => {
                         delete window[key];
                     });
-                
-                setTimeout(() => {
-                    targetModal.remove();
-                }, 300);
+                closeAppOverlay(targetModal, { remove: true });
             }
         }
 
@@ -19794,15 +20079,12 @@
             const saveBtn = document.getElementById('notes-save-btn');
             
             textarea.value = currentNotes;
-            modal.classList.remove('hidden', 'opacity-0');
-            modal.firstElementChild?.classList.remove('scale-95');
+            openAppOverlay(modal);
             saveBtn.onclick = () => savePersonalNotes(recipeId);
         }
         
         function closeNotesEditor() {
-            const modal = document.getElementById('notes-modal');
-            modal.classList.add('hidden', 'opacity-0');
-            modal.firstElementChild?.classList.add('scale-95');
+            closeAppOverlay(document.getElementById('notes-modal'));
         }
         
         function savePersonalNotes(recipeId) {
@@ -20162,6 +20444,7 @@
                 </div>
             `;
             lucide.createIcons();
+            markViewEnter();
             if (isCookingMode) bindCookStage();
         }
 
@@ -20531,6 +20814,7 @@
                 <datalist id="countries-list">${countriesList.map(c => `<option value="${c}"></option>`).join('')}</datalist>
             `;
             lucide.createIcons();
+            markViewEnter();
 
             if (recipeToEdit) {
                 document.getElementById('r-title').value = recipeToEdit.title || '';
