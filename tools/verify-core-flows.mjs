@@ -376,6 +376,92 @@ try {
   });
   log('recipes: phone detail fallbacks', !phoneDetail.hasUndefined && phoneDetail.hasAuthorFallback && phoneDetail.hidesEmptyCountryUnknown, JSON.stringify(phoneDetail));
   await phoneRecipe.screenshot({ path: `${ART}/core-recipe-detail-phone.png`, fullPage: false });
+
+  // Phone (390px): Clear filters must wipe every index filter via a real tap target.
+  await phoneRecipe.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+  await dismissGates(phoneRecipe);
+  await phoneRecipe.evaluate(() => {
+    userSettings.termsAccepted = true;
+    userSettings.privacyAccepted = true;
+    document.getElementById('terms-accept-modal')?.remove();
+    recipes = [
+      { id: 1, title: 'Clear Filter Soup', source: 'local', category: 'Cooking', difficulty: 'Easy', cuisine: 'Italian', ingredients: ['water'], instructions: ['boil'], mealType: ['Dinner'], diet: ['Vegetarian'], favorite: true },
+      { id: 2, title: 'Clear Filter Cake', source: 'local', category: 'Baking', difficulty: 'Hard', cuisine: 'French', ingredients: ['flour'], instructions: ['bake'], mealType: ['Dessert'], diet: [], favorite: false }
+    ];
+    showListSearch = true;
+    showListFilters = true;
+    searchQuery = 'Soup';
+    categoryFilter = 'Cooking';
+    difficultyFilter = 'Easy';
+    cuisineFilter = 'Italian';
+    mealTypeFilter = ['Dinner'];
+    dietFilter = ['Vegetarian'];
+    showFavoritesOnly = true;
+    collectionScopeFilter = 'mine';
+    renderList();
+  });
+  await sleep(400);
+  await dismissGates(phoneRecipe);
+  const clearBtnBox = await phoneRecipe.evaluate(() => {
+    const btn = [...document.querySelectorAll('button.index-clear-filters-btn, button')].find((b) => /Clear filters/i.test(b.textContent || ''));
+    if (!btn) return null;
+    btn.scrollIntoView({ block: 'center' });
+    const r = btn.getBoundingClientRect();
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    return {
+      x: r.left + r.width / 2,
+      y: r.top + r.height / 2,
+      w: r.width,
+      h: r.height,
+      type: btn.type,
+      hitIsButton: Boolean(hit && (hit === btn || btn.contains(hit)))
+    };
+  });
+  if (clearBtnBox?.hitIsButton) {
+    await phoneRecipe.touchscreen.tap(clearBtnBox.x, clearBtnBox.y);
+  } else if (clearBtnBox) {
+    await phoneRecipe.evaluate(() => {
+      const btn = [...document.querySelectorAll('button')].find((b) => /Clear filters/i.test(b.textContent || ''));
+      btn?.click();
+    });
+  }
+  await sleep(350);
+  const cleared = await phoneRecipe.evaluate(() => {
+    const searchInput = document.getElementById('recipe-search-input');
+    const selects = [...document.querySelectorAll('.index-discovery select')].map((s) => s.value);
+    return {
+      categoryFilter,
+      difficultyFilter,
+      cuisineFilter,
+      mealTypeFilter: [...mealTypeFilter],
+      dietFilter: [...dietFilter],
+      showFavoritesOnly,
+      collectionScopeFilter,
+      searchQuery,
+      searchInputValue: searchInput ? searchInput.value : '',
+      selectValues: selects,
+      activePanel: !!document.querySelector('.index-active-filters')
+    };
+  });
+  const clearOk = Boolean(
+    clearBtnBox
+    && clearBtnBox.type === 'button'
+    && clearBtnBox.w >= 44
+    && clearBtnBox.h >= 44
+    && cleared.categoryFilter === ''
+    && cleared.difficultyFilter === ''
+    && cleared.cuisineFilter === ''
+    && cleared.mealTypeFilter.length === 0
+    && cleared.dietFilter.length === 0
+    && cleared.showFavoritesOnly === false
+    && cleared.collectionScopeFilter === 'all'
+    && cleared.searchQuery === ''
+    && cleared.searchInputValue === ''
+    && cleared.selectValues.every((v) => v === '')
+    && cleared.activePanel === false
+  );
+  log('filters: Clear filters works on phone 390px', clearOk, JSON.stringify({ clearBtnBox, cleared }));
+  await phoneRecipe.screenshot({ path: `${ART}/core-clear-filters-phone-390.png`, fullPage: false });
   await phoneRecipe.close();
 
   // ---------- PREMIUM ----------

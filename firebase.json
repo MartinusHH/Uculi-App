@@ -40,7 +40,10 @@
       "Notes.txt",
       "**/*.md",
       "**/*.txt",
-      "firebase-debug.log"
+      "firebase-debug.log",
+      "tools/**",
+      "package.json",
+      "package-lock.json"
     ],
     "redirects": [
       {

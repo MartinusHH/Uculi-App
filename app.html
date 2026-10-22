@@ -995,9 +995,12 @@
             flex: 0 0 auto;
         }
 
-        .index-discovery > .index-filters-panel,
         .index-discovery > .index-active-filters {
             order: 1;
+        }
+
+        .index-discovery > .index-filter-controls {
+            order: 2;
         }
 
         .index-filters-panel {
@@ -1012,6 +1015,12 @@
         .index-search-slot .browse-search {
             max-width: none;
             box-shadow: 0 14px 28px rgba(28, 20, 16, 0.05);
+        }
+
+        .index-clear-filters-btn {
+            width: 100%;
+            min-height: var(--touch-min);
+            touch-action: manipulation;
         }
 
         .index-recipe-grid {
@@ -2339,6 +2348,13 @@
             padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
             overflow-y: auto;
             overscroll-behavior: contain;
+        }
+
+        /* Never let a dismissed/closing overlay steal taps on phone width. */
+        .app-overlay.hidden,
+        .app-overlay.is-closing,
+        .app-overlay.opacity-0 {
+            pointer-events: none !important;
         }
 
         .app-modal-panel {
@@ -16721,7 +16737,11 @@
             return dietFilter.every(selectedDiet => coverage.has(selectedDiet));
         }
 
-        function resetRecipeFilters() {
+        function resetRecipeFilters(event) {
+            if (event) {
+                event.preventDefault?.();
+                event.stopPropagation?.();
+            }
             searchQuery = "";
             categoryFilter = "";
             difficultyFilter = "";
@@ -16733,6 +16753,19 @@
             collectionScopeFilter = 'all';
             showFavoritesOnly = false;
             renderList();
+            // Mobile browsers can restore prior <select> values after an innerHTML swap;
+            // force every filter control back to the cleared state.
+            syncClearedRecipeFilterControls();
+        }
+
+        function syncClearedRecipeFilterControls() {
+            const searchInput = document.getElementById('recipe-search-input');
+            if (searchInput) searchInput.value = '';
+
+            document.querySelectorAll('.index-discovery select').forEach((select) => {
+                select.value = '';
+                select.selectedIndex = 0;
+            });
         }
 
         function normalizeCollectionScopeFilter(scope = collectionScopeFilter) {
@@ -18066,12 +18099,12 @@
             const notebookOverviewSlimClass = (isNotebookMode && !notebookCoverOpen) ? ' notebook-overview-slim' : '';
             const activeFiltersMarkup = activeFilters.length > 0 ? `
                 <div class="index-filters-panel index-active-filters">
-                    <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="flex flex-col gap-3">
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="index-hero-kicker" style="margin:0;">Active</span>
                             ${activeFilters.map(filter => `<span class="index-card-tag">${filter}</span>`).join('')}
                         </div>
-                        <button onclick="resetRecipeFilters()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
+                        <button type="button" onclick="resetRecipeFilters(event)" class="${getAppButtonClasses('secondary', { size: 'sm', fullWidth: true })} index-clear-filters-btn" aria-label="Clear filters">
                             <i data-lucide="rotate-ccw" class="h-4 w-4"></i>Clear filters
                         </button>
                     </div>
@@ -18106,7 +18139,7 @@
                 <p class="mt-2 text-xs font-semibold leading-relaxed text-sage">${dietDescriptions[option] || ''}</p>
             </div>`).join('');
             const filterControlsMarkup = isFilterVisible ? `
-                <div class="index-filters-panel space-y-5">
+                <div class="index-filters-panel index-filter-controls space-y-5">
                     <div>
                         <p class="index-hero-kicker">Source</p>
                         <p class="mt-1 text-sm font-semibold text-sage">Toggle between recipes you wrote and recipes you saved from Browse.</p>
@@ -18195,7 +18228,7 @@
                                     <i data-lucide="${showDietFilters ? 'chevron-up' : 'chevron-down'}" class="h-4 w-4"></i>
                                 </button>
                                 ${showDietFilters ? `<button onclick="toggleDietGuide()" class="${getAppButtonClasses('secondary')}"><i data-lucide="info" class="h-4 w-4"></i>${showDietGuide ? 'Hide guide' : 'Diet guide'}</button>` : ''}
-                                <button onclick="resetRecipeFilters()" class="${getAppButtonClasses('secondary')}">
+                                <button type="button" onclick="resetRecipeFilters(event)" class="${getAppButtonClasses('secondary')} index-clear-filters-btn" aria-label="Reset all filters">
                                     <i data-lucide="rotate-ccw" class="h-4 w-4"></i>Reset all
                                 </button>
                             </div>
