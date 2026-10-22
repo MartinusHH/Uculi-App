@@ -117,6 +117,25 @@ window.UCULI_FIREBASE_CONFIG = {
 3. Add `www.uculi.com` before launch.
 4. Add `uculi.com` as well if you want the apex domain to redirect to `www.uculi.com`.
 
+## Soft-launch checklist for `mholt-uculi` (Martijn)
+
+Do these in Firebase Console before pointing friends to uculi.com:
+
+1. Project `mholt-uculi` is selected.
+2. Authentication → Sign-in method → enable **Email/Password**.
+3. Authentication → Sign-in method → enable **Google** (support email = yours).
+4. Authentication → Settings → Authorized domains → add `uculi.com` and `www.uculi.com` (keep `localhost` for local tests).
+5. Firestore → publish the repo `firestore.rules` (includes private `users/{uid}/private/agreement`).
+6. Copy real web app config into local `firebase-config.js` (from Project settings), then deploy Hosting.
+7. On Google Cloud / Google Auth Platform, complete the OAuth consent screen for `uculi.com` so visitors do not see an unverified-app warning forever.
+8. Smoke-test on phone and desktop: register, login, Google login, open privacy/gebruiksvoorwaarden without losing form fields, sign out.
+
+Local emulator check (already wired in the app):
+
+1. Copy `firebase-config.example.js` → `firebase-config.js` (demo values are fine for emulators).
+2. `firebase emulators:start --only auth,firestore --project mholt-uculi`
+3. Serve the repo root and open `app.html?emulator=1&auth=register`
+
 ## Step 7: Prepare Single-Source Hosting
 
 1. Use `index.html` as the only app shell source.
