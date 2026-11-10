@@ -4619,6 +4619,13 @@
             backdrop-filter: blur(4px);
         }
 
+        /* Phone covers only: slightly smaller stickers; placement clamp is JS display-only. */
+        @media (max-width: 390px) {
+            .notebook-cover-panel {
+                --cover-sticker-scale: 0.82;
+            }
+        }
+
         .notebook-cover-sticker.is-transparent {
             border-color: transparent;
             box-shadow: none;
@@ -8213,6 +8220,36 @@
             return positions[position] || positions['top-right'];
         }
 
+        // Display-only clamp for phone covers (360–390px). Stored sticker coords stay unchanged.
+        function clampNotebookCoverStickerPlacement(x, y, kind = 'text', size = 'md') {
+            let nextX = Math.max(8, Math.min(92, Number(x) || 50));
+            let nextY = Math.max(10, Math.min(90, Number(y) || 50));
+            const isNarrowCover = typeof window !== 'undefined'
+                && window.matchMedia('(max-width: 390px)').matches;
+            if (!isNarrowCover) {
+                return { x: nextX, y: nextY };
+            }
+
+            // Keep stickers out of the front-cover title band (upper-left / center).
+            if (nextY < 46 && nextX < 70) {
+                nextX = Math.max(nextX, 78);
+            }
+
+            // Keep longer text stickers (e.g. GEZELLIG) fully on the cover.
+            // Bias the left edge more than the right so top-right accents can stay right.
+            if (kind === 'text') {
+                const minX = size === 'lg' ? 38 : size === 'sm' ? 30 : 34;
+                const maxX = size === 'lg' ? 70 : size === 'sm' ? 84 : 80;
+                nextX = Math.max(minX, Math.min(maxX, nextX));
+            } else if (kind === 'photo') {
+                nextX = Math.max(22, Math.min(80, nextX));
+            } else {
+                nextX = Math.max(18, Math.min(84, nextX));
+            }
+            nextY = Math.max(18, Math.min(84, nextY));
+            return { x: nextX, y: nextY };
+        }
+
         function getNotebookCoverStickerSize(size, kind = 'text', isTransparent = false) {
             if (kind === 'emoji') {
                 if (isTransparent) {
@@ -8528,8 +8565,14 @@
                 const stickerPalette = getNotebookCoverStickerPalette(normalized.color);
                 const isTransparent = kind !== 'photo' && normalized.background === 'none';
                 const stickerSizeClass = getNotebookCoverStickerSize(normalized.size, kind, isTransparent);
-                const stickerX = Math.max(8, Math.min(92, Number(normalized.x) || 50));
-                const stickerY = Math.max(10, Math.min(90, Number(normalized.y) || 50));
+                const placed = clampNotebookCoverStickerPlacement(
+                    Number(normalized.x) || 50,
+                    Number(normalized.y) || 50,
+                    kind,
+                    normalized.size
+                );
+                const stickerX = placed.x;
+                const stickerY = placed.y;
                 const wrapperClasses = isEditorPreview ? 'cover-editor-preview-sticker' : '';
                 const rotation = Number(normalized.rotation) || 0;
 
@@ -8561,7 +8604,7 @@
                 }
 
                 return `
-                    <div class="absolute ${wrapperClasses}" data-cover-sticker-index="${index}" data-cover-sticker-kind="${kind}" data-cover-sticker-face="${safeFace}" style="left:${stickerX}%; top:${stickerY}%; transform:translate(-50%, -50%);">
+                    <div class="absolute ${wrapperClasses}" data-cover-sticker-index="${index}" data-cover-sticker-kind="${kind}" data-cover-sticker-face="${safeFace}" style="left:${stickerX}%; top:${stickerY}%; transform:translate(-50%, -50%) scale(var(--cover-sticker-scale, 1));">
                         ${stickerInner}
                     </div>
                 `;
