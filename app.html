@@ -6220,17 +6220,17 @@
                     <div id="notes-modal" class="app-overlay fixed inset-0 bg-black bg-opacity-50 hidden opacity-0 transition-all duration-300 flex z-50">
                         <div class="app-modal-panel w-full max-w-2xl scale-95 transition-transform duration-300">
                             <div class="border-b border-parchmentDark bg-parchment p-5 md:p-6">
-                                <h2 class="font-fantasy font-bold text-3xl text-forest">Edit Your Notes</h2>
+                                <h2 class="font-fantasy font-bold text-3xl text-forest">Je notities bewerken</h2>
                             </div>
                             <div class="app-modal-body p-5 md:p-6">
-                                <textarea id="notes-textarea" placeholder="Add your personal modifications, tips, or reminders..." class="w-full h-40 rounded-md border border-sage p-4 text-forest font-semibold outline-none focus:border-gold"></textarea>
+                                <textarea id="notes-textarea" placeholder="Voeg persoonlijke tips of herinneringen toe…" class="w-full h-40 rounded-md border border-sage p-4 text-forest font-semibold outline-none focus:border-gold"></textarea>
                             </div>
                             <div class="app-modal-footer border-t border-parchmentDark bg-parchment p-5 md:p-6">
                                 <button onclick="closeNotesEditor()" data-app-button="secondary" data-app-button-size="lg" data-app-button-full-width="true">
-                                    Cancel
+                                    Annuleren
                                 </button>
-                                <button id="notes-save-btn" data-app-button="accent" data-app-button-size="lg" data-app-button-full-width="true" data-app-button-extra="phone-save-icon" aria-label="Save Notes" title="Save Notes">
-                                    <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Save Notes</span>
+                                <button id="notes-save-btn" data-app-button="accent" data-app-button-size="lg" data-app-button-full-width="true" data-app-button-extra="phone-save-icon" aria-label="Notities opslaan" title="Notities opslaan">
+                                    <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Notities opslaan</span>
                                 </button>
                             </div>
                         </div>
@@ -7353,17 +7353,17 @@
             restoreReady: false
         };
         const premiumFeatureLabels = {
-            backupDownload: 'download backups',
-            backupRestore: 'restore backups',
-            cloudSync: 'use cloud sync',
-            notebookMode: 'use notebook mode',
-            recipePdfExport: 'download recipe PDFs',
-            recipeSharing: 'share recipes',
-            recipeLimit: 'add more than 3 recipes',
-            publishRecipes: 'publish recipes',
-            createFamilies: 'create families',
+            backupDownload: 'backups te downloaden',
+            backupRestore: 'backups te herstellen',
+            cloudSync: 'cloudsync te gebruiken',
+            notebookMode: 'het schrift te gebruiken',
+            recipePdfExport: 'recept-PDF\'s te downloaden',
+            recipeSharing: 'recepten te delen',
+            recipeLimit: 'meer dan 3 recepten toe te voegen',
+            publishRecipes: 'recepten te publiceren',
+            createFamilies: 'families aan te maken',
             notebookCovers: 'de kaft van je schrift aanpassen',
-            stickyNotes: 'use sticky notes'
+            stickyNotes: 'plakbriefjes te gebruiken'
         };
         let accountPlanLoadPromise = null;
         let accountPlanLoadedAt = '';
@@ -7384,18 +7384,28 @@
             const normalized = raw.toLowerCase();
             const aliasMap = {
                 'add more than 3 recipes': 'recipeLimit',
+                'meer dan 3 recepten toe te voegen': 'recipeLimit',
                 'recipe limit': 'recipeLimit',
                 'use cloud sync': 'cloudSync',
+                'cloudsync te gebruiken': 'cloudSync',
                 'use notebook mode': 'notebookMode',
+                'het schrift te gebruiken': 'notebookMode',
                 'download recipe pdfs': 'recipePdfExport',
+                'recept-pdf\'s te downloaden': 'recipePdfExport',
                 'share recipes': 'recipeSharing',
+                'recepten te delen': 'recipeSharing',
                 'download backups': 'backupDownload',
+                'backups te downloaden': 'backupDownload',
                 'restore backups': 'backupRestore',
+                'backups te herstellen': 'backupRestore',
                 'publish recipes': 'publishRecipes',
+                'recepten te publiceren': 'publishRecipes',
                 'create families': 'createFamilies',
+                'families aan te maken': 'createFamilies',
                 'customize notebook covers': 'notebookCovers',
                 'de kaft van je schrift aanpassen': 'notebookCovers',
-                'use sticky notes': 'stickyNotes'
+                'use sticky notes': 'stickyNotes',
+                'plakbriefjes te gebruiken': 'stickyNotes'
             };
             return aliasMap[normalized] || raw;
         }
@@ -8732,33 +8742,33 @@
                         const menuAlignmentClass = Number(note.x) < 34 ? 'is-left-aligned' : Number(note.x) > 66 ? 'is-right-aligned' : '';
                         const swatches = ['butter', 'rose', 'sage', 'sky', 'lavender'].map(color => {
                             const swatchPalette = getNotebookStickyNotePalette(color);
-                            return `<button type="button" onpointerdown="event.stopPropagation()" onclick="setNotebookStickyNoteColor(${recipeId}, ${index}, '${color}')" class="notebook-sticky-note-menu-swatch ${note.color === color ? 'is-active' : ''}" style="background:${swatchPalette.bg};" aria-label="Set sticky note color to ${color}"></button>`;
+                            return `<button type="button" onpointerdown="event.stopPropagation()" onclick="setNotebookStickyNoteColor(${recipeId}, ${index}, '${color}')" class="notebook-sticky-note-menu-swatch ${note.color === color ? 'is-active' : ''}" style="background:${swatchPalette.bg};" aria-label="Plakbriefjekleur: ${color}"></button>`;
                         }).join('');
                         return `
                             <div class="notebook-sticky-note-anchor ${noteIsActive ? 'is-active' : ''}" data-notebook-note-index="${index}" data-notebook-note-side="${noteSide}" style="left:${clampNotebookStickyNoteX(note.x)}%;top:${clampNotebookStickyNoteY(note.y)}%;">
                                 <article class="notebook-sticky-note ${getNotebookStickyNoteSizeClass(note.size)}" data-notebook-note-card="true" style="--sticky-note-bg:${palette.bg};--sticky-note-border:${palette.border};--sticky-note-ink:${palette.ink};--sticky-note-tape:${palette.tape};transform:rotate(${noteRotation}deg) scale(${noteScale});">
-                                    <button type="button" class="notebook-sticky-note-handle top-left" data-notebook-note-handle="top-left" aria-label="Resize and rotate sticky note"></button>
-                                    <button type="button" class="notebook-sticky-note-handle top-right" data-notebook-note-handle="top-right" aria-label="Resize and rotate sticky note"></button>
-                                    <button type="button" class="notebook-sticky-note-handle bottom-left" data-notebook-note-handle="bottom-left" aria-label="Resize and rotate sticky note"></button>
-                                    <button type="button" class="notebook-sticky-note-handle bottom-right" data-notebook-note-handle="bottom-right" aria-label="Resize and rotate sticky note"></button>
+                                    <button type="button" class="notebook-sticky-note-handle top-left" data-notebook-note-handle="top-left" aria-label="Plakbriefje schalen en draaien"></button>
+                                    <button type="button" class="notebook-sticky-note-handle top-right" data-notebook-note-handle="top-right" aria-label="Plakbriefje schalen en draaien"></button>
+                                    <button type="button" class="notebook-sticky-note-handle bottom-left" data-notebook-note-handle="bottom-left" aria-label="Plakbriefje schalen en draaien"></button>
+                                    <button type="button" class="notebook-sticky-note-handle bottom-right" data-notebook-note-handle="bottom-right" aria-label="Plakbriefje schalen en draaien"></button>
                                     <div class="notebook-sticky-note__body">
                                         <div class="notebook-sticky-note__preview" data-notebook-note-preview="${note.id}">${notePreviewMarkup}</div>
-                                        <span class="sr-only" data-notebook-note-plaintext="${note.id}">${escapeHTML(noteText || 'Empty sticky note. Click to edit.')}</span>
+                                        <span class="sr-only" data-notebook-note-plaintext="${note.id}">${escapeHTML(noteText || 'Leeg plakbriefje. Tik om te bewerken.')}</span>
                                     </div>
                                 </article>
                                 ${noteIsActive ? `
                                     <div class="notebook-sticky-note-menu ${menuPlacementClass} ${menuAlignmentClass}" data-notebook-note-menu="true" onpointerdown="event.stopPropagation()">
                                         <div class="flex items-center justify-between gap-3">
-                                            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-sage">Sticky note</p>
+                                            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-sage">Plakbriefje</p>
                                             <button type="button" onpointerdown="event.stopPropagation()" onclick="closeNotebookStickyNoteMenu()" class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-parchmentDark bg-white text-sage shadow-sm">
                                                 <i data-lucide="x" class="h-4 w-4"></i>
                                             </button>
                                         </div>
-                                        <textarea maxlength="160" data-notebook-note-editor="${recipeId}-${index}" aria-label="Sticky note text" onpointerdown="event.stopPropagation()" oninput="updateNotebookStickyNoteText(${recipeId}, ${index}, this.value)" class="mt-3 w-full min-h-[6.5rem] rounded-xl border border-sage border-opacity-20 bg-white px-4 py-3 text-sm font-semibold text-forest shadow-sm outline-none focus:border-gold resize-y md:min-h-[7rem]" placeholder="Add a quick reminder...">${escapeHTML(note.text || '')}</textarea>
-                                        <p class="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-65">Saves automatically while you type</p>
+                                        <textarea maxlength="160" data-notebook-note-editor="${recipeId}-${index}" aria-label="Tekst plakbriefje" onpointerdown="event.stopPropagation()" oninput="updateNotebookStickyNoteText(${recipeId}, ${index}, this.value)" class="mt-3 w-full min-h-[6.5rem] rounded-xl border border-sage border-opacity-20 bg-white px-4 py-3 text-sm font-semibold text-forest shadow-sm outline-none focus:border-gold resize-y md:min-h-[7rem]" placeholder="Snel een herinnering…">${escapeHTML(note.text || '')}</textarea>
+                                        <p class="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-65">Wordt automatisch opgeslagen terwijl je typt</p>
                                         <div class="mt-3 flex items-center justify-between gap-3">
                                             <div class="flex flex-nowrap items-center gap-1.5">${swatches}</div>
-                                            <button type="button" title="Delete sticky note" aria-label="Delete sticky note" onpointerdown="event.stopPropagation()" onclick="deleteNotebookStickyNote(${recipeId}, ${index})" class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-parchmentDark bg-white text-sage shadow-sm transition-all hover:border-red-400 hover:text-red-500">
+                                            <button type="button" title="Plakbriefje verwijderen" aria-label="Plakbriefje verwijderen" onpointerdown="event.stopPropagation()" onclick="deleteNotebookStickyNote(${recipeId}, ${index})" class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-parchmentDark bg-white text-sage shadow-sm transition-all hover:border-red-400 hover:text-red-500">
                                                 <i data-lucide="trash-2" class="h-4 w-4"></i>
                                             </button>
                                         </div>
@@ -9663,7 +9673,7 @@
             openNotebookStickyNoteMenu(recipeId, 0);
 
             if (createdNote) {
-                showToast('Sticky note added. Click it to enlarge and edit.', 'sticky-note');
+                showToast('Plakbriefje toegevoegd. Tik om te vergroten en te bewerken.', 'sticky-note');
             }
         }
 
@@ -12732,24 +12742,33 @@
         }
 
         function getPublishActionLabel(recipe) {
+            const nl = getActiveUiLanguage() === 'nl';
             if (!recipe?.publishedId) {
-                return recipe?.familyId ? 'Request publish vote' : 'Publish';
+                return recipe?.familyId
+                    ? (nl ? 'Publicatiestem aanvragen' : 'Request publish vote')
+                    : (nl ? 'Publiceren' : 'Publish');
             }
 
             if (recipe?.publicationState === 'pending-retract') {
-                return 'Offline in 24h';
+                return nl ? 'Offline over 24 u' : 'Offline in 24h';
             }
 
             if (isRecipePublishedLive(recipe)) {
-                if (canUnpublishImmediately(recipe)) return 'Unpublish now (1h)';
-                return 'Take offline in 24h';
+                if (canUnpublishImmediately(recipe)) {
+                    return nl ? 'Nu offline (1 u)' : 'Unpublish now (1h)';
+                }
+                return nl ? 'Over 24 u offline' : 'Take offline in 24h';
             }
 
             if (recipe?.familyId) {
-                return hasRecipeChangesSincePublish(recipe) ? 'Request republish vote' : 'Request publish vote';
+                return hasRecipeChangesSincePublish(recipe)
+                    ? (nl ? 'Herpublicatiestem aanvragen' : 'Request republish vote')
+                    : (nl ? 'Publicatiestem aanvragen' : 'Request publish vote');
             }
 
-            return hasRecipeChangesSincePublish(recipe) ? 'Republish update' : 'Republish';
+            return hasRecipeChangesSincePublish(recipe)
+                ? (nl ? 'Update herpubliceren' : 'Republish update')
+                : (nl ? 'Opnieuw publiceren' : 'Republish');
         }
 
         function getLocalRecipeByPublishedId(publishedRecipeId) {
@@ -12905,7 +12924,7 @@
 
         async function publishRecipe(recipeId, options = {}) { if(requireAccountPlan('publishRecipes')) return;
             if (!isAuthenticated || !firebaseInitialized || !currentUser) {
-                showToast('Sign in to publish recipes', 'alert-circle');
+                showToast(getActiveUiLanguage() === 'nl' ? 'Log in om recepten te publiceren' : 'Sign in to publish recipes', 'alert-circle');
                 return false;
             }
 
@@ -17600,7 +17619,7 @@
             recipe.notebookStickyNotes.splice(noteIndex, 1);
             activeNotebookStickyNoteMenu = null;
             saveData();
-            showToast('Sticky note removed!', 'trash-2');
+            showToast('Plakbriefje verwijderd!', 'trash-2');
             if (currentView === 'index' && indexViewMode === 'book') {
                 renderList();
             }
@@ -17935,8 +17954,8 @@
             const notebookStickyNotes = normalizeNotebookStickyNotes(recipe.notebookStickyNotes);
             const showNotebookStickyNotes = userSettings.showNotebookStickyNotes !== false;
             const hasNotebookStickyNote = notebookStickyNotes.length > 0;
-            const notebookNoteActionLabel = hasNotebookStickyNote ? 'Edit note' : 'Add note';
-            const notebookVisibilityActionLabel = showNotebookStickyNotes ? 'Hide notes' : 'Show notes';
+            const notebookNoteActionLabel = hasNotebookStickyNote ? 'Notitie bewerken' : 'Notitie toevoegen';
+            const notebookVisibilityActionLabel = showNotebookStickyNotes ? 'Notities verbergen' : 'Notities tonen';
             const safeRecipeTitle = escapeHTML(recipe.title || 'Untitled recipe');
             const safeRecipeCategory = escapeHTML(recipe.category || 'Recipe');
             const safeRecipeAuthor = escapeHTML(recipe.author || 'Chef');
@@ -18246,11 +18265,11 @@
                             <div class="notebook-chrome-group" role="group" aria-label="Notes">
                                 <button type="button" title="${notebookNoteActionLabel}" aria-label="${notebookNoteActionLabel}" onclick="openNotebookStickyNotesEditor(${recipe.id})" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-gold transition-all hover:bg-surface-muted hover:text-forest notebook-note-control notebook-note-control--manage notebook-note-control--icon" data-notebook-note-control="manage-notes">
                                     <i data-lucide="sticky-note" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">Notes</span>
+                                    <span class="notebook-tool-label">Notities</span>
                                 </button>
                                 <button type="button" title="${notebookVisibilityActionLabel}" aria-label="${notebookVisibilityActionLabel}" onclick="toggleNotebookStickyNotesVisibility()" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all ${showNotebookStickyNotes ? 'text-sage' : 'text-gold'} hover:bg-surface-muted hover:text-forest notebook-note-control notebook-note-control--toggle notebook-note-control--icon" data-notebook-note-control="toggle-visibility">
                                     <i data-lucide="${showNotebookStickyNotes ? 'eye-off' : 'eye'}" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${showNotebookStickyNotes ? 'Hide' : 'Show'}</span>
+                                    <span class="notebook-tool-label">${showNotebookStickyNotes ? 'Verberg' : 'Toon'}</span>
                                 </button>
                                 <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook relative inline-flex items-center justify-center gap-2 rounded-lg text-xs font-bold uppercase tracking-wider text-white" data-notebook-note-control="open-cook">
                                     <i data-lucide="chef-hat" class="h-4 w-4"></i>
@@ -19735,7 +19754,7 @@
             const copyByKey = {
                 recipeLimit: nl ? {
                     title: 'Gratis limiet bereikt',
-                    kicker: 'Free plan',
+                    kicker: 'Gratis plan',
                     headline: 'Je hebt 3 recepten bereikt',
                     body: `Dit account staat op Free (${used}/${freeLocalRecipeLimit} recepten). Upgrade naar Premium voor onbeperkte recepten plus schrift, synchroniseren, delen en PDF.`,
                     primary: 'Bekijk Premium',
@@ -19750,9 +19769,9 @@
                 },
                 notebookMode: nl ? {
                     title: 'Premium: Schrift',
-                    kicker: 'Notebook',
+                    kicker: 'Schrift',
                     headline: 'Schrift is een Premium-functie',
-                    body: 'Het receptenschrift, covers en sticky notes horen bij Premium op dit account.',
+                    body: 'Het receptenschrift, kaften en plakbriefjes horen bij Premium op dit account.',
                     primary: 'Bekijk Premium',
                     secondary: 'Nu niet'
                 } : {
@@ -19765,9 +19784,9 @@
                 },
                 cloudSync: nl ? {
                     title: 'Premium: Synchroniseren',
-                    kicker: 'Cloud sync',
+                    kicker: 'Cloudsync',
                     headline: 'Synchroniseren is Premium',
-                    body: 'Cloud sync houdt dit account bij over apparaten. Dat zit in Premium.',
+                    body: 'Cloudsync houdt dit account bij over apparaten. Dat zit in Premium.',
                     primary: 'Bekijk Premium',
                     secondary: 'Nu niet'
                 } : {
@@ -19780,7 +19799,7 @@
                 },
                 recipeSharing: nl ? {
                     title: 'Premium: Delen',
-                    kicker: 'Share',
+                    kicker: 'Delen',
                     headline: 'Delen is Premium',
                     body: 'Recepten delen vanaf dit account vraagt om Premium.',
                     primary: 'Bekijk Premium',
@@ -19795,7 +19814,7 @@
                 },
                 recipePdfExport: nl ? {
                     title: 'Premium: PDF',
-                    kicker: 'Export',
+                    kicker: 'Exporteren',
                     headline: 'PDF-export is Premium',
                     body: 'Recepten als PDF downloaden hoort bij Premium op dit account.',
                     primary: 'Bekijk Premium',
@@ -19807,6 +19826,51 @@
                     body: 'Downloading recipes as PDF unlocks with Premium on this account.',
                     primary: 'View Premium',
                     secondary: 'Not now'
+                },
+                publishRecipes: nl ? {
+                    title: 'Premium: Publiceren',
+                    kicker: 'Publiceren',
+                    headline: 'Publiceren is Premium',
+                    body: 'Recepten publiceren hoort bij Premium op dit account.',
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Premium: Publish',
+                    kicker: 'Publish',
+                    headline: 'Publishing is Premium',
+                    body: 'Publishing recipes unlocks with Premium on this account.',
+                    primary: 'View Premium',
+                    secondary: 'Not now'
+                },
+                createFamilies: nl ? {
+                    title: 'Premium: Families',
+                    kicker: 'Families',
+                    headline: 'Families aanmaken is Premium',
+                    body: 'Families aanmaken hoort bij Premium op dit account.',
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Premium: Families',
+                    kicker: 'Families',
+                    headline: 'Creating families is Premium',
+                    body: 'Creating families unlocks with Premium on this account.',
+                    primary: 'View Premium',
+                    secondary: 'Not now'
+                },
+                stickyNotes: nl ? {
+                    title: 'Premium: Plakbriefjes',
+                    kicker: 'Plakbriefjes',
+                    headline: 'Plakbriefjes zijn Premium',
+                    body: 'Plakbriefjes gebruiken hoort bij Premium op dit account.',
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Premium: Sticky notes',
+                    kicker: 'Sticky notes',
+                    headline: 'Sticky notes are Premium',
+                    body: 'Using sticky notes unlocks with Premium on this account.',
+                    primary: 'View Premium',
+                    secondary: 'Not now'
                 }
             };
 
@@ -19815,10 +19879,25 @@
             }
 
             const featureLabel = premiumFeatureLabels[featureKey] || String(featureKeyOrName || (nl ? 'deze functie' : 'this feature'));
+            // English fallback copy still needs English infinitives when a Dutch label is the only map value.
+            const englishFeatureLabels = {
+                backupDownload: 'download backups',
+                backupRestore: 'restore backups',
+                cloudSync: 'use cloud sync',
+                notebookMode: 'use notebook mode',
+                recipePdfExport: 'download recipe PDFs',
+                recipeSharing: 'share recipes',
+                recipeLimit: 'add more than 3 recipes',
+                publishRecipes: 'publish recipes',
+                createFamilies: 'create families',
+                notebookCovers: 'customize notebook covers',
+                stickyNotes: 'use sticky notes'
+            };
+            const englishLabel = englishFeatureLabels[featureKey] || String(featureKeyOrName || 'this feature');
             return nl ? {
                 featureKey,
                 title: 'Upgrade naar Premium',
-                kicker: 'Account plan',
+                kicker: 'Accountplan',
                 headline: 'Deze functie is Premium',
                 body: `Premium is nodig om ${featureLabel}. Het plan van dit account bepaalt wat openstaat.`,
                 primary: 'Bekijk Premium',
@@ -19828,7 +19907,7 @@
                 title: 'Upgrade to Premium',
                 kicker: 'Account plan',
                 headline: 'This feature is Premium',
-                body: `Premium is required to ${featureLabel}. Your account plan controls what is unlocked.`,
+                body: `Premium is required to ${englishLabel}. Your account plan controls what is unlocked.`,
                 primary: 'View Premium',
                 secondary: 'Not now'
             };
@@ -19842,7 +19921,7 @@
             const perkItems = getActiveUiLanguage() === 'nl'
                 ? [
                     'Onbeperkte recepten',
-                    'Schrift / notebook',
+                    'Schrift',
                     'Synchroniseren',
                     'Delen & PDF'
                 ]
@@ -20069,14 +20148,21 @@
         }
 
         function showCreateFamilyModal() { if(requireAccountPlan('createFamilies')) return;
+            const nl = getActiveUiLanguage() === 'nl';
             if (isCurrentUserFamilyReadOnly() || isCurrentUserSociallyIsolated()) {
-                showToast('Family changes are disabled for your account.', 'alert-circle', true);
+                showToast(nl ? 'Familiewijzigingen staan uit voor je account.' : 'Family changes are disabled for your account.', 'alert-circle', true);
                 return;
             }
-            if (!isAuthenticated) return showToast('Please sign in to create a family.', 'alert-circle', true);
+            if (!isAuthenticated) {
+                return showToast(nl ? 'Log in om een familie aan te maken.' : 'Please sign in to create a family.', 'alert-circle', true);
+            }
             const activeFamilies = getActiveFamiliesForCurrentUser();
             if (activeFamilies.length >= 3) {
-                return showToast('You can only be an active member of 3 families at once.', 'alert-circle', true);
+                return showToast(
+                    nl ? 'Je kunt in max. 3 families actief lid zijn.' : 'You can only be an active member of 3 families at once.',
+                    'alert-circle',
+                    true
+                );
             }
 
             const colorChoicesMarkup = familyColorOptions.map((option, index) => `
@@ -20091,34 +20177,40 @@
                 </label>
             `).join('');
 
-            createModal('Create Family Book', `
+            createModal(nl ? 'Familieboek aanmaken' : 'Create Family Book', `
                 <div class="space-y-5 text-inkDark">
                     <div class="rounded-2xl border border-parchmentDark bg-parchment p-4 shadow-sm">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Shared archive</p>
-                        <p class="mt-2 text-sm font-semibold leading-relaxed text-forest">Create one shared book for the people you cook with. You will manage members, invites, and access.</p>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${nl ? 'Gedeeld archief' : 'Shared archive'}</p>
+                        <p class="mt-2 text-sm font-semibold leading-relaxed text-forest">${nl
+                            ? 'Maak één gedeeld boek voor de mensen met wie je kookt. Jij beheert leden, uitnodigingen en toegang.'
+                            : 'Create one shared book for the people you cook with. You will manage members, invites, and access.'}</p>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">Family Name</label>
-                        <input type="text" id="new-family-name" placeholder="e.g. Smith Family" class="${mutedInputClass}" maxlength="25">
+                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">${nl ? 'Familienaam' : 'Family Name'}</label>
+                        <input type="text" id="new-family-name" placeholder="${nl ? 'bijv. Familie Jansen' : 'e.g. Smith Family'}" class="${mutedInputClass}" maxlength="25">
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">Secret Pincode</label>
-                        <input type="text" id="new-family-pin" placeholder="Enter a 4-8 digit pin" class="${mutedInputClass}" maxlength="8">
-                        <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">People will need this pin to join the book.</p>
+                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">${nl ? 'Geheime pincode' : 'Secret Pincode'}</label>
+                        <input type="text" id="new-family-pin" placeholder="${nl ? 'Voer een pincode van 4–8 tekens in' : 'Enter a 4-8 digit pin'}" class="${mutedInputClass}" maxlength="8">
+                        <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">${nl ? 'Mensen hebben deze pincode nodig om toe te treden.' : 'People will need this pin to join the book.'}</p>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-3">Family Color</label>
+                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-3">${nl ? 'Familiekleur' : 'Family Color'}</label>
                         <div class="grid grid-cols-2 gap-2">${colorChoicesMarkup}</div>
                     </div>
                 </div>
             `, [
-                { text: 'Cancel', onClick: () => closeModal() },
-                { text: 'Create Family', primary: true, onClick: () => {
+                { text: nl ? 'Annuleren' : 'Cancel', onClick: () => closeModal() },
+                { text: nl ? 'Familie aanmaken' : 'Create Family', primary: true, onClick: () => {
                     const name = document.getElementById('new-family-name').value.trim();
                     const pin = document.getElementById('new-family-pin').value.trim();
                     const colorKey = document.querySelector('input[name="new-family-color"]:checked')?.value || familyColorOptions[0].key;
-                    if (!name || !pin) return showToast('Please fill out all fields.', 'alert-circle', true);
-                    if (pin.length < 4) return showToast('Pincode must be at least 4 characters.', 'alert-circle', true);
+                    if (!name || !pin) {
+                        return showToast(nl ? 'Vul alle velden in.' : 'Please fill out all fields.', 'alert-circle', true);
+                    }
+                    if (pin.length < 4) {
+                        return showToast(nl ? 'Pincode minstens 4 tekens.' : 'Pincode must be at least 4 characters.', 'alert-circle', true);
+                    }
                     if (!validateFamilyNameForModeration(name)) return;
                     submitCreateFamily(name, pin, colorKey);
                     closeModal();
@@ -20194,7 +20286,7 @@
 
         async function submitCreateFamily(name, pin, colorKey = familyColorOptions[0].key) {
             if (!validateFamilyNameForModeration(name)) return;
-            showToast('Creating family...', 'loader');
+            showToast(getActiveUiLanguage() === 'nl' ? 'Familie aanmaken…' : 'Creating family...', 'loader');
             const tag = Math.floor(1000 + Math.random() * 9000).toString();
             const color = getFamilyColorOption(colorKey);
             
@@ -20214,7 +20306,12 @@
             
             userFamilies.push(normalizeFamilyRecord(newFamily));
             saveData();
-            showToast(`Family created! Invite others with tag #${tag}.`, 'check');
+            showToast(
+                getActiveUiLanguage() === 'nl'
+                    ? `Familie aangemaakt! Nodig anderen uit met tag #${tag}.`
+                    : `Family created! Invite others with tag #${tag}.`,
+                'check'
+            );
             renderProfile(); 
         }
 
@@ -20560,7 +20657,7 @@
             recipe.personalNotes = textarea.value;
             saveData();
             closeNotesEditor();
-            showToast('Notes saved!', 'check-circle');
+            showToast(getActiveUiLanguage() === 'nl' ? 'Notities opgeslagen!' : 'Notes saved!', 'check-circle');
             if (currentView === 'index' && indexViewMode === 'book') {
                 renderList();
                 return;
@@ -20881,7 +20978,7 @@
                                     <p class="detail-panel-kicker" style="margin:0;">Personal</p>
                                     <h3 class="font-bold font-fantasy text-lg flex items-center text-forest mt-1"><i data-lucide="sticky-note" class="w-5 h-5 mr-2 text-gold"></i> Your Notes</h3>
                                 </div>
-                                <button type="button" onclick="openNotesEditor(${recipe.id})" class="inline-flex h-11 w-11 items-center justify-center rounded-xl text-sage transition-colors hover:bg-parchment hover:text-gold" aria-label="Edit notes" title="Edit notes">
+                                <button type="button" onclick="openNotesEditor(${recipe.id})" class="inline-flex h-11 w-11 items-center justify-center rounded-xl text-sage transition-colors hover:bg-parchment hover:text-gold" aria-label="Notities bewerken" title="Notities bewerken">
                                     <i data-lucide="edit" class="w-5 h-5"></i>
                                 </button>
                             </div>
@@ -21092,16 +21189,16 @@
             draftIngredients = recipeToEdit ? [...(recipeToEdit.ingredients || [])] : [];
             draftSteps = recipeToEdit ? normalizeRecipeInstructions(recipeToEdit.instructions) : [];
             draftProfile = recipeToEdit?.profile && recipeToEdit.profile !== defaultPlaceholderProfile ? recipeToEdit.profile : null;
-            const formTitle = recipeToEdit ? 'Edit Recipe' : 'Create Recipe';
-            const submitLabel = recipeToEdit ? 'Update Recipe' : 'Save Recipe';
+            const formTitle = recipeToEdit ? 'Recept bewerken' : 'Recept maken';
+            const submitLabel = recipeToEdit ? 'Recept bijwerken' : 'Recept opslaan';
             const publishSubmitLabel = recipeToEdit
-                ? (recipeToEdit.publishedId ? (isRecipePublishedLive(recipeToEdit) ? 'Save & Update Publish' : 'Save & Republish') : 'Save & Publish')
-                : 'Save & Publish';
+                ? (recipeToEdit.publishedId ? (isRecipePublishedLive(recipeToEdit) ? 'Opslaan & publicatie bijwerken' : 'Opslaan & herpubliceren') : 'Opslaan & publiceren')
+                : 'Opslaan & publiceren';
             const editorGuidance = recipeToEdit
                 ? 'Update the recipe basics here. Optional details stay in one section below when you need them.'
                 : 'Start with the essentials: title, category, ingredients, and steps. Optional details stay available below.';
             const activeFamilies = getActiveFamiliesForCurrentUser();
-            const familyOptionsMarkup = ['<option value="">Personal archive</option>', ...activeFamilies.map(family => `<option value="${family.id}">${escapeHTML(family.name)}</option>`)].join('');
+            const familyOptionsMarkup = [`<option value="">${getActiveUiLanguage() === 'nl' ? 'Persoonlijk archief' : 'Personal archive'}</option>`, ...activeFamilies.map(family => `<option value="${family.id}">${escapeHTML(family.name)}</option>`)].join('');
             const recipeFamily = recipeToEdit ? getRecipeFamily(recipeToEdit) : null;
             const familyHelperText = activeFamilies.length > 0
                 ? 'Choose a family book if this recipe belongs in a shared archive. Personal recipes stay private to your account.'
