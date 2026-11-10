@@ -17,12 +17,17 @@ service cloud.firestore {
 
     function adminEmails() {
       return adminConfigExists()
+        && get(/databases/$(database)/documents/app-config/admin).data.keys().hasAny(['enabledEmails'])
+        && get(/databases/$(database)/documents/app-config/admin).data.enabledEmails is list
         ? get(/databases/$(database)/documents/app-config/admin).data.enabledEmails
         : [];
     }
 
     function isAdminEmail() {
-      return signedIn() && authEmail() != '' && authEmail() in adminEmails();
+      return signedIn()
+        && authEmail() != ''
+        && adminConfigExists()
+        && authEmail() in adminEmails();
     }
 
     function isSelf(uid) {
@@ -42,6 +47,15 @@ service cloud.firestore {
         && !('publishBlocked' in request.resource.data)
         || isAdminEmail();
       allow delete: if isSelf(uid) || isAdminEmail();
+
+      match /private/agreement {
+        allow read: if isSelf(uid) || isAdminEmail();
+        allow create: if isSelf(uid)
+          && request.resource.data.keys().hasOnly(['acceptedAt', 'version'])
+          && request.resource.data.acceptedAt == request.time
+          && request.resource.data.version == '2026-10-10';
+        allow update, delete: if false;
+      }
     }
 
     match /published-recipes/{recipeId} {
@@ -72,9 +86,163 @@ service cloud.firestore {
       );
     }
 
+    function shoppingAuthEmail() {
+      return authEmail() != '' ? authEmail().lower() : '';
+    }
+
+    function shoppingListHasMemberIds() {
+      return resource.data.keys().hasAny(['memberIds'])
+        && resource.data.memberIds is list;
+    }
+
+    function shoppingListHasPendingEmails() {
+      return resource.data.keys().hasAny(['pendingInviteEmails'])
+        && resource.data.pendingInviteEmails is list;
+    }
+
+    function isShoppingListOwner() {
+      return signedIn()
+        && resource.data.keys().hasAny(['ownerId'])
+        && resource.data.ownerId == request.auth.uid;
+    }
+
+    function isShoppingListMember() {
+      return signedIn()
+        && shoppingListHasMemberIds()
+        && request.auth.uid in resource.data.memberIds;
+    }
+
+    function isShoppingListPendingInvitee() {
+      return signedIn()
+        && shoppingAuthEmail() != ''
+        && shoppingListHasPendingEmails()
+        && shoppingAuthEmail() in resource.data.pendingInviteEmails;
+    }
+
+    function shoppingOwnerIdUnchanged() {
+      return request.resource.data.keys().hasAny(['ownerId'])
+        && request.resource.data.ownerId == resource.data.ownerId;
+    }
+
+    function shoppingMembershipLocked() {
+      return request.resource.data.keys().hasAll(['ownerId', 'ownerEmail', 'memberIds', 'memberEmails', 'pendingInviteEmails'])
+        && shoppingOwnerIdUnchanged()
+        && request.resource.data.ownerEmail == resource.data.ownerEmail
+        && request.resource.data.memberIds == resource.data.memberIds
+        && request.resource.data.memberEmails == resource.data.memberEmails
+        && request.resource.data.pendingInviteEmails == resource.data.pendingInviteEmails
+        && (
+          !resource.data.keys().hasAny(['members'])
+          || request.resource.data.members == resource.data.members
+        );
+    }
+
+    function shoppingAcceptingInvite() {
+      return isShoppingListPendingInvitee()
+        && shoppingOwnerIdUnchanged()
+        && request.resource.data.keys().hasAll(['ownerEmail', 'memberIds', 'memberEmails', 'pendingInviteEmails'])
+        && request.resource.data.ownerEmail == resource.data.ownerEmail
+        && request.resource.data.memberIds is list
+        && request.resource.data.memberEmails is list
+        && request.resource.data.pendingInviteEmails is list
+        && request.auth.uid in request.resource.data.memberIds
+        && !(request.auth.uid in resource.data.memberIds)
+        && request.resource.data.memberIds.size() == resource.data.memberIds.size() + 1
+        && shoppingAuthEmail() in request.resource.data.memberEmails
+        && !(shoppingAuthEmail() in request.resource.data.pendingInviteEmails)
+        && request.resource.data.pendingInviteEmails.size() < resource.data.pendingInviteEmails.size()
+        && request.resource.data.items == resource.data.items
+        && request.resource.data.collaborators == resource.data.collaborators;
+    }
+
+    function shoppingMemberContentOnlyUpdate() {
+      return isShoppingListMember()
+        && shoppingMembershipLocked();
+    }
+
+    function shoppingOwnerCreateValid(listId) {
+      return signedIn()
+        && listId == request.auth.uid
+        && request.resource.data.keys().hasAll(['ownerId', 'ownerEmail', 'memberIds', 'memberEmails', 'pendingInviteEmails', 'items', 'collaborators', 'updatedAt'])
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerEmail == shoppingAuthEmail()
+        && shoppingAuthEmail() != ''
+        && request.resource.data.memberIds is list
+        && request.resource.data.memberEmails is list
+        && request.resource.data.pendingInviteEmails is list
+        && request.auth.uid in request.resource.data.memberIds
+        && shoppingAuthEmail() in request.resource.data.memberEmails
+        && request.resource.data.items is list
+        && request.resource.data.collaborators is list;
+    }
+
+    match /shopping-lists/{listId} {
+      // Single-doc reads for owner, members, and pending invitees.
+      // Pending invite discovery uses /shopping-list-invites (list queries here are denied).
+      // Allow get on missing owned docs so clients can seed shopping-lists/{uid}.
+      allow get: if signedIn() && (
+        listId == request.auth.uid
+        || (
+          resource != null
+          && (
+            resource.data.ownerId == request.auth.uid
+            || (resource.data.memberIds is list && request.auth.uid in resource.data.memberIds)
+            || (resource.data.pendingInviteEmails is list && shoppingAuthEmail() in resource.data.pendingInviteEmails)
+          )
+        )
+      );
+      allow list: if false;
+
+      // One owned list doc per uid; owner seeds membership + empty pending invites.
+      allow create: if shoppingOwnerCreateValid(listId);
+
+      // Owner manages invites/members/content (ownerId stays fixed).
+      // Members may update items/collaborators only.
+      // Pending invitees may accept once (self +1 to memberIds, email leaves pending).
+      allow update: if signedIn() && (
+        (isShoppingListOwner() && shoppingOwnerIdUnchanged())
+        || shoppingMemberContentOnlyUpdate()
+        || shoppingAcceptingInvite()
+      );
+
+      allow delete: if isShoppingListOwner();
+    }
+
+    // Email invite mailbox: invitees query their own invites without listing shopping-lists.
+    match /shopping-list-invites/{inviteId} {
+      allow get: if signedIn() && (
+        resource.data.ownerId == request.auth.uid
+        || (shoppingAuthEmail() != '' && resource.data.inviteeEmail == shoppingAuthEmail())
+      );
+
+      // Invitee inbox query: where('inviteeEmail', '==', authEmail)
+      allow list: if signedIn()
+        && shoppingAuthEmail() != ''
+        && resource.data.inviteeEmail == shoppingAuthEmail();
+
+      allow create: if signedIn()
+        && shoppingAuthEmail() != ''
+        && request.resource.data.keys().hasAll(['listId', 'ownerId', 'ownerEmail', 'inviteeEmail', 'createdAt'])
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.listId == request.auth.uid
+        && request.resource.data.ownerEmail == shoppingAuthEmail()
+        && request.resource.data.inviteeEmail is string
+        && request.resource.data.inviteeEmail == request.resource.data.inviteeEmail.lower()
+        && request.resource.data.inviteeEmail != shoppingAuthEmail();
+
+      allow delete: if signedIn() && (
+        resource.data.ownerId == request.auth.uid
+        || (shoppingAuthEmail() != '' && resource.data.inviteeEmail == shoppingAuthEmail())
+      );
+
+      allow update: if false;
+    }
+
     match /app-config/{docId} {
       allow read: if signedIn();
-      allow write: if isAdminEmail();
+      // Admin doc is managed manually (console/admin SDK) or by existing admins only.
+      allow create: if isAdminEmail();
+      allow update, delete: if isAdminEmail();
     }
 
     match /user-moderation/{uid} {
