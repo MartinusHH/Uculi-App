@@ -8253,7 +8253,8 @@
             }
 
             const face = options.face === 'back' ? 'back' : 'front';
-            const avoidEditButton = options.avoidEditButton !== false && face === 'front';
+            const tallClosedCover = options.tallClosedCover === true;
+            const avoidEditButton = options.avoidEditButton !== false && face === 'front' && tallClosedCover;
 
             // Keep longer text stickers (e.g. GEZELLIG) fully on the cover.
             if (kind === 'text') {
@@ -8268,15 +8269,28 @@
             nextY = Math.max(18, Math.min(84, nextY));
 
             if (face === 'front') {
-                // Narrow closed covers: title + subtitle span most of the width under Bewerken.
-                // Keep that whole copy band clear (push down, never into the edit button).
-                if (nextY < 62) {
-                    nextY = Math.max(nextY, 68);
-                }
-
-                // Bewerken sits top-right on the saved closed cover.
-                if (avoidEditButton && nextX > 50 && nextY < 30) {
-                    nextY = Math.max(nextY, 34);
+                if (tallClosedCover) {
+                    // Tall closed phone cover: title + subtitle under Bewerken — push stickers down.
+                    if (nextY < 62) {
+                        nextY = Math.max(nextY, 68);
+                    }
+                    if (avoidEditButton && nextX > 50 && nextY < 30) {
+                        nextY = Math.max(nextY, 34);
+                    }
+                } else {
+                    // Short/wide editor preview (~8rem tall on phone): title + subtitle fill most
+                    // of the left side. Nudge stickers right — never pack them downward onto copy.
+                    if (nextX < 72 && nextY < 72) {
+                        nextX = Math.max(nextX, 78);
+                        if (kind === 'text') {
+                            const maxX = size === 'lg' ? 66 : size === 'sm' ? 74 : 72;
+                            nextX = Math.min(nextX, maxX);
+                        } else if (kind === 'photo') {
+                            nextX = Math.min(nextX, 78);
+                        } else {
+                            nextX = Math.min(nextX, 80);
+                        }
+                    }
                 }
             }
 
@@ -8284,9 +8298,12 @@
         }
 
         // Display-only: separate narrow-cover stickers so they do not stack on each other.
+        // Slot packing is only for the tall closed cover — never the editor live preview.
         function resolveNotebookCoverStickerPlacements(stickers = [], options = {}) {
             const face = options.face === 'back' ? 'back' : 'front';
+            const tallClosedCover = options.tallClosedCover === true;
             const avoidEditButton = options.avoidEditButton !== false;
+            const clampOptions = { face, avoidEditButton, tallClosedCover };
             const placements = new Map();
             const items = [];
 
@@ -8298,7 +8315,7 @@
                     Number(normalized.y) || 50,
                     normalized.kind,
                     normalized.size,
-                    { face, avoidEditButton }
+                    clampOptions
                 );
                 const extent = estimateNotebookCoverStickerExtent(normalized.kind, normalized.size);
                 const item = {
@@ -8314,7 +8331,7 @@
                 placements.set(index, { x: item.x, y: item.y });
             });
 
-            if (!isNarrowNotebookCoverViewport() || items.length < 2) {
+            if (!isNarrowNotebookCoverViewport() || !tallClosedCover || items.length < 2) {
                 return placements;
             }
 
@@ -8323,7 +8340,7 @@
                 && Math.abs(a.y - b.y) < (a.ry + b.ry) * 1.02
             );
 
-            // Phone covers are tiny: pack into a diagonal 2x2 grid below the copy band.
+            // Phone closed covers are tiny: pack into a diagonal 2x2 grid below the copy band.
             // Wide text stickers take opposite corners first so they never share a row.
             const slots = face === 'back'
                 ? [
@@ -8353,7 +8370,7 @@
                     slot.y,
                     item.kind,
                     item.size,
-                    { face, avoidEditButton }
+                    clampOptions
                 );
                 item.x = clamped.x;
                 item.y = clamped.y;
@@ -8380,8 +8397,8 @@
                             a.y += dir * push;
                             b.y -= dir * push;
                         }
-                        const aClamped = clampNotebookCoverStickerPlacement(a.x, a.y, a.kind, a.size, { face, avoidEditButton });
-                        const bClamped = clampNotebookCoverStickerPlacement(b.x, b.y, b.kind, b.size, { face, avoidEditButton });
+                        const aClamped = clampNotebookCoverStickerPlacement(a.x, a.y, a.kind, a.size, clampOptions);
+                        const bClamped = clampNotebookCoverStickerPlacement(b.x, b.y, b.kind, b.size, clampOptions);
                         a.x = aClamped.x;
                         a.y = aClamped.y;
                         b.x = bClamped.x;
@@ -8705,10 +8722,12 @@
 
         function renderNotebookCoverStickers(cover, isEditorPreview = false, face = 'front') {
             const safeFace = face === 'back' ? 'back' : 'front';
+            // Slot packing is for the tall closed phone cover only — not the short editor preview.
+            const tallClosedCover = !isEditorPreview;
             const placements = resolveNotebookCoverStickerPlacements(cover.stickers || [], {
                 face: safeFace,
-                // Bewerken only exists on the saved closed cover, not the editor preview.
-                avoidEditButton: !isEditorPreview
+                avoidEditButton: tallClosedCover,
+                tallClosedCover
             });
             return (cover.stickers || []).map((sticker, index) => {
                 const normalized = normalizeNotebookCoverSticker(sticker, index);
@@ -8723,7 +8742,7 @@
                     Number(normalized.y) || 50,
                     kind,
                     normalized.size,
-                    { face: safeFace, avoidEditButton: !isEditorPreview }
+                    { face: safeFace, avoidEditButton: tallClosedCover, tallClosedCover }
                 );
                 const stickerX = placed.x;
                 const stickerY = placed.y;
@@ -8874,19 +8893,57 @@
             `;
         }
 
-        function fitCoverTextToBox(el) {
-            if (!(el instanceof HTMLElement)) return;
-            const copy = el.closest('.cover-face-copy');
-            const limit = Math.min(
+        function getCoverTextWidthLimit(el, copy) {
+            const base = Math.min(
                 copy?.clientWidth || Number.POSITIVE_INFINITY,
                 el.clientWidth || Number.POSITIVE_INFINITY
             );
-            if (!Number.isFinite(limit) || limit < 20) return;
+            if (!Number.isFinite(base) || base < 20) return base;
+
+            const inPreview = Boolean(el.closest('#cover-editor-preview-surface'));
+            // Narrow closed cover packs stickers below the copy band — no width carve-out needed.
+            // Desktop saved cover + editor preview: stop title/subtitle under stickers.
+            if (!inPreview && isNarrowNotebookCoverViewport()) return base;
+
+            const panel = el.closest('.notebook-cover-panel');
+            if (!panel) return base;
+            const stickers = [...panel.querySelectorAll('[data-cover-sticker-face="front"]')];
+            if (!stickers.length) return base;
+
+            const tr = el.getBoundingClientRect();
+            let limitRight = (copy || el).getBoundingClientRect().right;
+            stickers.forEach(sticker => {
+                const r = sticker.getBoundingClientRect();
+                // Stickers that share the text's vertical band can hide letters.
+                if (r.bottom > tr.top + 2 && r.top < tr.bottom - 2) {
+                    limitRight = Math.min(limitRight, r.left - 12);
+                }
+            });
+            const constrained = limitRight - tr.left;
+            if (!Number.isFinite(constrained) || constrained < 40) return base;
+            return Math.min(base, constrained);
+        }
+
+        function fitCoverTextToBox(el) {
+            if (!(el instanceof HTMLElement)) return;
+            const copy = el.closest('.cover-face-copy');
+            el.style.maxWidth = '';
             el.style.fontSize = '';
             el.style.whiteSpace = 'nowrap';
             el.style.overflowWrap = 'normal';
             el.style.wordBreak = 'normal';
             el.style.hyphens = 'manual';
+
+            let limit = getCoverTextWidthLimit(el, copy);
+            if (!Number.isFinite(limit) || limit < 20) return;
+
+            // When stickers constrain width on desktop, pin max-width so wrap stays clear of them.
+            const naturalWidth = Math.min(copy?.clientWidth || el.clientWidth, el.clientWidth || copy?.clientWidth || limit);
+            if (limit < naturalWidth - 1) {
+                el.style.maxWidth = `${Math.max(40, Math.floor(limit))}px`;
+                limit = getCoverTextWidthLimit(el, copy);
+            }
+
             const computed = parseFloat(getComputedStyle(el).fontSize) || 16;
             const inPreview = Boolean(el.closest('#cover-editor-preview-surface'));
             const isNarrow = isNarrowNotebookCoverViewport();
@@ -8914,6 +8971,28 @@
                 size = Math.max(hardMin, size - 1);
                 el.style.fontSize = `${size}px`;
                 guard += 1;
+            }
+
+            // If letters still sit under a sticker after width/fit, shrink a bit more
+            // (desktop saved cover + editor preview; skip packed narrow closed cover).
+            if (inPreview || !isNarrow) {
+                const panel = el.closest('.notebook-cover-panel');
+                const stickers = panel
+                    ? [...panel.querySelectorAll('[data-cover-sticker-face="front"]')]
+                    : [];
+                const overlapsSticker = () => {
+                    const tr = el.getBoundingClientRect();
+                    return stickers.some(sticker => {
+                        const r = sticker.getBoundingClientRect();
+                        return !(r.right <= tr.left || r.left >= tr.right || r.bottom <= tr.top || r.top >= tr.bottom);
+                    });
+                };
+                guard = 0;
+                while (overlapsSticker() && size > hardMin && guard < 40) {
+                    size = Math.max(hardMin, size - 1);
+                    el.style.fontSize = `${size}px`;
+                    guard += 1;
+                }
             }
         }
 
