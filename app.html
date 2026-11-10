@@ -6226,10 +6226,10 @@
                         <div class="app-modal-panel app-modal-panel--wide scale-95 transition-transform duration-300">
                             <div class="flex items-center justify-between gap-3 border-b border-parchmentDark bg-parchment p-3 md:p-4">
                                 <div>
-                                    <h2 class="font-fantasy font-bold text-xl text-forest md:text-2xl">Edit Notebook Cover</h2>
+                                    <h2 class="font-fantasy font-bold text-xl text-forest md:text-2xl">Kaft bewerken</h2>
                                     <p class="mt-0.5 text-xs font-semibold text-sage md:text-sm">Geef je kaft een kleur, titel en stickers. Dit blijft privé in je eigen archief.</p>
                                 </div>
-                                <button onclick="closeCoverEditor()" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-parchmentDark bg-white text-forest transition-colors hover:border-gold hover:text-sage" aria-label="Close cover editor">
+                                <button onclick="closeCoverEditor()" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-parchmentDark bg-white text-forest transition-colors hover:border-gold hover:text-sage" aria-label="Kafteditor sluiten">
                                     <i data-lucide="x" class="w-5 h-5"></i>
                                 </button>
                             </div>
@@ -6237,9 +6237,9 @@
                             <div id="cover-editor-body" class="app-modal-body p-3 md:p-5"></div>
 
                             <div class="app-modal-footer border-t border-parchmentDark bg-parchment p-3 md:p-4">
-                                <button onclick="closeCoverEditor()" data-app-button="secondary" data-app-button-size="md">Cancel</button>
-                                <button onclick="saveCoverEditor()" data-app-button="primary" data-app-button-size="md" data-app-button-extra="phone-save-icon" aria-label="Save Cover" title="Save Cover">
-                                    <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Save Cover</span>
+                                <button onclick="closeCoverEditor()" data-app-button="secondary" data-app-button-size="md">Annuleren</button>
+                                <button onclick="saveCoverEditor()" data-app-button="primary" data-app-button-size="md" data-app-button-extra="phone-save-icon" aria-label="Kaft opslaan" title="Kaft opslaan">
+                                    <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Kaft opslaan</span>
                                 </button>
                             </div>
                         </div>
@@ -7348,7 +7348,7 @@
             recipeLimit: 'add more than 3 recipes',
             publishRecipes: 'publish recipes',
             createFamilies: 'create families',
-            notebookCovers: 'customize notebook covers',
+            notebookCovers: 'de kaft van je schrift aanpassen',
             stickyNotes: 'use sticky notes'
         };
         let accountPlanLoadPromise = null;
@@ -7380,6 +7380,7 @@
                 'publish recipes': 'publishRecipes',
                 'create families': 'createFamilies',
                 'customize notebook covers': 'notebookCovers',
+                'de kaft van je schrift aanpassen': 'notebookCovers',
                 'use sticky notes': 'stickyNotes'
             };
             return aliasMap[normalized] || raw;
@@ -7941,9 +7942,9 @@
             const safeKind = ['text', 'emoji', 'photo'].includes(kind) ? kind : 'text';
             const safeFace = face === 'back' ? 'back' : 'front';
             const textPresets = [
-                { text: 'SOUP', color: 'blue', background: 'solid', x: 80, y: 20, size: 'md', rotation: -6 },
-                { text: 'COSY', color: 'gold', background: 'solid', x: 24, y: 78, size: 'sm', rotation: 5 },
-                { text: 'HOME', color: 'sage', background: 'solid', x: 76, y: 78, size: 'md', rotation: -3 }
+                { text: 'SOEP', color: 'blue', background: 'solid', x: 80, y: 20, size: 'md', rotation: -6 },
+                { text: 'GEZELLIG', color: 'gold', background: 'solid', x: 24, y: 78, size: 'sm', rotation: 5 },
+                { text: 'THUIS', color: 'sage', background: 'solid', x: 76, y: 78, size: 'md', rotation: -3 }
             ];
             const emojiPresets = [
                 { emoji: '🥣', color: 'blue', background: 'none', x: 78, y: 22, size: 'md', rotation: -8 },
@@ -8029,27 +8030,27 @@
 
         function getNotebookCoverStickerEmojiOptions() {
             return [
-                { value: '', label: 'No emoji' },
-                { value: '🥣', label: '🥣 Bowl' },
-                { value: '🍲', label: '🍲 Stew' },
-                { value: '🍜', label: '🍜 Noodles' },
-                { value: '🍰', label: '🍰 Cake' },
-                { value: '🥖', label: '🥖 Bread' },
-                { value: '☕', label: '☕ Coffee' },
-                { value: '🍋', label: '🍋 Lemon' },
-                { value: '🌿', label: '🌿 Herb' },
-                { value: '🍄', label: '🍄 Mushroom' },
-                { value: '🔥', label: '🔥 Flame' },
-                { value: '✨', label: '✨ Sparkles' },
-                { value: '💛', label: '💛 Heart' },
-                { value: '📖', label: '📖 Book' },
+                { value: '', label: 'Geen emoji' },
+                { value: '🥣', label: '🥣 Kom' },
+                { value: '🍲', label: '🍲 Stoofpot' },
+                { value: '🍜', label: '🍜 Noedels' },
+                { value: '🍰', label: '🍰 Taart' },
+                { value: '🥖', label: '🥖 Brood' },
+                { value: '☕', label: '☕ Koffie' },
+                { value: '🍋', label: '🍋 Citroen' },
+                { value: '🌿', label: '🌿 Kruid' },
+                { value: '🍄', label: '🍄 Champignon' },
+                { value: '🔥', label: '🔥 Vlam' },
+                { value: '✨', label: '✨ Glitters' },
+                { value: '💛', label: '💛 Hart' },
+                { value: '📖', label: '📖 Boek' },
                 { value: '🧁', label: '🧁 Cupcake' },
-                { value: '🍓', label: '🍓 Strawberry' },
-                { value: '🥕', label: '🥕 Carrot' },
-                { value: '🧄', label: '🧄 Garlic' },
-                { value: '🧈', label: '🧈 Butter' },
-                { value: '🌞', label: '🌞 Sun' },
-                { value: '🌙', label: '🌙 Moon' }
+                { value: '🍓', label: '🍓 Aardbei' },
+                { value: '🥕', label: '🥕 Wortel' },
+                { value: '🧄', label: '🧄 Knoflook' },
+                { value: '🧈', label: '🧈 Boter' },
+                { value: '🌞', label: '🌞 Zon' },
+                { value: '🌙', label: '🌙 Maan' }
             ];
         }
 
@@ -8618,7 +8619,7 @@
                     <div class="relative z-20 flex items-start justify-end gap-4 pt-1">
                         ${!isEditorPreview ? `
                             <button onclick="event.stopPropagation(); openCoverEditor()" onpointerdown="event.stopPropagation()" class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-white border-opacity-30 bg-white bg-opacity-20 px-4 text-[10px] font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur-sm">
-                                <i data-lucide="pencil-ruler" class="h-4 w-4"></i> Edit
+                                <i data-lucide="pencil-ruler" class="h-4 w-4"></i> Bewerken
                             </button>
                         ` : ''}
                     </div>
@@ -8934,7 +8935,7 @@
         function addDraftCoverSticker(kind = 'text') {
             if (!draftNotebookCover) return;
             if (draftNotebookCover.stickers.length >= 6) {
-                showToast('Maximum 6 cover stickers', 'stickers');
+                showToast('Maximaal 6 kaftstickers', 'stickers');
                 return;
             }
 
@@ -8952,7 +8953,7 @@
                 draftNotebookCover.stickers[index] = normalizeNotebookCoverSticker({
                     ...sticker,
                     kind: nextKind,
-                    text: nextKind === 'text' ? (sticker.text || 'SOUP') : '',
+                    text: nextKind === 'text' ? (sticker.text || 'SOEP') : '',
                     emoji: nextKind === 'emoji' ? (sticker.emoji || '✨') : '',
                     photo: nextKind === 'photo' ? (sticker.photo || '') : '',
                     background: nextKind === 'emoji' ? (sticker.background || 'none') : 'solid'
@@ -9054,7 +9055,7 @@
             userSettings.notebookCover = normalizeNotebookCover(draftNotebookCover);
             saveData();
             closeCoverEditor();
-            showToast('Cover saved!', 'book-open');
+            showToast('Kaft opgeslagen!', 'book-open');
             if (currentView === 'index' && indexViewMode === 'book') {
                 renderList();
             }
@@ -9073,11 +9074,11 @@
                 { key: 'schets', label: 'Schets' },
                 { key: 'spikkel', label: 'Spikkel' },
                 { key: 'vlekken', label: 'Vlekken' },
-                { key: 'oat', label: 'Oat' },
-                { key: 'sage', label: 'Sage' },
-                { key: 'berry', label: 'Berry' },
-                { key: 'midnight', label: 'Midnight' },
-                { key: 'sunflower', label: 'Sunflower' }
+                { key: 'oat', label: 'Haver' },
+                { key: 'sage', label: 'Salie' },
+                { key: 'berry', label: 'Bes' },
+                { key: 'midnight', label: 'Middernacht' },
+                { key: 'sunflower', label: 'Zonnebloem' }
             ];
 
             const previewFace = draftCoverPreviewFace === 'back' ? 'back' : 'front';
@@ -9087,7 +9088,7 @@
                 <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1.1fr,0.9fr]">
                     <div class="rounded-[28px] border border-parchmentDark bg-accent bg-opacity-40 p-5 md:p-6">
                         <div class="flex flex-wrap items-center justify-between gap-3">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Live preview</p>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Live voorbeeld</p>
                             <div class="inline-flex rounded-full border border-parchmentDark bg-white p-1 shadow-sm" role="group" aria-label="Kaftzijde">
                                 <button type="button" onclick="setDraftCoverPreviewFace('front')" class="cover-look-choice ${previewFace === 'front' ? 'is-active' : ''}" aria-pressed="${previewFace === 'front' ? 'true' : 'false'}">Voorkant</button>
                                 <button type="button" onclick="setDraftCoverPreviewFace('back')" class="cover-look-choice ${previewFace === 'back' ? 'is-active' : ''}" aria-pressed="${previewFace === 'back' ? 'true' : 'false'}">Achterkant</button>
@@ -9104,16 +9105,16 @@
                     <div class="space-y-5">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Title</label>
-                                <input id="cover-field-title" type="text" maxlength="40" value="${escapeHTML(draftNotebookCover.title || '')}" oninput="setDraftCoverField('title', this.value)" class="${inputClass}" placeholder="Kitchen Notebook">
+                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Titel</label>
+                                <input id="cover-field-title" type="text" maxlength="40" value="${escapeHTML(draftNotebookCover.title || '')}" oninput="setDraftCoverField('title', this.value)" class="${inputClass}" placeholder="Keukenschrift">
                             </div>
                             <div>
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Spine Label</label>
+                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Rugtekst</label>
                                 <input id="cover-field-spine" type="text" maxlength="28" value="${escapeHTML(draftNotebookCover.spineLabel || '')}" oninput="setDraftCoverField('spineLabel', this.value)" class="${inputClass}" placeholder="Uculi">
                             </div>
                             <div class="md:col-span-2">
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Subtitle</label>
-                                <textarea id="cover-field-subtitle" oninput="setDraftCoverField('subtitle', this.value)" class="${textareaClass}" placeholder="Add a personal line on the cover...">${escapeHTML(draftNotebookCover.subtitle || '')}</textarea>
+                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Ondertitel</label>
+                                <textarea id="cover-field-subtitle" oninput="setDraftCoverField('subtitle', this.value)" class="${textareaClass}" placeholder="Voeg een persoonlijke regel op de kaft toe…">${escapeHTML(draftNotebookCover.subtitle || '')}</textarea>
                             </div>
                             <div class="md:col-span-2">
                                 ${renderCoverLookControls()}
@@ -9122,7 +9123,7 @@
 
                         <div class="rounded-xl border border-parchmentDark bg-white p-4">
                             <div class="flex items-center justify-between gap-3 mb-4">
-                                <p class="text-xs font-bold uppercase tracking-[0.22em] text-sage">Cover Palette</p>
+                                <p class="text-xs font-bold uppercase tracking-[0.22em] text-sage">Kaftkleuren</p>
                                 <i data-lucide="palette" class="w-4 h-4 text-gold"></i>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -9191,7 +9192,7 @@
                                         ${kind === 'text' ? `
                                             <div>
                                                 <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Tekst</label>
-                                                <input type="text" maxlength="18" value="${escapeHTML(normalized.text || '')}" oninput="updateDraftCoverSticker(${index}, 'text', this.value)" class="${inputClass}" placeholder="SOUP CLUB">
+                                                <input type="text" maxlength="18" value="${escapeHTML(normalized.text || '')}" oninput="updateDraftCoverSticker(${index}, 'text', this.value)" class="${inputClass}" placeholder="SOEPCLUB">
                                             </div>
                                         ` : ''}
 
@@ -9224,18 +9225,18 @@
                                                 <div>
                                                     <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Kleur</label>
                                                     <select onchange="updateDraftCoverSticker(${index}, 'color', this.value)" class="${inputClass}">
-                                                        <option value="gold" ${normalized.color === 'gold' ? 'selected' : ''}>Gold</option>
-                                                        <option value="blue" ${normalized.color === 'blue' ? 'selected' : ''}>Blue</option>
-                                                        <option value="coral" ${normalized.color === 'coral' ? 'selected' : ''}>Coral</option>
-                                                        <option value="sage" ${normalized.color === 'sage' ? 'selected' : ''}>Sage</option>
-                                                        <option value="lilac" ${normalized.color === 'lilac' ? 'selected' : ''}>Lilac</option>
-                                                        <option value="cream" ${normalized.color === 'cream' ? 'selected' : ''}>Cream</option>
+                                                        <option value="gold" ${normalized.color === 'gold' ? 'selected' : ''}>Goud</option>
+                                                        <option value="blue" ${normalized.color === 'blue' ? 'selected' : ''}>Blauw</option>
+                                                        <option value="coral" ${normalized.color === 'coral' ? 'selected' : ''}>Koraal</option>
+                                                        <option value="sage" ${normalized.color === 'sage' ? 'selected' : ''}>Salie</option>
+                                                        <option value="lilac" ${normalized.color === 'lilac' ? 'selected' : ''}>Lila</option>
+                                                        <option value="cream" ${normalized.color === 'cream' ? 'selected' : ''}>Crème</option>
                                                     </select>
                                                 </div>
                                                 <div>
                                                     <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Achtergrond</label>
                                                     <select onchange="updateDraftCoverSticker(${index}, 'background', this.value)" class="${inputClass}">
-                                                        <option value="solid" ${normalized.background !== 'none' ? 'selected' : ''}>Sticker</option>
+                                                        <option value="solid" ${normalized.background !== 'none' ? 'selected' : ''}>Met vlak</option>
                                                         <option value="none" ${normalized.background === 'none' ? 'selected' : ''}>Transparant</option>
                                                     </select>
                                                 </div>
@@ -9243,9 +9244,9 @@
                                             <div>
                                                 <label class="block text-[11px] font-bold uppercase tracking-[0.2em] text-sage mb-2">Grootte</label>
                                                 <select onchange="updateDraftCoverSticker(${index}, 'size', this.value)" class="${inputClass}">
-                                                    <option value="sm" ${normalized.size === 'sm' ? 'selected' : ''}>Small</option>
-                                                    <option value="md" ${normalized.size === 'md' ? 'selected' : ''}>Medium</option>
-                                                    <option value="lg" ${normalized.size === 'lg' ? 'selected' : ''}>Large</option>
+                                                    <option value="sm" ${normalized.size === 'sm' ? 'selected' : ''}>Klein</option>
+                                                    <option value="md" ${normalized.size === 'md' ? 'selected' : ''}>Middel</option>
+                                                    <option value="lg" ${normalized.size === 'lg' ? 'selected' : ''}>Groot</option>
                                                 </select>
                                             </div>
                                             <div>
@@ -17830,8 +17831,8 @@
                     ? activeFilters.map(filter => `<span class="notebook-landing-pill">${escapeHTML(filter)}</span>`).join('')
                     : '';
                 const noteCount = notebookStickyNotes.length;
-                const recipeWord = totalPages === 1 ? 'recipe' : 'recipes';
-                const noteWord = noteCount === 1 ? 'note' : 'notes';
+                const recipeWord = totalPages === 1 ? 'recept' : 'recepten';
+                const noteWord = noteCount === 1 ? 'notitie' : 'notities';
 
                 return `
                     <div class="mb-4">
@@ -17839,27 +17840,27 @@
                             <div class="notebook-landing-stage">
                                 <div class="notebook-landing-cover-column">
                                     <div class="notebook-cover-shell notebook-book-cover-frame notebook-landing-cover-frame">
-                                        <div id="notebook-cover-surface" class="notebook-book-cover-surface notebook-cover-panel notebook-landing-cover-surface rounded-[32px] border px-6 py-6 text-[#1c1410] md:px-8 md:py-8" style="${getNotebookCoverPanelStyle(coverConfig)}" role="button" tabindex="0" aria-label="Open notebook" data-cover-openable="true" onclick="openNotebookCover()" onkeydown="if (event.target !== event.currentTarget) return; if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openNotebookCover(); }">
+                                        <div id="notebook-cover-surface" class="notebook-book-cover-surface notebook-cover-panel notebook-landing-cover-surface rounded-[32px] border px-6 py-6 text-[#1c1410] md:px-8 md:py-8" style="${getNotebookCoverPanelStyle(coverConfig)}" role="button" tabindex="0" aria-label="Open schrift" data-cover-openable="true" onclick="openNotebookCover()" onkeydown="if (event.target !== event.currentTarget) return; if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openNotebookCover(); }">
                                             ${renderNotebookCoverFace(coverConfig, recipe, totalPages, false)}
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="notebook-landing-invite">
-                                    <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Ready to open</p>
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Klaar om te openen</p>
                                     <h2>${safeRecipeTitle}</h2>
-                                    <p>${totalIngredients} ingredients · ${totalInstructions} steps. Open the notebook to cook, annotate, or turn the pages.</p>
+                                    <p>${totalIngredients} ingrediënten · ${totalInstructions} stappen. Open het schrift om te koken, notities te maken of bladzijden om te slaan.</p>
                                     <div class="notebook-landing-action-row">
                                         <button onclick="openNotebookCover()" class="${getAppButtonClasses('primary', { size: 'lg' })} rounded-2xl shadow-[0_16px_28px_rgba(45,77,52,0.24)]" translate="no">
-                                            <i data-lucide="book-open" class="h-4 w-4"></i>Open notebook
+                                            <i data-lucide="book-open" class="h-4 w-4"></i>Open schrift
                                         </button>
                                         <button type="button" onclick="${pdfActions.bookAction}" class="${getAppButtonClasses(accountHasPremiumPlan() ? 'secondary' : 'locked', { size: 'lg' })} rounded-2xl" title="${pdfActions.book}" aria-label="${pdfActions.book}">
                                             <i data-lucide="${accountHasPremiumPlan() ? 'file-down' : 'lock'}" class="h-4 w-4"></i>${pdfActions.book}
                                         </button>
                                     </div>
-                                    <p class="notebook-landing-hint notebook-landing-hint-desktop">Click the cover or the button to open the full spread.</p>
-                                    <p class="notebook-landing-hint notebook-landing-hint-touch">Tap the cover to open the full spread.</p>
-                                    <p class="notebook-landing-meta">${totalPages} ${recipeWord} · ${notebookRecipeSpreads.length} spreads · ${noteCount} ${noteWord}</p>
+                                    <p class="notebook-landing-hint notebook-landing-hint-desktop">Klik op de kaft of de knop om de volledige openslag te openen.</p>
+                                    <p class="notebook-landing-hint notebook-landing-hint-touch">Tik op de kaft om de volledige openslag te openen.</p>
+                                    <p class="notebook-landing-meta">${totalPages} ${recipeWord} · ${notebookRecipeSpreads.length} openslagen · ${noteCount} ${noteWord}</p>
                                     ${hasActiveFilters ? `<div class="notebook-landing-pill-row">${activeFilterPills}</div>` : ''}
                                 </div>
                             </div>
