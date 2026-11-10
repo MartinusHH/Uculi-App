@@ -43,7 +43,8 @@
       "firebase-debug.log",
       "tools/**",
       "package.json",
-      "package-lock.json"
+      "package-lock.json",
+      "functions/**"
     ],
     "redirects": [
       {
