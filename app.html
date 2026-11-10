@@ -4624,6 +4624,11 @@
             .notebook-cover-panel {
                 --cover-sticker-scale: 0.72;
             }
+
+            /* Short editor preview cannot fit four full-size stickers without stacking. */
+            #cover-editor-preview-surface.notebook-cover-panel {
+                --cover-sticker-scale: 0.4;
+            }
         }
 
         .notebook-cover-sticker.is-transparent {
@@ -8256,15 +8261,19 @@
             const tallClosedCover = options.tallClosedCover === true;
             const avoidEditButton = options.avoidEditButton !== false && face === 'front' && tallClosedCover;
 
+            const previewStagger = options.previewStagger === true && !tallClosedCover;
             // Keep longer text stickers (e.g. GEZELLIG) fully on the cover.
+            // Preview stagger may sit farther right so stickers can clear each other.
             if (kind === 'text') {
                 const minX = size === 'lg' ? 34 : size === 'sm' ? 28 : 30;
-                const maxX = size === 'lg' ? 66 : size === 'sm' ? 74 : 72;
+                const maxX = previewStagger
+                    ? 84
+                    : (size === 'lg' ? 66 : size === 'sm' ? 74 : 72);
                 nextX = Math.max(minX, Math.min(maxX, nextX));
             } else if (kind === 'photo') {
-                nextX = Math.max(22, Math.min(78, nextX));
+                nextX = Math.max(22, Math.min(previewStagger ? 86 : 78, nextX));
             } else {
-                nextX = Math.max(18, Math.min(80, nextX));
+                nextX = Math.max(18, Math.min(previewStagger ? 86 : 80, nextX));
             }
             nextY = Math.max(18, Math.min(84, nextY));
 
@@ -8280,15 +8289,15 @@
                 } else {
                     // Short/wide editor preview (~8rem tall on phone): title + subtitle fill most
                     // of the left side. Nudge stickers right — never pack them downward onto copy.
-                    if (nextX < 72 && nextY < 72) {
-                        nextX = Math.max(nextX, 78);
+                    if (nextX < 66 && nextY < 72) {
+                        nextX = Math.max(nextX, previewStagger ? 68 : 78);
                         if (kind === 'text') {
-                            const maxX = size === 'lg' ? 66 : size === 'sm' ? 74 : 72;
+                            const maxX = previewStagger ? 84 : (size === 'lg' ? 66 : size === 'sm' ? 74 : 72);
                             nextX = Math.min(nextX, maxX);
                         } else if (kind === 'photo') {
-                            nextX = Math.min(nextX, 78);
+                            nextX = Math.min(nextX, previewStagger ? 86 : 78);
                         } else {
-                            nextX = Math.min(nextX, 80);
+                            nextX = Math.min(nextX, previewStagger ? 86 : 80);
                         }
                     }
                 }
@@ -8303,7 +8312,8 @@
             const face = options.face === 'back' ? 'back' : 'front';
             const tallClosedCover = options.tallClosedCover === true;
             const avoidEditButton = options.avoidEditButton !== false;
-            const clampOptions = { face, avoidEditButton, tallClosedCover };
+            const previewStagger = !tallClosedCover;
+            const clampOptions = { face, avoidEditButton, tallClosedCover, previewStagger };
             const placements = new Map();
             const items = [];
 
@@ -8318,20 +8328,22 @@
                     clampOptions
                 );
                 const extent = estimateNotebookCoverStickerExtent(normalized.kind, normalized.size);
+                // Short preview panels make the same sticker cover more % height than tall covers.
+                const extentScale = previewStagger ? 1.55 : 1;
                 const item = {
                     index,
                     kind: normalized.kind,
                     size: normalized.size,
                     x: placed.x,
                     y: placed.y,
-                    rx: extent.rx,
-                    ry: extent.ry
+                    rx: extent.rx * extentScale,
+                    ry: extent.ry * extentScale
                 };
                 items.push(item);
                 placements.set(index, { x: item.x, y: item.y });
             });
 
-            if (!isNarrowNotebookCoverViewport() || !tallClosedCover || items.length < 2) {
+            if (!isNarrowNotebookCoverViewport() || items.length < 2) {
                 return placements;
             }
 
@@ -8340,73 +8352,117 @@
                 && Math.abs(a.y - b.y) < (a.ry + b.ry) * 1.02
             );
 
-            // Phone closed covers are tiny: pack into a diagonal 2x2 grid below the copy band.
-            // Wide text stickers take opposite corners first so they never share a row.
-            const slots = face === 'back'
-                ? [
-                    { x: 28, y: 24 },
-                    { x: 74, y: 78 },
-                    { x: 74, y: 28 },
-                    { x: 28, y: 74 },
-                    { x: 50, y: 48 },
-                    { x: 50, y: 84 }
-                ]
-                : [
-                    { x: 28, y: 66 },
-                    { x: 74, y: 84 },
-                    { x: 74, y: 66 },
-                    { x: 28, y: 84 },
-                    { x: 50, y: 74 },
-                    { x: 50, y: 86 }
-                ];
-            const ordered = [...items].sort((a, b) => {
-                const rank = (item) => (item.kind === 'text' ? 0 : item.kind === 'photo' ? 1 : 2);
-                return rank(a) - rank(b) || (a.y - b.y) || (a.x - b.x);
-            });
-            ordered.forEach((item, slotIndex) => {
-                const slot = slots[Math.min(slotIndex, slots.length - 1)];
-                const clamped = clampNotebookCoverStickerPlacement(
-                    slot.x,
-                    slot.y,
-                    item.kind,
-                    item.size,
-                    clampOptions
-                );
-                item.x = clamped.x;
-                item.y = clamped.y;
-            });
-
-            // Final micro-nudge if anything still collides after clamping into slots.
-            for (let pass = 0; pass < 6; pass += 1) {
-                let moved = false;
-                for (let i = 0; i < items.length; i += 1) {
-                    for (let j = i + 1; j < items.length; j += 1) {
-                        const a = items[i];
-                        const b = items[j];
-                        if (!boxesOverlap(a, b)) continue;
-                        const overlapX = (a.rx + b.rx) * 1.02 - Math.abs(a.x - b.x);
-                        const overlapY = (a.ry + b.ry) * 1.02 - Math.abs(a.y - b.y);
-                        if (overlapX <= overlapY) {
-                            const dir = (a.x === b.x) ? (a.index < b.index ? -1 : 1) : Math.sign(a.x - b.x) || 1;
-                            const push = overlapX / 2 + 0.5;
-                            a.x += dir * push;
-                            b.x -= dir * push;
-                        } else {
-                            const dir = (a.y === b.y) ? (a.index < b.index ? -1 : 1) : Math.sign(a.y - b.y) || 1;
-                            const push = overlapY / 2 + 0.5;
-                            a.y += dir * push;
-                            b.y -= dir * push;
+            const separateOverlapping = ({ preferVertical = false, passes = 8 } = {}) => {
+                for (let pass = 0; pass < passes; pass += 1) {
+                    let moved = false;
+                    for (let i = 0; i < items.length; i += 1) {
+                        for (let j = i + 1; j < items.length; j += 1) {
+                            const a = items[i];
+                            const b = items[j];
+                            if (!boxesOverlap(a, b)) continue;
+                            const overlapX = (a.rx + b.rx) * 1.02 - Math.abs(a.x - b.x);
+                            const overlapY = (a.ry + b.ry) * 1.02 - Math.abs(a.y - b.y);
+                            const useVertical = preferVertical || overlapY <= overlapX || Math.abs(a.x - b.x) < 10;
+                            if (!useVertical) {
+                                const dir = (a.x === b.x) ? (a.index < b.index ? -1 : 1) : Math.sign(a.x - b.x) || 1;
+                                const push = overlapX / 2 + 0.5;
+                                a.x += dir * push;
+                                b.x -= dir * push;
+                            } else {
+                                const dir = (a.y === b.y) ? (a.index < b.index ? -1 : 1) : Math.sign(a.y - b.y) || 1;
+                                const push = overlapY / 2 + 0.6;
+                                a.y += dir * push;
+                                b.y -= dir * push;
+                            }
+                            const aClamped = clampNotebookCoverStickerPlacement(a.x, a.y, a.kind, a.size, clampOptions);
+                            const bClamped = clampNotebookCoverStickerPlacement(b.x, b.y, b.kind, b.size, clampOptions);
+                            a.x = aClamped.x;
+                            a.y = aClamped.y;
+                            b.x = bClamped.x;
+                            b.y = bClamped.y;
+                            moved = true;
                         }
-                        const aClamped = clampNotebookCoverStickerPlacement(a.x, a.y, a.kind, a.size, clampOptions);
-                        const bClamped = clampNotebookCoverStickerPlacement(b.x, b.y, b.kind, b.size, clampOptions);
-                        a.x = aClamped.x;
-                        a.y = aClamped.y;
-                        b.x = bClamped.x;
-                        b.y = bClamped.y;
-                        moved = true;
                     }
+                    if (!moved) break;
                 }
-                if (!moved) break;
+            };
+
+            if (tallClosedCover) {
+                // Phone closed covers are tiny: pack into a diagonal 2x2 grid below the copy band.
+                // Wide text stickers take opposite corners first so they never share a row.
+                const slots = face === 'back'
+                    ? [
+                        { x: 28, y: 24 },
+                        { x: 74, y: 78 },
+                        { x: 74, y: 28 },
+                        { x: 28, y: 74 },
+                        { x: 50, y: 48 },
+                        { x: 50, y: 84 }
+                    ]
+                    : [
+                        { x: 28, y: 66 },
+                        { x: 74, y: 84 },
+                        { x: 74, y: 66 },
+                        { x: 28, y: 84 },
+                        { x: 50, y: 74 },
+                        { x: 50, y: 86 }
+                    ];
+                const ordered = [...items].sort((a, b) => {
+                    const rank = (item) => (item.kind === 'text' ? 0 : item.kind === 'photo' ? 1 : 2);
+                    return rank(a) - rank(b) || (a.y - b.y) || (a.x - b.x);
+                });
+                ordered.forEach((item, slotIndex) => {
+                    const slot = slots[Math.min(slotIndex, slots.length - 1)];
+                    const clamped = clampNotebookCoverStickerPlacement(
+                        slot.x,
+                        slot.y,
+                        item.kind,
+                        item.size,
+                        clampOptions
+                    );
+                    item.x = clamped.x;
+                    item.y = clamped.y;
+                });
+                separateOverlapping({ preferVertical: false, passes: 6 });
+            } else {
+                // Short editor preview: put wide text stickers on opposite corners of the
+                // right band so they never share a row with each other or the emoji/photo.
+                const previewSlots = face === 'back'
+                    ? [
+                        { x: 68, y: 18 },
+                        { x: 68, y: 84 },
+                        { x: 86, y: 44 },
+                        { x: 86, y: 66 },
+                        { x: 56, y: 30 },
+                        { x: 56, y: 72 }
+                    ]
+                    : [
+                        { x: 66, y: 18 },
+                        { x: 68, y: 84 },
+                        { x: 86, y: 44 },
+                        { x: 86, y: 66 },
+                        { x: 58, y: 30 },
+                        { x: 58, y: 72 }
+                    ];
+                // Text stickers first on opposite corners; emoji before photo so the
+                // bulkier photo sits lower in the right column.
+                const ordered = [...items].sort((a, b) => {
+                    const rank = (item) => (item.kind === 'text' ? 0 : item.kind === 'emoji' ? 1 : 2);
+                    return rank(a) - rank(b) || (a.y - b.y) || (a.x - b.x);
+                });
+                ordered.forEach((item, slotIndex) => {
+                    const slot = previewSlots[Math.min(slotIndex, previewSlots.length - 1)];
+                    const clamped = clampNotebookCoverStickerPlacement(
+                        slot.x,
+                        slot.y,
+                        item.kind,
+                        item.size,
+                        clampOptions
+                    );
+                    item.x = clamped.x;
+                    item.y = clamped.y;
+                });
+                separateOverlapping({ preferVertical: true, passes: 10 });
             }
 
             items.forEach(item => {
