@@ -6186,7 +6186,7 @@
                 </div>
                 <div class="app-header-copy">
                     <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
-                    <p class="app-header-subtitle"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
+                    <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -6220,17 +6220,17 @@
                     <div id="notes-modal" class="app-overlay fixed inset-0 bg-black bg-opacity-50 hidden opacity-0 transition-all duration-300 flex z-50">
                         <div class="app-modal-panel w-full max-w-2xl scale-95 transition-transform duration-300">
                             <div class="border-b border-parchmentDark bg-parchment p-5 md:p-6">
-                                <h2 class="font-fantasy font-bold text-3xl text-forest">Edit Your Notes</h2>
+                                <h2 class="font-fantasy font-bold text-3xl text-forest">Je notities bewerken</h2>
                             </div>
                             <div class="app-modal-body p-5 md:p-6">
-                                <textarea id="notes-textarea" placeholder="Add your personal modifications, tips, or reminders..." class="w-full h-40 rounded-md border border-sage p-4 text-forest font-semibold outline-none focus:border-gold"></textarea>
+                                <textarea id="notes-textarea" placeholder="Voeg persoonlijke tips of herinneringen toe…" class="w-full h-40 rounded-md border border-sage p-4 text-forest font-semibold outline-none focus:border-gold"></textarea>
                             </div>
                             <div class="app-modal-footer border-t border-parchmentDark bg-parchment p-5 md:p-6">
                                 <button onclick="closeNotesEditor()" data-app-button="secondary" data-app-button-size="lg" data-app-button-full-width="true">
-                                    Cancel
+                                    Annuleren
                                 </button>
-                                <button id="notes-save-btn" data-app-button="accent" data-app-button-size="lg" data-app-button-full-width="true" data-app-button-extra="phone-save-icon" aria-label="Save Notes" title="Save Notes">
-                                    <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Save Notes</span>
+                                <button id="notes-save-btn" data-app-button="accent" data-app-button-size="lg" data-app-button-full-width="true" data-app-button-extra="phone-save-icon" aria-label="Notities opslaan" title="Notities opslaan">
+                                    <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Notities opslaan</span>
                                 </button>
                             </div>
                         </div>
@@ -7063,6 +7063,11 @@
             return language;
         }
 
+        // Visible UI copy: English first (fallback), Dutch when language is nl.
+        function uiText(english, dutch) {
+            return getActiveUiLanguage() === 'nl' ? dutch : english;
+        }
+
         function getAuthI18n() {
             const lang = getActiveUiLanguage();
             const dictionary = {
@@ -7353,17 +7358,17 @@
             restoreReady: false
         };
         const premiumFeatureLabels = {
-            backupDownload: 'download backups',
-            backupRestore: 'restore backups',
-            cloudSync: 'use cloud sync',
-            notebookMode: 'use notebook mode',
-            recipePdfExport: 'download recipe PDFs',
-            recipeSharing: 'share recipes',
-            recipeLimit: 'add more than 3 recipes',
-            publishRecipes: 'publish recipes',
-            createFamilies: 'create families',
+            backupDownload: 'backups te downloaden',
+            backupRestore: 'backups te herstellen',
+            cloudSync: 'cloudsync te gebruiken',
+            notebookMode: 'het schrift te gebruiken',
+            recipePdfExport: 'recept-PDF\'s te downloaden',
+            recipeSharing: 'recepten te delen',
+            recipeLimit: 'meer dan 3 recepten toe te voegen',
+            publishRecipes: 'recepten te publiceren',
+            createFamilies: 'families aan te maken',
             notebookCovers: 'de kaft van je schrift aanpassen',
-            stickyNotes: 'use sticky notes'
+            stickyNotes: 'plakbriefjes te gebruiken'
         };
         let accountPlanLoadPromise = null;
         let accountPlanLoadedAt = '';
@@ -7384,18 +7389,28 @@
             const normalized = raw.toLowerCase();
             const aliasMap = {
                 'add more than 3 recipes': 'recipeLimit',
+                'meer dan 3 recepten toe te voegen': 'recipeLimit',
                 'recipe limit': 'recipeLimit',
                 'use cloud sync': 'cloudSync',
+                'cloudsync te gebruiken': 'cloudSync',
                 'use notebook mode': 'notebookMode',
+                'het schrift te gebruiken': 'notebookMode',
                 'download recipe pdfs': 'recipePdfExport',
+                'recept-pdf\'s te downloaden': 'recipePdfExport',
                 'share recipes': 'recipeSharing',
+                'recepten te delen': 'recipeSharing',
                 'download backups': 'backupDownload',
+                'backups te downloaden': 'backupDownload',
                 'restore backups': 'backupRestore',
+                'backups te herstellen': 'backupRestore',
                 'publish recipes': 'publishRecipes',
+                'recepten te publiceren': 'publishRecipes',
                 'create families': 'createFamilies',
+                'families aan te maken': 'createFamilies',
                 'customize notebook covers': 'notebookCovers',
                 'de kaft van je schrift aanpassen': 'notebookCovers',
-                'use sticky notes': 'stickyNotes'
+                'use sticky notes': 'stickyNotes',
+                'plakbriefjes te gebruiken': 'stickyNotes'
             };
             return aliasMap[normalized] || raw;
         }
@@ -8732,33 +8747,33 @@
                         const menuAlignmentClass = Number(note.x) < 34 ? 'is-left-aligned' : Number(note.x) > 66 ? 'is-right-aligned' : '';
                         const swatches = ['butter', 'rose', 'sage', 'sky', 'lavender'].map(color => {
                             const swatchPalette = getNotebookStickyNotePalette(color);
-                            return `<button type="button" onpointerdown="event.stopPropagation()" onclick="setNotebookStickyNoteColor(${recipeId}, ${index}, '${color}')" class="notebook-sticky-note-menu-swatch ${note.color === color ? 'is-active' : ''}" style="background:${swatchPalette.bg};" aria-label="Set sticky note color to ${color}"></button>`;
+                            return `<button type="button" onpointerdown="event.stopPropagation()" onclick="setNotebookStickyNoteColor(${recipeId}, ${index}, '${color}')" class="notebook-sticky-note-menu-swatch ${note.color === color ? 'is-active' : ''}" style="background:${swatchPalette.bg};" aria-label="Plakbriefjekleur: ${color}"></button>`;
                         }).join('');
                         return `
                             <div class="notebook-sticky-note-anchor ${noteIsActive ? 'is-active' : ''}" data-notebook-note-index="${index}" data-notebook-note-side="${noteSide}" style="left:${clampNotebookStickyNoteX(note.x)}%;top:${clampNotebookStickyNoteY(note.y)}%;">
                                 <article class="notebook-sticky-note ${getNotebookStickyNoteSizeClass(note.size)}" data-notebook-note-card="true" style="--sticky-note-bg:${palette.bg};--sticky-note-border:${palette.border};--sticky-note-ink:${palette.ink};--sticky-note-tape:${palette.tape};transform:rotate(${noteRotation}deg) scale(${noteScale});">
-                                    <button type="button" class="notebook-sticky-note-handle top-left" data-notebook-note-handle="top-left" aria-label="Resize and rotate sticky note"></button>
-                                    <button type="button" class="notebook-sticky-note-handle top-right" data-notebook-note-handle="top-right" aria-label="Resize and rotate sticky note"></button>
-                                    <button type="button" class="notebook-sticky-note-handle bottom-left" data-notebook-note-handle="bottom-left" aria-label="Resize and rotate sticky note"></button>
-                                    <button type="button" class="notebook-sticky-note-handle bottom-right" data-notebook-note-handle="bottom-right" aria-label="Resize and rotate sticky note"></button>
+                                    <button type="button" class="notebook-sticky-note-handle top-left" data-notebook-note-handle="top-left" aria-label="Plakbriefje schalen en draaien"></button>
+                                    <button type="button" class="notebook-sticky-note-handle top-right" data-notebook-note-handle="top-right" aria-label="Plakbriefje schalen en draaien"></button>
+                                    <button type="button" class="notebook-sticky-note-handle bottom-left" data-notebook-note-handle="bottom-left" aria-label="Plakbriefje schalen en draaien"></button>
+                                    <button type="button" class="notebook-sticky-note-handle bottom-right" data-notebook-note-handle="bottom-right" aria-label="Plakbriefje schalen en draaien"></button>
                                     <div class="notebook-sticky-note__body">
                                         <div class="notebook-sticky-note__preview" data-notebook-note-preview="${note.id}">${notePreviewMarkup}</div>
-                                        <span class="sr-only" data-notebook-note-plaintext="${note.id}">${escapeHTML(noteText || 'Empty sticky note. Click to edit.')}</span>
+                                        <span class="sr-only" data-notebook-note-plaintext="${note.id}">${escapeHTML(noteText || 'Leeg plakbriefje. Tik om te bewerken.')}</span>
                                     </div>
                                 </article>
                                 ${noteIsActive ? `
                                     <div class="notebook-sticky-note-menu ${menuPlacementClass} ${menuAlignmentClass}" data-notebook-note-menu="true" onpointerdown="event.stopPropagation()">
                                         <div class="flex items-center justify-between gap-3">
-                                            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-sage">Sticky note</p>
+                                            <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-sage">Plakbriefje</p>
                                             <button type="button" onpointerdown="event.stopPropagation()" onclick="closeNotebookStickyNoteMenu()" class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-parchmentDark bg-white text-sage shadow-sm">
                                                 <i data-lucide="x" class="h-4 w-4"></i>
                                             </button>
                                         </div>
-                                        <textarea maxlength="160" data-notebook-note-editor="${recipeId}-${index}" aria-label="Sticky note text" onpointerdown="event.stopPropagation()" oninput="updateNotebookStickyNoteText(${recipeId}, ${index}, this.value)" class="mt-3 w-full min-h-[6.5rem] rounded-xl border border-sage border-opacity-20 bg-white px-4 py-3 text-sm font-semibold text-forest shadow-sm outline-none focus:border-gold resize-y md:min-h-[7rem]" placeholder="Add a quick reminder...">${escapeHTML(note.text || '')}</textarea>
-                                        <p class="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-65">Saves automatically while you type</p>
+                                        <textarea maxlength="160" data-notebook-note-editor="${recipeId}-${index}" aria-label="Tekst plakbriefje" onpointerdown="event.stopPropagation()" oninput="updateNotebookStickyNoteText(${recipeId}, ${index}, this.value)" class="mt-3 w-full min-h-[6.5rem] rounded-xl border border-sage border-opacity-20 bg-white px-4 py-3 text-sm font-semibold text-forest shadow-sm outline-none focus:border-gold resize-y md:min-h-[7rem]" placeholder="Snel een herinnering…">${escapeHTML(note.text || '')}</textarea>
+                                        <p class="mt-2 text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-65">Wordt automatisch opgeslagen terwijl je typt</p>
                                         <div class="mt-3 flex items-center justify-between gap-3">
                                             <div class="flex flex-nowrap items-center gap-1.5">${swatches}</div>
-                                            <button type="button" title="Delete sticky note" aria-label="Delete sticky note" onpointerdown="event.stopPropagation()" onclick="deleteNotebookStickyNote(${recipeId}, ${index})" class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-parchmentDark bg-white text-sage shadow-sm transition-all hover:border-red-400 hover:text-red-500">
+                                            <button type="button" title="Plakbriefje verwijderen" aria-label="Plakbriefje verwijderen" onpointerdown="event.stopPropagation()" onclick="deleteNotebookStickyNote(${recipeId}, ${index})" class="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-parchmentDark bg-white text-sage shadow-sm transition-all hover:border-red-400 hover:text-red-500">
                                                 <i data-lucide="trash-2" class="h-4 w-4"></i>
                                             </button>
                                         </div>
@@ -9663,7 +9678,7 @@
             openNotebookStickyNoteMenu(recipeId, 0);
 
             if (createdNote) {
-                showToast('Sticky note added. Click it to enlarge and edit.', 'sticky-note');
+                showToast('Plakbriefje toegevoegd. Tik om te vergroten en te bewerken.', 'sticky-note');
             }
         }
 
@@ -12732,24 +12747,33 @@
         }
 
         function getPublishActionLabel(recipe) {
+            const nl = getActiveUiLanguage() === 'nl';
             if (!recipe?.publishedId) {
-                return recipe?.familyId ? 'Request publish vote' : 'Publish';
+                return recipe?.familyId
+                    ? (nl ? 'Publicatiestem aanvragen' : 'Request publish vote')
+                    : (nl ? 'Publiceren' : 'Publish');
             }
 
             if (recipe?.publicationState === 'pending-retract') {
-                return 'Offline in 24h';
+                return nl ? 'Offline over 24 u' : 'Offline in 24h';
             }
 
             if (isRecipePublishedLive(recipe)) {
-                if (canUnpublishImmediately(recipe)) return 'Unpublish now (1h)';
-                return 'Take offline in 24h';
+                if (canUnpublishImmediately(recipe)) {
+                    return nl ? 'Nu offline (1 u)' : 'Unpublish now (1h)';
+                }
+                return nl ? 'Over 24 u offline' : 'Take offline in 24h';
             }
 
             if (recipe?.familyId) {
-                return hasRecipeChangesSincePublish(recipe) ? 'Request republish vote' : 'Request publish vote';
+                return hasRecipeChangesSincePublish(recipe)
+                    ? (nl ? 'Herpublicatiestem aanvragen' : 'Request republish vote')
+                    : (nl ? 'Publicatiestem aanvragen' : 'Request publish vote');
             }
 
-            return hasRecipeChangesSincePublish(recipe) ? 'Republish update' : 'Republish';
+            return hasRecipeChangesSincePublish(recipe)
+                ? (nl ? 'Update herpubliceren' : 'Republish update')
+                : (nl ? 'Opnieuw publiceren' : 'Republish');
         }
 
         function getLocalRecipeByPublishedId(publishedRecipeId) {
@@ -12905,7 +12929,7 @@
 
         async function publishRecipe(recipeId, options = {}) { if(requireAccountPlan('publishRecipes')) return;
             if (!isAuthenticated || !firebaseInitialized || !currentUser) {
-                showToast('Sign in to publish recipes', 'alert-circle');
+                showToast(getActiveUiLanguage() === 'nl' ? 'Log in om recepten te publiceren' : 'Sign in to publish recipes', 'alert-circle');
                 return false;
             }
 
@@ -14271,9 +14295,9 @@
             const addLabel = nl ? 'Recept' : 'Add Recipe';
             const backLabel = nl ? 'Terug' : 'Back';
             const navLabels = {
-                index: 'Index',
-                shopping: 'Shop',
-                browse: 'Browse',
+                index: nl ? 'Index' : 'Index',
+                shopping: nl ? 'Boodschappen' : 'Shop',
+                browse: nl ? 'Bladeren' : 'Browse',
                 profile: nl ? 'Profiel' : 'Profile'
             };
             if (gear) {
@@ -14308,6 +14332,13 @@
                 const text = button.querySelector('.app-nav-label');
                 if (text) text.textContent = label;
             });
+            const createdBy = document.getElementById('app-header-created-by');
+            if (createdBy) {
+                const apple = createdBy.querySelector('img.brand-apple');
+                createdBy.replaceChildren();
+                if (apple) createdBy.appendChild(apple);
+                createdBy.append(nl ? 'Gemaakt door Mholt' : 'Created by Mholt');
+            }
         }
 
         function syncHeaderBackButton() {
@@ -15407,12 +15438,16 @@
         }
 
         function getNotebookRecipeMoodLabel(recipe) {
-            if (recipe?.source === 'published') return 'Saved from another cook';
+            if (recipe?.source === 'published') {
+                return uiText('Saved from another cook', 'Opgeslagen van een andere kok');
+            }
 
             const family = getRecipeFamily(recipe);
-            if (family) return `${family.label} shared book`;
+            if (family) {
+                return uiText(`${family.label} shared book`, `${family.label} gedeeld boek`);
+            }
 
-            return 'Written in your own archive';
+            return uiText('Written in your own archive', 'Geschreven in je eigen archief');
         }
 
         function getRecipeFamilyChipMarkup(recipe, className = 'text-[10px] font-bold uppercase tracking-[0.16em] px-2.5 py-1.5 rounded-sm border') {
@@ -17276,14 +17311,14 @@
 
             if (recipe.tips) {
                 noteBlocks.push({
-                    title: "Chef's notes",
+                    title: uiText("Chef's notes", 'Chefsnotities'),
                     text: applyMeasurementSystem(recipe.tips)
                 });
             }
 
             if (recipe.personalNotes) {
                 noteBlocks.push({
-                    title: 'Your notes',
+                    title: uiText('Your notes', 'Jouw notities'),
                     text: applyMeasurementSystem(recipe.personalNotes)
                 });
             }
@@ -17600,7 +17635,7 @@
             recipe.notebookStickyNotes.splice(noteIndex, 1);
             activeNotebookStickyNoteMenu = null;
             saveData();
-            showToast('Sticky note removed!', 'trash-2');
+            showToast('Plakbriefje verwijderd!', 'trash-2');
             if (currentView === 'index' && indexViewMode === 'book') {
                 renderList();
             }
@@ -17935,13 +17970,19 @@
             const notebookStickyNotes = normalizeNotebookStickyNotes(recipe.notebookStickyNotes);
             const showNotebookStickyNotes = userSettings.showNotebookStickyNotes !== false;
             const hasNotebookStickyNote = notebookStickyNotes.length > 0;
-            const notebookNoteActionLabel = hasNotebookStickyNote ? 'Edit note' : 'Add note';
-            const notebookVisibilityActionLabel = showNotebookStickyNotes ? 'Hide notes' : 'Show notes';
-            const safeRecipeTitle = escapeHTML(recipe.title || 'Untitled recipe');
-            const safeRecipeCategory = escapeHTML(recipe.category || 'Recipe');
+            const notebookNoteActionLabel = hasNotebookStickyNote
+                ? uiText('Edit note', 'Notitie bewerken')
+                : uiText('Add note', 'Notitie toevoegen');
+            const notebookVisibilityActionLabel = showNotebookStickyNotes
+                ? uiText('Hide notes', 'Notities verbergen')
+                : uiText('Show notes', 'Notities tonen');
+            const safeRecipeTitle = escapeHTML(recipe.title || uiText('Untitled recipe', 'Naamloos recept'));
+            const safeRecipeCategory = escapeHTML(recipe.category || uiText('Recipe', 'Recept'));
             const safeRecipeAuthor = escapeHTML(recipe.author || 'Chef');
-            const dietText = (recipe.diet || []).length > 0 ? escapeHTML(recipe.diet.join(' · ')) : 'No diet tags';
-            const notebookCookActionLabel = totalInstructions > 0 ? 'Start cooking' : 'Open recipe';
+            const dietText = (recipe.diet || []).length > 0 ? escapeHTML(recipe.diet.join(' · ')) : uiText('No diet tags', 'Geen dieettags');
+            const notebookCookActionLabel = totalInstructions > 0
+                ? uiText('Start cooking', 'Begin met koken')
+                : uiText('Open recipe', 'Open recept');
             const pdfActions = getNotebookPdfActionLabels();
             const notebookRecipeSpreads = getNotebookRecipeSpreads(recipe);
             notebookSpreadPageIndex = Math.max(0, Math.min(notebookSpreadPageIndex, notebookRecipeSpreads.length - 1));
@@ -17969,7 +18010,7 @@
 
             const renderNotebookIngredientRows = ingredients => {
                 if (!ingredients || ingredients.length === 0) {
-                    return '<li class="notebook-line-row"><span class="notebook-line-text">No ingredients written yet.</span></li>';
+                    return `<li class="notebook-line-row"><span class="notebook-line-text">${uiText('No ingredients written yet.', 'Nog geen ingrediënten geschreven.')}</span></li>`;
                 }
 
                 return ingredients.map(ingredient => `
@@ -17982,7 +18023,7 @@
 
             const renderNotebookInstructionRows = (steps, startIndex = 0) => {
                 if (!steps || steps.length === 0) {
-                    return '<li class="notebook-line-row notebook-line-row--top"><span class="notebook-line-text">No instructions written yet.</span></li>';
+                    return `<li class="notebook-line-row notebook-line-row--top"><span class="notebook-line-text">${uiText('No instructions written yet.', 'Nog geen bereiding geschreven.')}</span></li>`;
                 }
 
                 return steps.map((step, index) => `
@@ -18013,9 +18054,9 @@
                     return `
                         <div class="notebook-paper__body">
                             <div class="notebook-paper__section">
-                                <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Recipe archive</p>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Recipe archive', 'Receptarchief')}</p>
                                 <div class="notebook-ruled-block mt-2 text-sm font-semibold text-sage">
-                                    <div class="notebook-line-row">Turn the page to continue this recipe.</div>
+                                    <div class="notebook-line-row">${uiText('Turn the page to continue this recipe.', 'Sla de bladzijde om om dit recept voort te zetten.')}</div>
                                 </div>
                             </div>
                         </div>
@@ -18038,7 +18079,7 @@
                         <div class="notebook-paper__body">
                             <div class="notebook-paper__section">
                                 <div class="flex items-center justify-between gap-3">
-                                    <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Ingredients</p>
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Ingredients', 'Ingrediënten')}</p>
                                     <span class="text-[10px] font-bold uppercase tracking-[0.22em] text-sage opacity-75">${startItem}-${endItem}</span>
                                 </div>
                                 <ul class="notebook-ruled-block mt-2 text-sm font-semibold text-forest">
@@ -18050,10 +18091,15 @@
                     `;
                 }
 
+                const prepCookServesLine = uiText(
+                    `${recipe.prepTime || 0}m prep · ${recipe.cookTime || 0}m cook · serves ${recipe.servings || 0}`,
+                    `${recipe.prepTime || 0}m voorb. · ${recipe.cookTime || 0}m koken · ${recipe.servings || 0} porties`
+                );
+
                 return `
                     <div class="notebook-paper__body">
                         ${isShortNotebook ? `
-                            <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Recipe page</p>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Recipe page', 'Receptpagina')}</p>
                             ${notebookFamilyBadge ? `<div class="mt-3">${notebookFamilyBadge}</div>` : ''}
                             <h3 class="mt-2 font-fantasy text-2xl md:text-3xl font-bold text-forest leading-[1.02]">${safeRecipeTitle}</h3>
                             <div class="notebook-paper__section notebook-ruled-block mt-3 text-xs font-semibold text-sage">
@@ -18065,7 +18111,7 @@
                                 </div>
                             </div>
                             <div class="notebook-paper__section notebook-ruled-block mt-3 text-xs font-semibold text-sage">
-                                <div class="notebook-line-row">${recipe.prepTime || 0}m prep · ${recipe.cookTime || 0}m cook · serves ${recipe.servings || 0}</div>
+                                <div class="notebook-line-row">${prepCookServesLine}</div>
                             </div>
                         ` : `
                             <div class="notebook-page-hero">
@@ -18075,7 +18121,7 @@
                                         <div class="notebook-page-photo-card" style="background-image:url('${recipe.profile || defaultPlaceholderProfile}')"></div>
                                     </div>
                                 </div>
-                                <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Recipe page</p>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Recipe page', 'Receptpagina')}</p>
                                 ${notebookFamilyBadge ? `<div class="mt-3">${notebookFamilyBadge}</div>` : ''}
                                 <h3 class="mt-2 font-fantasy text-3xl md:text-5xl font-bold text-forest leading-[1.02]">${safeRecipeTitle}</h3>
                                 <div class="notebook-ruled-block mt-3 text-sm font-semibold text-sage">
@@ -18090,15 +18136,15 @@
 
                             <div class="notebook-paper__section notebook-page-summary-grid text-sm font-semibold text-forest">
                                 <div class="notebook-page-summary-card">
-                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">Prep</p>
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${uiText('Prep', 'Voorb.')}</p>
                                     <div class="notebook-line-row border-b-0 text-2xl font-bold">${recipe.prepTime || 0}m</div>
                                 </div>
                                 <div class="notebook-page-summary-card">
-                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">Cook</p>
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${uiText('Cook', 'Koken')}</p>
                                     <div class="notebook-line-row border-b-0 text-2xl font-bold">${recipe.cookTime || 0}m</div>
                                 </div>
                                 <div class="notebook-page-summary-card">
-                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">Serves</p>
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${uiText('Serves', 'Porties')}</p>
                                     <div class="notebook-line-row border-b-0 text-2xl font-bold">${recipe.servings || 0}</div>
                                 </div>
                             </div>
@@ -18106,13 +18152,13 @@
 
                         <div class="notebook-paper__section">
                             <div class="flex items-center justify-between">
-                                <p class="text-xs font-bold uppercase tracking-[0.28em] text-sage">Ingredients</p>
-                                <span class="text-[10px] font-bold uppercase tracking-[0.22em] text-sage opacity-75">${totalIngredients} total</span>
+                                <p class="text-xs font-bold uppercase tracking-[0.28em] text-sage">${uiText('Ingredients', 'Ingrediënten')}</p>
+                                <span class="text-[10px] font-bold uppercase tracking-[0.22em] text-sage opacity-75">${totalIngredients} ${uiText('total', 'totaal')}</span>
                             </div>
                             <ul class="notebook-ruled-block mt-1 text-sm font-semibold text-forest">
                                 ${renderNotebookIngredientRows(page.ingredients)}
                             </ul>
-                            ${page.remainingIngredients > 0 ? `<p class="pt-3 text-xs font-bold uppercase tracking-[0.22em] text-sage opacity-80">+ ${page.remainingIngredients} more ingredients on the next pages</p>` : ''}
+                            ${page.remainingIngredients > 0 ? `<p class="pt-3 text-xs font-bold uppercase tracking-[0.22em] text-sage opacity-80">+ ${page.remainingIngredients} ${uiText('more ingredients on the next pages', 'meer ingrediënten op de volgende bladzijden')}</p>` : ''}
                         </div>
                         ${page.showDiet ? `<div class="notebook-paper__section"><div class="text-[11px] font-bold uppercase tracking-[0.2em] text-sage">${dietText}</div></div>` : ''}
                     </div>
@@ -18120,13 +18166,20 @@
             };
 
             const renderNotebookRightPage = page => {
+                const byAuthorLine = recipe.lastOpened
+                    ? uiText(
+                        `By ${safeRecipeAuthor} · last opened ${new Date(recipe.lastOpened).toLocaleDateString()}`,
+                        `Door ${safeRecipeAuthor} · laatst geopend ${new Date(recipe.lastOpened).toLocaleDateString('nl-NL')}`
+                    )
+                    : uiText(`By ${safeRecipeAuthor}`, `Door ${safeRecipeAuthor}`);
+
                 if (!page || page.kind === 'blank') {
                     return `
                         <div class="notebook-paper__body">
                             <div class="notebook-paper__section">
-                                <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Next page</p>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Next page', 'Volgende bladzijde')}</p>
                                 <div class="notebook-ruled-block mt-2 text-sm font-semibold text-sage">
-                                    <div class="notebook-line-row">Use the page arrows to continue through this recipe.</div>
+                                    <div class="notebook-line-row">${uiText('Use the page arrows to continue through this recipe.', 'Gebruik de pijlen om verder te bladeren in dit recept.')}</div>
                                 </div>
                             </div>
                         </div>
@@ -18138,9 +18191,9 @@
                         <div class="notebook-paper__body">
                             ${page.showMeta ? `
                                 <div class="notebook-paper__section">
-                                    <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Recipe notes</p>
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Recipe notes', 'Receptnotities')}</p>
                                     <div class="notebook-ruled-block mt-2 text-sm font-semibold text-sage">
-                                        <div class="notebook-line-row">By ${safeRecipeAuthor}${recipe.lastOpened ? ` · last opened ${new Date(recipe.lastOpened).toLocaleDateString()}` : ''}</div>
+                                        <div class="notebook-line-row">${byAuthorLine}</div>
                                     </div>
                                 </div>
                             ` : ''}
@@ -18154,22 +18207,22 @@
                     <div class="notebook-paper__body">
                         ${page.showMeta ? `
                             <div class="notebook-paper__section">
-                                <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">Recipe notes</p>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Recipe notes', 'Receptnotities')}</p>
                                 <div class="notebook-ruled-block mt-2 text-sm font-semibold text-sage">
-                                    <div class="notebook-line-row">By ${safeRecipeAuthor}${recipe.lastOpened ? ` · last opened ${new Date(recipe.lastOpened).toLocaleDateString()}` : ''}</div>
+                                    <div class="notebook-line-row">${byAuthorLine}</div>
                                 </div>
                             </div>
                         ` : ''}
 
                         <div class="notebook-paper__section">
                             <div class="mb-1 flex items-center justify-between gap-3">
-                                <p class="text-xs font-bold uppercase tracking-[0.28em] text-sage">Instructions</p>
-                                <span class="text-[10px] font-bold uppercase tracking-[0.22em] text-sage opacity-75">Page ${notebookSpreadPageIndex + 1}</span>
+                                <p class="text-xs font-bold uppercase tracking-[0.28em] text-sage">${uiText('Instructions', 'Bereiding')}</p>
+                                <span class="text-[10px] font-bold uppercase tracking-[0.22em] text-sage opacity-75">${uiText('Page', 'Pagina')} ${notebookSpreadPageIndex + 1}</span>
                             </div>
                             <ol class="notebook-ruled-block text-sm font-semibold text-forest">
                                 ${renderNotebookInstructionRows(page.instructions, page.startIndex)}
                             </ol>
-                            ${page.startIndex + (page.instructions?.length || 0) < totalInstructions ? `<p class="pt-3 text-xs font-bold uppercase tracking-[0.22em] text-sage opacity-80">Continue on the next page</p>` : ''}
+                            ${page.startIndex + (page.instructions?.length || 0) < totalInstructions ? `<p class="pt-3 text-xs font-bold uppercase tracking-[0.22em] text-sage opacity-80">${uiText('Continue on the next page', 'Vervolg op de volgende bladzijde')}</p>` : ''}
                         </div>
 
                         ${page.showDiet ? `<div class="notebook-paper__section"><div class="text-[11px] font-bold uppercase tracking-[0.2em] text-sage">${dietText}</div></div>` : ''}
@@ -18224,47 +18277,47 @@
                 <div>
                     <div class="notebook-chrome">
                         <div class="notebook-chrome-kicker">
-                            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-80">Notebook mode</p>
-                            <p class="notebook-chrome-page">Page ${notebookPageLabel}</p>
+                            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-80">${uiText('Notebook mode', 'Schriftmodus')}</p>
+                            <p class="notebook-chrome-page">${uiText('Page', 'Pagina')} ${notebookPageLabel}</p>
                         </div>
-                        ${hasActiveFilters ? `<p class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}</p>` : ''}
+                        ${hasActiveFilters ? `<p class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">${uiText(`Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}`, `Gefilterde openslag: ${activeFilters.length} actieve filter${activeFilters.length === 1 ? '' : 's'}`)}</p>` : ''}
                         <div class="notebook-chrome-bar">
-                            <div class="notebook-chrome-group" role="group" aria-label="View">
-                                <button type="button" onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest" title="Cards view" aria-label="Cards view">
+                            <div class="notebook-chrome-group" role="group" aria-label="${uiText('View', 'Weergave')}">
+                                <button type="button" onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest" title="${uiText('Cards view', 'Kaartenweergave')}" aria-label="${uiText('Cards view', 'Kaartenweergave')}">
                                     <i data-lucide="layout-grid" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">Cards</span>
+                                    <span class="notebook-tool-label">${uiText('Cards', 'Kaarten')}</span>
                                 </button>
-                                <button type="button" onclick="setIndexViewMode('list')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest" title="List view" aria-label="List view">
+                                <button type="button" onclick="setIndexViewMode('list')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest" title="${uiText('List view', 'Lijstweergave')}" aria-label="${uiText('List view', 'Lijstweergave')}">
                                     <i data-lucide="list" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">List</span>
+                                    <span class="notebook-tool-label">${uiText('List', 'Lijst')}</span>
                                 </button>
-                                <button type="button" onclick="setIndexViewMode('book')" class="notebook-view-toggle is-active inline-flex items-center justify-center rounded-lg text-white transition-all" title="Notebook view" aria-label="Notebook view">
+                                <button type="button" onclick="setIndexViewMode('book')" class="notebook-view-toggle is-active inline-flex items-center justify-center rounded-lg text-white transition-all" title="${uiText('Notebook view', 'Schriftweergave')}" aria-label="${uiText('Notebook view', 'Schriftweergave')}">
                                     <i data-lucide="book-open" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">Book</span>
+                                    <span class="notebook-tool-label">${uiText('Book', 'Boek')}</span>
                                 </button>
                             </div>
-                            <div class="notebook-chrome-group" role="group" aria-label="Notes">
+                            <div class="notebook-chrome-group" role="group" aria-label="${uiText('Notes', 'Notities')}">
                                 <button type="button" title="${notebookNoteActionLabel}" aria-label="${notebookNoteActionLabel}" onclick="openNotebookStickyNotesEditor(${recipe.id})" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-gold transition-all hover:bg-surface-muted hover:text-forest notebook-note-control notebook-note-control--manage notebook-note-control--icon" data-notebook-note-control="manage-notes">
                                     <i data-lucide="sticky-note" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">Notes</span>
+                                    <span class="notebook-tool-label">${uiText('Notes', 'Notities')}</span>
                                 </button>
                                 <button type="button" title="${notebookVisibilityActionLabel}" aria-label="${notebookVisibilityActionLabel}" onclick="toggleNotebookStickyNotesVisibility()" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all ${showNotebookStickyNotes ? 'text-sage' : 'text-gold'} hover:bg-surface-muted hover:text-forest notebook-note-control notebook-note-control--toggle notebook-note-control--icon" data-notebook-note-control="toggle-visibility">
                                     <i data-lucide="${showNotebookStickyNotes ? 'eye-off' : 'eye'}" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${showNotebookStickyNotes ? 'Hide' : 'Show'}</span>
+                                    <span class="notebook-tool-label">${showNotebookStickyNotes ? uiText('Hide', 'Verberg') : uiText('Show', 'Toon')}</span>
                                 </button>
                                 <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook relative inline-flex items-center justify-center gap-2 rounded-lg text-xs font-bold uppercase tracking-wider text-white" data-notebook-note-control="open-cook">
                                     <i data-lucide="chef-hat" class="h-4 w-4"></i>
-                                    <span class="notebook-cook-label">Cook</span>
+                                    <span class="notebook-cook-label">${uiText('Cook', 'Koken')}</span>
                                 </button>
                             </div>
-                            <div class="notebook-chrome-group" role="group" aria-label="PDF export">
+                            <div class="notebook-chrome-group" role="group" aria-label="${uiText('PDF export', 'PDF-export')}">
                                 <button type="button" title="${pdfActions.recipe}" aria-label="${pdfActions.recipe}" onclick="${pdfActions.recipeAction}" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg ${accountHasPremiumPlan() ? 'text-forest' : 'text-sage'} transition-all hover:bg-surface-muted hover:text-forest">
                                     <i data-lucide="${accountHasPremiumPlan() ? 'file-text' : 'lock'}" class="h-4 w-4 ${accountHasPremiumPlan() ? '' : 'text-gold'}"></i>
                                     <span class="notebook-tool-label">PDF</span>
                                 </button>
                                 <button type="button" title="${pdfActions.book}" aria-label="${pdfActions.book}" onclick="${pdfActions.bookAction}" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg ${accountHasPremiumPlan() ? 'text-forest' : 'text-sage'} transition-all hover:bg-surface-muted hover:text-forest">
                                     <i data-lucide="${accountHasPremiumPlan() ? 'files' : 'lock'}" class="h-4 w-4 ${accountHasPremiumPlan() ? '' : 'text-gold'}"></i>
-                                    <span class="notebook-tool-label">Book</span>
+                                    <span class="notebook-tool-label">${uiText('Book', 'Boek')}</span>
                                 </button>
                             </div>
                         </div>
@@ -18279,7 +18332,7 @@
                                     ${renderNotebookLeftPage(currentSpread.left)}
 
                                     <div class="notebook-paper__footer hidden items-end justify-start md:flex">
-                                        <button type="button" title="Previous page" aria-label="Previous page" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
+                                        <button type="button" title="${uiText('Previous page', 'Vorige bladzijde')}" aria-label="${uiText('Previous page', 'Vorige bladzijde')}" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
                                             <i data-lucide="chevron-left" class="h-4 w-4"></i>
                                         </button>
                                     </div>
@@ -18291,7 +18344,7 @@
                                     ${renderNotebookRightPage(currentSpread.right)}
 
                                     <div class="notebook-paper__footer hidden items-end justify-end md:flex">
-                                        <button type="button" title="Next page" aria-label="Next page" onclick="goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-page-nav notebook-page-nav--primary">
+                                        <button type="button" title="${uiText('Next page', 'Volgende bladzijde')}" aria-label="${uiText('Next page', 'Volgende bladzijde')}" onclick="goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-page-nav notebook-page-nav--primary">
                                             <i data-lucide="chevron-right" class="h-4 w-4"></i>
                                         </button>
                                     </div>
@@ -18303,11 +18356,11 @@
                     </div>
 
                     <div class="notebook-mobile-pager flex items-center justify-between gap-3 md:hidden">
-                        <button type="button" title="Previous page" aria-label="Previous page" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
+                        <button type="button" title="${uiText('Previous page', 'Vorige bladzijde')}" aria-label="${uiText('Previous page', 'Vorige bladzijde')}" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
                             <i data-lucide="chevron-left" class="h-4 w-4"></i>
                         </button>
-                        <span data-notebook-page-label="${notebookPageLabel}" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-parchmentDark bg-white/90 px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-sage shadow-sm">Page ${notebookPageLabel}</span>
-                        <button type="button" title="Next page" aria-label="Next page" onclick="goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-page-nav notebook-page-nav--primary">
+                        <span data-notebook-page-label="${notebookPageLabel}" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-parchmentDark bg-white/90 px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-sage shadow-sm">${uiText('Page', 'Pagina')} ${notebookPageLabel}</span>
+                        <button type="button" title="${uiText('Next page', 'Volgende bladzijde')}" aria-label="${uiText('Next page', 'Volgende bladzijde')}" onclick="goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-page-nav notebook-page-nav--primary">
                             <i data-lucide="chevron-right" class="h-4 w-4"></i>
                         </button>
                     </div>
@@ -18437,7 +18490,10 @@
                 notebookSpreadPageIndex = Math.max(0, Math.min(notebookSpreadPageIndex, currentNotebookSpreads.length - 1));
             }
 
-            const resultLabel = `${filteredRecipes.length} recipe${filteredRecipes.length === 1 ? '' : 's'}`;
+            const resultLabel = uiText(
+                `${filteredRecipes.length} recipe${filteredRecipes.length === 1 ? '' : 's'}`,
+                `${filteredRecipes.length} recept${filteredRecipes.length === 1 ? '' : 'en'}`
+            );
             const hasActiveListFilters = Boolean(collectionScopeFilter !== 'all' || categoryFilter || difficultyFilter || cuisineFilter || mealTypeFilter.length || showFavoritesOnly || dietFilter.length);
             const localRecipeCount = collectionScopeCounts.mine;
             const freeRecipeSlotsRemaining = Math.max(0, freeLocalRecipeLimit - localRecipeCount);
@@ -18453,11 +18509,11 @@
                 <div class="index-filters-panel index-active-filters">
                     <div class="flex flex-col gap-3">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="index-hero-kicker" style="margin:0;">Active</span>
+                            <span class="index-hero-kicker" style="margin:0;">${uiText('Active', 'Actief')}</span>
                             ${activeFilters.map(filter => `<span class="index-card-tag">${filter}</span>`).join('')}
                         </div>
-                        <button type="button" onclick="resetRecipeFilters(event)" class="${getAppButtonClasses('secondary', { size: 'sm', fullWidth: true })} index-clear-filters-btn" aria-label="Clear filters">
-                            <i data-lucide="rotate-ccw" class="h-4 w-4"></i>Clear filters
+                        <button type="button" onclick="resetRecipeFilters(event)" class="${getAppButtonClasses('secondary', { size: 'sm', fullWidth: true })} index-clear-filters-btn" aria-label="${uiText('Clear filters', 'Filters wissen')}">
+                            <i data-lucide="rotate-ccw" class="h-4 w-4"></i>${uiText('Clear filters', 'Filters wissen')}
                         </button>
                     </div>
                 </div>
@@ -18466,21 +18522,21 @@
                 <div class="index-search-slot">
                     <div class="browse-search">
                         <i data-lucide="search" class="h-5 w-5 shrink-0 text-sage opacity-70"></i>
-                        <input type="text" placeholder="Search by title, ingredient, or occasion..." id="recipe-search-input" value="${escapeAttrSafe(searchQuery)}" oninput="handleRecipeSearchInput(this)" onkeydown="handleAppSearchFieldKeydown(event)" aria-label="Search recipes">
+                        <input type="text" placeholder="${uiText('Search by title, ingredient, or occasion...', 'Zoek op titel, ingrediënt of gelegenheid…')}" id="recipe-search-input" value="${escapeAttrSafe(searchQuery)}" oninput="handleRecipeSearchInput(this)" onkeydown="handleAppSearchFieldKeydown(event)" aria-label="${uiText('Search recipes', 'Recepten zoeken')}">
                     </div>
                 </div>
             ` : '';
             const sourceFilterButtonsMarkup = [
-                { value: 'mine', label: 'Mine', icon: 'notebook-pen', count: collectionScopeCounts.mine },
-                { value: 'saved', label: 'Saved', icon: 'heart-handshake', count: collectionScopeCounts.saved }
+                { value: 'mine', label: uiText('Mine', 'Van mij'), icon: 'notebook-pen', count: collectionScopeCounts.mine },
+                { value: 'saved', label: uiText('Saved', 'Opgeslagen'), icon: 'heart-handshake', count: collectionScopeCounts.saved }
             ].map(scope => {
                 const isActive = collectionScopeFilter === scope.value;
                 const nextScope = isActive ? 'all' : scope.value;
                 return `<button type="button" onclick="collectionScopeFilter='${nextScope}'; renderList()" class="${getAppButtonClasses(isActive ? 'primary' : 'secondary')}"><i data-lucide="${scope.icon}" class="h-4 w-4"></i>${scope.label} <span class="rounded-full ${isActive ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'} px-2 py-0.5 text-[10px]">${scope.count}</span></button>`;
             }).join('');
             const selectedDietSummary = dietFilter.length === 0
-                ? 'Optional'
-                : (dietFilter.length === 1 ? dietFilter[0] : `${dietFilter.length} selected`);
+                ? uiText('Optional', 'Optioneel')
+                : (dietFilter.length === 1 ? dietFilter[0] : uiText(`${dietFilter.length} selected`, `${dietFilter.length} geselecteerd`));
             const dietFilterButtonsMarkup = dietOptions.map(option => {
                 const isActive = dietFilter.includes(option);
                 const desc = dietDescriptions[option] || '';
@@ -18493,8 +18549,8 @@
             const filterControlsMarkup = isFilterVisible ? `
                 <div class="index-filters-panel index-filter-controls space-y-5">
                     <div>
-                        <p class="index-hero-kicker">Source</p>
-                        <p class="mt-1 text-sm font-semibold text-sage">Toggle between recipes you wrote and recipes you saved from Browse.</p>
+                        <p class="index-hero-kicker">${uiText('Source', 'Bron')}</p>
+                        <p class="mt-1 text-sm font-semibold text-sage">${uiText('Toggle between recipes you wrote and recipes you saved from Browse.', 'Wissel tussen recepten die je schreef en recepten die je uit Bladeren bewaarde.')}</p>
                         <div class="mt-4 flex flex-wrap gap-2">
                             ${sourceFilterButtonsMarkup}
                         </div>
@@ -18502,53 +18558,53 @@
 
                     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
                         <div class="space-y-2">
-                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Category</label>
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Category', 'Categorie')}</label>
                             <div class="relative">
                                 <select onchange="categoryFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
-                                    <option value="">All categories</option>
-                                    <option value="Baking" ${categoryFilter === 'Baking' ? 'selected' : ''}>Baking</option>
-                                    <option value="Cooking" ${categoryFilter === 'Cooking' ? 'selected' : ''}>Cooking</option>
-                                    <option value="Dessert" ${categoryFilter === 'Dessert' ? 'selected' : ''}>Dessert</option>
-                                    <option value="Drink" ${categoryFilter === 'Drink' ? 'selected' : ''}>Drink</option>
+                                    <option value="">${uiText('All categories', 'Alle categorieën')}</option>
+                                    <option value="Baking" ${categoryFilter === 'Baking' ? 'selected' : ''}>${uiText('Baking', 'Bakken')}</option>
+                                    <option value="Cooking" ${categoryFilter === 'Cooking' ? 'selected' : ''}>${uiText('Cooking', 'Koken')}</option>
+                                    <option value="Dessert" ${categoryFilter === 'Dessert' ? 'selected' : ''}>${uiText('Dessert', 'Dessert')}</option>
+                                    <option value="Drink" ${categoryFilter === 'Drink' ? 'selected' : ''}>${uiText('Drink', 'Drank')}</option>
                                 </select>
                                 <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
                             </div>
                         </div>
 
                         <div class="space-y-2">
-                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Difficulty</label>
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Difficulty', 'Moeilijkheid')}</label>
                             <div class="relative">
                                 <select onchange="difficultyFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
-                                    <option value="">All levels</option>
-                                    <option value="Easy" ${difficultyFilter === 'Easy' ? 'selected' : ''}>Easy</option>
-                                    <option value="Medium" ${difficultyFilter === 'Medium' ? 'selected' : ''}>Medium</option>
-                                    <option value="Hard" ${difficultyFilter === 'Hard' ? 'selected' : ''}>Hard</option>
+                                    <option value="">${uiText('All levels', 'Alle niveaus')}</option>
+                                    <option value="Easy" ${difficultyFilter === 'Easy' ? 'selected' : ''}>${uiText('Easy', 'Makkelijk')}</option>
+                                    <option value="Medium" ${difficultyFilter === 'Medium' ? 'selected' : ''}>${uiText('Medium', 'Gemiddeld')}</option>
+                                    <option value="Hard" ${difficultyFilter === 'Hard' ? 'selected' : ''}>${uiText('Hard', 'Moeilijk')}</option>
                                 </select>
                                 <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
                             </div>
                         </div>
 
                         <div class="space-y-2">
-                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Cuisine</label>
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Cuisine', 'Keuken')}</label>
                             <div class="relative">
                                 <select onchange="cuisineFilter = this.value; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
-                                    <option value="">All cuisines</option>
-                                    <option value="European" ${cuisineFilter === 'European' ? 'selected' : ''}>European</option>
-                                    <option value="Asian" ${cuisineFilter === 'Asian' ? 'selected' : ''}>Asian</option>
-                                    <option value="Italian" ${cuisineFilter === 'Italian' ? 'selected' : ''}>Italian</option>
-                                    <option value="Mediterranean" ${cuisineFilter === 'Mediterranean' ? 'selected' : ''}>Mediterranean</option>
-                                    <option value="American" ${cuisineFilter === 'American' ? 'selected' : ''}>American</option>
-                                    <option value="Mexican" ${cuisineFilter === 'Mexican' ? 'selected' : ''}>Mexican</option>
+                                    <option value="">${uiText('All cuisines', 'Alle keukens')}</option>
+                                    <option value="European" ${cuisineFilter === 'European' ? 'selected' : ''}>${uiText('European', 'Europees')}</option>
+                                    <option value="Asian" ${cuisineFilter === 'Asian' ? 'selected' : ''}>${uiText('Asian', 'Aziatisch')}</option>
+                                    <option value="Italian" ${cuisineFilter === 'Italian' ? 'selected' : ''}>${uiText('Italian', 'Italiaans')}</option>
+                                    <option value="Mediterranean" ${cuisineFilter === 'Mediterranean' ? 'selected' : ''}>${uiText('Mediterranean', 'Mediterraan')}</option>
+                                    <option value="American" ${cuisineFilter === 'American' ? 'selected' : ''}>${uiText('American', 'Amerikaans')}</option>
+                                    <option value="Mexican" ${cuisineFilter === 'Mexican' ? 'selected' : ''}>${uiText('Mexican', 'Mexicaans')}</option>
                                 </select>
                                 <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
                             </div>
                         </div>
 
                         <div class="space-y-2">
-                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Meal type</label>
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Meal type', 'Maaltijd')}</label>
                             <div class="relative">
                                 <select onchange="mealTypeFilter = this.value ? [this.value] : []; renderList()" class="h-11 w-full appearance-none rounded-xl border border-sage border-opacity-20 bg-white px-4 pr-11 text-sm font-semibold text-forest shadow-sm outline-none transition-all focus:border-gold focus:shadow-md">
-                                    <option value="">All meal types</option>
+                                    <option value="">${uiText('All meal types', 'Alle maaltijden')}</option>
                                     ${mealTypeOptions.map(opt => `<option value="${opt}" ${mealTypeFilter.includes(opt) ? 'selected' : ''}>${opt}</option>`).join('')}
                                 </select>
                                 <i data-lucide="chevron-down" class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-sage"></i>
@@ -18556,11 +18612,11 @@
                         </div>
 
                         <div class="space-y-2">
-                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Quick view</label>
+                            <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Quick view', 'Snelbeeld')}</label>
                             <button onclick="showFavoritesOnly = !showFavoritesOnly; renderList()" class="flex h-11 w-full items-center justify-between rounded-xl border px-4 text-sm font-semibold shadow-sm transition-all ${showFavoritesOnly ? 'border-forest bg-forest text-white shadow-md' : 'border-sage border-opacity-20 bg-white text-forest hover:border-gold hover:shadow-md'}">
                                 <span class="flex items-center gap-2">
                                     <i data-lucide="heart" class="h-4 w-4 ${showFavoritesOnly ? 'fill-current' : ''}"></i>
-                                    ${showFavoritesOnly ? 'Favorites only' : 'Show favorites'}
+                                    ${showFavoritesOnly ? uiText('Favorites only', 'Alleen favorieten') : uiText('Show favorites', 'Toon favorieten')}
                                 </span>
                                 <i data-lucide="chevron-right" class="h-4 w-4 opacity-60"></i>
                             </button>
@@ -18570,18 +18626,18 @@
                     <div class="rounded-xl border border-accent bg-accent bg-opacity-40 p-4">
                         <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                             <div>
-                                <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Diets</p>
-                                <p class="mt-1 text-sm font-semibold text-sage">Use diet tags only when you want to narrow results by dietary fit.</p>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Diets', 'Diëten')}</p>
+                                <p class="mt-1 text-sm font-semibold text-sage">${uiText('Use diet tags only when you want to narrow results by dietary fit.', 'Gebruik dieettags alleen om resultaten op dieet te verfijnen.')}</p>
                             </div>
                             <div class="flex flex-wrap gap-2">
                                 <button onclick="toggleDietFiltersVisibility()" class="${getAppButtonClasses(showDietFilters ? 'primary' : 'secondary')}">
-                                    <i data-lucide="leaf" class="h-4 w-4"></i>Diets
+                                    <i data-lucide="leaf" class="h-4 w-4"></i>${uiText('Diets', 'Diëten')}
                                     <span class="rounded-full px-2 py-0.5 text-[10px] ${showDietFilters ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'}">${selectedDietSummary}</span>
                                     <i data-lucide="${showDietFilters ? 'chevron-up' : 'chevron-down'}" class="h-4 w-4"></i>
                                 </button>
-                                ${showDietFilters ? `<button onclick="toggleDietGuide()" class="${getAppButtonClasses('secondary')}"><i data-lucide="info" class="h-4 w-4"></i>${showDietGuide ? 'Hide guide' : 'Diet guide'}</button>` : ''}
-                                <button type="button" onclick="resetRecipeFilters(event)" class="${getAppButtonClasses('secondary')} index-clear-filters-btn" aria-label="Reset all filters">
-                                    <i data-lucide="rotate-ccw" class="h-4 w-4"></i>Reset all
+                                ${showDietFilters ? `<button onclick="toggleDietGuide()" class="${getAppButtonClasses('secondary')}"><i data-lucide="info" class="h-4 w-4"></i>${showDietGuide ? uiText('Hide guide', 'Gids verbergen') : uiText('Diet guide', 'Dieetgids')}</button>` : ''}
+                                <button type="button" onclick="resetRecipeFilters(event)" class="${getAppButtonClasses('secondary')} index-clear-filters-btn" aria-label="${uiText('Reset all filters', 'Alle filters wissen')}">
+                                    <i data-lucide="rotate-ccw" class="h-4 w-4"></i>${uiText('Reset all', 'Alles wissen')}
                                 </button>
                             </div>
                         </div>
@@ -18612,28 +18668,28 @@
 
             const indexToolbarMarkup = `
                 <div class="index-toolbar">
-                    <div class="index-view-switch" role="group" aria-label="Recipe views">
-                        <button type="button" onclick="setIndexViewMode('cards')" class="index-tool-btn notebook-view-toggle ${indexViewMode === 'cards' ? 'is-active' : ''}" title="Cards view" aria-label="Cards view" aria-pressed="${indexViewMode === 'cards'}">
+                    <div class="index-view-switch" role="group" aria-label="${uiText('Recipe views', 'Receptweergaven')}">
+                        <button type="button" onclick="setIndexViewMode('cards')" class="index-tool-btn notebook-view-toggle ${indexViewMode === 'cards' ? 'is-active' : ''}" title="${uiText('Cards view', 'Kaartenweergave')}" aria-label="${uiText('Cards view', 'Kaartenweergave')}" aria-pressed="${indexViewMode === 'cards'}">
                             <i data-lucide="layout-grid" class="h-4 w-4"></i>
-                            <span class="index-tool-label">Cards</span>
+                            <span class="index-tool-label">${uiText('Cards', 'Kaarten')}</span>
                         </button>
-                        <button type="button" onclick="setIndexViewMode('list')" class="index-tool-btn notebook-view-toggle ${indexViewMode === 'list' ? 'is-active' : ''}" title="List view" aria-label="List view" aria-pressed="${indexViewMode === 'list'}">
+                        <button type="button" onclick="setIndexViewMode('list')" class="index-tool-btn notebook-view-toggle ${indexViewMode === 'list' ? 'is-active' : ''}" title="${uiText('List view', 'Lijstweergave')}" aria-label="${uiText('List view', 'Lijstweergave')}" aria-pressed="${indexViewMode === 'list'}">
                             <i data-lucide="list" class="h-4 w-4"></i>
-                            <span class="index-tool-label">List</span>
+                            <span class="index-tool-label">${uiText('List', 'Lijst')}</span>
                         </button>
-                        <button type="button" onclick="setIndexViewMode('book')" class="index-tool-btn notebook-view-toggle ${indexViewMode === 'book' ? 'is-active' : ''}" title="${notebookModeLocked ? 'Premium notebook mode' : 'Notebook view'}" aria-label="${notebookModeLocked ? 'Premium notebook mode' : 'Notebook view'}" aria-pressed="${indexViewMode === 'book'}">
+                        <button type="button" onclick="setIndexViewMode('book')" class="index-tool-btn notebook-view-toggle ${indexViewMode === 'book' ? 'is-active' : ''}" title="${notebookModeLocked ? uiText('Premium notebook mode', 'Premium schriftmodus') : uiText('Notebook view', 'Schriftweergave')}" aria-label="${notebookModeLocked ? uiText('Premium notebook mode', 'Premium schriftmodus') : uiText('Notebook view', 'Schriftweergave')}" aria-pressed="${indexViewMode === 'book'}">
                             <i data-lucide="${notebookModeLocked ? 'crown' : 'book-open'}" class="h-4 w-4 ${notebookModeLocked ? 'text-gold' : ''}"></i>
-                            <span class="index-tool-label">Book</span>
+                            <span class="index-tool-label">${uiText('Book', 'Boek')}</span>
                         </button>
                     </div>
-                    <div class="index-tool-actions" role="group" aria-label="Search and filters">
-                        <button type="button" onclick="toggleListSearchVisibility()" class="index-tool-btn index-tool-btn--ghost ${isSearchVisible ? 'is-active' : ''}" title="${isNotebookMode ? 'Switch to card view and open search' : 'Toggle search'}" aria-label="Search" aria-pressed="${isSearchVisible}">
+                    <div class="index-tool-actions" role="group" aria-label="${uiText('Search and filters', 'Zoeken en filters')}">
+                        <button type="button" onclick="toggleListSearchVisibility()" class="index-tool-btn index-tool-btn--ghost ${isSearchVisible ? 'is-active' : ''}" title="${isNotebookMode ? uiText('Switch to card view and open search', 'Ga naar kaarten en open zoeken') : uiText('Toggle search', 'Zoeken tonen of verbergen')}" aria-label="${uiText('Search', 'Zoeken')}" aria-pressed="${isSearchVisible}">
                             <i data-lucide="search" class="h-4 w-4"></i>
-                            <span class="index-tool-label">Search</span>
+                            <span class="index-tool-label">${uiText('Search', 'Zoeken')}</span>
                         </button>
-                        <button type="button" onclick="toggleListFiltersVisibility()" class="index-tool-btn index-tool-btn--ghost ${isFilterVisible ? 'is-active' : ''}" title="${isNotebookMode ? 'Switch to card view and open filters' : 'Toggle filters'}" aria-label="Filters" aria-pressed="${isFilterVisible}">
+                        <button type="button" onclick="toggleListFiltersVisibility()" class="index-tool-btn index-tool-btn--ghost ${isFilterVisible ? 'is-active' : ''}" title="${isNotebookMode ? uiText('Switch to card view and open filters', 'Ga naar kaarten en open filters') : uiText('Toggle filters', 'Filters tonen of verbergen')}" aria-label="${uiText('Filters', 'Filters')}" aria-pressed="${isFilterVisible}">
                             <i data-lucide="sliders-horizontal" class="h-4 w-4"></i>
-                            <span class="index-tool-label">Filters</span>
+                            <span class="index-tool-label">${uiText('Filters', 'Filters')}</span>
                         </button>
                     </div>
                 </div>
@@ -18644,20 +18700,20 @@
                     <div class="index-hero">
                         <div class="index-hero-copy">
                             ${isNotebookMode ? `
-                                <p class="index-hero-kicker">Notebook mode</p>
-                                <h2>Recipe notebook</h2>
+                                <p class="index-hero-kicker">${uiText('Notebook mode', 'Schriftmodus')}</p>
+                                <h2>${uiText('Recipe notebook', 'Receptenschrift')}</h2>
                                 <p class="index-hero-copy-meta" style="margin-top:0.45rem;display:inline-flex;align-items:center;gap:0.4rem;">
                                     <span class="index-card-tag">${resultLabel}</span>
                                 </p>
                             ` : `
-                                <h2>Every recipe you created and liked</h2>
+                                <h2>${uiText('Every recipe you created and liked', 'Elk recept dat je maakte of bewaarde')}</h2>
                                 <p class="index-hero-kicker" style="margin-top:0.55rem;display:inline-flex;align-items:center;gap:0.4rem;letter-spacing:0.14em;">
                                     <i data-lucide="book-copy" class="h-4 w-4"></i>${resultLabel}
                                 </p>
                                 ${isPremiumEnforced() ? `
                                 <div class="index-plan-note">
-                                    <p class="index-plan-kicker">${premiumActive ? billingMeta.badge : `Free plan: ${localRecipeCount}/${freeLocalRecipeLimit} recipes on this account`}</p>
-                                    <p class="index-plan-detail">${premiumActive ? billingMeta.summary : `${freeRecipeSlotsRemaining} free slot${freeRecipeSlotsRemaining === 1 ? '' : 's'} left. Premium unlocks notebook, sync, sharing, and PDF.`}</p>
+                                    <p class="index-plan-kicker">${premiumActive ? billingMeta.badge : uiText(`Free plan: ${localRecipeCount}/${freeLocalRecipeLimit} recipes on this account`, `Gratis plan: ${localRecipeCount}/${freeLocalRecipeLimit} recepten op dit account`)}</p>
+                                    <p class="index-plan-detail">${premiumActive ? billingMeta.summary : uiText(`${freeRecipeSlotsRemaining} free slot${freeRecipeSlotsRemaining === 1 ? '' : 's'} left. Premium unlocks notebook, sync, sharing, and PDF.`, `${freeRecipeSlotsRemaining} gratis plek${freeRecipeSlotsRemaining === 1 ? '' : 'ken'} over. Premium opent schrift, sync, delen en PDF.`)}</p>
                                 </div>
                                 ` : `
                                 <div class="index-plan-note">
@@ -19363,11 +19419,11 @@
                     <div class="detail-content-shell">
                         ${(recipe.prepTime || recipe.cookTime || recipe.servings || recipe.difficulty || recipe.cuisine) ? `
                         <div class="detail-meta-grid detail-panel">
-                            ${recipe.prepTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Prep</div><div class="detail-meta-value">${recipe.prepTime}m</div></div>` : ''}
-                            ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Cook</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
-                            ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Servings</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
-                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Difficulty</div><div class="detail-meta-value">${recipe.difficulty}</div></div>` : ''}
-                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Cuisine</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
+                            ${recipe.prepTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Prep', 'Voorb.')}</div><div class="detail-meta-value">${recipe.prepTime}m</div></div>` : ''}
+                            ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cook', 'Koken')}</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
+                            ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Servings', 'Porties')}</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
+                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${recipe.difficulty}</div></div>` : ''}
+                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
                         </div>` : ''}
 
                         <div class="detail-toolbar-row detail-panel">
@@ -19380,16 +19436,16 @@
 
                         <div class="detail-layout-grid grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
                             <div class="detail-ingredients-panel detail-panel md:col-span-1 h-fit">
-                                <p class="detail-panel-kicker">Ingredients</p>
-                                <h3 class="font-bold font-fantasy text-2xl flex items-center text-forest mb-5"><i data-lucide="shopping-basket" class="w-6 h-6 mr-2 text-gold"></i> Shopping list</h3>
+                                <p class="detail-panel-kicker">${uiText('Ingredients', 'Ingrediënten')}</p>
+                                <h3 class="font-bold font-fantasy text-2xl flex items-center text-forest mb-5"><i data-lucide="shopping-basket" class="w-6 h-6 mr-2 text-gold"></i> ${uiText('Shopping list', 'Boodschappenlijst')}</h3>
                                 <ul class="text-sm space-y-2">
                                     ${(recipe.ingredients || []).map(ing => `<li class="detail-ingredient-row"><span class="text-forest font-semibold text-sm leading-snug">${applyMeasurementSystem(ing)}</span></li>`).join('')}
                                 </ul>
                             </div>
 
                             <div class="detail-instructions-panel detail-panel md:col-span-2">
-                                <p class="detail-panel-kicker">Method</p>
-                                <h3 class="font-bold font-fantasy text-2xl md:text-3xl mb-5 flex items-center text-forest"><i data-lucide="list-ordered" class="w-7 h-7 mr-3 text-gold"></i> Instructions</h3>
+                                <p class="detail-panel-kicker">${uiText('Method', 'Methode')}</p>
+                                <h3 class="font-bold font-fantasy text-2xl md:text-3xl mb-5 flex items-center text-forest"><i data-lucide="list-ordered" class="w-7 h-7 mr-3 text-gold"></i> ${uiText('Instructions', 'Bereiding')}</h3>
                                 <ol class="space-y-3">
                                     ${(recipe.instructions || []).map((step, index) => {
                                         const stepImage = getRecipeInstructionImage(step);
@@ -19735,7 +19791,7 @@
             const copyByKey = {
                 recipeLimit: nl ? {
                     title: 'Gratis limiet bereikt',
-                    kicker: 'Free plan',
+                    kicker: 'Gratis plan',
                     headline: 'Je hebt 3 recepten bereikt',
                     body: `Dit account staat op Free (${used}/${freeLocalRecipeLimit} recepten). Upgrade naar Premium voor onbeperkte recepten plus schrift, synchroniseren, delen en PDF.`,
                     primary: 'Bekijk Premium',
@@ -19750,9 +19806,9 @@
                 },
                 notebookMode: nl ? {
                     title: 'Premium: Schrift',
-                    kicker: 'Notebook',
+                    kicker: 'Schrift',
                     headline: 'Schrift is een Premium-functie',
-                    body: 'Het receptenschrift, covers en sticky notes horen bij Premium op dit account.',
+                    body: 'Het receptenschrift, kaften en plakbriefjes horen bij Premium op dit account.',
                     primary: 'Bekijk Premium',
                     secondary: 'Nu niet'
                 } : {
@@ -19765,9 +19821,9 @@
                 },
                 cloudSync: nl ? {
                     title: 'Premium: Synchroniseren',
-                    kicker: 'Cloud sync',
+                    kicker: 'Cloudsync',
                     headline: 'Synchroniseren is Premium',
-                    body: 'Cloud sync houdt dit account bij over apparaten. Dat zit in Premium.',
+                    body: 'Cloudsync houdt dit account bij over apparaten. Dat zit in Premium.',
                     primary: 'Bekijk Premium',
                     secondary: 'Nu niet'
                 } : {
@@ -19780,7 +19836,7 @@
                 },
                 recipeSharing: nl ? {
                     title: 'Premium: Delen',
-                    kicker: 'Share',
+                    kicker: 'Delen',
                     headline: 'Delen is Premium',
                     body: 'Recepten delen vanaf dit account vraagt om Premium.',
                     primary: 'Bekijk Premium',
@@ -19795,7 +19851,7 @@
                 },
                 recipePdfExport: nl ? {
                     title: 'Premium: PDF',
-                    kicker: 'Export',
+                    kicker: 'Exporteren',
                     headline: 'PDF-export is Premium',
                     body: 'Recepten als PDF downloaden hoort bij Premium op dit account.',
                     primary: 'Bekijk Premium',
@@ -19807,6 +19863,51 @@
                     body: 'Downloading recipes as PDF unlocks with Premium on this account.',
                     primary: 'View Premium',
                     secondary: 'Not now'
+                },
+                publishRecipes: nl ? {
+                    title: 'Premium: Publiceren',
+                    kicker: 'Publiceren',
+                    headline: 'Publiceren is Premium',
+                    body: 'Recepten publiceren hoort bij Premium op dit account.',
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Premium: Publish',
+                    kicker: 'Publish',
+                    headline: 'Publishing is Premium',
+                    body: 'Publishing recipes unlocks with Premium on this account.',
+                    primary: 'View Premium',
+                    secondary: 'Not now'
+                },
+                createFamilies: nl ? {
+                    title: 'Premium: Families',
+                    kicker: 'Families',
+                    headline: 'Families aanmaken is Premium',
+                    body: 'Families aanmaken hoort bij Premium op dit account.',
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Premium: Families',
+                    kicker: 'Families',
+                    headline: 'Creating families is Premium',
+                    body: 'Creating families unlocks with Premium on this account.',
+                    primary: 'View Premium',
+                    secondary: 'Not now'
+                },
+                stickyNotes: nl ? {
+                    title: 'Premium: Plakbriefjes',
+                    kicker: 'Plakbriefjes',
+                    headline: 'Plakbriefjes zijn Premium',
+                    body: 'Plakbriefjes gebruiken hoort bij Premium op dit account.',
+                    primary: 'Bekijk Premium',
+                    secondary: 'Nu niet'
+                } : {
+                    title: 'Premium: Sticky notes',
+                    kicker: 'Sticky notes',
+                    headline: 'Sticky notes are Premium',
+                    body: 'Using sticky notes unlocks with Premium on this account.',
+                    primary: 'View Premium',
+                    secondary: 'Not now'
                 }
             };
 
@@ -19815,10 +19916,25 @@
             }
 
             const featureLabel = premiumFeatureLabels[featureKey] || String(featureKeyOrName || (nl ? 'deze functie' : 'this feature'));
+            // English fallback copy still needs English infinitives when a Dutch label is the only map value.
+            const englishFeatureLabels = {
+                backupDownload: 'download backups',
+                backupRestore: 'restore backups',
+                cloudSync: 'use cloud sync',
+                notebookMode: 'use notebook mode',
+                recipePdfExport: 'download recipe PDFs',
+                recipeSharing: 'share recipes',
+                recipeLimit: 'add more than 3 recipes',
+                publishRecipes: 'publish recipes',
+                createFamilies: 'create families',
+                notebookCovers: 'customize notebook covers',
+                stickyNotes: 'use sticky notes'
+            };
+            const englishLabel = englishFeatureLabels[featureKey] || String(featureKeyOrName || 'this feature');
             return nl ? {
                 featureKey,
                 title: 'Upgrade naar Premium',
-                kicker: 'Account plan',
+                kicker: 'Accountplan',
                 headline: 'Deze functie is Premium',
                 body: `Premium is nodig om ${featureLabel}. Het plan van dit account bepaalt wat openstaat.`,
                 primary: 'Bekijk Premium',
@@ -19828,7 +19944,7 @@
                 title: 'Upgrade to Premium',
                 kicker: 'Account plan',
                 headline: 'This feature is Premium',
-                body: `Premium is required to ${featureLabel}. Your account plan controls what is unlocked.`,
+                body: `Premium is required to ${englishLabel}. Your account plan controls what is unlocked.`,
                 primary: 'View Premium',
                 secondary: 'Not now'
             };
@@ -19842,7 +19958,7 @@
             const perkItems = getActiveUiLanguage() === 'nl'
                 ? [
                     'Onbeperkte recepten',
-                    'Schrift / notebook',
+                    'Schrift',
                     'Synchroniseren',
                     'Delen & PDF'
                 ]
@@ -20069,14 +20185,21 @@
         }
 
         function showCreateFamilyModal() { if(requireAccountPlan('createFamilies')) return;
+            const nl = getActiveUiLanguage() === 'nl';
             if (isCurrentUserFamilyReadOnly() || isCurrentUserSociallyIsolated()) {
-                showToast('Family changes are disabled for your account.', 'alert-circle', true);
+                showToast(nl ? 'Familiewijzigingen staan uit voor je account.' : 'Family changes are disabled for your account.', 'alert-circle', true);
                 return;
             }
-            if (!isAuthenticated) return showToast('Please sign in to create a family.', 'alert-circle', true);
+            if (!isAuthenticated) {
+                return showToast(nl ? 'Log in om een familie aan te maken.' : 'Please sign in to create a family.', 'alert-circle', true);
+            }
             const activeFamilies = getActiveFamiliesForCurrentUser();
             if (activeFamilies.length >= 3) {
-                return showToast('You can only be an active member of 3 families at once.', 'alert-circle', true);
+                return showToast(
+                    nl ? 'Je kunt in max. 3 families actief lid zijn.' : 'You can only be an active member of 3 families at once.',
+                    'alert-circle',
+                    true
+                );
             }
 
             const colorChoicesMarkup = familyColorOptions.map((option, index) => `
@@ -20091,34 +20214,40 @@
                 </label>
             `).join('');
 
-            createModal('Create Family Book', `
+            createModal(nl ? 'Familieboek aanmaken' : 'Create Family Book', `
                 <div class="space-y-5 text-inkDark">
                     <div class="rounded-2xl border border-parchmentDark bg-parchment p-4 shadow-sm">
-                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Shared archive</p>
-                        <p class="mt-2 text-sm font-semibold leading-relaxed text-forest">Create one shared book for the people you cook with. You will manage members, invites, and access.</p>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${nl ? 'Gedeeld archief' : 'Shared archive'}</p>
+                        <p class="mt-2 text-sm font-semibold leading-relaxed text-forest">${nl
+                            ? 'Maak één gedeeld boek voor de mensen met wie je kookt. Jij beheert leden, uitnodigingen en toegang.'
+                            : 'Create one shared book for the people you cook with. You will manage members, invites, and access.'}</p>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">Family Name</label>
-                        <input type="text" id="new-family-name" placeholder="e.g. Smith Family" class="${mutedInputClass}" maxlength="25">
+                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">${nl ? 'Familienaam' : 'Family Name'}</label>
+                        <input type="text" id="new-family-name" placeholder="${nl ? 'bijv. Familie Jansen' : 'e.g. Smith Family'}" class="${mutedInputClass}" maxlength="25">
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">Secret Pincode</label>
-                        <input type="text" id="new-family-pin" placeholder="Enter a 4-8 digit pin" class="${mutedInputClass}" maxlength="8">
-                        <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">People will need this pin to join the book.</p>
+                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-1">${nl ? 'Geheime pincode' : 'Secret Pincode'}</label>
+                        <input type="text" id="new-family-pin" placeholder="${nl ? 'Voer een pincode van 4–8 tekens in' : 'Enter a 4-8 digit pin'}" class="${mutedInputClass}" maxlength="8">
+                        <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">${nl ? 'Mensen hebben deze pincode nodig om toe te treden.' : 'People will need this pin to join the book.'}</p>
                     </div>
                     <div>
-                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-3">Family Color</label>
+                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-3">${nl ? 'Familiekleur' : 'Family Color'}</label>
                         <div class="grid grid-cols-2 gap-2">${colorChoicesMarkup}</div>
                     </div>
                 </div>
             `, [
-                { text: 'Cancel', onClick: () => closeModal() },
-                { text: 'Create Family', primary: true, onClick: () => {
+                { text: nl ? 'Annuleren' : 'Cancel', onClick: () => closeModal() },
+                { text: nl ? 'Familie aanmaken' : 'Create Family', primary: true, onClick: () => {
                     const name = document.getElementById('new-family-name').value.trim();
                     const pin = document.getElementById('new-family-pin').value.trim();
                     const colorKey = document.querySelector('input[name="new-family-color"]:checked')?.value || familyColorOptions[0].key;
-                    if (!name || !pin) return showToast('Please fill out all fields.', 'alert-circle', true);
-                    if (pin.length < 4) return showToast('Pincode must be at least 4 characters.', 'alert-circle', true);
+                    if (!name || !pin) {
+                        return showToast(nl ? 'Vul alle velden in.' : 'Please fill out all fields.', 'alert-circle', true);
+                    }
+                    if (pin.length < 4) {
+                        return showToast(nl ? 'Pincode minstens 4 tekens.' : 'Pincode must be at least 4 characters.', 'alert-circle', true);
+                    }
                     if (!validateFamilyNameForModeration(name)) return;
                     submitCreateFamily(name, pin, colorKey);
                     closeModal();
@@ -20194,7 +20323,7 @@
 
         async function submitCreateFamily(name, pin, colorKey = familyColorOptions[0].key) {
             if (!validateFamilyNameForModeration(name)) return;
-            showToast('Creating family...', 'loader');
+            showToast(getActiveUiLanguage() === 'nl' ? 'Familie aanmaken…' : 'Creating family...', 'loader');
             const tag = Math.floor(1000 + Math.random() * 9000).toString();
             const color = getFamilyColorOption(colorKey);
             
@@ -20214,7 +20343,12 @@
             
             userFamilies.push(normalizeFamilyRecord(newFamily));
             saveData();
-            showToast(`Family created! Invite others with tag #${tag}.`, 'check');
+            showToast(
+                getActiveUiLanguage() === 'nl'
+                    ? `Familie aangemaakt! Nodig anderen uit met tag #${tag}.`
+                    : `Family created! Invite others with tag #${tag}.`,
+                'check'
+            );
             renderProfile(); 
         }
 
@@ -20560,7 +20694,7 @@
             recipe.personalNotes = textarea.value;
             saveData();
             closeNotesEditor();
-            showToast('Notes saved!', 'check-circle');
+            showToast(getActiveUiLanguage() === 'nl' ? 'Notities opgeslagen!' : 'Notes saved!', 'check-circle');
             if (currentView === 'index' && indexViewMode === 'book') {
                 renderList();
                 return;
@@ -20634,21 +20768,21 @@
                 return;
             }
 
-            createModal('Delete Recipe', `
+            createModal(uiText('Delete Recipe', 'Recept verwijderen'), `
                 <div class="space-y-4">
-                    <p class="text-sm font-semibold leading-relaxed text-forest">Are you sure you want to permanently delete <strong>${escapeHTML(recipe.title)}</strong>?</p>
-                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-red-500">Confirm to remove it from this device. Undo stays available for 5 minutes.</p>
+                    <p class="text-sm font-semibold leading-relaxed text-forest">${uiText('Are you sure you want to permanently delete', 'Weet je zeker dat je permanent wilt verwijderen')} <strong>${escapeHTML(recipe.title)}</strong>?</p>
+                    <p class="text-xs font-bold uppercase tracking-[0.16em] text-red-500">${uiText('Confirm to remove it from this device. Undo stays available for 5 minutes.', 'Bevestig om het van dit apparaat te verwijderen. Ongedaan maken blijft 5 minuten beschikbaar.')}</p>
                 </div>
             `, [
-                { text: 'Cancel', onClick: () => closeModal() },
+                { text: uiText('Cancel', 'Annuleren'), onClick: () => closeModal() },
                 {
-                    text: 'Delete',
+                    text: uiText('Delete', 'Verwijderen'),
                     danger: true,
                     onClick: () => {
                         const recipeTitle = recipe.title;
-                        deleteRecipeNow(recipe.id, `Recipe "${recipeTitle}" deleted.`);
+                        deleteRecipeNow(recipe.id, uiText(`Recipe "${recipeTitle}" deleted.`, `Recept "${recipeTitle}" verwijderd.`));
                         closeModal();
-                        showToast('Recipe deleted. Undo available for 5 minutes.', 'trash-2');
+                        showToast(uiText('Recipe deleted. Undo available for 5 minutes.', 'Recept verwijderd. Ongedaan maken 5 minuten beschikbaar.'), 'trash-2');
                     }
                 }
             ]);
@@ -20702,31 +20836,31 @@
                     : `${remainingStepCount} step${remainingStepCount === 1 ? '' : 's'} left. Next up: ${escapeHTML(nextStepPreview)}`);
             const primarySupportActionClass = getAppButtonClasses('secondary', { size: 'md' });
             const primarySupportAction = canEditExistingRecipe
-                ? `<button onclick="renderAddForm(${recipe.id})" class="${primarySupportActionClass}" translate="no"><i data-lucide="pencil-line" class="h-4 w-4 text-gold"></i>Edit recipe</button>`
-                : `<button onclick="renderPublishedRecipeDetail('${recipe.publishedId}')" class="${primarySupportActionClass}"><i data-lucide="external-link" class="h-4 w-4 text-gold"></i>${savedRecipeIsOutdated ? 'Open latest' : 'Browse original'}</button>`;
+                ? `<button onclick="renderAddForm(${recipe.id})" class="${primarySupportActionClass}" translate="no"><i data-lucide="pencil-line" class="h-4 w-4 text-gold"></i>${uiText('Edit recipe', 'Recept bewerken')}</button>`
+                : `<button onclick="renderPublishedRecipeDetail('${recipe.publishedId}')" class="${primarySupportActionClass}"><i data-lucide="external-link" class="h-4 w-4 text-gold"></i>${savedRecipeIsOutdated ? uiText('Open latest', 'Open nieuwste') : uiText('Browse original', 'Bekijk origineel')}</button>`;
             const publishDetailVariant = !isSavedCommunityRecipe && recipe.publishedId ? 'accent' : 'secondary';
             const detailActionButtonsMarkup = `
                 <div class="detail-actions action-row">
-                    ${savedRecipeIsOutdated ? renderDetailIconAction('Update warning', 'alert-circle', `toggleSavedRecipeUpdateNotice(${recipe.id})`, 'warning', '', true) : ''}
+                    ${savedRecipeIsOutdated ? renderDetailIconAction(uiText('Update warning', 'Updatewaarschuwing'), 'alert-circle', `toggleSavedRecipeUpdateNotice(${recipe.id})`, 'warning', '', true) : ''}
                     <button onclick="toggleCookingMode(${recipe.id})" class="detail-cook-toggle-btn ${getAppButtonClasses(isCookingMode ? 'secondary' : 'primary', { size: 'md' })}">
                         <i id="focus-btn-icon" data-lucide="${isCookingMode ? 'x-circle' : 'chef-hat'}" class="h-4 w-4"></i>
                         <span id="focus-btn-text">${isCookingMode
-                            ? (userSettings.language === 'nl' ? 'Stop koken' : 'Exit Cooking')
-                            : (userSettings.language === 'nl' ? 'Kookmodus' : 'Cook Mode')}</span>
+                            ? uiText('Exit Cooking', 'Stop koken')
+                            : uiText('Cook Mode', 'Kookmodus')}</span>
                     </button>
                     ${primarySupportAction}
-                    ${!isSavedCommunityRecipe && versionHistoryCount > 0 ? renderDetailIconAction(`History (${versionHistoryCount})`, 'history', `showRecipeVersionHistory(${recipe.id})`, 'secondary', '', true) : ''}
+                    ${!isSavedCommunityRecipe && versionHistoryCount > 0 ? renderDetailIconAction(uiText(`History (${versionHistoryCount})`, `Geschiedenis (${versionHistoryCount})`), 'history', `showRecipeVersionHistory(${recipe.id})`, 'secondary', '', true) : ''}
                     ${accountHasPremiumPlan()
-                        ? renderDetailIconAction('Share', 'share-2', `shareRecipe(${recipe.id})`, 'secondary', '', true)
-                        : renderDetailIconAction('Share', 'lock', "showPremiumModal('recipeSharing')", 'muted', '', true)}
+                        ? renderDetailIconAction(uiText('Share', 'Delen'), 'share-2', `shareRecipe(${recipe.id})`, 'secondary', '', true)
+                        : renderDetailIconAction(uiText('Share', 'Delen'), 'lock', "showPremiumModal('recipeSharing')", 'muted', '', true)}
                     ${accountHasPremiumPlan()
-                        ? renderDetailIconAction(userSettings.language === 'nl' ? 'PDF' : 'PDF', 'file-down', `exportRecipeAsPDF(${recipe.id})`, 'secondary', '', true)
-                        : renderDetailIconAction(userSettings.language === 'nl' ? 'PDF' : 'PDF', 'lock', "showPremiumModal('recipePdfExport')", 'muted', '', true)}
+                        ? renderDetailIconAction('PDF', 'file-down', `exportRecipeAsPDF(${recipe.id})`, 'secondary', '', true)
+                        : renderDetailIconAction('PDF', 'lock', "showPremiumModal('recipePdfExport')", 'muted', '', true)}
                     ${isSavedCommunityRecipe ? '' : renderDetailIconAction(publishActionLabel, publishActionIcon, `publishRecipe(${recipe.id})`, publishDetailVariant, '', true)}
-                    ${canAdminForceOffline ? renderDetailIconAction('Admin: offline now', 'shield-x', `adminForceOfflineRecipe(${recipe.id})`, 'danger', '', true) : ''}
+                    ${canAdminForceOffline ? renderDetailIconAction(uiText('Admin: offline now', 'Admin: nu offline'), 'shield-x', `adminForceOfflineRecipe(${recipe.id})`, 'danger', '', true) : ''}
                     ${deletionVoteProgress
-                        ? renderDetailIconAction('Vote pending', 'bell-ring', 'showNotificationsModal()', 'warning', '', true)
-                        : renderDetailIconAction('Delete', 'trash-2', `requestRecipeDeletion(${recipe.id})`, 'danger', '', true)}
+                        ? renderDetailIconAction(uiText('Vote pending', 'Stemming open'), 'bell-ring', 'showNotificationsModal()', 'warning', '', true)
+                        : renderDetailIconAction(uiText('Delete', 'Verwijderen'), 'trash-2', `requestRecipeDeletion(${recipe.id})`, 'danger', '', true)}
                 </div>
             `;
 
@@ -20755,8 +20889,8 @@
                                 <div class="detail-hero-meta">
                                     <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${escapeHTML(getRecipeAuthorLabel(recipe))}</span>
                                     ${getRecipeCountryLabel(recipe, { fallback: false }) ? `<span>|</span><span class="flex items-center gap-1"><i data-lucide="map-pinned" class="w-4 h-4"></i> ${escapeHTML(getRecipeCountryLabel(recipe))}</span>` : ''}
-                                    ${isSavedCommunityRecipe ? `<span>|</span><span class="flex items-center gap-1"><i data-lucide="heart" class="w-4 h-4"></i> Community save${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
-                                    ${!isSavedCommunityRecipe && recipe.publishedId ? `<span>|</span><span class="flex items-center gap-1"><i data-lucide="${recipeIsLive ? 'cloud' : 'cloud-off'}" class="w-4 h-4"></i> ${recipeIsLive ? 'Live in Browse' : 'Removed from Browse'}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
+                                    ${isSavedCommunityRecipe ? `<span>|</span><span class="flex items-center gap-1"><i data-lucide="heart" class="w-4 h-4"></i> ${uiText('Community save', 'Community-opslag')}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
+                                    ${!isSavedCommunityRecipe && recipe.publishedId ? `<span>|</span><span class="flex items-center gap-1"><i data-lucide="${recipeIsLive ? 'cloud' : 'cloud-off'}" class="w-4 h-4"></i> ${recipeIsLive ? uiText('Live in Browse', 'Live in Bladeren') : uiText('Removed from Browse', 'Weg uit Bladeren')}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -20766,24 +20900,24 @@
                         ${isCookingMode ? renderCookStage(recipe) : ''}
                         ${(recipe.prepTime || recipe.cookTime || recipe.servings || recipe.difficulty || recipe.cuisine) ? `
                         <div class="detail-meta-grid detail-panel">
-                            ${recipe.prepTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Prep</div><div class="detail-meta-value">${recipe.prepTime}m</div></div>` : ''}
-                            ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Cook</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
-                            ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Servings</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
-                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Difficulty</div><div class="detail-meta-value">${recipe.difficulty}</div></div>` : ''}
-                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">Cuisine</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
+                            ${recipe.prepTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Prep', 'Voorb.')}</div><div class="detail-meta-value">${recipe.prepTime}m</div></div>` : ''}
+                            ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cook', 'Koken')}</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
+                            ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Servings', 'Porties')}</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
+                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${recipe.difficulty}</div></div>` : ''}
+                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
                         </div>` : ''}
 
                         <div class="detail-toolbar-row detail-panel">
                             <div class="detail-status-chips">
-                                <span class="detail-chip">${recipe.category || 'Recipe'}</span>
+                                <span class="detail-chip">${recipe.category || uiText('Recipe', 'Recept')}</span>
                                 ${recipe.diet && recipe.diet.length > 0 ? recipe.diet.map(d => `<span class="detail-chip">${d}</span>`).join('') : ''}
                                 ${recipeFamilyChip}
-                                ${isSavedCommunityRecipe ? `<span class="detail-chip">Saved community recipe${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
-                                ${!isSavedCommunityRecipe && recipe.publishedId ? `<span class="detail-chip">${recipeIsLive ? 'Live in Browse' : 'Removed from Browse'}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
-                                ${!isSavedCommunityRecipe && recipeHasUnpublishedChanges ? `<span class="detail-chip">Local changes not published</span>` : ''}
-                                ${savedRecipeIsOutdated ? `<span class="detail-chip">Newer author version ${latestPublishedVersionLabel}</span>` : ''}
-                                ${savedRecipeSourceRetracted ? `<span class="detail-chip">Original removed from Browse</span>` : ''}
-                                ${deletionVoteProgress ? `<span class="detail-chip">Deletion vote ${deletionVoteProgress.approved}/${deletionVoteProgress.total}</span>` : ''}
+                                ${isSavedCommunityRecipe ? `<span class="detail-chip">${uiText('Saved community recipe', 'Opgeslagen communityrecept')}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
+                                ${!isSavedCommunityRecipe && recipe.publishedId ? `<span class="detail-chip">${recipeIsLive ? uiText('Live in Browse', 'Live in Bladeren') : uiText('Removed from Browse', 'Weg uit Bladeren')}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
+                                ${!isSavedCommunityRecipe && recipeHasUnpublishedChanges ? `<span class="detail-chip">${uiText('Local changes not published', 'Lokale wijzigingen niet gepubliceerd')}</span>` : ''}
+                                ${savedRecipeIsOutdated ? `<span class="detail-chip">${uiText('Newer author version', 'Nieuwere auteursversie')} ${latestPublishedVersionLabel}</span>` : ''}
+                                ${savedRecipeSourceRetracted ? `<span class="detail-chip">${uiText('Original removed from Browse', 'Origineel weg uit Bladeren')}</span>` : ''}
+                                ${deletionVoteProgress ? `<span class="detail-chip">${uiText('Deletion vote', 'Verwijderstem')} ${deletionVoteProgress.approved}/${deletionVoteProgress.total}</span>` : ''}
                             </div>
                             ${detailActionButtonsMarkup}
                         </div>
@@ -20813,25 +20947,27 @@
                                 <div class="mb-5 flex flex-col gap-4 border-b border-parchmentDark/60 pb-4">
                                     <div class="flex items-start justify-between gap-3">
                                         <div class="min-w-0">
-                                            <p class="detail-panel-kicker" style="margin:0;">Ingredients</p>
-                                            <h3 class="font-bold font-fantasy text-2xl flex items-center text-forest mt-1"><i data-lucide="shopping-basket" class="w-6 h-6 mr-2 text-gold"></i> Scale & shop</h3>
-                                            <p class="mt-2 text-sm font-semibold text-sage">Scale the recipe or send the list to Shop.</p>
+                                            <p class="detail-panel-kicker" style="margin:0;">${uiText('Ingredients', 'Ingrediënten')}</p>
+                                            <h3 class="font-bold font-fantasy text-2xl flex items-center text-forest mt-1"><i data-lucide="shopping-basket" class="w-6 h-6 mr-2 text-gold"></i> ${uiText('Scale & shop', 'Schalen & boodschappen')}</h3>
+                                            <p class="mt-2 text-sm font-semibold text-sage">${uiText('Scale the recipe or send the list to Shop.', 'Schaal het recept of stuur de lijst naar Boodschappen.')}</p>
                                         </div>
                                         ${(() => {
                                             const hasIngredientsInList = userSettings.shoppingList.items.some(item => 
                                                 !item.checked && (item.sourceRecipeIds || []).includes(recipe.id)
                                             );
-                                            return `<button type="button" onclick="toggleRecipeIngredientsInShoppingList(${recipe.id}, false); renderDetail(${recipe.id});" class="mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border shadow-sm transition-all ${hasIngredientsInList ? 'bg-forest border-forest text-white hover:bg-coral hover:border-coral' : 'bg-white border-parchmentDark text-gold hover:shadow-md hover:text-forest'}" title="${hasIngredientsInList ? 'Remove ingredients from list' : 'Add all ingredients to shopping list'}" aria-label="${hasIngredientsInList ? 'Remove ingredients from list' : 'Add all ingredients to shopping list'}"><i data-lucide="shopping-basket" class="h-5 w-5"></i></button>`;
+                                            return `<button type="button" onclick="toggleRecipeIngredientsInShoppingList(${recipe.id}, false); renderDetail(${recipe.id});" class="mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border shadow-sm transition-all ${hasIngredientsInList ? 'bg-forest border-forest text-white hover:bg-coral hover:border-coral' : 'bg-white border-parchmentDark text-gold hover:shadow-md hover:text-forest'}" title="${hasIngredientsInList ? uiText('Remove ingredients from list', 'Ingrediënten van de lijst halen') : uiText('Add all ingredients to shopping list', 'Alle ingrediënten op de boodschappenlijst')}" aria-label="${hasIngredientsInList ? uiText('Remove ingredients from list', 'Ingrediënten van de lijst halen') : uiText('Add all ingredients to shopping list', 'Alle ingrediënten op de boodschappenlijst')}"><i data-lucide="shopping-basket" class="h-5 w-5"></i></button>`;
                                         })()}
                                     </div>
                                     <div class="detail-scale-control" translate="no">
-                                        <button type="button" onclick="updateScale(-0.5, ${recipe.id})" aria-label="Decrease scale">-</button>
+                                        <button type="button" onclick="updateScale(-0.5, ${recipe.id})" aria-label="${uiText('Decrease scale', 'Schaal verlagen')}">-</button>
                                         <span id="scale-display">${formatScaleLabel(recipe)}</span>
-                                        <button type="button" onclick="updateScale(0.5, ${recipe.id})" aria-label="Increase scale">+</button>
+                                        <button type="button" onclick="updateScale(0.5, ${recipe.id})" aria-label="${uiText('Increase scale', 'Schaal verhogen')}">+</button>
                                     </div>
-                                    <button onclick="toggleMeasurementSystem(${recipe.id})" title="Toggle Metric / Imperial" class="${getAppButtonClasses((userSettings.measurementSystem || 'Metric') === 'Imperial' ? 'primary' : 'secondary', { fullWidth: true, size: 'md' })}">
+                                    <button onclick="toggleMeasurementSystem(${recipe.id})" title="${uiText('Toggle Metric / Imperial', 'Wissel Metriek / Imperial')}" class="${getAppButtonClasses((userSettings.measurementSystem || 'Metric') === 'Imperial' ? 'primary' : 'secondary', { fullWidth: true, size: 'md' })}">
                                         <i data-lucide="ruler" class="h-4 w-4"></i>
-                                        ${(userSettings.measurementSystem || 'Metric') === 'Imperial' ? 'Imperial — switch to Metric' : 'Metric — switch to Imperial'}
+                                        ${(userSettings.measurementSystem || 'Metric') === 'Imperial'
+                                            ? uiText('Imperial — switch to Metric', 'Imperial — wissel naar metriek')
+                                            : uiText('Metric — switch to Imperial', 'Metriek — wissel naar imperial')}
                                     </button>
                                 </div>
                                 <ul id="ingredients-list" class="text-sm space-y-2">
@@ -20840,8 +20976,8 @@
                             </div>
 
                             <div id="instructions-section-${recipe.id}" class="detail-instructions-panel detail-panel md:col-span-2">
-                                <p class="detail-panel-kicker">Method</p>
-                                <h3 class="font-bold font-fantasy text-2xl md:text-3xl mb-5 flex items-center text-forest"><i data-lucide="list-ordered" class="w-7 h-7 mr-3 text-gold"></i> Instructions</h3>
+                                <p class="detail-panel-kicker">${uiText('Method', 'Methode')}</p>
+                                <h3 class="font-bold font-fantasy text-2xl md:text-3xl mb-5 flex items-center text-forest"><i data-lucide="list-ordered" class="w-7 h-7 mr-3 text-gold"></i> ${uiText('Instructions', 'Bereiding')}</h3>
                                 <ol class="space-y-3">
                                     ${(recipe.instructions || []).map((step, index) => {
                                         const isChecked = recipe.checkedSteps?.includes(index);
@@ -20869,8 +21005,8 @@
 
                         ${recipe.tips ? `
                             <div class="detail-secondary-section detail-panel detail-notes-callout">
-                                <p class="detail-panel-kicker">Chef notes</p>
-                                <h3 class="font-bold font-fantasy text-2xl mb-3 flex items-center text-forest"><i data-lucide="lightbulb" class="w-6 h-6 mr-2 text-gold"></i> Chef's Notes & Secrets</h3>
+                                <p class="detail-panel-kicker">${uiText('Chef notes', 'Chefsnotities')}</p>
+                                <h3 class="font-bold font-fantasy text-2xl mb-3 flex items-center text-forest"><i data-lucide="lightbulb" class="w-6 h-6 mr-2 text-gold"></i> ${uiText("Chef's Notes & Secrets", 'Chefsnotities & geheimen')}</h3>
                                 <p class="text-base font-semibold text-forest leading-relaxed">${applyMeasurementSystem(recipe.tips)}</p>
                             </div>
                         ` : ''}
@@ -20878,15 +21014,15 @@
                         <div class="detail-notes-panel detail-panel">
                             <div class="flex items-center justify-between mb-3">
                                 <div>
-                                    <p class="detail-panel-kicker" style="margin:0;">Personal</p>
-                                    <h3 class="font-bold font-fantasy text-lg flex items-center text-forest mt-1"><i data-lucide="sticky-note" class="w-5 h-5 mr-2 text-gold"></i> Your Notes</h3>
+                                    <p class="detail-panel-kicker" style="margin:0;">${uiText('Personal', 'Persoonlijk')}</p>
+                                    <h3 class="font-bold font-fantasy text-lg flex items-center text-forest mt-1"><i data-lucide="sticky-note" class="w-5 h-5 mr-2 text-gold"></i> ${uiText('Your Notes', 'Jouw notities')}</h3>
                                 </div>
-                                <button type="button" onclick="openNotesEditor(${recipe.id})" class="inline-flex h-11 w-11 items-center justify-center rounded-xl text-sage transition-colors hover:bg-parchment hover:text-gold" aria-label="Edit notes" title="Edit notes">
+                                <button type="button" onclick="openNotesEditor(${recipe.id})" class="inline-flex h-11 w-11 items-center justify-center rounded-xl text-sage transition-colors hover:bg-parchment hover:text-gold" aria-label="${uiText('Edit notes', 'Notities bewerken')}" title="${uiText('Edit notes', 'Notities bewerken')}">
                                     <i data-lucide="edit" class="w-5 h-5"></i>
                                 </button>
                             </div>
                             <div id="notes-section-${recipe.id}">
-                                ${recipe.personalNotes ? `<p class="text-sm text-forest">${recipe.personalNotes}</p>` : '<p class="text-xs text-sage italic">Click edit to add your personal notes and modifications...</p>'}
+                                ${recipe.personalNotes ? `<p class="text-sm text-forest">${recipe.personalNotes}</p>` : `<p class="text-xs text-sage italic">${uiText('Click edit to add your personal notes and modifications...', 'Tik op bewerken om persoonlijke notities toe te voegen…')}</p>`}
                             </div>
                         </div>
                     </div>
@@ -20922,7 +21058,7 @@
                             <div class="cook-active-meta">
                                 <p class="cook-kicker" id="cook-kicker"></p>
                                 <div>
-                                    <p class="cook-clock-label">Timer</p>
+                                    <p class="cook-clock-label">${uiText('Timer', 'Timer')}</p>
                                     <p class="cook-clock" id="cook-clock" aria-live="polite">00:00</p>
                                 </div>
                             </div>
@@ -20931,22 +21067,22 @@
                                 <ul class="cook-ingredients" id="cook-ingredients"></ul>
                             </div>
                             <div class="cook-peek" id="cook-peek">
-                                <p class="cook-peek-kicker">Up next</p>
+                                <p class="cook-peek-kicker">${uiText('Up next', 'Hierna')}</p>
                                 <p class="cook-peek-text" id="cook-peek-text"></p>
                             </div>
                         </article>
                         <div class="cook-nav">
                             <button type="button" class="cook-nav-btn" onclick="moveCookStep(-1)">
                                 <i data-lucide="chevron-left" class="w-5 h-5"></i>
-                                Previous
+                                ${uiText('Previous', 'Vorige')}
                             </button>
                             <button type="button" class="cook-nav-btn cook-nav-btn--next" onclick="moveCookStep(1)">
-                                Next
+                                ${uiText('Next', 'Volgende')}
                                 <i data-lucide="chevron-right" class="w-5 h-5"></i>
                             </button>
                         </div>
                         <button type="button" class="cook-leave-link" onclick="exitCookingMode()">
-                            Leave cooking mode
+                            ${uiText('Leave cooking mode', 'Kookmodus verlaten')}
                         </button>
                     </section>
                 `;
@@ -20960,13 +21096,13 @@
                         <div class="cook-prep-copy">
                             <p>${escapeHTML(getRecipeInstructionText(step))}</p>
                         </div>
-                        <div class="cook-stepper" role="group" aria-label="Minutes for step ${index + 1}">
-                            <button type="button" class="cook-stepper-btn" onclick="adjustCookMinutes(${index}, -1)" aria-label="Decrease minutes for step ${index + 1}">−</button>
+                        <div class="cook-stepper" role="group" aria-label="${uiText(`Minutes for step ${index + 1}`, `Minuten voor stap ${index + 1}`)}">
+                            <button type="button" class="cook-stepper-btn" onclick="adjustCookMinutes(${index}, -1)" aria-label="${uiText(`Decrease minutes for step ${index + 1}`, `Minuten verlagen voor stap ${index + 1}`)}">−</button>
                             <div class="cook-stepper-value">
                                 <span data-cook-minutes-display="${index}">${minutes}</span>
                                 <span class="cook-stepper-unit">min</span>
                             </div>
-                            <button type="button" class="cook-stepper-btn" onclick="adjustCookMinutes(${index}, 1)" aria-label="Increase minutes for step ${index + 1}">+</button>
+                            <button type="button" class="cook-stepper-btn" onclick="adjustCookMinutes(${index}, 1)" aria-label="${uiText(`Increase minutes for step ${index + 1}`, `Minuten verhogen voor stap ${index + 1}`)}">+</button>
                             <input type="number" min="1" max="240" inputmode="numeric" value="${minutes}" data-cook-minutes="${index}" tabindex="-1" aria-hidden="true">
                         </div>
                     </li>
@@ -20978,12 +21114,12 @@
                     <article class="cook-board cook-board--prepare">
                         <div class="cook-prepare-layout">
                             <header class="cook-prepare-head">
-                                <p class="cook-kicker">Before cooking</p>
-                                <p class="cook-instruction">Set the pace for each step.</p>
-                                <p class="cook-prepare-lead">Tune the minutes, then start. The timer moves with you through the recipe.</p>
+                                <p class="cook-kicker">${uiText('Before cooking', 'Voor het koken')}</p>
+                                <p class="cook-instruction">${uiText('Set the pace for each step.', 'Stel het tempo per stap in.')}</p>
+                                <p class="cook-prepare-lead">${uiText('Tune the minutes, then start. The timer moves with you through the recipe.', 'Pas de minuten aan en start. De timer loopt met je mee door het recept.')}</p>
                                 <button type="button" class="cook-begin" onclick="beginCookSession()">
                                     <i data-lucide="flame" class="w-5 h-5"></i>
-                                    Start cooking
+                                    ${uiText('Start cooking', 'Begin met koken')}
                                 </button>
                             </header>
                             <ul class="cook-prep-list">${rows}</ul>
@@ -21092,16 +21228,16 @@
             draftIngredients = recipeToEdit ? [...(recipeToEdit.ingredients || [])] : [];
             draftSteps = recipeToEdit ? normalizeRecipeInstructions(recipeToEdit.instructions) : [];
             draftProfile = recipeToEdit?.profile && recipeToEdit.profile !== defaultPlaceholderProfile ? recipeToEdit.profile : null;
-            const formTitle = recipeToEdit ? 'Edit Recipe' : 'Create Recipe';
-            const submitLabel = recipeToEdit ? 'Update Recipe' : 'Save Recipe';
+            const formTitle = recipeToEdit ? 'Recept bewerken' : 'Recept maken';
+            const submitLabel = recipeToEdit ? 'Recept bijwerken' : 'Recept opslaan';
             const publishSubmitLabel = recipeToEdit
-                ? (recipeToEdit.publishedId ? (isRecipePublishedLive(recipeToEdit) ? 'Save & Update Publish' : 'Save & Republish') : 'Save & Publish')
-                : 'Save & Publish';
+                ? (recipeToEdit.publishedId ? (isRecipePublishedLive(recipeToEdit) ? 'Opslaan & publicatie bijwerken' : 'Opslaan & herpubliceren') : 'Opslaan & publiceren')
+                : 'Opslaan & publiceren';
             const editorGuidance = recipeToEdit
                 ? 'Update the recipe basics here. Optional details stay in one section below when you need them.'
                 : 'Start with the essentials: title, category, ingredients, and steps. Optional details stay available below.';
             const activeFamilies = getActiveFamiliesForCurrentUser();
-            const familyOptionsMarkup = ['<option value="">Personal archive</option>', ...activeFamilies.map(family => `<option value="${family.id}">${escapeHTML(family.name)}</option>`)].join('');
+            const familyOptionsMarkup = [`<option value="">${getActiveUiLanguage() === 'nl' ? 'Persoonlijk archief' : 'Personal archive'}</option>`, ...activeFamilies.map(family => `<option value="${family.id}">${escapeHTML(family.name)}</option>`)].join('');
             const recipeFamily = recipeToEdit ? getRecipeFamily(recipeToEdit) : null;
             const familyHelperText = activeFamilies.length > 0
                 ? 'Choose a family book if this recipe belongs in a shared archive. Personal recipes stay private to your account.'
