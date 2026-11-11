@@ -469,6 +469,11 @@
             padding: 0;
         }
 
+        /* Settings stays a gear-only control on every viewport (label via aria). */
+        #main-header #header-open-settings .header-icon-label {
+            display: none !important;
+        }
+
         #header-back[hidden],
         #header-help[hidden],
         #header-open-settings[hidden],
@@ -669,12 +674,17 @@
             }
 
             #main-header #header-back,
-            #main-header #header-help,
-            #main-header #header-open-settings {
+            #main-header #header-help {
                 width: auto;
                 min-width: 2.75rem;
                 padding: 0 0.9rem;
                 gap: 0.4rem;
+            }
+
+            #main-header #header-open-settings {
+                width: 2.75rem;
+                min-width: 2.75rem;
+                padding: 0;
             }
 
             .header-icon-label {
@@ -684,6 +694,10 @@
                 font-weight: 800;
                 letter-spacing: 0.1em;
                 text-transform: uppercase;
+            }
+
+            #main-header #header-open-settings .header-icon-label {
+                display: none !important;
             }
         }
 
@@ -6209,8 +6223,8 @@
                     <span class="header-icon-label">Help</span>
                 </button>
                 <button id="header-open-settings" type="button" onclick="renderSettings()" class="header-icon-button" aria-label="Opties" title="Opties">
-                    <i data-lucide="settings-2" class="w-5 h-5" aria-hidden="true"></i>
-                    <span class="header-icon-label">Opties</span>
+                    <i data-lucide="settings" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="header-icon-label" aria-hidden="true"></span>
                 </button>
                 <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="flex h-11 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
                     <i data-lucide="plus" class="w-4 h-4"></i> <span class="header-add-label">Add Recipe</span>
@@ -14328,7 +14342,10 @@
                 gear.setAttribute('aria-label', optionsLabel);
                 gear.title = optionsLabel;
                 const gearLabel = gear.querySelector('.header-icon-label');
-                if (gearLabel) gearLabel.textContent = optionsLabel;
+                // Keep DOM for a11y structure, but never show "Options"/"Opties" text — icon only.
+                if (gearLabel) gearLabel.textContent = '';
+                const gearIcon = gear.querySelector('[data-lucide]');
+                if (gearIcon) gearIcon.setAttribute('data-lucide', 'settings');
             }
             if (help) {
                 help.setAttribute('aria-label', helpLabel);
@@ -16698,34 +16715,82 @@
             `, [{ text: nl ? 'Sluiten' : 'Close', primary: true, onClick: () => closeModal() }]);
         }
 
+        function isTourTargetVisible(el) {
+            if (!(el instanceof HTMLElement)) return false;
+            if (el.hidden || el.getAttribute('aria-hidden') === 'true') return false;
+            const style = window.getComputedStyle(el);
+            if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) return false;
+            const rect = el.getBoundingClientRect();
+            if (rect.width < 2 || rect.height < 2) return false;
+            const vw = window.innerWidth || document.documentElement.clientWidth;
+            const vh = window.innerHeight || document.documentElement.clientHeight;
+            return rect.bottom > 0 && rect.right > 0 && rect.top < vh && rect.left < vw;
+        }
+
+        function resolveTourTarget(selectors = []) {
+            const list = Array.isArray(selectors) ? selectors : [selectors];
+            for (const selector of list) {
+                if (!selector) continue;
+                const nodes = [...document.querySelectorAll(selector)];
+                const visible = nodes.find(node => isTourTargetVisible(node));
+                if (visible) return visible;
+            }
+            return null;
+        }
+
+        function prepareInteractiveTutorialStep(stepIndex) {
+            // Keep the shell on the index surface so header gear / add / nav stay visible.
+            const needsIndexSurface = currentView !== 'index'
+                || activeDetailRecipeId != null
+                || !document.getElementById('header-add-recipe')
+                || document.getElementById('header-add-recipe')?.hidden
+                || Boolean(document.querySelector('#content h2')?.textContent?.match(/^(Opties|Options)$/i));
+            activeDetailRecipeId = null;
+            chromeBackAction = null;
+            if (needsIndexSurface && typeof renderList === 'function') {
+                renderList();
+            } else if (typeof setActiveNav === 'function') {
+                setActiveNav('index');
+            }
+            if (typeof syncHeaderBackButton === 'function') syncHeaderBackButton();
+            if (typeof syncHeaderAddButton === 'function') syncHeaderAddButton();
+            // Ensure the Opties control stays a gear (tandwiel), never the sliders glyph.
+            const gearIcon = document.querySelector('#header-open-settings [data-lucide]');
+            if (gearIcon && gearIcon.getAttribute('data-lucide') !== 'settings') {
+                gearIcon.setAttribute('data-lucide', 'settings');
+            }
+            if (typeof lucide?.createIcons === 'function') lucide.createIcons();
+        }
+
         function showInteractiveTutorial(step = 0, manualOpen = false) {
             const tourSteps = [
                 {
                     title: 'Welkom bij Uculi',
                     body: 'Dit is je persoonlijke receptenarchief. We nemen je in 4 stappen mee langs de belangrijkste onderdelen.',
                     icon: 'sparkles',
-                    target: null
+                    targets: ['.app-header-brand', '#main-header'],
+                    prefer: 'below'
                 },
                 {
                     title: 'Recept toevoegen',
-                    body: 'Tap op "Add Recipe" om een nieuw recept te maken. Je voegt ingrediënten, stappen en notities toe. Probeer hem na deze rondleiding!',
+                    body: 'Tik op de plusknop om een nieuw recept te maken. Je voegt ingrediënten, stappen en notities toe.',
                     icon: 'plus-circle',
-                    target: 'button[onclick="renderAddForm()"]',
-                    position: 'below'
+                    targets: ['#header-add-recipe', 'button[onclick="renderAddForm()"]'],
+                    prefer: 'below'
                 },
                 {
                     title: 'Navigatie',
-                    body: 'Via de tabbladen onderaan schakel je tussen Recepten, Shop, Browse en Profiel.',
+                    body: 'Via de tabbladen onderaan schakel je tussen Recepten, Boodschappen, Bladeren en Profiel.',
                     icon: 'navigation',
-                    target: '#main-nav',
-                    position: 'above'
+                    targets: ['#main-nav', '#main-nav .app-nav-inner', '#main-nav .app-nav-button'],
+                    prefer: 'above'
                 },
                 {
                     title: 'Instellingen',
                     body: 'Opties open je via het tandwiel. Daar staan account, taal en backup.',
-                    icon: 'settings-2',
-                    target: '#header-open-settings',
-                    position: 'above'
+                    icon: 'settings',
+                    targets: ['#header-open-settings'],
+                    prefer: 'below'
                 }
             ];
 
@@ -16741,74 +16806,102 @@
             const current = tourSteps[safeStep];
             const isLast = safeStep === numSteps - 1;
             const PAD = 10;
+            const EDGE = 8;
+
+            prepareInteractiveTutorialStep(safeStep);
 
             // Remove any existing tour element (prevents stacking)
             document.getElementById('uculi-tour')?.remove();
 
-            const targetEl = current.target ? document.querySelector(current.target) : null;
-            const rect = targetEl ? targetEl.getBoundingClientRect() : null;
+            const paint = () => {
+                document.getElementById('uculi-tour')?.remove();
+                const targetEl = resolveTourTarget(current.targets);
+                const rect = targetEl ? targetEl.getBoundingClientRect() : null;
+                const tooltipWidth = Math.min(340, window.innerWidth - EDGE * 2);
+                const tooltipHeight = 210;
 
-            // Spotlight style: box-shadow "punches a hole" through the backdrop
-            let backdropHtml = '';
-            let tooltipPosStyle = '';
+                let backdropHtml = '';
+                let tooltipPosStyle = '';
 
-            if (rect) {
-                const sl = rect.left - PAD;
-                const st = rect.top - PAD;
-                const sw = rect.width + PAD * 2;
-                const sh = rect.height + PAD * 2;
-                backdropHtml = `<div style="position:fixed;pointer-events:none;left:${sl}px;top:${st}px;width:${sw}px;height:${sh}px;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.60);z-index:301;"></div>`;
+                if (rect) {
+                    const sl = Math.max(0, rect.left - PAD);
+                    const st = Math.max(0, rect.top - PAD);
+                    const sw = Math.min(window.innerWidth - sl, rect.width + PAD * 2);
+                    const sh = Math.min(window.innerHeight - st, rect.height + PAD * 2);
+                    backdropHtml = `<div style="position:fixed;pointer-events:none;left:${sl}px;top:${st}px;width:${sw}px;height:${sh}px;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.60);z-index:301;"></div>`;
 
-                const tooltipWidth = Math.min(340, window.innerWidth - 16);
-                const rawLeft = Math.min(Math.max(8, rect.left), window.innerWidth - tooltipWidth - 8);
-                if (current.position === 'above') {
-                    tooltipPosStyle = `left:${rawLeft}px;bottom:${window.innerHeight - (rect.top - PAD - 12)}px;`;
+                    const spaceBelow = window.innerHeight - rect.bottom - EDGE;
+                    const spaceAbove = rect.top - EDGE;
+                    let placeBelow = current.prefer !== 'above';
+                    if (placeBelow && spaceBelow < tooltipHeight && spaceAbove > spaceBelow) placeBelow = false;
+                    if (!placeBelow && spaceAbove < tooltipHeight && spaceBelow >= spaceAbove) placeBelow = true;
+
+                    const rawLeft = Math.min(
+                        Math.max(EDGE, rect.left + rect.width / 2 - tooltipWidth / 2),
+                        window.innerWidth - tooltipWidth - EDGE
+                    );
+
+                    if (placeBelow) {
+                        const top = Math.min(rect.bottom + PAD + 12, window.innerHeight - tooltipHeight - EDGE);
+                        tooltipPosStyle = `left:${rawLeft}px;top:${Math.max(EDGE, top)}px;`;
+                    } else {
+                        const top = Math.max(EDGE, rect.top - PAD - 12 - tooltipHeight);
+                        tooltipPosStyle = `left:${rawLeft}px;top:${top}px;`;
+                    }
                 } else {
-                    tooltipPosStyle = `left:${rawLeft}px;top:${rect.bottom + PAD + 12}px;`;
+                    // Fallback: still show a visible spotlight on the header so the step never floats aimlessly.
+                    const fallback = resolveTourTarget(['#main-header', '.app-header-brand']);
+                    if (fallback) {
+                        const fr = fallback.getBoundingClientRect();
+                        backdropHtml = `<div style="position:fixed;pointer-events:none;left:${Math.max(0, fr.left - PAD)}px;top:${Math.max(0, fr.top - PAD)}px;width:${fr.width + PAD * 2}px;height:${fr.height + PAD * 2}px;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.60);z-index:301;"></div>`;
+                        tooltipPosStyle = `left:${EDGE}px;right:${EDGE}px;top:${Math.min(window.innerHeight - tooltipHeight - EDGE, fr.bottom + 16)}px;width:auto;max-width:none;`;
+                    } else {
+                        backdropHtml = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.60);z-index:301;pointer-events:none;"></div>`;
+                        tooltipPosStyle = `left:${EDGE}px;right:${EDGE}px;top:50%;transform:translateY(-50%);width:auto;max-width:none;`;
+                    }
                 }
-            } else {
-                // No target: full dimmed backdrop + centered tooltip
-                backdropHtml = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.60);z-index:301;pointer-events:none;"></div>`;
-                tooltipPosStyle = 'left:50%;top:50%;transform:translate(-50%,-50%);';
-            }
 
-            const dots = tourSteps.map((_, i) =>
-                `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${i === safeStep ? '#1c1410' : 'rgba(0,0,0,0.18)'}"></span>`
-            ).join('');
+                const dots = tourSteps.map((_, i) =>
+                    `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${i === safeStep ? '#1c1410' : 'rgba(0,0,0,0.18)'}"></span>`
+                ).join('');
 
-            const nextBtn = isLast
-                ? `<button onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:flex;align-items:center;gap:6px;background:#1c1410;color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
-                        <i data-lucide="check" style="width:16px;height:16px;"></i> Klaar
-                   </button>`
-                : `<button onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:flex;align-items:center;gap:6px;background:#1c1410;color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
-                        Volgende <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
-                   </button>`;
+                const nextBtn = isLast
+                    ? `<button type="button" onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;background:#1c1410;color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
+                            <i data-lucide="check" style="width:16px;height:16px;"></i> Klaar
+                       </button>`
+                    : `<button type="button" onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;background:#1c1410;color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
+                            Volgende <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+                       </button>`;
 
-            const tourHtml = `
-                <div id="uculi-tour" style="position:fixed;inset:0;z-index:300;pointer-events:none;">
-                    ${backdropHtml}
-                    <div style="position:fixed;${tooltipPosStyle}pointer-events:all;width:min(340px,calc(100vw - 16px));background:#fff;border:1px solid #E5DDD0;border-radius:20px;box-shadow:0 24px 48px rgba(0,0,0,0.18);overflow:hidden;z-index:302;">
-                        <div style="background:#F7F1E8;padding:14px 16px;border-bottom:1px solid #E5DDD0;display:flex;align-items:center;gap:10px;">
-                            <i data-lucide="${current.icon}" style="width:20px;height:20px;color:#C8972A;flex-shrink:0;"></i>
-                            <span style="font-family:serif;font-weight:700;font-size:17px;color:#1c1410;flex:1;">${current.title}</span>
-                            <span style="font-size:11px;font-weight:700;color:#7A8C6E;white-space:nowrap;">${safeStep + 1} / ${numSteps}</span>
-                        </div>
-                        <div style="padding:14px 16px;">
-                            <p style="font-size:14px;font-weight:600;color:#1c1410;line-height:1.55;margin:0;">${current.body}</p>
-                        </div>
-                        <div style="padding:0 16px 14px;display:flex;align-items:center;gap:8px;">
-                            <div style="display:flex;gap:5px;align-items:center;">${dots}</div>
-                            <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
-                                <button onclick="skipInteractiveTutorial()" style="background:none;border:none;font-size:13px;font-weight:700;color:#7A8C6E;cursor:pointer;padding:8px 10px;border-radius:10px;">Overslaan</button>
-                                ${nextBtn}
+                const tourHtml = `
+                    <div id="uculi-tour" role="dialog" aria-modal="true" aria-label="${current.title}" style="position:fixed;inset:0;z-index:300;pointer-events:none;">
+                        ${backdropHtml}
+                        <div style="position:fixed;${tooltipPosStyle}pointer-events:auto;width:min(340px,calc(100vw - 16px));background:#fff;border:1px solid #E5DDD0;border-radius:20px;box-shadow:0 24px 48px rgba(0,0,0,0.18);overflow:hidden;z-index:302;">
+                            <div style="background:#F7F1E8;padding:14px 16px;border-bottom:1px solid #E5DDD0;display:flex;align-items:center;gap:10px;">
+                                <i data-lucide="${current.icon}" style="width:20px;height:20px;color:#C8972A;flex-shrink:0;"></i>
+                                <span style="font-family:serif;font-weight:700;font-size:17px;color:#1c1410;flex:1;">${current.title}</span>
+                                <span style="font-size:11px;font-weight:700;color:#7A8C6E;white-space:nowrap;">${safeStep + 1} / ${numSteps}</span>
+                            </div>
+                            <div style="padding:14px 16px;">
+                                <p style="font-size:14px;font-weight:600;color:#1c1410;line-height:1.55;margin:0;">${current.body}</p>
+                            </div>
+                            <div style="padding:0 16px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                                <div style="display:flex;gap:5px;align-items:center;">${dots}</div>
+                                <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                                    <button type="button" onclick="skipInteractiveTutorial()" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;background:none;border:none;font-size:13px;font-weight:700;color:#7A8C6E;cursor:pointer;padding:8px 12px;border-radius:10px;">Overslaan</button>
+                                    ${nextBtn}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
 
-            document.body.insertAdjacentHTML('beforeend', tourHtml);
-            lucide.createIcons();
+                document.body.insertAdjacentHTML('beforeend', tourHtml);
+                lucide.createIcons();
+            };
+
+            // Paint after layout so targets (nav/header) have real geometry on phone/tablet/desktop.
+            requestAnimationFrame(() => requestAnimationFrame(paint));
         }
 
         function skipInteractiveTutorial() {
