@@ -7459,16 +7459,45 @@
             return isDeveloperBypassSession() && !isProductionUculiHost() && isLocalDeveloperPreviewContext();
         }
 
-        // Enige plan-check per account: Firestore billing (lokaal gespiegeld) of Testmodus.
-        // When PREMIUM_ENABLED is false, everyone is unlocked (Stripe not live yet).
-        function accountHasPremiumPlan() {
+        // Hard-coded access superuser (must match firestore.rules exactly).
+        const ACCESS_SUPERUSER_EMAIL = 'm.holtzapffel@gmail.com';
+        let currentUserAccessGrant = false;
+        let accessGrantListCache = [];
+        let accessGrantLoadPromise = null;
+
+        function normalizeAccessEmail(value = '') {
+            return normalizeAdminEmail(value);
+        }
+
+        function isAccessSuperuser() {
+            if (!isAuthenticated || !currentUser) return false;
+            // Match rules: request.auth.token.email == 'm.holtzapffel@gmail.com'
+            // && request.auth.token.email_verified == true
+            return currentUser.email === ACCESS_SUPERUSER_EMAIL
+                && currentUser.emailVerified === true;
+        }
+
+        function hasCachedAccessGrant() {
+            return currentUserAccessGrant === true;
+        }
+
+        // Single entitlement helper for paid/full features.
+        // Superuser always has full access without an access/{email} grant doc.
+        function hasFullAccess() {
+            if (isAccessSuperuser()) return true;
+            if (hasCachedAccessGrant()) return true;
             if (!isPremiumEnforced()) return true;
             if (isLocalTestPremiumSession()) return true;
             return hasPremiumBillingStatus(getAccountPlan().status);
         }
 
+        // Legacy names — all premium gates go through hasFullAccess().
+        function accountHasPremiumPlan() {
+            return hasFullAccess();
+        }
+
         function hasPremiumAccess() {
-            return accountHasPremiumPlan();
+            return hasFullAccess();
         }
 
         function countLocalRecipes() {
@@ -7476,8 +7505,127 @@
         }
 
         function canAddLocalRecipe() {
-            if (!isPremiumEnforced()) return true;
-            return accountHasPremiumPlan() || countLocalRecipes() < freeLocalRecipeLimit;
+            return hasFullAccess() || countLocalRecipes() < freeLocalRecipeLimit;
+        }
+
+        async function refreshCurrentUserAccessGrant() {
+            currentUserAccessGrant = false;
+            if (!firebaseInitialized || !isAuthenticated || !currentUser?.email) return false;
+            if (isDeveloperBypassSession()) return false;
+            // Superuser does not need a grant doc; keep cache false so UI stays honest.
+            if (isAccessSuperuser()) return false;
+            if (currentUser.emailVerified !== true) return false;
+
+            const emailLower = normalizeAccessEmail(currentUser.email);
+            if (!emailLower) return false;
+
+            try {
+                const snapshot = await firebase.firestore().collection('access').doc(emailLower).get();
+                currentUserAccessGrant = snapshot.exists === true;
+                return currentUserAccessGrant;
+            } catch (error) {
+                console.error('Access grant load failed:', error);
+                currentUserAccessGrant = false;
+                return false;
+            }
+        }
+
+        async function loadAccessGrantListForSuperuser() {
+            accessGrantListCache = [];
+            if (!isAccessSuperuser() || !firebaseInitialized) return [];
+
+            try {
+                const snapshot = await firebase.firestore().collection('access').get();
+                accessGrantListCache = snapshot.docs
+                    .map(doc => normalizeAccessEmail(doc.id))
+                    .filter(Boolean)
+                    .sort((a, b) => a.localeCompare(b));
+                return accessGrantListCache;
+            } catch (error) {
+                console.error('Access grant list load failed:', error);
+                showToast(uiText('Could not load access list.', 'Toegangslijst laden mislukt.'), 'alert-circle');
+                return [];
+            }
+        }
+
+        async function addAccessGrantEmail(rawEmail) {
+            if (!isAccessSuperuser()) {
+                showToast(uiText('Superuser access required.', 'Alleen de superuser mag dit.'), 'alert-circle');
+                return false;
+            }
+
+            const emailLower = normalizeAccessEmail(rawEmail);
+            if (!emailLower || !emailLower.includes('@')) {
+                showToast(uiText('Provide a valid email address.', 'Vul een geldig e-mailadres in.'), 'alert-circle');
+                return false;
+            }
+
+            if (emailLower === normalizeAccessEmail(ACCESS_SUPERUSER_EMAIL)) {
+                showToast(uiText('Superuser already has full access.', 'De superuser heeft al volledige toegang.'), 'info');
+                return false;
+            }
+
+            try {
+                const ref = firebase.firestore().collection('access').doc(emailLower);
+                const existing = await ref.get();
+                if (existing.exists) {
+                    showToast(uiText('That email already has access.', 'Dat e-mailadres staat al op de lijst.'), 'info');
+                    return false;
+                }
+
+                // Create only — rules forbid update on access docs.
+                await ref.set({
+                    email: emailLower,
+                    grantedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    grantedByUid: currentUser.uid,
+                    grantedByEmail: ACCESS_SUPERUSER_EMAIL
+                });
+
+                await loadAccessGrantListForSuperuser();
+                showToast(uiText(`Access granted to ${emailLower}.`, `Toegang gegeven aan ${emailLower}.`), 'check-circle');
+                return true;
+            } catch (error) {
+                console.error('Access grant create failed:', error);
+                showToast(uiText('Could not add access.', 'Toegang toevoegen mislukt.'), 'alert-circle');
+                return false;
+            }
+        }
+
+        async function removeAccessGrantEmail(rawEmail) {
+            if (!isAccessSuperuser()) {
+                showToast(uiText('Superuser access required.', 'Alleen de superuser mag dit.'), 'alert-circle');
+                return false;
+            }
+
+            const emailLower = normalizeAccessEmail(rawEmail);
+            if (!emailLower) return false;
+
+            try {
+                await firebase.firestore().collection('access').doc(emailLower).delete();
+                await loadAccessGrantListForSuperuser();
+                showToast(uiText(`Access removed for ${emailLower}.`, `Toegang verwijderd voor ${emailLower}.`), 'check-circle');
+                return true;
+            } catch (error) {
+                console.error('Access grant delete failed:', error);
+                showToast(uiText('Could not remove access.', 'Toegang verwijderen mislukt.'), 'alert-circle');
+                return false;
+            }
+        }
+
+        async function submitAccessGrantAdd() {
+            const input = document.getElementById('access-grant-email');
+            const ok = await addAccessGrantEmail(input?.value || '');
+            if (ok && input) input.value = '';
+            if (currentView === 'access' || document.getElementById('access-grant-list')) {
+                renderAccessManagement();
+            }
+        }
+
+        async function submitAccessGrantRemove(email) {
+            await removeAccessGrantEmail(email);
+            if (currentView === 'access' || document.getElementById('access-grant-list')) {
+                renderAccessManagement();
+            }
         }
 
         async function persistAccountPlanToFirestore(billingProfile = userSettings.billing) {
@@ -7575,6 +7723,32 @@
         }
 
         function getBillingStatusMeta() {
+            if (isAccessSuperuser()) {
+                const nl = getActiveUiLanguage() === 'nl';
+                return {
+                    state: 'superuser',
+                    badge: nl ? 'Volledige toegang' : 'Full access',
+                    summary: nl
+                        ? 'Superuser-account: alle betaalde functies staan open zonder grant-document.'
+                        : 'Superuser account: all paid features are unlocked without a grant document.',
+                    sourceLabel: 'Superuser',
+                    actionLabel: nl ? 'Superuser' : 'Superuser'
+                };
+            }
+
+            if (hasCachedAccessGrant()) {
+                const nl = getActiveUiLanguage() === 'nl';
+                return {
+                    state: 'access-grant',
+                    badge: nl ? 'Volledige toegang' : 'Full access',
+                    summary: nl
+                        ? 'Je e-mailadres staat op de toegangslijst. Alle betaalde functies zijn beschikbaar.'
+                        : 'Your email is on the access list. All paid features are available.',
+                    sourceLabel: nl ? 'Toegangslijst' : 'Access list',
+                    actionLabel: nl ? 'Via toegang' : 'Via access list'
+                };
+            }
+
             if (isLocalTestPremiumSession()) {
                 return {
                     state: 'testmodus',
@@ -7659,6 +7833,12 @@
         }
 
         function refreshCurrentViewAfterBillingChange() {
+            if (currentView === 'access') {
+                if (isAccessSuperuser()) renderAccessManagement();
+                else renderSettings();
+                return;
+            }
+
             if (currentView === 'settings') {
                 renderSettings();
                 return;
@@ -11688,6 +11868,9 @@
             recipes = [];
             userFamilies = [];
             currentUserModerationStatus = getDefaultModerationStatus();
+            currentUserAccessGrant = false;
+            accessGrantListCache = [];
+            accessGrantLoadPromise = null;
             indexViewMode = 'cards';
             notebookPageIndex = 0;
             notebookSpreadPageIndex = 0;
@@ -12316,6 +12499,15 @@
                         loadAccountPlanFromFirestore()
                             .then(() => refreshCurrentViewAfterBillingChange())
                             .catch(error => console.error('Account plan refresh error:', error));
+                        accessGrantLoadPromise = refreshCurrentUserAccessGrant()
+                            .then(() => {
+                                if (isAccessSuperuser()) {
+                                    return loadAccessGrantListForSuperuser();
+                                }
+                                return null;
+                            })
+                            .then(() => refreshCurrentViewAfterBillingChange())
+                            .catch(error => console.error('Access grant refresh error:', error));
                         loadFamiliesFromFirestore();
                         setTimeout(() => checkFamilyRemovals(), 1000);
                         bootstrapShoppingListCloud().catch(error => console.error('Shopping cloud bootstrap error:', error));
@@ -14430,6 +14622,10 @@
             }
             if (action === 'browse') {
                 renderBrowse();
+                return;
+            }
+            if (action === 'settings') {
+                renderSettings();
                 return;
             }
             renderList();
@@ -16677,6 +16873,20 @@
                             </div>
                         </section>
 
+                        ${isAccessSuperuser() ? `
+                        <section class="settings-panel settings-panel--wide">
+                            <p class="settings-panel-kicker">${settingsNl ? 'Toegang' : 'Access'}</p>
+                            <p class="text-sm font-semibold text-sage mb-3">${settingsNl
+                                ? 'Beheer welke e-mailadressen volledige (betaalde) functies krijgen.'
+                                : 'Manage which emails receive full (paid) features.'}</p>
+                            <div class="settings-actions">
+                                <button type="button" onclick="renderAccessManagement()" class="${getAppButtonClasses('primary', { size: 'sm' })}">
+                                    <i data-lucide="key-round" class="w-4 h-4"></i>${settingsNl ? 'Toegang beheren' : 'Manage access'}
+                                </button>
+                            </div>
+                        </section>
+                        ` : ''}
+
                         ${isCurrentUserAdmin() ? `<section class="settings-panel settings-panel--wide"><p class="settings-panel-kicker">Admin</p>${adminManagementContent}</section>` : ''}
                     </form>
                 </div>
@@ -16684,6 +16894,66 @@
             lucide.createIcons();
             markViewEnter();
             syncAuthGateButtons();
+        }
+
+        async function renderAccessManagement() {
+            if (!ensureAuthenticatedAccess()) return;
+            if (!isAccessSuperuser()) {
+                showToast(uiText('Superuser access required.', 'Alleen de superuser mag dit.'), 'alert-circle');
+                renderSettings();
+                return;
+            }
+
+            chromeBackAction = 'settings';
+            activeDetailRecipeId = null;
+            setActiveNav('settings');
+            currentView = 'access';
+
+            await loadAccessGrantListForSuperuser();
+            const nl = userSettings.language === 'nl';
+            const rows = accessGrantListCache.length
+                ? accessGrantListCache.map(email => `
+                    <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-parchmentDark bg-white px-3 py-2" data-access-email="${escapeHTML(email)}">
+                        <span class="text-sm font-semibold text-forest">${escapeHTML(email)}</span>
+                        <button type="button" onclick="submitAccessGrantRemove('${escapeHTML(email)}')" class="${getAppButtonClasses('danger', { size: 'sm' })}">
+                            <i data-lucide="user-minus" class="w-4 h-4"></i>${nl ? 'Verwijderen' : 'Remove'}
+                        </button>
+                    </div>
+                `).join('')
+                : `<p class="text-sm font-semibold text-sage">${nl ? 'Nog geen e-mailadressen op de lijst.' : 'No emails on the list yet.'}</p>`;
+
+            contentDiv.innerHTML = `
+                <div class="settings-sheet push-sheet" id="access-grant-list">
+                    <header class="settings-hero">
+                        <h2>${nl ? 'Toegang beheren' : 'Manage access'}</h2>
+                        <p>${nl
+                            ? 'E-mailadressen op deze lijst krijgen volledige (betaalde) functies. Jij hebt als superuser altijd toegang.'
+                            : 'Emails on this list get full (paid) features. As superuser you always have access.'}</p>
+                    </header>
+                    <section class="settings-panel settings-panel--wide">
+                        <p class="settings-panel-kicker">${nl ? 'Toevoegen' : 'Add'}</p>
+                        <div class="mt-3 flex flex-col gap-2 sm:flex-row">
+                            <input id="access-grant-email" type="email" autocomplete="email" placeholder="naam@email.com" class="${inputClass} h-11" />
+                            <button type="button" onclick="submitAccessGrantAdd()" class="${getAppButtonClasses('primary', { size: 'lg' })}">
+                                <i data-lucide="user-plus" class="w-4 h-4"></i>${nl ? 'Toevoegen' : 'Add'}
+                            </button>
+                        </div>
+                    </section>
+                    <section class="settings-panel settings-panel--wide">
+                        <p class="settings-panel-kicker">${nl ? 'Lijst' : 'List'}</p>
+                        <div class="mt-3 space-y-2">${rows}</div>
+                    </section>
+                    <div class="settings-actions" style="margin-top:1rem;">
+                        <button type="button" onclick="renderSettings()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
+                            <i data-lucide="arrow-left" class="w-4 h-4"></i>${nl ? 'Terug naar Opties' : 'Back to Options'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            markViewEnter();
+            if (typeof syncHeaderBackButton === 'function') syncHeaderBackButton();
+            if (typeof syncTopBackButton === 'function') syncTopBackButton();
         }
 
         function showAppInfo() {

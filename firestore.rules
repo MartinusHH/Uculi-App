@@ -90,6 +90,24 @@ service cloud.firestore {
       return authEmail() != '' ? authEmail().lower() : '';
     }
 
+    // Hard-coded access superuser (exact email + verified). No admins doc involved.
+    function isAccessSuperuser() {
+      return signedIn()
+        && request.auth.token.email == 'm.holtzapffel@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    function authEmailLower() {
+      return authEmail() != '' ? authEmail().lower() : '';
+    }
+
+    function canReadOwnAccessGrant(emailLower) {
+      return signedIn()
+        && request.auth.token.email_verified == true
+        && authEmailLower() != ''
+        && authEmailLower() == emailLower;
+    }
+
     function shoppingListHasMemberIds() {
       return resource.data.keys().hasAny(['memberIds'])
         && resource.data.memberIds is list;
@@ -235,6 +253,15 @@ service cloud.firestore {
         || (shoppingAuthEmail() != '' && resource.data.inviteeEmail == shoppingAuthEmail())
       );
 
+      allow update: if false;
+    }
+
+    // Full-access grants keyed by lowercase email. Users may only read their own doc.
+    // Only the hard-coded superuser may list, create, or delete. Nobody may update grants.
+    match /access/{emailLower} {
+      allow get: if canReadOwnAccessGrant(emailLower) || isAccessSuperuser();
+      allow list: if isAccessSuperuser();
+      allow create, delete: if isAccessSuperuser();
       allow update: if false;
     }
 
