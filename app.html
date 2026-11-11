@@ -593,6 +593,92 @@
             width: 100%;
         }
 
+        /* Toegang beheren: equal-height add row + ellipsis list rows */
+        .access-add-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        .access-add-row .access-add-input,
+        .access-add-row .access-add-submit {
+            width: 100%;
+            height: var(--touch-min);
+            min-height: var(--touch-min);
+            max-height: var(--touch-min);
+            border-radius: 0.75rem;
+            box-sizing: border-box;
+        }
+
+        .access-add-row .access-add-input {
+            margin: 0;
+            border: 1px solid rgba(144, 152, 112, 0.3);
+            background: #fff;
+            color: var(--text-primary);
+            font-family: var(--font-ui);
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0 1rem;
+            outline: none;
+        }
+
+        .access-add-row .access-add-input:focus {
+            border-color: var(--brand-gold);
+        }
+
+        .access-add-row .access-add-submit {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .access-grant-list {
+            display: grid;
+            gap: 0.35rem;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .access-grant-row {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            width: 100%;
+            min-width: 0;
+            min-height: var(--touch-min);
+            padding: 0.25rem 0;
+        }
+
+        .access-grant-row .access-grant-email {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text-primary);
+            font-family: var(--font-ui);
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .access-grant-row .access-grant-remove {
+            flex: 0 0 auto;
+            max-width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .access-add-row {
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 0.65rem;
+                align-items: center;
+            }
+
+            .access-add-row .access-add-submit {
+                width: auto;
+            }
+        }
+
         .settings-legal {
             display: grid;
             gap: 0.15rem;
@@ -2849,16 +2935,17 @@
             }
 
             .app-overlay {
-                padding: 0;
+                /* Keep side margin so sheets stay inside narrow viewports (e.g. 360px). */
+                padding: 0.75rem;
+                padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
                 align-items: flex-end;
             }
 
             .app-modal-panel {
                 width: 100%;
-                border-radius: 1rem 1rem 0 0;
-                border-left: 0;
-                border-right: 0;
-                border-bottom: 0;
+                max-width: 100%;
+                max-height: min(88vh, 88dvh);
+                border-radius: 1rem;
             }
         }
 
@@ -7621,11 +7708,41 @@
             }
         }
 
+        function confirmAccessGrantRemove(email) {
+            const emailLower = normalizeAccessEmail(email);
+            if (!emailLower || !isAccessSuperuser()) return;
+            const nl = userSettings.language === 'nl';
+            let modalId = null;
+            modalId = createModal(
+                nl ? 'Toegang verwijderen' : 'Remove access',
+                `<div class="space-y-3 text-inkDark">
+                    <p class="text-sm font-semibold leading-relaxed text-forest">${nl
+                        ? 'Dit e-mailadres verliest volledige (betaalde) functies.'
+                        : 'This email will lose full (paid) features.'}</p>
+                    <p class="rounded-xl border border-parchmentDark bg-parchment px-3 py-2 text-sm font-bold text-forest" style="overflow-wrap:anywhere;">${escapeHTML(emailLower)}</p>
+                </div>`,
+                [
+                    {
+                        text: nl ? 'Annuleren' : 'Cancel',
+                        onClick: () => closeModal(modalId)
+                    },
+                    {
+                        text: nl ? 'Verwijderen' : 'Remove',
+                        danger: true,
+                        onClick: async () => {
+                            closeModal(modalId);
+                            await removeAccessGrantEmail(emailLower);
+                            if (currentView === 'access' || document.getElementById('access-grant-list')) {
+                                renderAccessManagement();
+                            }
+                        }
+                    }
+                ]
+            );
+        }
+
         async function submitAccessGrantRemove(email) {
-            await removeAccessGrantEmail(email);
-            if (currentView === 'access' || document.getElementById('access-grant-list')) {
-                renderAccessManagement();
-            }
+            confirmAccessGrantRemove(email);
         }
 
         async function persistAccountPlanToFirestore(billingProfile = userSettings.billing) {
@@ -16912,15 +17029,18 @@
             await loadAccessGrantListForSuperuser();
             const nl = userSettings.language === 'nl';
             const rows = accessGrantListCache.length
-                ? accessGrantListCache.map(email => `
-                    <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-parchmentDark bg-white px-3 py-2" data-access-email="${escapeHTML(email)}">
-                        <span class="text-sm font-semibold text-forest">${escapeHTML(email)}</span>
-                        <button type="button" onclick="submitAccessGrantRemove('${escapeHTML(email)}')" class="${getAppButtonClasses('danger', { size: 'sm' })}">
-                            <i data-lucide="user-minus" class="w-4 h-4"></i>${nl ? 'Verwijderen' : 'Remove'}
+                ? accessGrantListCache.map(email => {
+                    const safeEmail = escapeHTML(email);
+                    const safeAttr = escapeHTML(email).replace(/"/g, '&quot;');
+                    return `
+                    <div class="access-grant-row" data-access-email="${safeAttr}">
+                        <span class="access-grant-email" title="${safeAttr}">${safeEmail}</span>
+                        <button type="button" class="access-grant-remove ${getAppButtonClasses('secondary', { size: 'sm' })}" data-email="${safeAttr}" onclick="confirmAccessGrantRemove(this.dataset.email)" aria-label="${nl ? 'Verwijderen' : 'Remove'} ${safeAttr}">
+                            <i data-lucide="user-minus" class="w-4 h-4" aria-hidden="true"></i><span>${nl ? 'Verwijderen' : 'Remove'}</span>
                         </button>
-                    </div>
-                `).join('')
-                : `<p class="text-sm font-semibold text-sage">${nl ? 'Nog geen e-mailadressen op de lijst.' : 'No emails on the list yet.'}</p>`;
+                    </div>`;
+                }).join('')
+                : `<p class="text-sm font-semibold text-sage" style="margin:0;">${nl ? 'Nog geen e-mailadressen op de lijst.' : 'No emails on the list yet.'}</p>`;
 
             contentDiv.innerHTML = `
                 <div class="settings-sheet push-sheet" id="access-grant-list">
@@ -16930,23 +17050,27 @@
                             ? 'E-mailadressen op deze lijst krijgen volledige (betaalde) functies. Jij hebt als superuser altijd toegang.'
                             : 'Emails on this list get full (paid) features. As superuser you always have access.'}</p>
                     </header>
-                    <section class="settings-panel settings-panel--wide">
-                        <p class="settings-panel-kicker">${nl ? 'Toevoegen' : 'Add'}</p>
-                        <div class="mt-3 flex flex-col gap-2 sm:flex-row">
-                            <input id="access-grant-email" type="email" autocomplete="email" placeholder="naam@email.com" class="${inputClass} h-11" />
-                            <button type="button" onclick="submitAccessGrantAdd()" class="${getAppButtonClasses('primary', { size: 'lg' })}">
-                                <i data-lucide="user-plus" class="w-4 h-4"></i>${nl ? 'Toevoegen' : 'Add'}
-                            </button>
-                        </div>
-                    </section>
-                    <section class="settings-panel settings-panel--wide">
-                        <p class="settings-panel-kicker">${nl ? 'Lijst' : 'List'}</p>
-                        <div class="mt-3 space-y-2">${rows}</div>
-                    </section>
-                    <div class="settings-actions" style="margin-top:1rem;">
-                        <button type="button" onclick="renderSettings()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
-                            <i data-lucide="arrow-left" class="w-4 h-4"></i>${nl ? 'Terug naar Opties' : 'Back to Options'}
-                        </button>
+                    <div class="settings-grid">
+                        <section class="settings-panel settings-panel--wide">
+                            <p class="settings-panel-kicker">${nl ? 'Toevoegen' : 'Add'}</p>
+                            <div class="access-add-row">
+                                <input id="access-grant-email" class="access-add-input" type="email" autocomplete="email" inputmode="email" placeholder="naam@email.com" aria-label="${nl ? 'E-mailadres' : 'Email address'}" />
+                                <button type="button" onclick="submitAccessGrantAdd()" class="access-add-submit ${getAppButtonClasses('primary', { size: 'sm' })}">
+                                    <i data-lucide="user-plus" class="w-4 h-4" aria-hidden="true"></i>${nl ? 'Toevoegen' : 'Add'}
+                                </button>
+                            </div>
+                        </section>
+                        <section class="settings-panel settings-panel--wide">
+                            <p class="settings-panel-kicker">${nl ? 'Lijst' : 'List'}</p>
+                            <div class="access-grant-list">${rows}</div>
+                        </section>
+                        <section class="settings-panel settings-panel--wide">
+                            <div class="settings-actions">
+                                <button type="button" onclick="renderSettings()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
+                                    <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>${nl ? 'Terug naar Opties' : 'Back to Options'}
+                                </button>
+                            </div>
+                        </section>
                     </div>
                 </div>
             `;
