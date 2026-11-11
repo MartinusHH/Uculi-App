@@ -55,7 +55,8 @@
             --touch-min: 2.75rem; /* 44px — WCAG / Apple HIG minimum */
             /* Floating #main-nav clearance (pill + bottom offset + breathing room) */
             --app-nav-clearance: calc(6rem + env(safe-area-inset-bottom, 0px));
-            --app-nav-clearance-phone: calc(6.75rem + env(safe-area-inset-bottom, 0px));
+            /* Phone needs extra room so the last recipe line clears the floating bar + safe area. */
+            --app-nav-clearance-phone: calc(8.25rem + env(safe-area-inset-bottom, 0px));
 
             /* 8px spacing scale (0.25rem = 4px half-step) */
             --space-1: 0.25rem;
@@ -2551,6 +2552,11 @@
 
             #app-content {
                 padding-bottom: var(--app-nav-clearance-phone);
+            }
+
+            #app-content .detail-sheet,
+            #app-content .detail-content-shell {
+                padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
             }
 
             .editor-sheet {
@@ -6241,7 +6247,7 @@
                             <div class="flex items-center justify-between gap-3 border-b border-parchmentDark bg-parchment p-3 md:p-4">
                                 <div>
                                     <h2 class="font-fantasy font-bold text-xl text-forest md:text-2xl">Kaft bewerken</h2>
-                                    <p class="mt-0.5 text-xs font-semibold text-sage md:text-sm">Geef je kaft een kleur, titel en stickers. Dit blijft privé in je eigen archief.</p>
+                                    <p id="cover-editor-personalize-copy" class="mt-0.5 text-xs font-semibold text-sage md:text-sm">Personalize your cover…</p>
                                 </div>
                                 <button onclick="closeCoverEditor()" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-parchmentDark bg-white text-forest transition-colors hover:border-gold hover:text-sage" aria-label="Kafteditor sluiten">
                                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -8264,11 +8270,22 @@
             return { rx: 9, ry: 9 };
         }
 
-        // Display-only clamp for phone covers (360–390px). Stored sticker coords stay unchanged.
+        // Display-only clamp. Stored sticker coords stay unchanged.
         function clampNotebookCoverStickerPlacement(x, y, kind = 'text', size = 'md', options = {}) {
             let nextX = Math.max(8, Math.min(92, Number(x) || 50));
             let nextY = Math.max(10, Math.min(90, Number(y) || 50));
             if (!isNarrowNotebookCoverViewport()) {
+                // Desktop/wide closed cover: keep wide text stickers (e.g. GEZELLIG) inside the edge.
+                if (kind === 'text') {
+                    const minX = size === 'lg' ? 28 : size === 'sm' ? 22 : 24;
+                    const maxX = size === 'lg' ? 70 : size === 'sm' ? 78 : 74;
+                    nextX = Math.max(minX, Math.min(maxX, nextX));
+                } else if (kind === 'photo') {
+                    nextX = Math.max(16, Math.min(84, nextX));
+                } else {
+                    nextX = Math.max(14, Math.min(86, nextX));
+                }
+                nextY = Math.max(12, Math.min(88, nextY));
                 return { x: nextX, y: nextY };
             }
 
@@ -9124,6 +9141,13 @@
             draftCoverPreviewFace = 'front';
             const modal = document.getElementById('cover-editor-modal');
             if (!modal) return;
+            const personalize = document.getElementById('cover-editor-personalize-copy');
+            if (personalize) {
+                personalize.textContent = uiText(
+                    'Personalize your cover…',
+                    'Geef je kaft een kleur, titel en stickers. Dit blijft privé in je eigen archief.'
+                );
+            }
             renderCoverEditor();
             openAppOverlay(modal);
         }
@@ -14291,11 +14315,11 @@
             const add = document.getElementById('header-add-recipe');
             const back = document.getElementById('header-back');
             const optionsLabel = nl ? 'Opties' : 'Options';
-            const helpLabel = 'Help';
+            const helpLabel = uiText('Help', 'Hulp');
             const addLabel = nl ? 'Recept' : 'Add Recipe';
             const backLabel = nl ? 'Terug' : 'Back';
             const navLabels = {
-                index: nl ? 'Index' : 'Index',
+                index: uiText('Index', 'Recepten'),
                 shopping: nl ? 'Boodschappen' : 'Shop',
                 browse: nl ? 'Bladeren' : 'Browse',
                 profile: nl ? 'Profiel' : 'Profile'
@@ -14311,6 +14335,13 @@
                 help.title = helpLabel;
                 const helpText = help.querySelector('.header-icon-label');
                 if (helpText) helpText.textContent = helpLabel;
+            }
+            const coverPersonalize = document.getElementById('cover-editor-personalize-copy');
+            if (coverPersonalize) {
+                coverPersonalize.textContent = uiText(
+                    'Personalize your cover…',
+                    'Geef je kaft een kleur, titel en stickers. Dit blijft privé in je eigen archief.'
+                );
             }
             if (add) {
                 add.setAttribute('aria-label', addLabel);
@@ -15421,12 +15452,12 @@
         }
 
         function getRecipeAuthorLabel(recipe) {
-            const nl = userSettings.language === 'nl';
             const raw = String(recipe?.author ?? '').trim();
+            if (raw === 'House Recipe') return uiText('House Recipe', 'Huisrecept');
             if (raw) return raw;
             const profileName = String(userSettings?.name || currentUser?.displayName || '').trim();
             if (profileName) return profileName;
-            return nl ? 'Onbekende kok' : 'Unknown chef';
+            return uiText('Unknown chef', 'Onbekende kok');
         }
 
         function getRecipeCountryLabel(recipe, { fallback = true } = {}) {
@@ -16460,8 +16491,8 @@
                         <div>
                             <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Measurement System</label>
                             <select id="settings-measurement" class="${inputClass}">
-                                <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>Metric (Grams, ML, °C)</option>
-                                <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>Imperial (Ounces, Cups, °F)</option>
+                                <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>${uiText('Metric (Grams, ML, °C)', 'Metriek (gram, ml, °C)')}</option>
+                                <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>${uiText('Imperial (Ounces, Cups, °F)', 'Imperiaal (ounces, cups, °F)')}</option>
                             </select>
                         </div>
                         <div>
@@ -16519,7 +16550,9 @@
             `;
 
             const accountStatus = currentUser?.email || userSettings.email || userSettings.name || 'Lokaal';
-            const backupStatus = (!isPremiumEnforced() || premiumActive) ? 'Ready' : 'Premium';
+            const backupStatus = (!isPremiumEnforced() || premiumActive)
+                ? uiText('Ready', 'Klaar')
+                : uiText('Premium', 'Premium');
             const purchaseRestoreLabel = settingsNl ? 'Herstel aankoop' : 'Restore purchase';
             const backupRestoreLabel = settingsNl ? 'Herstel backup' : 'Restore backup';
             const backupDownloadLabel = settingsNl ? 'Backup downloaden' : 'Download backup';
@@ -16590,8 +16623,8 @@
                                         <label class="settings-row">
                                             <span>${settingsNl ? 'Maten' : 'Measurement'}</span>
                                             <select id="settings-measurement" class="settings-select">
-                                                <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>Metric</option>
-                                                <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>Imperial</option>
+                                                <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>${uiText('Metric', 'Metriek')}</option>
+                                                <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>${uiText('Imperial', 'Imperiaal')}</option>
                                             </select>
                                         </label>
                                         <label class="settings-row">
@@ -16605,7 +16638,7 @@
                                             </select>
                                         </label>
                                         <label class="settings-row settings-row--full">
-                                            <span>Auto-publish</span>
+                                            <span>${uiText('Auto-publish', 'Automatisch publiceren')}</span>
                                             <input type="checkbox" id="settings-auto-publish" ${userSettings.autoPublish ? 'checked' : ''}>
                                         </label>
                                     </div>
@@ -17978,7 +18011,7 @@
                 : uiText('Show notes', 'Notities tonen');
             const safeRecipeTitle = escapeHTML(recipe.title || uiText('Untitled recipe', 'Naamloos recept'));
             const safeRecipeCategory = escapeHTML(recipe.category || uiText('Recipe', 'Recept'));
-            const safeRecipeAuthor = escapeHTML(recipe.author || 'Chef');
+            const safeRecipeAuthor = escapeHTML(getRecipeAuthorLabel(recipe) || 'Chef');
             const dietText = (recipe.diet || []).length > 0 ? escapeHTML(recipe.diet.join(' · ')) : uiText('No diet tags', 'Geen dieettags');
             const notebookCookActionLabel = totalInstructions > 0
                 ? uiText('Start cooking', 'Begin met koken')
@@ -18687,9 +18720,9 @@
                             <i data-lucide="search" class="h-4 w-4"></i>
                             <span class="index-tool-label">${uiText('Search', 'Zoeken')}</span>
                         </button>
-                        <button type="button" onclick="toggleListFiltersVisibility()" class="index-tool-btn index-tool-btn--ghost ${isFilterVisible ? 'is-active' : ''}" title="${isNotebookMode ? uiText('Switch to card view and open filters', 'Ga naar kaarten en open filters') : uiText('Toggle filters', 'Filters tonen of verbergen')}" aria-label="${uiText('Filters', 'Filters')}" aria-pressed="${isFilterVisible}">
+                        <button type="button" onclick="toggleListFiltersVisibility()" class="index-tool-btn index-tool-btn--ghost ${isFilterVisible ? 'is-active' : ''}" title="${isNotebookMode ? uiText('Switch to card view and open filters', 'Ga naar kaarten en open filters') : uiText('Toggle filters', 'Filters tonen of verbergen')}" aria-label="${uiText('Filters', 'Filteren')}" aria-pressed="${isFilterVisible}">
                             <i data-lucide="sliders-horizontal" class="h-4 w-4"></i>
-                            <span class="index-tool-label">${uiText('Filters', 'Filters')}</span>
+                            <span class="index-tool-label">${uiText('Filters', 'Filteren')}</span>
                         </button>
                     </div>
                 </div>
@@ -18764,7 +18797,7 @@
                             <div class="index-list-body">
                                 <h3 class="truncate">${escapeHTML(recipe.title || 'Untitled')}</h3>
                                 <div class="index-card-meta">
-                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i>${escapeHTML(recipe.author || 'Chef')}</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i>${escapeHTML(getRecipeAuthorLabel(recipe))}</span>
                                     ${recipeVersionLabel ? `<span>${escapeHTML(recipeVersionLabel)}</span>` : ''}
                                     ${totalMinutes ? `<span>${totalMinutes}m</span>` : ''}
                                 </div>
@@ -18792,7 +18825,7 @@
                             <div class="index-card-body">
                                 <h3>${escapeHTML(recipe.title || 'Untitled')}</h3>
                                 <div class="index-card-meta">
-                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i>${escapeHTML(recipe.author || 'Chef')}</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i>${escapeHTML(getRecipeAuthorLabel(recipe))}</span>
                                     ${recipeVersionLabel ? `<span>${escapeHTML(recipeVersionLabel)}</span>` : ''}
                                 </div>
                                 <div class="index-card-stats">
@@ -20963,11 +20996,11 @@
                                         <span id="scale-display">${formatScaleLabel(recipe)}</span>
                                         <button type="button" onclick="updateScale(0.5, ${recipe.id})" aria-label="${uiText('Increase scale', 'Schaal verhogen')}">+</button>
                                     </div>
-                                    <button onclick="toggleMeasurementSystem(${recipe.id})" title="${uiText('Toggle Metric / Imperial', 'Wissel Metriek / Imperial')}" class="${getAppButtonClasses((userSettings.measurementSystem || 'Metric') === 'Imperial' ? 'primary' : 'secondary', { fullWidth: true, size: 'md' })}">
+                                    <button onclick="toggleMeasurementSystem(${recipe.id})" title="${uiText('Toggle Metric / Imperial', 'Wissel Metriek / Imperiaal')}" class="${getAppButtonClasses((userSettings.measurementSystem || 'Metric') === 'Imperial' ? 'primary' : 'secondary', { fullWidth: true, size: 'md' })}">
                                         <i data-lucide="ruler" class="h-4 w-4"></i>
                                         ${(userSettings.measurementSystem || 'Metric') === 'Imperial'
-                                            ? uiText('Imperial — switch to Metric', 'Imperial — wissel naar metriek')
-                                            : uiText('Metric — switch to Imperial', 'Metriek — wissel naar imperial')}
+                                            ? uiText('Imperial — switch to Metric', 'Imperiaal — wissel naar metriek')
+                                            : uiText('Metric — switch to Imperial', 'Metriek — wissel naar imperiaal')}
                                     </button>
                                 </div>
                                 <ul id="ingredients-list" class="text-sm space-y-2">
@@ -21167,7 +21200,7 @@
             const base = Number(recipe?.servings) || 4;
             const servings = formatCookAmount(base * currentScale);
             const factor = Number.isInteger(currentScale) ? String(currentScale) : String(Math.round(currentScale * 10) / 10);
-            return `${factor}× · ${servings} servings`;
+            return uiText(`${factor}× · ${servings} servings`, `${factor}× · ${servings} porties`);
         }
 
         function updateScale(amount, recipeId) {
