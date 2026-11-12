@@ -4220,12 +4220,25 @@
             color: #1c1410;
         }
 
+        .notebook-chrome-leading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
         .notebook-chrome-actions {
             display: inline-flex;
             align-items: center;
             gap: 0.35rem;
             margin-left: auto;
             flex: 0 0 auto;
+        }
+
+        /* Cook stays glued to the Kaarten/Lijst/Boek switch. */
+        .notebook-chrome-leading .notebook-note-control--cook {
+            flex: 0 0 2.75rem;
         }
 
         .notebook-more {
@@ -7714,6 +7727,56 @@
         // Visible UI copy: English first (fallback), Dutch when language is nl.
         function uiText(english, dutch) {
             return getActiveUiLanguage() === 'nl' ? dutch : english;
+        }
+
+        function localizeRecipeCategoryLabel(value) {
+            const raw = String(value || '').trim();
+            if (!raw) return uiText('Recipe', 'Recept');
+            const key = raw.toLowerCase();
+            const map = {
+                cooking: uiText('Cooking', 'Koken'),
+                baking: uiText('Baking', 'Bakken'),
+                dessert: uiText('Dessert', 'Dessert'),
+                drink: uiText('Drink', 'Drank'),
+                breakfast: uiText('Breakfast', 'Ontbijt'),
+                lunch: uiText('Lunch', 'Lunch'),
+                dinner: uiText('Dinner', 'Diner'),
+                snack: uiText('Snack', 'Tussendoortje'),
+                other: uiText('Other', 'Overig'),
+                recipe: uiText('Recipe', 'Recept'),
+                misc: uiText('Misc', 'Divers')
+            };
+            return map[key] || raw;
+        }
+
+        function localizeRecipeDifficultyLabel(value) {
+            const raw = String(value || '').trim();
+            if (!raw) return '';
+            const key = raw.toLowerCase();
+            const map = {
+                easy: uiText('Easy', 'Makkelijk'),
+                medium: uiText('Medium', 'Gemiddeld'),
+                hard: uiText('Hard', 'Moeilijk')
+            };
+            return map[key] || raw;
+        }
+
+        function localizeRecipeCuisineLabel(value) {
+            const raw = String(value || '').trim();
+            if (!raw) return '';
+            const key = raw.toLowerCase();
+            const map = {
+                european: uiText('European', 'Europees'),
+                asian: uiText('Asian', 'Aziatisch'),
+                american: uiText('American', 'Amerikaans'),
+                mediterranean: uiText('Mediterranean', 'Mediterraan'),
+                mexican: uiText('Mexican', 'Mexicaans'),
+                italian: uiText('Italian', 'Italiaans'),
+                french: uiText('French', 'Frans'),
+                dutch: uiText('Dutch', 'Nederlands'),
+                netherlands: uiText('Netherlands', 'Nederland')
+            };
+            return map[key] || raw;
         }
 
         function getAuthI18n() {
@@ -19281,8 +19344,14 @@
                 ? uiText('Hide notes', 'Notities verbergen')
                 : uiText('Show notes', 'Notities tonen');
             const safeRecipeTitle = escapeHTML(recipe.title || uiText('Untitled recipe', 'Naamloos recept'));
-            const safeRecipeCategory = escapeHTML(recipe.category || uiText('Recipe', 'Recept'));
-            const safeRecipeAuthor = escapeHTML(getRecipeAuthorLabel(recipe) || 'Chef');
+            const safeRecipeCategory = escapeHTML(localizeRecipeCategoryLabel(recipe.category));
+            const safeRecipeDifficulty = recipe.difficulty
+                ? escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))
+                : '';
+            const safeRecipeCountry = recipe.country
+                ? escapeHTML(localizeRecipeCuisineLabel(recipe.country) || recipe.country)
+                : '';
+            const safeRecipeAuthor = escapeHTML(getRecipeAuthorLabel(recipe) || uiText('Chef', 'Kok'));
             const dietText = (recipe.diet || []).length > 0 ? escapeHTML(recipe.diet.join(' · ')) : uiText('No diet tags', 'Geen dieettags');
             const notebookCookActionLabel = totalInstructions > 0
                 ? uiText('Start cooking', 'Begin met koken')
@@ -19412,8 +19481,8 @@
                                 <div class="notebook-line-row">${recipeMood}</div>
                                 <div class="notebook-line-row text-[10px] font-bold uppercase tracking-[0.22em]">
                                     <span>${safeRecipeCategory}</span>
-                                    ${recipe.difficulty ? `<span>· ${escapeHTML(recipe.difficulty)}</span>` : ''}
-                                    ${recipe.country ? `<span>· ${escapeHTML(recipe.country)}</span>` : ''}
+                                    ${safeRecipeDifficulty ? `<span>· ${safeRecipeDifficulty}</span>` : ''}
+                                    ${safeRecipeCountry ? `<span>· ${safeRecipeCountry}</span>` : ''}
                                 </div>
                             </div>
                             <div class="notebook-paper__section notebook-ruled-block mt-3 text-xs font-semibold text-sage">
@@ -19434,8 +19503,8 @@
                                     <div class="notebook-line-row">${recipeMood}</div>
                                     <div class="notebook-line-row text-[11px] font-bold uppercase tracking-[0.22em]">
                                         <span>${safeRecipeCategory}</span>
-                                        ${recipe.difficulty ? `<span>· ${escapeHTML(recipe.difficulty)}</span>` : ''}
-                                        ${recipe.country ? `<span>· ${escapeHTML(recipe.country)}</span>` : ''}
+                                        ${safeRecipeDifficulty ? `<span>· ${safeRecipeDifficulty}</span>` : ''}
+                                        ${safeRecipeCountry ? `<span>· ${safeRecipeCountry}</span>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -19472,10 +19541,14 @@
             };
 
             const renderNotebookRightPage = page => {
+                const openedLocale = getActiveUiLanguage() === 'nl' ? 'nl-NL' : undefined;
+                const openedDate = recipe.lastOpened
+                    ? new Date(recipe.lastOpened).toLocaleDateString(openedLocale)
+                    : '';
                 const byAuthorLine = recipe.lastOpened
                     ? uiText(
-                        `By ${safeRecipeAuthor} · last opened ${new Date(recipe.lastOpened).toLocaleDateString()}`,
-                        `Door ${safeRecipeAuthor} · laatst geopend ${new Date(recipe.lastOpened).toLocaleDateString('nl-NL')}`
+                        `By ${safeRecipeAuthor} · last opened ${openedDate}`,
+                        `Door ${safeRecipeAuthor} · laatst geopend ${openedDate}`
                     )
                     : uiText(`By ${safeRecipeAuthor}`, `Door ${safeRecipeAuthor}`);
 
@@ -19541,8 +19614,12 @@
                     ? activeFilters.map(filter => `<span class="notebook-landing-pill">${escapeHTML(filter)}</span>`).join('')
                     : '';
                 const noteCount = notebookStickyNotes.length;
-                const recipeWord = totalPages === 1 ? 'recept' : 'recepten';
-                const noteWord = noteCount === 1 ? 'notitie' : 'notities';
+                const recipeWord = totalPages === 1
+                    ? uiText('recipe', 'recept')
+                    : uiText('recipes', 'recepten');
+                const noteWord = noteCount === 1
+                    ? uiText('note', 'notitie')
+                    : uiText('notes', 'notities');
 
                 return `
                     <div class="mb-4">
@@ -19557,20 +19634,26 @@
                                 </div>
 
                                 <div class="notebook-landing-invite">
-                                    <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Klaar om te openen</p>
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Ready to open', 'Klaar om te openen')}</p>
                                     <h2>${safeRecipeTitle}</h2>
-                                    <p>${totalIngredients} ingrediënten · ${totalInstructions} stappen. Open het schrift om te koken, notities te maken of bladzijden om te slaan.</p>
+                                    <p>${uiText(
+                                        `${totalIngredients} ingredients · ${totalInstructions} steps. Open the notebook to cook, take notes, or turn pages.`,
+                                        `${totalIngredients} ingrediënten · ${totalInstructions} stappen. Open het schrift om te koken, notities te maken of bladzijden om te slaan.`
+                                    )}</p>
                                     <div class="notebook-landing-action-row">
                                         <button onclick="openNotebookCover()" class="${getAppButtonClasses('primary', { size: 'lg' })} rounded-2xl shadow-[0_16px_28px_rgba(45,77,52,0.24)]" translate="no">
-                                            <i data-lucide="book-open" class="h-4 w-4"></i>Open schrift
+                                            <i data-lucide="book-open" class="h-4 w-4"></i>${uiText('Open notebook', 'Open schrift')}
                                         </button>
                                         <button type="button" onclick="${pdfActions.bookAction}" class="${getAppButtonClasses(accountHasPremiumPlan() ? 'secondary' : 'locked', { size: 'lg' })} rounded-2xl" title="${pdfActions.book}" aria-label="${pdfActions.book}">
                                             <i data-lucide="${accountHasPremiumPlan() ? 'file-down' : 'lock'}" class="h-4 w-4"></i>${pdfActions.book}
                                         </button>
                                     </div>
-                                    <p class="notebook-landing-hint notebook-landing-hint-desktop">Klik op de kaft of de knop om de volledige openslag te openen.</p>
-                                    <p class="notebook-landing-hint notebook-landing-hint-touch">Tik op de kaft om de volledige openslag te openen.</p>
-                                    <p class="notebook-landing-meta">${totalPages} ${recipeWord} · ${notebookRecipeSpreads.length} openslagen · ${noteCount} ${noteWord}</p>
+                                    <p class="notebook-landing-hint notebook-landing-hint-desktop">${uiText('Click the cover or button to open the full spread.', 'Klik op de kaft of de knop om de volledige openslag te openen.')}</p>
+                                    <p class="notebook-landing-hint notebook-landing-hint-touch">${uiText('Tap the cover to open the full spread.', 'Tik op de kaft om de volledige openslag te openen.')}</p>
+                                    <p class="notebook-landing-meta">${uiText(
+                                        `${totalPages} ${recipeWord} · ${notebookRecipeSpreads.length} spreads · ${noteCount} ${noteWord}`,
+                                        `${totalPages} ${recipeWord} · ${notebookRecipeSpreads.length} openslagen · ${noteCount} ${noteWord}`
+                                    )}</p>
                                     ${hasActiveFilters ? `<div class="notebook-landing-pill-row">${activeFilterPills}</div>` : ''}
                                 </div>
                             </div>
@@ -19588,25 +19671,27 @@
                         </div>
                         ${hasActiveFilters ? `<p class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">${uiText(`Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}`, `Gefilterde openslag: ${activeFilters.length} actieve filter${activeFilters.length === 1 ? '' : 's'}`)}</p>` : ''}
                         <div class="notebook-chrome-bar">
-                            <div class="notebook-view-segment" role="group" aria-label="${uiText('View', 'Weergave')}">
-                                <button type="button" onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('Cards view', 'Kaartenweergave')}" aria-label="${uiText('Cards view', 'Kaartenweergave')}" aria-pressed="false">
-                                    <i data-lucide="layout-grid" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${uiText('Cards', 'Kaarten')}</span>
-                                </button>
-                                <button type="button" onclick="setIndexViewMode('list')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('List view', 'Lijstweergave')}" aria-label="${uiText('List view', 'Lijstweergave')}" aria-pressed="false">
-                                    <i data-lucide="list" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${uiText('List', 'Lijst')}</span>
-                                </button>
-                                <button type="button" onclick="setIndexViewMode('book')" class="notebook-view-toggle is-active inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('Notebook view', 'Schriftweergave')}" aria-label="${uiText('Notebook view', 'Schriftweergave')}" aria-pressed="true">
-                                    <i data-lucide="book-open" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${uiText('Book', 'Boek')}</span>
-                                </button>
-                            </div>
-                            <div class="notebook-chrome-actions">
+                            <div class="notebook-chrome-leading">
+                                <div class="notebook-view-segment" role="group" aria-label="${uiText('View', 'Weergave')}">
+                                    <button type="button" onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('Cards view', 'Kaartenweergave')}" aria-label="${uiText('Cards view', 'Kaartenweergave')}" aria-pressed="false">
+                                        <i data-lucide="layout-grid" class="h-4 w-4"></i>
+                                        <span class="notebook-tool-label">${uiText('Cards', 'Kaarten')}</span>
+                                    </button>
+                                    <button type="button" onclick="setIndexViewMode('list')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('List view', 'Lijstweergave')}" aria-label="${uiText('List view', 'Lijstweergave')}" aria-pressed="false">
+                                        <i data-lucide="list" class="h-4 w-4"></i>
+                                        <span class="notebook-tool-label">${uiText('List', 'Lijst')}</span>
+                                    </button>
+                                    <button type="button" onclick="setIndexViewMode('book')" class="notebook-view-toggle is-active inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('Notebook view', 'Schriftweergave')}" aria-label="${uiText('Notebook view', 'Schriftweergave')}" aria-pressed="true">
+                                        <i data-lucide="book-open" class="h-4 w-4"></i>
+                                        <span class="notebook-tool-label">${uiText('Book', 'Boek')}</span>
+                                    </button>
+                                </div>
                                 <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook header-icon-button relative inline-flex items-center justify-center" data-notebook-note-control="open-cook">
                                     <i data-lucide="chef-hat" class="w-5 h-5" aria-hidden="true"></i>
                                     <span class="notebook-cook-label">${uiText('Cook mode', 'Kookmodus')}</span>
                                 </button>
+                            </div>
+                            <div class="notebook-chrome-actions">
                                 <div class="notebook-more" data-notebook-more>
                                     <button type="button" class="notebook-more-toggle" aria-label="${uiText('More', 'Meer')}" aria-haspopup="menu" aria-expanded="false" title="${uiText('More', 'Meer')}" onclick="toggleNotebookMoreMenu(event)">
                                         <i data-lucide="ellipsis" class="w-5 h-5" aria-hidden="true"></i>
