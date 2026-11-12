@@ -5099,17 +5099,20 @@
                 min-height: 2.75rem;
             }
 
+            /* Keep pager in document flow under the page (like tablet), never overlaying content. */
             .notebook-mobile-pager {
-                position: fixed;
-                left: 0.7rem;
-                right: 0.7rem;
-                bottom: calc(3.15rem + 0.7rem + env(safe-area-inset-bottom, 0px));
-                z-index: 30;
-                width: auto;
-                margin-top: 0;
-                padding: 0.3rem;
-                border-radius: 0.9rem;
-                background: rgba(246, 241, 232, 0.94);
+                position: relative;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                z-index: 2;
+                width: 100%;
+                margin-top: 0.65rem;
+                margin-bottom: 0.55rem;
+                padding: 0.2rem 0.1rem;
+                border-radius: 0;
+                background: transparent;
+                box-shadow: none;
             }
 
             .notebook-page-summary-grid {
