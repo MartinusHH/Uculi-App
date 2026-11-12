@@ -469,7 +469,9 @@
             padding: 0;
         }
 
-        /* Settings stays a gear-only control on every viewport (label via aria). */
+        /* Back / Help / Opties stay icon-only on every viewport (label via aria). */
+        #main-header #header-back .header-icon-label,
+        #main-header #header-help .header-icon-label,
         #main-header #header-open-settings .header-icon-label {
             display: none !important;
         }
@@ -760,13 +762,7 @@
             }
 
             #main-header #header-back,
-            #main-header #header-help {
-                width: auto;
-                min-width: 2.75rem;
-                padding: 0 0.9rem;
-                gap: 0.4rem;
-            }
-
+            #main-header #header-help,
             #main-header #header-open-settings {
                 width: 2.75rem;
                 min-width: 2.75rem;
@@ -782,9 +778,48 @@
                 text-transform: uppercase;
             }
 
+            /* Back / Help / Opties stay icon-only; labels live in aria-label. */
+            #main-header #header-back .header-icon-label,
+            #main-header #header-help .header-icon-label,
             #main-header #header-open-settings .header-icon-label {
                 display: none !important;
             }
+        }
+
+        /* Settings (Opties): uniform control width + alignment while Back/Help are visible. */
+        .settings-sheet .settings-prefs .settings-row {
+            display: grid;
+            grid-template-columns: minmax(0, 7.5rem) minmax(0, 1fr);
+            align-items: center;
+            gap: 0.75rem;
+            justify-content: stretch;
+        }
+
+        .settings-sheet .settings-prefs .settings-row > span {
+            min-width: 0;
+        }
+
+        .settings-sheet .settings-prefs .settings-select,
+        .settings-sheet .settings-prefs input[type="text"],
+        .settings-sheet .settings-prefs input[type="email"],
+        .settings-sheet .settings-prefs input:not([type="checkbox"]),
+        .settings-sheet .settings-prefs select {
+            width: 100%;
+            max-width: none;
+            min-width: 0;
+            justify-self: stretch;
+            text-align: left;
+        }
+
+        .settings-sheet .settings-prefs .settings-row--full {
+            grid-template-columns: minmax(0, 1fr) auto;
+        }
+
+        .settings-sheet .access-add-row .access-add-input,
+        .settings-sheet #admin-account-email,
+        .settings-sheet input[type="email"],
+        .settings-sheet input[type="text"]:not([type="checkbox"]) {
+            box-sizing: border-box;
         }
 
         .settings-disclosure {
@@ -3661,11 +3696,31 @@
             align-content: start;
         }
 
+        .notebook-sticky-note__text {
+            margin: 0;
+            color: var(--sticky-note-ink, #5d4516);
+            font-family: Outfit, sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            line-height: 1.35;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .notebook-sticky-note__placeholder {
+            margin: 0;
+            color: var(--sticky-note-ink, #5d4516);
+            font-family: Outfit, sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            line-height: 1.35;
+            opacity: 0.55;
+            font-style: italic;
+        }
+
         .notebook-sticky-note__scribble-stack {
-            width: 100%;
-            display: grid;
-            gap: 0.18rem;
-            padding-top: 0.1rem;
+            display: none;
         }
 
         .notebook-sticky-note__scribble-line {
@@ -6312,10 +6367,10 @@
     <div id="app-shell" class="w-full max-w-7xl mx-auto flex flex-col h-[100dvh] max-h-[100dvh] relative shadow-2xl bg-parchment overflow-hidden border-x border-parchmentDark">
         
         <header id="main-header" class="text-forest transition-all" translate="no">
-            <button id="header-back" type="button" onclick="handleTopBackAction()" class="header-icon-button" hidden aria-label="Back">
-                <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i>
-                <span class="header-icon-label">Back</span>
-            </button>
+                <button id="header-back" type="button" onclick="handleTopBackAction()" class="header-icon-button" hidden aria-label="Back" title="Back">
+                    <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="header-icon-label" aria-hidden="true"></span>
+                </button>
             <div class="app-header-brand">
                 <div class="app-header-mark">
                     <img src="assets/uculi-boekje.jpg" alt="Uculi" width="46" height="46" />
@@ -6336,7 +6391,7 @@
                 </button>
                 <button id="header-help" type="button" onclick="showUsageGuide()" class="header-icon-button" hidden aria-label="Help" title="Help">
                     <i data-lucide="info" class="w-5 h-5" aria-hidden="true"></i>
-                    <span class="header-icon-label">Help</span>
+                    <span class="header-icon-label" aria-hidden="true"></span>
                 </button>
                 <button id="header-open-settings" type="button" onclick="renderSettings()" class="header-icon-button" aria-label="Opties" title="Opties">
                     <i data-lucide="settings" class="w-5 h-5" aria-hidden="true"></i>
@@ -8937,7 +8992,7 @@
 
         function getNotebookStickyNotePreviewText(note) {
             const rawText = String(note?.text ?? '').trim();
-            if (!rawText) return 'Write here';
+            if (!rawText) return uiText('Write here', 'Schrijf hier');
 
             const previewLimit = getNotebookStickyNotePreviewLimit(note);
             if (rawText.length <= previewLimit) return rawText;
@@ -8947,62 +9002,10 @@
 
         function getNotebookStickyNotePreviewMarkup(note) {
             const rawText = String(note?.text ?? '').trim();
-            const seedSource = `${note?.id || ''}${rawText || 'preview'}`;
-            const seed = Array.from(seedSource).reduce((total, char, index) => total + (char.charCodeAt(0) * (index + 3)), 0) || 97;
-            const lineCount = rawText ? Math.max(4, Math.min(6, Math.ceil(rawText.length / 24))) : 4;
-            const fragments = ['mn', 'ul', 're', 'va', 'cl', 'ae', 'so', 'ni', 'tra', 'xo', 'lia', 'ves', 'quo'];
-
-            const buildPseudoWord = (wordSeed, isSignature = false) => {
-                const chunkCount = isSignature ? 2 + (wordSeed % 2) : 2 + (wordSeed % 3);
-                let word = '';
-                for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex += 1) {
-                    word += fragments[(wordSeed + chunkIndex * 5) % fragments.length];
-                }
-                return word;
-            };
-
-            const buildPseudoLine = (lineSeed, { header = false, signature = false } = {}) => {
-                const wordCount = header ? 2 : signature ? 2 : 3 + (lineSeed % 2);
-                const words = header ? ['Rx'] : [];
-
-                for (let wordIndex = 0; wordIndex < wordCount; wordIndex += 1) {
-                    words.push(buildPseudoWord(lineSeed + wordIndex * 17, signature));
-                }
-
-                if (signature && words.length) {
-                    words[words.length - 1] = `${words[words.length - 1]}.`;
-                }
-
-                return words.join(' ');
-            };
-
-            return `
-                <div class="notebook-sticky-note__scribble-stack" aria-hidden="true">
-                    ${Array.from({ length: lineCount }, (_, index) => {
-                        const isHeader = index === 0;
-                        const isSignature = index === lineCount - 1;
-                        const width = isHeader
-                            ? 42 + ((seed + index * 9) % 18)
-                            : isSignature
-                                ? 34 + ((seed + index * 7) % 14)
-                                : 58 + ((seed + index * 17) % 24);
-                        const indent = isHeader
-                            ? ((seed + index * 5) % 4)
-                            : isSignature
-                                ? 16 + ((seed + index * 11) % 10)
-                                : 2 + ((seed + index * 13) % 7);
-                        const tilt = isHeader
-                            ? -8 + ((seed + index * 3) % 7)
-                            : isSignature
-                                ? -12 + ((seed + index * 5) % 9)
-                                : -6 + ((seed + index * 7) % 8);
-                        const opacity = (isHeader ? 0.72 : isSignature ? 0.54 : 0.58 + (((seed + index * 5) % 3) * 0.06)).toFixed(2);
-                        const lineClass = `notebook-sticky-note__scribble-line${isHeader ? ' is-header' : ''}${isSignature ? ' is-signature' : ''}`;
-                        const lineText = buildPseudoLine(seed + index * 19, { header: isHeader, signature: isSignature });
-                        return `<span class="${lineClass}" style="--scribble-width:${width}%;--scribble-indent:${indent}%;--scribble-tilt:${tilt}deg;--scribble-opacity:${opacity};">${lineText}</span>`;
-                    }).join('')}
-                </div>
-            `;
+            if (!rawText) {
+                return `<p class="notebook-sticky-note__placeholder">${escapeHTML(uiText('Write here', 'Schrijf hier'))}</p>`;
+            }
+            return `<p class="notebook-sticky-note__text">${escapeHTML(getNotebookStickyNotePreviewText(note))}</p>`;
         }
 
         function normalizeNotebookStickyNotes(notes) {
@@ -14362,93 +14365,77 @@
                 return false;
             }
 
-            const seedElement = document.createElement('div');
-            seedElement.textContent = 'seed';
-            seedElement.setAttribute('aria-hidden', 'true');
-            seedElement.style.position = 'absolute';
-            seedElement.style.left = '-10000px';
-            seedElement.style.top = '0';
-            seedElement.style.pointerEvents = 'none';
-            document.body.appendChild(seedElement);
-
+            // Keep the template in-viewport (opacity 0). Off-screen (-200vw) captures
+            // often produce blank pages that only show the footer/page numbers.
             const templateRoot = document.createElement('div');
             templateRoot.setAttribute('aria-hidden', 'true');
-            templateRoot.style.position = 'absolute';
-            templateRoot.style.left = '-200vw';
-            templateRoot.style.top = '0';
-            templateRoot.style.width = '794px';
-            templateRoot.style.background = '#ffffff';
-            templateRoot.style.pointerEvents = 'none';
-            templateRoot.style.zIndex = '-1';
+            templateRoot.style.cssText = [
+                'position:fixed',
+                'left:0',
+                'top:0',
+                'width:794px',
+                'background:#ffffff',
+                'opacity:0',
+                'pointer-events:none',
+                'z-index:-1'
+            ].join(';');
             templateRoot.innerHTML = html;
             document.body.appendChild(templateRoot);
 
             try {
-                const worker = html2pdf().set({ jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' } }).from(seedElement).toPdf();
-                await worker;
-                const pdf = await worker.get('pdf');
-
-                if (!pdf || typeof pdf.text !== 'function' || typeof pdf.html !== 'function') {
-                    throw new Error('jsPDF instance unavailable');
-                }
-
-                if (typeof pdf.internal?.getNumberOfPages === 'function' && pdf.internal.getNumberOfPages() > 0 && typeof pdf.deletePage === 'function') {
-                    pdf.deletePage(1);
-                }
-                if (typeof pdf.internal?.getNumberOfPages === 'function' && pdf.internal.getNumberOfPages() === 0 && typeof pdf.addPage === 'function') {
-                    pdf.addPage();
-                }
-
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const margin = 18;
-
-                const drawPageFooter = (pageNumber, totalPages) => {
-                    const footerY = pageHeight - 10;
-                    pdf.setDrawColor(239, 239, 239);
-                    pdf.setLineWidth(0.5);
-                    pdf.line(margin, footerY - 4, pageWidth - margin, footerY - 4);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setFontSize(8);
-                    pdf.setTextColor(144, 152, 112);
-                    pdf.text('Uculi · A Sneezing Donkey product', margin, footerY);
-                    pdf.text(`${nl ? 'Pagina' : 'Page'} ${pageNumber} ${nl ? 'van' : 'of'} ${totalPages}`, pageWidth - margin, footerY, { align: 'right' });
-                };
-
                 if (document.fonts?.ready) {
                     await document.fonts.ready;
                 }
                 await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-                await new Promise((resolve) => {
-                    pdf.html(templateRoot, {
-                        x: 0,
-                        y: 0,
-                        margin: [0, 0, 0, 0],
-                        width: pageWidth,
-                        windowWidth: 794,
-                        autoPaging: 'text',
-                        html2canvas: {
-                            scale: 1.15,
-                            useCORS: true,
-                            backgroundColor: '#FFFFFF',
-                            logging: false
-                        },
-                        callback: () => resolve()
-                    });
-                });
+                const marginTop = 10;
+                const marginSide = 12;
+                const marginBottom = 16;
+                const worker = html2pdf().set({
+                    margin: [marginTop, marginSide, marginBottom, marginSide],
+                    filename,
+                    image: { type: 'jpeg', quality: 0.96 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: '#FFFFFF',
+                        logging: false,
+                        windowWidth: 794
+                    },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' },
+                    pagebreak: { mode: ['css', 'legacy'] }
+                }).from(templateRoot);
 
+                const pdf = await worker.toPdf().get('pdf');
+                if (!pdf) throw new Error('jsPDF instance unavailable');
+
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const footerMargin = 12;
                 const totalPages = pdf.internal.getNumberOfPages();
+
                 for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
                     pdf.setPage(pageNumber);
-                    drawPageFooter(pageNumber, totalPages);
+                    const footerY = pageHeight - 8;
+                    pdf.setDrawColor(239, 239, 239);
+                    pdf.setLineWidth(0.4);
+                    pdf.line(footerMargin, footerY - 4, pageWidth - footerMargin, footerY - 4);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(144, 152, 112);
+                    pdf.text('Uculi · A Sneezing Donkey product', footerMargin, footerY);
+                    pdf.text(
+                        `${nl ? 'Pagina' : 'Page'} ${pageNumber} ${nl ? 'van' : 'of'} ${totalPages}`,
+                        pageWidth - footerMargin,
+                        footerY,
+                        { align: 'right' }
+                    );
                 }
 
                 pdf.save(filename);
                 return true;
             } finally {
                 templateRoot.remove();
-                seedElement.remove();
             }
         }
 
@@ -14741,7 +14728,8 @@
                 help.setAttribute('aria-label', helpLabel);
                 help.title = helpLabel;
                 const helpText = help.querySelector('.header-icon-label');
-                if (helpText) helpText.textContent = helpLabel;
+                // Icon-only — never show "Help"/"Hulp" text beside the icon.
+                if (helpText) helpText.textContent = '';
             }
             const coverPersonalize = document.getElementById('cover-editor-personalize-copy');
             if (coverPersonalize) {
@@ -14759,7 +14747,8 @@
                 back.setAttribute('aria-label', backLabel);
                 back.title = backLabel;
                 const backText = back.querySelector('.header-icon-label');
-                if (backText) backText.textContent = backLabel;
+                // Icon-only — never show "Back"/"Terug" text beside the icon.
+                if (backText) backText.textContent = '';
             }
             document.querySelectorAll('#main-nav .app-nav-button[data-nav-view]').forEach(button => {
                 const view = button.getAttribute('data-nav-view');
@@ -18238,7 +18227,7 @@
                 node.innerHTML = nextPreviewMarkup;
             });
             document.querySelectorAll(`[data-notebook-note-plaintext="${noteId}"]`).forEach(node => {
-                node.textContent = nextText || 'Empty sticky note. Click to edit.';
+                node.textContent = nextText || uiText('Empty sticky note. Click to edit.', 'Leeg plakbriefje. Tik om te bewerken.');
             });
         }
 
