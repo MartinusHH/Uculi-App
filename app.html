@@ -2274,7 +2274,36 @@
         button.auth-gate-action-locked,
         button.auth-gate-action-locked:hover {
             opacity: 0.45;
-            pointer-events: none;
+            /* Keep clickable so a tap can nudge the agreement checkbox. */
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .auth-agreement-intro {
+            margin: 0 0 0.55rem;
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.45;
+        }
+
+        .auth-agreement.is-attention {
+            border-radius: 0.75rem;
+            background: rgba(146, 157, 117, 0.22);
+            box-shadow: 0 0 0 3px rgba(146, 157, 117, 0.55);
+            animation: authAgreementPulse 0.85s ease;
+        }
+
+        .auth-agreement.is-attention .auth-agreement-check {
+            accent-color: #929D75;
+            outline: 2px solid #929D75;
+            outline-offset: 2px;
+        }
+
+        @keyframes authAgreementPulse {
+            0%, 100% { background: rgba(146, 157, 117, 0.08); box-shadow: 0 0 0 0 rgba(146, 157, 117, 0); }
+            35% { background: rgba(146, 157, 117, 0.28); box-shadow: 0 0 0 4px rgba(146, 157, 117, 0.55); }
         }
 
         .legal-page {
@@ -7028,6 +7057,9 @@
                 lastModerationNotificationId: '',
                 recipeUndo: null,
                 hasCompletedTutorial: false,
+                termsAccepted: false,
+                termsAcceptedAt: '',
+                termsAcceptedVersion: '',
                 favorites: [],
                 myRecipeRatings: {}
             };
@@ -10071,6 +10103,9 @@
             userSettings.notifications = normalizeFamilyNotifications(userSettings.notifications);
             userSettings.recipeUndo = normalizeRecipeUndoEntry(userSettings.recipeUndo);
             userSettings.hasCompletedTutorial = userSettings.hasCompletedTutorial === true;
+            userSettings.termsAccepted = userSettings.termsAccepted === true;
+            userSettings.termsAcceptedAt = String(userSettings.termsAcceptedAt || '');
+            userSettings.termsAcceptedVersion = String(userSettings.termsAcceptedVersion || '');
             document.getElementById('body')?.classList.remove('theme-dark');
             applyUserModeClasses();
             document.documentElement.style.colorScheme = 'light';
@@ -12240,16 +12275,18 @@
                                         </div>
                                     </div>
 
-                                    <div class="mt-5 space-y-2.5">
+                                    ${shouldShowAuthAgreementFields() ? `
+                                    <div class="mt-5 space-y-2.5" id="auth-agreement-block">
                                         ${authAgreementFieldsMarkup()}
                                     </div>
+                                    ` : ''}
 
                                     <div class="mt-5 space-y-2.5">
-                                        <button type="button" data-auth-gate-action="submit" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} auth-gate-submit auth-gate-action-locked">
+                                        <button type="button" data-auth-gate-action="submit" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} auth-gate-submit${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}">
                                             <i data-lucide="${showRegister ? 'user-plus' : 'log-in'}" class="h-4 w-4"></i>${showRegister ? authText.submitRegister : authText.submitLogin}
                                         </button>
                                         <p class="text-center text-[10px] font-bold uppercase tracking-[0.22em] text-sage">${authText.orDivider || 'or'}</p>
-                                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })} auth-gate-social auth-gate-action-locked">
+                                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}">
                                             <i data-lucide="globe-2" class="h-4 w-4"></i>${authText.continueGoogle}
                                         </button>
                                         ${localTestModeButtonMarkup('local-test-mode-auth')}
@@ -12268,16 +12305,38 @@
             syncAuthGateButtons();
         }
 
+        function hasAcceptedCurrentTermsVersion() {
+            return userSettings?.termsAccepted === true
+                && String(userSettings?.termsAcceptedVersion || '') === AGREEMENT_VERSION;
+        }
+
+        // New accounts (register) must agree once for the current AGREEMENT_VERSION.
+        // Returning users with a saved termsAcceptedVersion skip the checkbox.
+        function shouldShowAuthAgreementFields() {
+            if (hasAcceptedCurrentTermsVersion()) return false;
+            if (currentView === 'auth') return authViewMode === 'register';
+            // Settings cloud link / other non-auth surfaces: only when current version is missing.
+            return true;
+        }
+
+        function authGateRequiresAgreement() {
+            return shouldShowAuthAgreementFields();
+        }
+
+        function getAuthAgreementIntroCopy() {
+            return uiText(
+                'First, please agree: check below that you have read the privacy policy and the terms. After that you can log in.',
+                'Eerst even akkoord: vink hieronder aan dat je de privacyverklaring en de voorwaarden hebt gelezen. Daarna kun je inloggen.'
+            );
+        }
+
         function authAgreementFieldsMarkup() {
             const copy = getAgreementCopy();
             return `
-                <label class="auth-agreement">
-                    <input id="auth-read-privacy" type="checkbox" class="auth-agreement-check" onchange="syncAuthGateButtons()">
-                    <span>${copy.readPrivacy} <a href="${legalPageHref('privacy')}" onclick="event.preventDefault(); event.stopPropagation(); showLegalDocument('privacy');">${copy.privacyName}</a> ${copy.readSuffix}</span>
-                </label>
-                <label class="auth-agreement">
-                    <input id="auth-agree-terms" type="checkbox" class="auth-agreement-check" onchange="syncAuthGateButtons()">
-                    <span>${copy.readTerms} <a href="${legalPageHref('terms')}" onclick="event.preventDefault(); event.stopPropagation(); showLegalDocument('terms');">${copy.termsName}</a> ${copy.readSuffix}</span>
+                <p class="auth-agreement-intro">${getAuthAgreementIntroCopy()}</p>
+                <label class="auth-agreement" id="auth-agreement-row">
+                    <input id="auth-agree-current" type="checkbox" class="auth-agreement-check" onchange="syncAuthGateButtons()">
+                    <span>${copy.readPrivacy} <a href="${legalPageHref('privacy')}" onclick="event.preventDefault(); event.stopPropagation(); showLegalDocument('privacy');">${copy.privacyName}</a> ${copy.andWord || '&'} ${copy.readTerms} <a href="${legalPageHref('terms')}" onclick="event.preventDefault(); event.stopPropagation(); showLegalDocument('terms');">${copy.termsName}</a> ${copy.readSuffix}</span>
                 </label>
             `;
         }
@@ -12298,45 +12357,50 @@
                 en: {
                     readPrivacy: 'I have read the',
                     privacyName: 'privacy policy',
-                    readTerms: 'I have read the',
+                    readTerms: 'the',
                     agreeTerms: 'I have read the',
-                    termsName: 'terms of use',
+                    termsName: 'terms',
+                    andWord: 'and',
                     readSuffix: 'and agree',
                     needAgreements: 'Read the privacy policy and terms of use before you continue.'
                 },
                 nl: {
-                    readPrivacy: 'Ik heb het',
-                    privacyName: 'privacybeleid',
-                    readTerms: 'Ik heb de',
+                    readPrivacy: 'Ik heb de',
+                    privacyName: 'privacyverklaring',
+                    readTerms: 'de',
                     agreeTerms: 'Ik heb de',
-                    termsName: 'gebruiksvoorwaarden',
+                    termsName: 'voorwaarden',
+                    andWord: 'en',
                     readSuffix: 'gelezen en ga akkoord',
-                    needAgreements: 'Lees het privacybeleid en de gebruiksvoorwaarden voordat je verdergaat.'
+                    needAgreements: 'Lees de privacyverklaring en de voorwaarden voordat je verdergaat.'
                 },
                 fr: {
                     readPrivacy: 'J\'ai lu la',
                     privacyName: 'politique de confidentialité',
-                    readTerms: 'J\'ai lu les',
+                    readTerms: 'les',
                     agreeTerms: 'J\'ai lu les',
                     termsName: 'conditions d\'utilisation',
+                    andWord: 'et',
                     readSuffix: 'et j\'accepte',
                     needAgreements: 'Lisez la politique de confidentialité et les conditions d\'utilisation avant de continuer.'
                 },
                 de: {
                     readPrivacy: 'Ich habe die',
                     privacyName: 'Datenschutzerklärung',
-                    readTerms: 'Ich habe die',
+                    readTerms: 'die',
                     agreeTerms: 'Ich habe die',
                     termsName: 'Nutzungsbedingungen',
+                    andWord: 'und',
                     readSuffix: 'gelesen und stimme zu',
                     needAgreements: 'Bitte Datenschutzerklärung und Nutzungsbedingungen lesen, bevor du weitermachst.'
                 },
                 es: {
                     readPrivacy: 'He leído la',
                     privacyName: 'política de privacidad',
-                    readTerms: 'He leído las',
+                    readTerms: 'las',
                     agreeTerms: 'He leído las',
                     termsName: 'condiciones de uso',
+                    andWord: 'y',
                     readSuffix: 'y acepto',
                     needAgreements: 'Lee la política de privacidad y las condiciones de uso antes de continuar.'
                 }
@@ -12345,22 +12409,39 @@
         }
 
         function authAgreementsChecked() {
-            const privacyChecked = Boolean(document.getElementById('auth-read-privacy')?.checked);
-            const termsChecked = Boolean(document.getElementById('auth-agree-terms')?.checked);
-            return privacyChecked && termsChecked;
+            if (!authGateRequiresAgreement()) return true;
+            return Boolean(document.getElementById('auth-agree-current')?.checked);
+        }
+
+        function pulseAuthAgreementPrompt() {
+            const row = document.getElementById('auth-agreement-row') || document.querySelector('#auth-agreement-block .auth-agreement');
+            if (!row) return;
+            row.classList.remove('is-attention');
+            // Retrigger CSS animation.
+            void row.offsetWidth;
+            row.classList.add('is-attention');
+            clearTimeout(window.__authAgreementPulseTimer);
+            window.__authAgreementPulseTimer = setTimeout(() => {
+                row.classList.remove('is-attention');
+            }, 900);
+            try {
+                document.getElementById('auth-agree-current')?.focus({ preventScroll: true });
+            } catch (_) { /* ignore */ }
         }
 
         function syncAuthGateButtons() {
-            const unlocked = authAgreementsChecked();
+            const requires = authGateRequiresAgreement();
+            const unlocked = !requires || authAgreementsChecked();
             document.querySelectorAll('[data-auth-gate-action]').forEach(button => {
-                button.classList.toggle('auth-gate-action-locked', !unlocked);
+                button.classList.toggle('auth-gate-action-locked', requires && !unlocked);
                 button.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
             });
         }
 
         function authAgreementsAccepted() {
+            if (!authGateRequiresAgreement()) return true;
             if (authAgreementsChecked()) return true;
-            showToast(getAgreementCopy().needAgreements, 'alert-circle');
+            pulseAuthAgreementPrompt();
             return false;
         }
 
@@ -12478,15 +12559,20 @@
             loadData();
             userSettings.name = userSettings.name || currentUser.displayName;
             userSettings.email = account.email;
-            userSettings.termsAccepted = true;
-            userSettings.termsAcceptedAt = userSettings.termsAcceptedAt || new Date().toISOString();
-            userSettings.termsAcceptedVersion = userSettings.termsAcceptedVersion || AGREEMENT_VERSION;
+            // Do not invent termsAcceptedVersion here — new accounts set it via
+            // pending agreement; existing accounts keep the saved version.
+            applyPendingAgreementToSettings();
             saveData();
             syncAuthenticatedAppChrome();
             document.getElementById('app-landing')?.remove();
             sessionStorage.setItem(landingSessionKey, '1');
             dismissAuthLoadingScreen();
             renderList();
+            if (!hasAcceptedCurrentTermsVersion()) {
+                showTermsAcceptanceModal();
+            } else {
+                maybeShowFirstRunTutorial();
+            }
         }
 
         function restoreLocalAccountSession() {
@@ -12603,7 +12689,7 @@
                         syncAuthenticatedAppChrome();
                         // Always render the list first so there's a real screen behind any modal
                         renderList();
-                        if (!userSettings.termsAccepted) {
+                        if (!hasAcceptedCurrentTermsVersion()) {
                             maybeShowFirstRunTutorial();
                             showTermsAcceptanceModal();
                         } else {
@@ -12649,7 +12735,7 @@
         }
 
         async function signInWithEmailPassword() {
-            if (!authAgreementsAccepted()) return;
+            // Existing accounts: no checkbox. Current termsVersion is checked after loadData.
             const email = document.getElementById('auth-email')?.value?.trim();
             const password = document.getElementById('auth-password')?.value || '';
 
@@ -12658,10 +12744,8 @@
                 return;
             }
 
-            notePendingAgreement();
             if (!isCloudAuthConfigured() || !firebaseInitialized) {
                 signInLocalAccount(email, password);
-                clearPendingAgreement();
                 return;
             }
 
@@ -12670,12 +12754,8 @@
 
             try {
                 await firebase.auth().signInWithEmailAndPassword(email, password);
-                applyPendingAgreementToSettings();
-                saveData();
-                if (!sessionStorage.getItem(agreementRetryStorageKey)) clearPendingAgreement();
-                // onAuthStateChanged handles navigation
+                // onAuthStateChanged handles navigation + termsVersion modal if needed
             } catch (error) {
-                clearPendingAgreement();
                 const authText = getAuthI18n();
                 showToast(getReadableAuthErrorMessage(error), 'alert-circle');
                 if (btn) { btn.disabled = false; btn.innerHTML = `<i data-lucide="log-in" class="h-4 w-4"></i>${authText.submitLogin}`; lucide.createIcons(); }
@@ -12703,7 +12783,7 @@
             notePendingAgreement();
             if (!isCloudAuthConfigured() || !firebaseInitialized) {
                 registerLocalAccount({ firstName, lastName, email, password });
-                clearPendingAgreement();
+                if (!sessionStorage.getItem(agreementRetryStorageKey)) clearPendingAgreement();
                 return;
             }
 
@@ -12743,13 +12823,14 @@
         }
 
         async function signInWithGoogle(origin = 'app') {
-            if (!authAgreementsAccepted()) return;
+            // Agreement only for new-account surfaces (register / settings without current termsVersion).
+            if (authGateRequiresAgreement() && !authAgreementsAccepted()) return;
             if (!firebaseInitialized) {
                 showCloudSetupStatusModal(origin);
                 return;
             }
 
-            notePendingAgreement();
+            if (authGateRequiresAgreement()) notePendingAgreement();
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 if (shouldUseRedirectForGoogleSignIn()) {
@@ -16669,9 +16750,9 @@
                 `
                 : `
                     <p class="text-sm font-semibold text-sage mb-5">${firebaseInitialized ? 'Log in or create your account now so cloud sync, publishing, and cross-device access can be connected later. Premium still gates sync, publishing, and family collaboration.' : 'Google login is still in setup. Keep using the app locally for now, and only treat cloud sync, publishing, and shared families as live once Firebase is fully connected.'}</p>
-                    <div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>
+                    ${shouldShowAuthAgreementFields() ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
                     <div class="${settingsActionGridClass}">
-                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses(cloudAuthActionVariant, { fullWidth: true, size: 'lg' })} auth-gate-social auth-gate-action-locked">
+                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses(cloudAuthActionVariant, { fullWidth: true, size: 'lg' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}">
                             <i data-lucide="${cloudAuthActionIcon}" class="w-4 h-4"></i> ${cloudAuthActionLabel}
                         </button>
                         ${firebaseInitialized
@@ -16936,16 +17017,16 @@
                                         <span>Account</span>
                                         <span class="settings-status">${escapeHTML(accountStatus)}</span>
                                     </div>
-                                    ${offerCloudSignIn ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
+                                    ${offerCloudSignIn && shouldShowAuthAgreementFields() ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
                                     <div class="settings-actions button-pair">
                                         <button type="submit" class="${getAppButtonClasses('primary', { size: 'sm' })}">
                                             <i data-lucide="save" class="w-4 h-4"></i>${settingsNl ? 'Opslaan' : 'Save'}
                                         </button>
                                         ${isAuthenticated
                                             ? `<button type="button" onclick="signOut()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="log-out" class="w-4 h-4"></i>${settingsNl ? 'Uitloggen' : 'Sign Out'}</button>`
-                                            : `<button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { size: 'sm' })} auth-gate-social auth-gate-action-locked"><i data-lucide="log-in" class="w-4 h-4"></i>Google</button>`}
+                                            : `<button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { size: 'sm' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}"><i data-lucide="log-in" class="w-4 h-4"></i>Google</button>`}
                                     </div>
-                                    ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'sm' })} auth-gate-social auth-gate-action-locked"><i data-lucide="link" class="w-4 h-4"></i>${settingsNl ? 'Koppel Google' : 'Link Google'}</button></div>` : ''}
+                                    ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'sm' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}"><i data-lucide="link" class="w-4 h-4"></i>${settingsNl ? 'Koppel Google' : 'Link Google'}</button></div>` : ''}
                                 </div>
                                 <div>
                                     <p class="settings-panel-kicker">${settingsNl ? 'Voorkeuren' : 'Preferences'}</p>
@@ -17133,13 +17214,20 @@
         }
 
         function prepareInteractiveTutorialStep(stepIndex) {
+            activeDetailRecipeId = null;
+            // Language step opens Settings so #settings-language is a visible target.
+            if (stepIndex === 4 && typeof renderSettings === 'function') {
+                renderSettings();
+                if (typeof lucide?.createIcons === 'function') lucide.createIcons();
+                return;
+            }
+
             // Keep the shell on the index surface so header gear / add / nav stay visible.
             const needsIndexSurface = currentView !== 'index'
                 || activeDetailRecipeId != null
                 || !document.getElementById('header-add-recipe')
                 || document.getElementById('header-add-recipe')?.hidden
                 || Boolean(document.querySelector('#content h2')?.textContent?.match(/^(Opties|Options)$/i));
-            activeDetailRecipeId = null;
             chromeBackAction = null;
             if (needsIndexSurface && typeof renderList === 'function') {
                 renderList();
@@ -17160,7 +17248,10 @@
             const tourSteps = [
                 {
                     title: 'Welkom bij Uculi',
-                    body: 'Dit is je persoonlijke receptenarchief. We nemen je in 4 stappen mee langs de belangrijkste onderdelen.',
+                    body: uiText(
+                        'This is your personal recipe archive. We walk you through the main parts in 5 short steps.',
+                        'Dit is je persoonlijke receptenarchief. We nemen je in 5 stappen mee langs de belangrijkste onderdelen.'
+                    ),
                     icon: 'sparkles',
                     targets: ['.app-header-brand', '#main-header'],
                     prefer: 'below'
@@ -17184,6 +17275,16 @@
                     body: 'Opties open je via het tandwiel. Daar staan account, taal en backup.',
                     icon: 'settings',
                     targets: ['#header-open-settings'],
+                    prefer: 'below'
+                },
+                {
+                    title: uiText('Language', 'Taal'),
+                    body: uiText(
+                        'Prefer a different language? You choose that in Settings. Do not forget to tap Save, or everything stays as it was.',
+                        'Liever een andere taal? Die kies je bij Instellingen. Vergeet niet op Opslaan te tikken, anders blijft alles zoals het was.'
+                    ),
+                    icon: 'languages',
+                    targets: ['#settings-language', 'button[type="submit"].app-btn-primary', '#header-open-settings'],
                     prefer: 'below'
                 }
             ];
@@ -17532,12 +17633,16 @@
         function syncTermsAcceptButton() {
             const privacyChecked = Boolean(document.getElementById('terms-accept-privacy')?.checked);
             const termsChecked = Boolean(document.getElementById('terms-accept-terms')?.checked);
+            const singleChecked = Boolean(document.getElementById('auth-agree-current')?.checked);
             const button = document.getElementById('terms-accept-confirm-btn');
-            if (button) button.disabled = !(privacyChecked && termsChecked);
+            if (button) button.disabled = !((privacyChecked && termsChecked) || singleChecked);
         }
 
         function confirmTermsAcceptance() {
-            if (!document.getElementById('terms-accept-privacy')?.checked || !document.getElementById('terms-accept-terms')?.checked) {
+            const dualOk = Boolean(document.getElementById('terms-accept-privacy')?.checked)
+                && Boolean(document.getElementById('terms-accept-terms')?.checked);
+            const singleOk = Boolean(document.getElementById('auth-agree-current')?.checked);
+            if (!dualOk && !singleOk) {
                 showToast(getAgreementCopy().needAgreements, 'alert-circle');
                 return;
             }
