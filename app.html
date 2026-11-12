@@ -239,9 +239,9 @@
             top: 0;
             z-index: 25;
             display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-columns: 2.75rem minmax(0, 1fr) auto;
             align-items: center;
-            gap: var(--space-3);
+            column-gap: 0.55rem;
             padding: calc(var(--space-4) + env(safe-area-inset-top, 0px)) var(--space-5) var(--space-4);
             background: rgba(251, 248, 243, 0.85); /* parchment but slightly transparent */
             border-bottom: 1px solid rgba(144, 152, 112, 0.28);
@@ -253,18 +253,30 @@
         .app-header-leading {
             display: flex;
             align-items: center;
-            gap: 0.55rem;
-            min-width: 0;
+            justify-content: flex-start;
+            width: 2.75rem;
+            min-width: 2.75rem;
+        }
+
+        .app-header-leading-spacer {
+            display: block;
+            width: 2.75rem;
+            height: 2.75rem;
+            flex: 0 0 2.75rem;
         }
 
         .app-header-titles {
             min-width: 0;
-            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
 
         .app-header-page-title {
             margin: 0;
             min-width: 0;
+            max-width: 100%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -273,6 +285,7 @@
             font-weight: 700;
             line-height: 1.15;
             color: #1c1410;
+            text-align: center;
         }
 
         .app-header-actions {
@@ -281,9 +294,10 @@
             justify-content: flex-end;
             gap: 0.45rem;
             flex: 0 0 auto;
+            min-width: 2.75rem;
         }
 
-        /* Top row: at most three equal icon slots (primary / ⋯ / gear). */
+        /* Right cluster: at most two equal slots (action or ⋯, plus gear). */
         .app-header-actions > .header-icon-button,
         .app-header-actions > .header-more > .header-icon-button,
         .app-header-actions > #header-add-recipe {
@@ -306,6 +320,10 @@
         }
 
         @media (min-width: 900px) {
+            #main-header {
+                grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+            }
+
             .app-header-actions > #header-add-recipe {
                 width: auto;
                 min-width: 2.75rem;
@@ -370,16 +388,13 @@
             gap: 0.85rem;
         }
 
-        #main-header.is-subview .app-header-brand {
-            display: none;
-        }
-
-        #main-header.is-subview .app-header-page-title {
-            display: block;
-        }
-
-        #main-header:not(.is-subview) .app-header-page-title {
+        /* Brand mark no longer lives in the top bar; title is always centered. */
+        #main-header .app-header-brand {
             display: none !important;
+        }
+
+        #main-header .app-header-page-title {
+            display: block;
         }
 
         .app-header-mark {
@@ -6737,18 +6752,19 @@
                     <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i>
                     <span class="header-icon-label" aria-hidden="true"></span>
                 </button>
-                <div class="app-header-titles">
-                    <div class="app-header-brand" id="header-brand">
-                        <div class="app-header-mark">
-                            <img src="assets/uculi-boekje.jpg" alt="Uculi" width="46" height="46" />
-                        </div>
-                        <div class="app-header-copy">
-                            <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
-                            <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
-                        </div>
+                <span id="header-back-spacer" class="app-header-leading-spacer" aria-hidden="true"></span>
+            </div>
+            <div class="app-header-titles">
+                <div class="app-header-brand" id="header-brand" hidden>
+                    <div class="app-header-mark">
+                        <img src="assets/uculi-boekje.jpg" alt="Uculi" width="46" height="46" />
                     </div>
-                    <h2 id="header-page-title" class="app-header-page-title" hidden></h2>
+                    <div class="app-header-copy">
+                        <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
+                        <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
+                    </div>
                 </div>
+                <h1 id="header-page-title" class="app-header-page-title">Uculi</h1>
             </div>
             <div class="app-header-actions">
                 <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="header-primary-action flex h-11 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
@@ -6759,6 +6775,10 @@
                         <i data-lucide="ellipsis" class="w-5 h-5" aria-hidden="true"></i>
                     </button>
                     <div id="header-more-menu" class="header-more-menu" role="menu" hidden>
+                        <button id="header-more-add" type="button" role="menuitem" class="header-more-item" hidden onclick="closeHeaderMoreMenu(); renderAddForm();">
+                            <i data-lucide="plus" class="w-4 h-4" aria-hidden="true"></i>
+                            <span id="header-more-add-label">Recept</span>
+                        </button>
                         <button id="header-more-help" type="button" role="menuitem" class="header-more-item" onclick="closeHeaderMoreMenu(); showUsageGuide();">
                             <i data-lucide="circle-help" class="w-4 h-4" aria-hidden="true"></i>
                             <span>Help</span>
@@ -15138,10 +15158,8 @@
         }
 
         function syncHeaderAddButton() {
-            const button = document.getElementById('header-add-recipe');
-            if (!button) return;
-            // Primary action only on the Index start screen (keeps right cluster ≤ 3 icons).
-            button.hidden = !(currentView === 'index' && activeDetailRecipeId == null && chromeBackAction == null);
+            // Visibility is decided in syncHeaderOverflowMenu (≤ 2 right icons).
+            if (typeof syncHeaderOverflowMenu === 'function') syncHeaderOverflowMenu();
         }
 
         function shouldShowTopBackButton() {
@@ -15241,17 +15259,18 @@
             if (currentView === 'index' && indexViewMode === 'book' && chromeBackAction) {
                 return nl ? 'Schrift' : 'Notebook';
             }
+            if (currentView === 'index') return nl ? 'Recepten' : 'Recipes';
             return 'Uculi';
         }
 
         function syncHeaderPageTitle() {
             const header = document.getElementById('main-header');
             const titleEl = document.getElementById('header-page-title');
-            const show = chromeBackAction != null;
-            if (header) header.classList.toggle('is-subview', show);
+            const showBack = chromeBackAction != null;
+            if (header) header.classList.toggle('is-subview', showBack);
             if (titleEl) {
-                titleEl.hidden = !show;
-                titleEl.textContent = show ? getHeaderPageTitle() : '';
+                titleEl.hidden = false;
+                titleEl.textContent = getHeaderPageTitle();
             }
         }
 
@@ -15259,23 +15278,40 @@
             const more = document.getElementById('header-more');
             const moreToggle = document.getElementById('header-more-toggle');
             const moreMenu = document.getElementById('header-more-menu');
+            const moreAdd = document.getElementById('header-more-add');
+            const moreAddLabel = document.getElementById('header-more-add-label');
             const moreHelp = document.getElementById('header-more-help');
             const moreNotifications = document.getElementById('header-more-notifications');
             const moreUndo = document.getElementById('header-more-undo');
             const gear = document.getElementById('header-open-settings');
             const help = document.getElementById('header-help');
+            const add = document.getElementById('header-add-recipe');
             const nl = userSettings.language === 'nl';
+            const addLabel = nl ? 'Recept' : 'Add Recipe';
+            const canShowPrimary = currentView === 'index' && activeDetailRecipeId == null && chromeBackAction == null;
+            const showGear = !(currentView === 'settings' || currentView === 'access');
             const showHelp = currentView === 'settings' || currentView === 'access';
-            const showNotifications = moreNotifications && !moreNotifications.hidden;
-            const showUndo = moreUndo && !moreUndo.hidden;
-            const showMore = showHelp || showNotifications || showUndo;
+            const showNotifications = Boolean(moreNotifications && moreNotifications.dataset.available === '1');
+            const showUndo = Boolean(moreUndo && moreUndo.dataset.available === '1');
+            const overflowExtras = showHelp || showNotifications || showUndo;
+            // Right side ≤ 2: (primary|⋯) + gear. If primary and overflow both needed, fold primary into ⋯.
+            const foldPrimaryIntoMore = canShowPrimary && overflowExtras && showGear;
+            const showPrimaryButton = canShowPrimary && !foldPrimaryIntoMore;
+            const showMore = overflowExtras || foldPrimaryIntoMore;
 
             if (help) help.hidden = true;
+            if (add) add.hidden = !showPrimaryButton;
+            if (moreAdd) {
+                moreAdd.hidden = !foldPrimaryIntoMore;
+                if (moreAddLabel) moreAddLabel.textContent = addLabel;
+            }
             if (moreHelp) {
                 moreHelp.hidden = !showHelp;
-                const helpLabel = 'Help';
-                moreHelp.querySelector('span') && (moreHelp.querySelector('span').textContent = helpLabel);
+                const helpSpan = moreHelp.querySelector('span');
+                if (helpSpan) helpSpan.textContent = 'Help';
             }
+            if (moreNotifications) moreNotifications.hidden = !showNotifications;
+            if (moreUndo) moreUndo.hidden = !showUndo;
             if (more) more.hidden = !showMore;
             if (moreMenu && more.hidden) moreMenu.hidden = true;
             if (moreToggle) {
@@ -15283,7 +15319,7 @@
                 moreToggle.setAttribute('aria-label', nl ? 'Meer' : 'More');
                 moreToggle.title = nl ? 'Meer' : 'More';
             }
-            if (gear) gear.hidden = currentView === 'settings' || currentView === 'access';
+            if (gear) gear.hidden = !showGear;
         }
 
         function closeHeaderMoreMenu() {
@@ -15336,9 +15372,11 @@
 
         function syncHeaderBackButton() {
             const back = document.getElementById('header-back');
+            const spacer = document.getElementById('header-back-spacer');
             const show = chromeBackAction != null;
             const wasShowing = Boolean(back && !back.hidden);
             if (back) back.hidden = !show;
+            if (spacer) spacer.hidden = show;
             document.body.classList.toggle('chrome-push', show);
             if (show && !wasShowing) pushChromeHistoryState();
             syncHeaderPageTitle();
@@ -15956,7 +15994,7 @@
                 badge.textContent = '';
             }
             if (moreItem) {
-                moreItem.hidden = !shouldShowBell;
+                moreItem.dataset.available = shouldShowBell ? '1' : '0';
                 moreItem.setAttribute('aria-label', label);
             }
             if (moreLabel) moreLabel.textContent = label;
@@ -15986,7 +16024,7 @@
             }
             if (undoLabel) undoLabel.textContent = label;
             if (moreItem) {
-                moreItem.hidden = !shouldShow;
+                moreItem.dataset.available = shouldShow ? '1' : '0';
                 moreItem.setAttribute('aria-label', label);
             }
             if (moreLabel) moreLabel.textContent = label;
@@ -17849,7 +17887,7 @@
                         'Dit is je persoonlijke receptenarchief. We nemen je in 5 stappen mee langs de belangrijkste onderdelen.'
                     ),
                     icon: 'sparkles',
-                    targets: ['.app-header-brand', '#main-header'],
+                    targets: ['#header-page-title', '#main-header'],
                     prefer: 'below'
                 },
                 {
@@ -17941,7 +17979,7 @@
                     }
                 } else {
                     // Fallback: still show a visible spotlight on the header so the step never floats aimlessly.
-                    const fallback = resolveTourTarget(['#main-header', '.app-header-brand']);
+                    const fallback = resolveTourTarget(['#main-header', '#header-page-title']);
                     if (fallback) {
                         const fr = fallback.getBoundingClientRect();
                         backdropHtml = `<div style="position:fixed;pointer-events:none;left:${Math.max(0, fr.left - PAD)}px;top:${Math.max(0, fr.top - PAD)}px;width:${fr.width + PAD * 2}px;height:${fr.height + PAD * 2}px;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.60);z-index:301;"></div>`;
