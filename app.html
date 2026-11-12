@@ -19563,6 +19563,10 @@
                                 </button>
                             </div>
                             <div class="notebook-chrome-actions">
+                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook header-icon-button relative inline-flex items-center justify-center" data-notebook-note-control="open-cook">
+                                    <i data-lucide="chef-hat" class="w-5 h-5" aria-hidden="true"></i>
+                                    <span class="notebook-cook-label">${uiText('Cook mode', 'Kookmodus')}</span>
+                                </button>
                                 <div class="notebook-more" data-notebook-more>
                                     <button type="button" class="notebook-more-toggle" aria-label="${uiText('More', 'Meer')}" aria-haspopup="menu" aria-expanded="false" title="${uiText('More', 'Meer')}" onclick="toggleNotebookMoreMenu(event)">
                                         <i data-lucide="ellipsis" class="w-5 h-5" aria-hidden="true"></i>
@@ -19575,10 +19579,6 @@
                                         <button type="button" role="menuitem" class="notebook-more-item" title="${notebookVisibilityActionLabel}" onclick="toggleNotebookStickyNotesVisibility(); closeNotebookMoreMenus();">
                                             <i data-lucide="${showNotebookStickyNotes ? 'eye-off' : 'eye'}" aria-hidden="true"></i>
                                             <span>${showNotebookStickyNotes ? uiText('Hide notes', 'Verbergen') : uiText('Show notes', 'Tonen')}</span>
-                                        </button>
-                                        <button type="button" role="menuitem" class="notebook-more-item" title="${notebookCookActionLabel}" onclick="closeNotebookMoreMenus(); openNotebookRecipeForCooking(${recipe.id});">
-                                            <i data-lucide="chef-hat" aria-hidden="true"></i>
-                                            <span>${uiText('Cook mode', 'Kookmodus')}</span>
                                         </button>
                                         <button type="button" role="menuitem" class="notebook-more-item" title="${pdfActions.recipe}" onclick="closeNotebookMoreMenus(); ${pdfActions.recipeAction}">
                                             <i data-lucide="${accountHasPremiumPlan() ? 'file-text' : 'lock'}" aria-hidden="true"></i>
