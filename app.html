@@ -20912,7 +20912,7 @@
                             ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cook', 'Koken')}</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
                             ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Servings', 'Porties')}</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
                             ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</div></div>` : ''}
-                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
+                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${escapeHTML(localizeRecipeCuisineLabel(recipe.cuisine))}</div></div>` : ''}
                         </div>` : ''}
 
                         <div class="detail-toolbar-row detail-panel">
@@ -22393,7 +22393,7 @@
                             ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cook', 'Koken')}</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
                             ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Servings', 'Porties')}</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
                             ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</div></div>` : ''}
-                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
+                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${escapeHTML(localizeRecipeCuisineLabel(recipe.cuisine))}</div></div>` : ''}
                         </div>` : ''}
 
                         <div class="detail-toolbar-row detail-panel">
