@@ -4675,8 +4675,8 @@
         /* Tablet: keep title + category·level·country together; photo overlays instead of splitting them. */
         @media (min-width: 768px) and (max-width: 1023px) {
             .notebook-page-hero {
-                /* Must exceed photo width (4.55rem) so title/meta never collide with the overlay. */
-                padding-right: 5.85rem;
+                /* Title clears the photo via h3 padding; meta uses full width below. */
+                padding-right: 0;
             }
 
             .notebook-page-photo-cluster {
@@ -4691,13 +4691,17 @@
             }
 
             .notebook-page-hero-copy h3 {
-                /* Larger than the photo so the title clears the overlay. */
+                /* Larger than the photo (4.55rem) so the title clears the overlay. */
                 padding-right: 5.1rem;
             }
 
             .notebook-page-hero-copy .notebook-meta-line {
                 max-width: 100%;
+                width: 100%;
                 white-space: nowrap;
+                overflow: visible;
+                text-overflow: clip;
+                letter-spacing: 0.14em;
             }
         }
 
@@ -5273,7 +5277,7 @@
             }
 
             .notebook-page-hero {
-                padding-right: 5.85rem;
+                padding-right: 0;
             }
 
             .notebook-page-hero-copy h3 {
@@ -5282,6 +5286,9 @@
 
             .notebook-page-hero-copy .notebook-meta-line {
                 white-space: nowrap;
+                overflow: visible;
+                text-overflow: clip;
+                letter-spacing: 0.14em;
             }
         }
 
