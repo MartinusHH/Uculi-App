@@ -4644,6 +4644,12 @@
             clear: both;
         }
 
+        .notebook-page-hero-copy {
+            position: relative;
+            z-index: 1;
+            min-width: 0;
+        }
+
         .notebook-page-photo-cluster {
             float: right;
             width: clamp(6.15rem, 28%, 7.35rem);
@@ -4651,6 +4657,28 @@
             margin: 0.1rem 0 0.85rem 0.95rem;
             shape-outside: inset(0 round 0.85rem);
             shape-margin: 0.6rem;
+        }
+
+        /* Tablet: keep title + category·level·country together; photo overlays instead of splitting them. */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .notebook-page-hero {
+                padding-right: 5.25rem;
+            }
+
+            .notebook-page-photo-cluster {
+                float: none;
+                position: absolute;
+                top: 0.15rem;
+                right: 0;
+                width: 4.55rem;
+                margin: 0;
+                shape-outside: none;
+                z-index: 2;
+            }
+
+            .notebook-page-hero-copy h3 {
+                padding-right: 0.25rem;
+            }
         }
 
         .notebook-page-photo-frame {
@@ -7729,54 +7757,96 @@
             return getActiveUiLanguage() === 'nl' ? dutch : english;
         }
 
-        function localizeRecipeCategoryLabel(value) {
-            const raw = String(value || '').trim();
-            if (!raw) return uiText('Recipe', 'Recept');
+        // Single recipe-meta translator used on cards, detail, and notebook reader.
+        function localizeRecipeLabel(kind, value) {
+            const type = String(kind || '').toLowerCase();
+            if (type === 'prep' || type === 'cook' || type === 'serves') {
+                const amount = Math.max(0, Number(value) || 0);
+                if (type === 'prep') return uiText(`${amount}m prep`, `${amount}m voorb.`);
+                if (type === 'cook') return uiText(`${amount}m cook`, `${amount}m koken`);
+                return uiText(`serves ${amount}`, `${amount} porties`);
+            }
+
+            const raw = String(value ?? '').trim();
+            if (type === 'chef') {
+                if (!raw || /^chef$/i.test(raw)) return uiText('Chef', 'Kok');
+                if (/^house recipe$/i.test(raw) || /^huisrecept$/i.test(raw)) {
+                    return uiText('House Recipe', 'Huisrecept');
+                }
+                return raw;
+            }
+
+            if (!raw) {
+                if (type === 'category') return uiText('Recipe', 'Recept');
+                return '';
+            }
+
             const key = raw.toLowerCase();
-            const map = {
-                cooking: uiText('Cooking', 'Koken'),
-                baking: uiText('Baking', 'Bakken'),
-                dessert: uiText('Dessert', 'Dessert'),
-                drink: uiText('Drink', 'Drank'),
-                breakfast: uiText('Breakfast', 'Ontbijt'),
-                lunch: uiText('Lunch', 'Lunch'),
-                dinner: uiText('Dinner', 'Diner'),
-                snack: uiText('Snack', 'Tussendoortje'),
-                other: uiText('Other', 'Overig'),
-                recipe: uiText('Recipe', 'Recept'),
-                misc: uiText('Misc', 'Divers')
+            const maps = {
+                category: {
+                    cooking: uiText('Cooking', 'Koken'),
+                    baking: uiText('Baking', 'Bakken'),
+                    dessert: uiText('Dessert', 'Dessert'),
+                    drink: uiText('Drink', 'Drank'),
+                    breakfast: uiText('Breakfast', 'Ontbijt'),
+                    lunch: uiText('Lunch', 'Lunch'),
+                    dinner: uiText('Dinner', 'Diner'),
+                    snack: uiText('Snack', 'Tussendoortje'),
+                    other: uiText('Other', 'Overig'),
+                    recipe: uiText('Recipe', 'Recept'),
+                    misc: uiText('Misc', 'Divers')
+                },
+                difficulty: {
+                    easy: uiText('Easy', 'Makkelijk'),
+                    medium: uiText('Medium', 'Gemiddeld'),
+                    hard: uiText('Hard', 'Moeilijk')
+                },
+                diet: {
+                    vegan: uiText('Vegan', 'Veganistisch'),
+                    vegetarian: uiText('Vegetarian', 'Vegetarisch'),
+                    pescatarian: uiText('Pescatarian', 'Pescotarisch'),
+                    'gluten-free': uiText('Gluten-free', 'Glutenvrij'),
+                    'dairy-free': uiText('Dairy-free', 'Zonder zuivel'),
+                    'nut-free': uiText('Nut-free', 'Notenvrij'),
+                    'egg-free': uiText('Egg-free', 'Zonder ei'),
+                    'soy-free': uiText('Soy-free', 'Sojavrij'),
+                    halal: uiText('Halal', 'Halal'),
+                    kosher: uiText('Kosher', 'Kosjer'),
+                    'low-carb': uiText('Low-carb', 'Koolhydraatarm'),
+                    keto: uiText('Keto', 'Keto'),
+                    paleo: uiText('Paleo', 'Paleo')
+                },
+                cuisine: {
+                    european: uiText('European', 'Europees'),
+                    asian: uiText('Asian', 'Aziatisch'),
+                    american: uiText('American', 'Amerikaans'),
+                    mediterranean: uiText('Mediterranean', 'Mediterraan'),
+                    mexican: uiText('Mexican', 'Mexicaans'),
+                    italian: uiText('Italian', 'Italiaans'),
+                    french: uiText('French', 'Frans'),
+                    dutch: uiText('Dutch', 'Nederlands'),
+                    netherlands: uiText('Netherlands', 'Nederland')
+                }
             };
-            return map[key] || raw;
+
+            const table = maps[type] || maps.category;
+            return table[key] || raw;
+        }
+
+        function localizeRecipeCategoryLabel(value) {
+            return localizeRecipeLabel('category', value);
         }
 
         function localizeRecipeDifficultyLabel(value) {
-            const raw = String(value || '').trim();
-            if (!raw) return '';
-            const key = raw.toLowerCase();
-            const map = {
-                easy: uiText('Easy', 'Makkelijk'),
-                medium: uiText('Medium', 'Gemiddeld'),
-                hard: uiText('Hard', 'Moeilijk')
-            };
-            return map[key] || raw;
+            return localizeRecipeLabel('difficulty', value);
         }
 
         function localizeRecipeCuisineLabel(value) {
-            const raw = String(value || '').trim();
-            if (!raw) return '';
-            const key = raw.toLowerCase();
-            const map = {
-                european: uiText('European', 'Europees'),
-                asian: uiText('Asian', 'Aziatisch'),
-                american: uiText('American', 'Amerikaans'),
-                mediterranean: uiText('Mediterranean', 'Mediterraan'),
-                mexican: uiText('Mexican', 'Mexicaans'),
-                italian: uiText('Italian', 'Italiaans'),
-                french: uiText('French', 'Frans'),
-                dutch: uiText('Dutch', 'Nederlands'),
-                netherlands: uiText('Netherlands', 'Nederland')
-            };
-            return map[key] || raw;
+            return localizeRecipeLabel('cuisine', value);
+        }
+
+        function localizeRecipeDietLabel(value) {
+            return localizeRecipeLabel('diet', value);
         }
 
         function getAuthI18n() {
@@ -12830,6 +12900,26 @@
                 && String(userSettings?.termsAcceptedVersion || '') === AGREEMENT_VERSION;
         }
 
+        // Only brand-new accounts must see the blocking terms modal.
+        // Existing accounts missing a local termsAcceptedVersion keep using the app.
+        function shouldShowTermsAcceptanceModal() {
+            if (hasAcceptedCurrentTermsVersion()) return false;
+            if (hasPendingAgreement()) return true;
+            if (userSettings?.isNewAccount === true) return true;
+            if (sessionStorage.getItem('uculiNewAccountTerms') === '1') return true;
+            return false;
+        }
+
+        function markCurrentAccountAsNewForTerms() {
+            userSettings.isNewAccount = true;
+            sessionStorage.setItem('uculiNewAccountTerms', '1');
+        }
+
+        function clearNewAccountTermsMarker() {
+            if (userSettings) userSettings.isNewAccount = false;
+            sessionStorage.removeItem('uculiNewAccountTerms');
+        }
+
         // New accounts (register) must agree once for the current AGREEMENT_VERSION.
         // Returning users with a saved termsAcceptedVersion skip the checkbox.
         function shouldShowAuthAgreementFields() {
@@ -13030,6 +13120,7 @@
         async function recordNewAccountAgreement(result, forceNew = false) {
             const uid = result?.user?.uid;
             if (!uid || (!forceNew && !isNewFirebaseAccount(result))) return;
+            markCurrentAccountAsNewForTerms();
             try {
                 await savePrivateAgreementOnce(uid);
             } catch (error) {
@@ -13067,7 +13158,7 @@
             localStorage.setItem('uculiLocalAccounts', JSON.stringify(accounts));
         }
 
-        function activateLocalAccountSession(account) {
+        function activateLocalAccountSession(account, { isNewAccount = false } = {}) {
             currentUser = {
                 uid: account.uid,
                 email: account.email,
@@ -13082,13 +13173,14 @@
             // Do not invent termsAcceptedVersion here — new accounts set it via
             // pending agreement; existing accounts keep the saved version.
             applyPendingAgreementToSettings();
+            if (isNewAccount) markCurrentAccountAsNewForTerms();
             saveData();
             syncAuthenticatedAppChrome();
             document.getElementById('app-landing')?.remove();
             sessionStorage.setItem(landingSessionKey, '1');
             dismissAuthLoadingScreen();
             renderList();
-            if (!hasAcceptedCurrentTermsVersion()) {
+            if (shouldShowTermsAcceptanceModal()) {
                 showTermsAcceptanceModal();
             } else {
                 maybeShowFirstRunTutorial();
@@ -13120,7 +13212,8 @@
             };
             accounts.push(account);
             writeLocalAccounts(accounts);
-            activateLocalAccountSession(account);
+            markCurrentAccountAsNewForTerms();
+            activateLocalAccountSession(account, { isNewAccount: true });
             showToast('Account saved on this device.', 'check-circle');
             return true;
         }
@@ -13209,7 +13302,7 @@
                         syncAuthenticatedAppChrome();
                         // Always render the list first so there's a real screen behind any modal
                         renderList();
-                        if (!hasAcceptedCurrentTermsVersion()) {
+                        if (shouldShowTermsAcceptanceModal()) {
                             maybeShowFirstRunTutorial();
                             showTermsAcceptanceModal();
                         } else {
@@ -16602,19 +16695,25 @@
 
         function getRecipeAuthorLabel(recipe) {
             const raw = String(recipe?.author ?? '').trim();
-            if (raw === 'House Recipe') return uiText('House Recipe', 'Huisrecept');
-            if (raw) return raw;
+            if (raw) return localizeRecipeLabel('chef', raw);
             const profileName = String(userSettings?.name || currentUser?.displayName || '').trim();
             if (profileName) return profileName;
-            return uiText('Unknown chef', 'Onbekende kok');
+            return localizeRecipeLabel('chef', 'Chef');
+        }
+
+        function getRecipeAuthorByline(recipe) {
+            const author = getRecipeAuthorLabel(recipe);
+            const raw = String(recipe?.author ?? '').trim();
+            const isHouse = /^house recipe$/i.test(raw) || /^huisrecept$/i.test(author);
+            if (isHouse) return author; // "Huisrecept", never "Door Huisrecept"
+            return uiText(`By ${author}`, `Door ${author}`);
         }
 
         function getRecipeCountryLabel(recipe, { fallback = true } = {}) {
-            const nl = userSettings.language === 'nl';
             const raw = String(recipe?.country ?? '').trim();
-            if (raw) return raw;
+            if (raw) return localizeRecipeCuisineLabel(raw);
             if (!fallback) return '';
-            return nl ? 'Onbekend land' : 'Unknown country';
+            return uiText('Unknown country', 'Onbekend land');
         }
 
         function getNotebookRecipeMoodLabel(recipe) {
@@ -18391,6 +18490,8 @@
             userSettings.termsAccepted = true;
             userSettings.termsAcceptedAt = new Date().toISOString();
             userSettings.termsAcceptedVersion = AGREEMENT_VERSION;
+            clearNewAccountTermsMarker();
+            clearPendingAgreement();
             saveData();
             const modal = document.getElementById('terms-accept-modal');
             if (modal) modal.remove();
@@ -19352,7 +19453,9 @@
                 ? escapeHTML(localizeRecipeCuisineLabel(recipe.country) || recipe.country)
                 : '';
             const safeRecipeAuthor = escapeHTML(getRecipeAuthorLabel(recipe) || uiText('Chef', 'Kok'));
-            const dietText = (recipe.diet || []).length > 0 ? escapeHTML(recipe.diet.join(' · ')) : uiText('No diet tags', 'Geen dieettags');
+            const dietText = (recipe.diet || []).length > 0
+                ? escapeHTML(recipe.diet.map(tag => localizeRecipeDietLabel(tag)).join(' · '))
+                : uiText('No diet tags', 'Geen dieettags');
             const notebookCookActionLabel = totalInstructions > 0
                 ? uiText('Start cooking', 'Begin met koken')
                 : uiText('Open recipe', 'Open recept');
@@ -19466,10 +19569,11 @@
                     `;
                 }
 
-                const prepCookServesLine = uiText(
-                    `${recipe.prepTime || 0}m prep · ${recipe.cookTime || 0}m cook · serves ${recipe.servings || 0}`,
-                    `${recipe.prepTime || 0}m voorb. · ${recipe.cookTime || 0}m koken · ${recipe.servings || 0} porties`
-                );
+                const prepCookServesLine = [
+                    localizeRecipeLabel('prep', recipe.prepTime || 0),
+                    localizeRecipeLabel('cook', recipe.cookTime || 0),
+                    localizeRecipeLabel('serves', recipe.servings || 0)
+                ].join(' · ');
 
                 return `
                     <div class="notebook-paper__body">
@@ -19496,15 +19600,17 @@
                                         <div class="notebook-page-photo-card" style="background-image:url('${recipe.profile || defaultPlaceholderProfile}')"></div>
                                     </div>
                                 </div>
-                                <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Recipe page', 'Receptpagina')}</p>
-                                ${notebookFamilyBadge ? `<div class="mt-3">${notebookFamilyBadge}</div>` : ''}
-                                <h3 class="mt-2 font-fantasy text-3xl md:text-5xl font-bold text-forest leading-[1.02]">${safeRecipeTitle}</h3>
-                                <div class="notebook-ruled-block mt-3 text-sm font-semibold text-sage">
-                                    <div class="notebook-line-row">${recipeMood}</div>
-                                    <div class="notebook-line-row text-[11px] font-bold uppercase tracking-[0.22em]">
-                                        <span>${safeRecipeCategory}</span>
-                                        ${safeRecipeDifficulty ? `<span>· ${safeRecipeDifficulty}</span>` : ''}
-                                        ${safeRecipeCountry ? `<span>· ${safeRecipeCountry}</span>` : ''}
+                                <div class="notebook-page-hero-copy">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Recipe page', 'Receptpagina')}</p>
+                                    ${notebookFamilyBadge ? `<div class="mt-3">${notebookFamilyBadge}</div>` : ''}
+                                    <h3 class="mt-2 font-fantasy text-3xl md:text-5xl font-bold text-forest leading-[1.02]">${safeRecipeTitle}</h3>
+                                    <div class="notebook-ruled-block mt-3 text-sm font-semibold text-sage">
+                                        <div class="notebook-line-row">${recipeMood}</div>
+                                        <div class="notebook-line-row text-[11px] font-bold uppercase tracking-[0.22em]">
+                                            <span>${safeRecipeCategory}</span>
+                                            ${safeRecipeDifficulty ? `<span>· ${safeRecipeDifficulty}</span>` : ''}
+                                            ${safeRecipeCountry ? `<span>· ${safeRecipeCountry}</span>` : ''}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -19545,12 +19651,13 @@
                 const openedDate = recipe.lastOpened
                     ? new Date(recipe.lastOpened).toLocaleDateString(openedLocale)
                     : '';
+                const authorByline = getRecipeAuthorByline(recipe);
                 const byAuthorLine = recipe.lastOpened
                     ? uiText(
-                        `By ${safeRecipeAuthor} · last opened ${openedDate}`,
-                        `Door ${safeRecipeAuthor} · laatst geopend ${openedDate}`
+                        `${authorByline} · last opened ${openedDate}`,
+                        `${authorByline} · laatst geopend ${openedDate}`
                     )
-                    : uiText(`By ${safeRecipeAuthor}`, `Door ${safeRecipeAuthor}`);
+                    : authorByline;
 
                 if (!page || page.kind === 'blank') {
                     return `
@@ -20151,8 +20258,8 @@
                                     ${totalMinutes ? `<span>${totalMinutes}m</span>` : ''}
                                 </div>
                                 <div class="index-card-tags">
-                                    <span class="index-card-tag">${escapeHTML(recipe.category || 'Misc')}</span>
-                                    ${recipe.difficulty ? `<span class="index-card-tag">${escapeHTML(recipe.difficulty)}</span>` : ''}
+                                    <span class="index-card-tag">${escapeHTML(localizeRecipeCategoryLabel(recipe.category || 'Misc'))}</span>
+                                    ${recipe.difficulty ? `<span class="index-card-tag">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</span>` : ''}
                                     ${familyChipMarkup || ''}
                                 </div>
                             </div>
@@ -20178,19 +20285,19 @@
                                     ${recipeVersionLabel ? `<span>${escapeHTML(recipeVersionLabel)}</span>` : ''}
                                 </div>
                                 <div class="index-card-stats">
-                                    ${recipe.prepTime ? `<span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i>${recipe.prepTime}m prep</span>` : ''}
-                                    ${recipe.cookTime ? `<span class="flex items-center gap-1"><i data-lucide="flame" class="w-3 h-3"></i>${recipe.cookTime}m cook</span>` : ''}
-                                    ${recipe.servings ? `<span class="flex items-center gap-1"><i data-lucide="users" class="w-3 h-3"></i>${recipe.servings}</span>` : ''}
+                                    ${recipe.prepTime ? `<span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i>${localizeRecipeLabel('prep', recipe.prepTime)}</span>` : ''}
+                                    ${recipe.cookTime ? `<span class="flex items-center gap-1"><i data-lucide="flame" class="w-3 h-3"></i>${localizeRecipeLabel('cook', recipe.cookTime)}</span>` : ''}
+                                    ${recipe.servings ? `<span class="flex items-center gap-1"><i data-lucide="users" class="w-3 h-3"></i>${localizeRecipeLabel('serves', recipe.servings)}</span>` : ''}
                                 </div>
                                 <div class="index-card-tags">
-                                    <span class="index-card-tag">${escapeHTML(recipe.category || 'Misc')}</span>
-                                    ${recipe.difficulty ? `<span class="index-card-tag">${escapeHTML(recipe.difficulty)}</span>` : ''}
-                                    ${recipe.country ? `<span class="index-card-tag">${escapeHTML(recipe.country)}</span>` : ''}
-                                    ${recipe.source === 'published' ? '<span class="index-card-tag">Saved</span>' : ''}
+                                    <span class="index-card-tag">${escapeHTML(localizeRecipeCategoryLabel(recipe.category || 'Misc'))}</span>
+                                    ${recipe.difficulty ? `<span class="index-card-tag">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</span>` : ''}
+                                    ${recipe.country ? `<span class="index-card-tag">${escapeHTML(localizeRecipeCuisineLabel(recipe.country))}</span>` : ''}
+                                    ${recipe.source === 'published' ? `<span class="index-card-tag">${uiText('Saved', 'Opgeslagen')}</span>` : ''}
                                     ${recipe.source !== 'published' && isRecipePublishedLive(recipe) ? '<span class="index-card-tag">Live</span>' : ''}
                                     ${savedRecipeOutdated ? '<span class="index-card-tag">Update</span>' : ''}
                                     ${recipeNeedsAttention(recipe) && !savedRecipeOutdated ? '<span class="index-card-tag">Attention</span>' : ''}
-                                    ${(recipe.diet || []).slice(0, 3).map(d => `<span class="index-card-tag">${escapeHTML(d)}</span>`).join('')}
+                                    ${(recipe.diet || []).slice(0, 3).map(d => `<span class="index-card-tag">${escapeHTML(localizeRecipeDietLabel(d))}</span>`).join('')}
                                 </div>
                                 <div class="index-card-footer">
                                     ${familyChipMarkup || escapeHTML(recipeSourceLabel)}
@@ -20716,9 +20823,9 @@
                                     ${versionLabel ? `<span>${escapeHTML(versionLabel)}</span>` : ''}
                                 </div>
                                 <div class="flex flex-wrap gap-2 mt-1">
-                                    <span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${escapeHTML(recipe.category || 'Misc')}</span>
-                                    ${recipe.difficulty ? `<span class="text-[10px] bg-gold bg-opacity-20 text-sage font-bold px-2 py-1 rounded-sm">${escapeHTML(recipe.difficulty)}</span>` : ''}
-                                    ${recipe.cuisine ? `<span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${escapeHTML(recipe.cuisine)}</span>` : ''}
+                                    <span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${escapeHTML(localizeRecipeCategoryLabel(recipe.category || 'Misc'))}</span>
+                                    ${recipe.difficulty ? `<span class="text-[10px] bg-gold bg-opacity-20 text-sage font-bold px-2 py-1 rounded-sm">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</span>` : ''}
+                                    ${recipe.cuisine ? `<span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${escapeHTML(localizeRecipeCuisineLabel(recipe.cuisine))}</span>` : ''}
                                 </div>
                             </div>
                             <div class="browse-card-actions">
@@ -20804,7 +20911,7 @@
                             ${recipe.prepTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Prep', 'Voorb.')}</div><div class="detail-meta-value">${recipe.prepTime}m</div></div>` : ''}
                             ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cook', 'Koken')}</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
                             ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Servings', 'Porties')}</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
-                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${recipe.difficulty}</div></div>` : ''}
+                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</div></div>` : ''}
                             ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
                         </div>` : ''}
 
@@ -22285,13 +22392,13 @@
                             ${recipe.prepTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Prep', 'Voorb.')}</div><div class="detail-meta-value">${recipe.prepTime}m</div></div>` : ''}
                             ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cook', 'Koken')}</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
                             ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Servings', 'Porties')}</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
-                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${recipe.difficulty}</div></div>` : ''}
+                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</div></div>` : ''}
                             ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
                         </div>` : ''}
 
                         <div class="detail-toolbar-row detail-panel">
                             <div class="detail-status-chips">
-                                <span class="detail-chip">${recipe.category || uiText('Recipe', 'Recept')}</span>
+                                <span class="detail-chip">${escapeHTML(localizeRecipeCategoryLabel(recipe.category))}</span>
                                 ${recipe.diet && recipe.diet.length > 0 ? recipe.diet.map(d => `<span class="detail-chip">${d}</span>`).join('') : ''}
                                 ${recipeFamilyChip}
                                 ${isSavedCommunityRecipe ? `<span class="detail-chip">${uiText('Saved community recipe', 'Opgeslagen communityrecept')}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
