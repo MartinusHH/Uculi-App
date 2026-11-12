@@ -238,10 +238,10 @@
             position: sticky;
             top: 0;
             z-index: 25;
-            display: flex;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
             align-items: center;
-            justify-content: space-between;
-            gap: var(--space-4);
+            gap: var(--space-3);
             padding: calc(var(--space-4) + env(safe-area-inset-top, 0px)) var(--space-5) var(--space-4);
             background: rgba(251, 248, 243, 0.85); /* parchment but slightly transparent */
             border-bottom: 1px solid rgba(144, 152, 112, 0.28);
@@ -250,11 +250,105 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
+        .app-header-leading {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            min-width: 0;
+        }
+
+        .app-header-titles {
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .app-header-page-title {
+            margin: 0;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.15;
+            color: #1c1410;
+        }
+
+        .app-header-actions {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.45rem;
+            flex: 0 0 auto;
+        }
+
+        .header-more {
+            position: relative;
+        }
+
+        .header-more-menu {
+            position: absolute;
+            top: calc(100% + 0.35rem);
+            right: 0;
+            z-index: 40;
+            display: grid;
+            gap: 0.2rem;
+            min-width: 11.5rem;
+            padding: 0.35rem;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            border-radius: 0.9rem;
+            background: #fffdf9;
+            box-shadow: 0 16px 32px rgba(28, 20, 16, 0.14);
+        }
+
+        .header-more-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            width: 100%;
+            min-height: 2.55rem;
+            padding: 0.55rem 0.7rem;
+            border: 0;
+            border-radius: 0.7rem;
+            background: transparent;
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 0.84rem;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .header-more-item:hover,
+        .header-more-item:focus-visible {
+            background: rgba(146, 157, 117, 0.16);
+            outline: none;
+        }
+
+        /* Keep legacy icon slots out of the visible top row; they live in ⋯. */
+        #main-header #header-help,
+        #main-header #notifications-button,
+        #main-header #undo-delete-button {
+            display: none !important;
+        }
+
         .app-header-brand {
             min-width: 0;
             display: flex;
             align-items: center;
             gap: 0.85rem;
+        }
+
+        #main-header.is-subview .app-header-brand {
+            display: none;
+        }
+
+        #main-header.is-subview .app-header-page-title {
+            display: block;
+        }
+
+        #main-header:not(.is-subview) .app-header-page-title {
+            display: none !important;
         }
 
         .app-header-mark {
@@ -2567,6 +2661,11 @@
             color: #1c1410;
         }
 
+        .notebook-view-segment button.notebook-view-toggle.is-active {
+            background-color: #929D75;
+            color: #1c1410;
+        }
+
         #header-add-recipe {
             display: inline-flex;
             align-items: center;
@@ -3992,17 +4091,28 @@
         }
 
         .notebook-note-control--cook {
-            min-width: 6.25rem;
-            border: 1px solid rgba(200, 144, 80, 0.92);
-            background: linear-gradient(135deg, rgba(236, 210, 118, 0.96) 0%, rgba(219, 177, 77, 0.96) 100%);
-            color: #fffdf6;
-            box-shadow: 0 14px 28px rgba(200, 144, 80, 0.24);
+            min-width: 2.75rem;
+            width: 2.75rem;
+            height: 2.75rem;
+            padding: 0;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            border-radius: 0.85rem;
+            background: #fbf8f3;
+            color: #929D75;
+            box-shadow: none;
         }
 
         .notebook-note-control--cook:hover {
-            border-color: rgba(166, 127, 38, 0.94);
-            background: linear-gradient(135deg, rgba(220, 185, 95, 0.98) 0%, rgba(194, 150, 55, 0.98) 100%);
-            color: #fffdf6;
+            border-color: rgba(146, 157, 117, 0.65);
+            background: rgba(146, 157, 117, 0.14);
+            color: #6f7a52;
+        }
+
+        .notebook-note-control--cook [data-lucide],
+        .notebook-note-control--cook svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke-width: 2;
         }
 
         .notebook-chrome {
@@ -4016,7 +4126,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 0.65rem;
+            gap: 0.55rem;
             width: 100%;
             padding: 0.3rem;
             border: 1px solid rgba(228, 215, 196, 0.85);
@@ -4033,6 +4143,124 @@
             padding: 0;
             border-radius: 0;
             background: transparent;
+        }
+
+        .notebook-view-segment {
+            display: inline-flex;
+            align-items: stretch;
+            gap: 0.15rem;
+            min-width: 0;
+            padding: 0.15rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 0.85rem;
+            background: rgba(246, 241, 232, 0.72);
+        }
+
+        .notebook-view-segment .notebook-view-toggle {
+            flex: 1 1 0;
+            min-width: 2.55rem;
+            color: var(--text-muted);
+        }
+
+        .notebook-view-segment .notebook-view-toggle.is-active {
+            background: #929D75;
+            color: #1c1410;
+            box-shadow: inset 0 0 0 1px rgba(28, 20, 16, 0.06);
+        }
+
+        .notebook-chrome-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-left: auto;
+            flex: 0 0 auto;
+        }
+
+        .notebook-more {
+            position: relative;
+        }
+
+        .notebook-more-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            min-width: 2.75rem;
+            border-radius: 0.85rem;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            background: #fbf8f3;
+            color: #1c1410;
+        }
+
+        .notebook-more-menu {
+            position: absolute;
+            top: calc(100% + 0.35rem);
+            right: 0;
+            z-index: 40;
+            display: none;
+            min-width: 13.5rem;
+            padding: 0.35rem;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            border-radius: 0.9rem;
+            background: #fffdf9;
+            box-shadow: 0 16px 32px rgba(28, 20, 16, 0.14);
+        }
+
+        .notebook-more.is-open .notebook-more-menu {
+            display: grid;
+            gap: 0.2rem;
+        }
+
+        .notebook-more-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            width: 100%;
+            min-height: 2.55rem;
+            padding: 0.55rem 0.7rem;
+            border: 0;
+            border-radius: 0.7rem;
+            background: transparent;
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 0.84rem;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .notebook-more-item:hover,
+        .notebook-more-item:focus-visible {
+            background: rgba(146, 157, 117, 0.16);
+            outline: none;
+        }
+
+        .notebook-more-item i,
+        .notebook-more-item svg {
+            width: 1.1rem;
+            height: 1.1rem;
+            flex: 0 0 auto;
+            color: #929D75;
+        }
+
+        .notebook-page-under {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            width: 100%;
+        }
+
+        .notebook-page-under .notebook-page-label {
+            flex: 1 1 auto;
+            min-width: 0;
+            text-align: center;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-muted);
         }
 
         .notebook-chrome-kicker {
@@ -4128,22 +4356,28 @@
                 background: rgba(246, 241, 232, 0.55);
             }
 
-            .notebook-chrome-bar button,
-            .notebook-chrome-bar .notebook-note-control--cook {
+            .notebook-chrome-bar .notebook-view-segment .notebook-view-toggle {
                 flex: 0 0 auto;
-                flex-direction: row;
-                flex-wrap: nowrap;
                 width: auto;
                 min-width: 2.55rem;
                 max-width: none;
                 height: 2.7rem;
                 min-height: 2.7rem;
-                padding: 0 0.85rem;
+                padding: 0 0.75rem;
                 white-space: nowrap;
             }
 
-            .notebook-chrome-bar .notebook-tool-label,
-            .notebook-chrome-bar .notebook-cook-label {
+            .notebook-chrome-bar .notebook-note-control--cook,
+            .notebook-chrome-bar .notebook-more-toggle {
+                width: 2.75rem;
+                min-width: 2.75rem;
+                max-width: 2.75rem;
+                height: 2.75rem;
+                min-height: 2.75rem;
+                padding: 0;
+            }
+
+            .notebook-chrome-bar .notebook-tool-label {
                 position: static;
                 width: auto;
                 height: auto;
@@ -4151,6 +4385,18 @@
                 overflow: visible;
                 clip: auto;
                 white-space: nowrap;
+            }
+
+            .notebook-chrome-bar .notebook-cook-label {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
             }
         }
 
@@ -4642,7 +4888,8 @@
                 padding: 0;
                 letter-spacing: 0;
                 box-shadow: none;
-                background: #c89050;
+                background: #fbf8f3;
+                color: #929D75;
             }
 
             .notebook-paper__body {
@@ -6454,25 +6701,52 @@
     <div id="app-shell" class="w-full max-w-7xl mx-auto flex flex-col h-[100dvh] max-h-[100dvh] relative shadow-2xl bg-parchment overflow-hidden border-x border-parchmentDark">
         
         <header id="main-header" class="text-forest transition-all" translate="no">
+            <div class="app-header-leading">
                 <button id="header-back" type="button" onclick="handleTopBackAction()" class="header-icon-button" hidden aria-label="Terug" title="Terug">
                     <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i>
                     <span class="header-icon-label" aria-hidden="true"></span>
                 </button>
-            <div class="app-header-brand">
-                <div class="app-header-mark">
-                    <img src="assets/uculi-boekje.jpg" alt="Uculi" width="46" height="46" />
-                </div>
-                <div class="app-header-copy">
-                    <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
-                    <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
+                <div class="app-header-titles">
+                    <div class="app-header-brand" id="header-brand">
+                        <div class="app-header-mark">
+                            <img src="assets/uculi-boekje.jpg" alt="Uculi" width="46" height="46" />
+                        </div>
+                        <div class="app-header-copy">
+                            <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
+                            <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
+                        </div>
+                    </div>
+                    <h2 id="header-page-title" class="app-header-page-title" hidden></h2>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button id="notifications-button" onclick="showNotificationsModal()" class="header-icon-button relative hidden" title="Notifications" aria-label="Notifications">
+            <div class="app-header-actions">
+                <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="header-primary-action flex h-11 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
+                    <i data-lucide="plus" class="w-4 h-4"></i> <span class="header-add-label">Add Recipe</span>
+                </button>
+                <div class="header-more" id="header-more" hidden>
+                    <button id="header-more-toggle" type="button" class="header-icon-button" aria-label="Meer" title="Meer" aria-haspopup="menu" aria-expanded="false" onclick="toggleHeaderMoreMenu(event)">
+                        <i data-lucide="ellipsis" class="w-5 h-5" aria-hidden="true"></i>
+                    </button>
+                    <div id="header-more-menu" class="header-more-menu" role="menu" hidden>
+                        <button id="header-more-help" type="button" role="menuitem" class="header-more-item" onclick="closeHeaderMoreMenu(); showUsageGuide();">
+                            <i data-lucide="circle-help" class="w-4 h-4" aria-hidden="true"></i>
+                            <span>Help</span>
+                        </button>
+                        <button id="header-more-notifications" type="button" role="menuitem" class="header-more-item" hidden onclick="closeHeaderMoreMenu(); showNotificationsModal();">
+                            <i data-lucide="bell" class="w-4 h-4" aria-hidden="true"></i>
+                            <span id="header-more-notifications-label">Notifications</span>
+                        </button>
+                        <button id="header-more-undo" type="button" role="menuitem" class="header-more-item" hidden onclick="closeHeaderMoreMenu(); undoDeletedRecipe();">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4" aria-hidden="true"></i>
+                            <span id="header-more-undo-label">Undo</span>
+                        </button>
+                    </div>
+                </div>
+                <button id="notifications-button" onclick="showNotificationsModal()" class="header-icon-button relative hidden" hidden title="Notifications" aria-label="Notifications">
                     <i data-lucide="bell" class="w-5 h-5"></i>
                     <span id="notifications-badge" class="absolute -right-1 -top-1 hidden min-w-[1.15rem] rounded-full bg-coral px-1 text-[10px] font-bold leading-5 text-white"></span>
                 </button>
-                <button id="undo-delete-button" onclick="undoDeletedRecipe()" class="header-icon-button hidden" title="Undo last delete" aria-label="Undo last delete">
+                <button id="undo-delete-button" onclick="undoDeletedRecipe()" class="header-icon-button hidden" hidden title="Undo last delete" aria-label="Undo last delete">
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                     <span id="undo-delete-label">Undo</span>
                 </button>
@@ -6483,9 +6757,6 @@
                 <button id="header-open-settings" type="button" onclick="renderSettings()" class="header-icon-button" aria-label="Opties" title="Opties">
                     <i data-lucide="settings" class="w-5 h-5" aria-hidden="true"></i>
                     <span class="header-icon-label" aria-hidden="true"></span>
-                </button>
-                <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="flex h-11 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
-                    <i data-lucide="plus" class="w-4 h-4"></i> <span class="header-add-label">Add Recipe</span>
                 </button>
             </div>
         </header>
@@ -14920,15 +15191,126 @@
             if (typeof lucide?.createIcons === 'function') lucide.createIcons();
         }
 
+        let chromeHistoryDepth = 0;
+        let ignoreChromePopstate = false;
+
+        function getHeaderPageTitle() {
+            const nl = userSettings.language === 'nl';
+            if (currentView === 'settings') return nl ? 'Opties' : 'Options';
+            if (currentView === 'access') return nl ? 'Toegang beheren' : 'Manage access';
+            if (currentView === 'add') return nl ? 'Recept' : 'Recipe';
+            if (currentView === 'shopping') return nl ? 'Boodschappen' : 'Shopping';
+            if (currentView === 'browse') return nl ? 'Bladeren' : 'Browse';
+            if (currentView === 'profile') return nl ? 'Profiel' : 'Profile';
+            if (currentView === 'detail' || activeDetailRecipeId != null) {
+                const recipe = recipes.find(item => item.id === activeDetailRecipeId);
+                return recipe?.title || (nl ? 'Recept' : 'Recipe');
+            }
+            if (currentView === 'index' && indexViewMode === 'book' && chromeBackAction) {
+                return nl ? 'Schrift' : 'Notebook';
+            }
+            return 'Uculi';
+        }
+
+        function syncHeaderPageTitle() {
+            const header = document.getElementById('main-header');
+            const titleEl = document.getElementById('header-page-title');
+            const show = chromeBackAction != null;
+            if (header) header.classList.toggle('is-subview', show);
+            if (titleEl) {
+                titleEl.hidden = !show;
+                titleEl.textContent = show ? getHeaderPageTitle() : '';
+            }
+        }
+
+        function syncHeaderOverflowMenu() {
+            const more = document.getElementById('header-more');
+            const moreToggle = document.getElementById('header-more-toggle');
+            const moreMenu = document.getElementById('header-more-menu');
+            const moreHelp = document.getElementById('header-more-help');
+            const moreNotifications = document.getElementById('header-more-notifications');
+            const moreUndo = document.getElementById('header-more-undo');
+            const gear = document.getElementById('header-open-settings');
+            const help = document.getElementById('header-help');
+            const nl = userSettings.language === 'nl';
+            const showHelp = currentView === 'settings' || currentView === 'access';
+            const showNotifications = moreNotifications && !moreNotifications.hidden;
+            const showUndo = moreUndo && !moreUndo.hidden;
+            const showMore = showHelp || showNotifications || showUndo;
+
+            if (help) help.hidden = true;
+            if (moreHelp) {
+                moreHelp.hidden = !showHelp;
+                const helpLabel = 'Help';
+                moreHelp.querySelector('span') && (moreHelp.querySelector('span').textContent = helpLabel);
+            }
+            if (more) more.hidden = !showMore;
+            if (moreMenu && more.hidden) moreMenu.hidden = true;
+            if (moreToggle) {
+                moreToggle.setAttribute('aria-expanded', moreMenu && !moreMenu.hidden ? 'true' : 'false');
+                moreToggle.setAttribute('aria-label', nl ? 'Meer' : 'More');
+                moreToggle.title = nl ? 'Meer' : 'More';
+            }
+            if (gear) gear.hidden = currentView === 'settings' || currentView === 'access';
+        }
+
+        function closeHeaderMoreMenu() {
+            const moreMenu = document.getElementById('header-more-menu');
+            const moreToggle = document.getElementById('header-more-toggle');
+            if (moreMenu) moreMenu.hidden = true;
+            if (moreToggle) moreToggle.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleHeaderMoreMenu(event) {
+            event?.stopPropagation?.();
+            const moreMenu = document.getElementById('header-more-menu');
+            const moreToggle = document.getElementById('header-more-toggle');
+            if (!moreMenu || !moreToggle) return;
+            const open = moreMenu.hidden;
+            closeNotebookMoreMenus();
+            moreMenu.hidden = !open;
+            moreToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (open && typeof lucide?.createIcons === 'function') lucide.createIcons();
+        }
+
+        function closeNotebookMoreMenus() {
+            document.querySelectorAll('[data-notebook-more].is-open').forEach(node => {
+                node.classList.remove('is-open');
+                const toggle = node.querySelector('.notebook-more-toggle');
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        function toggleNotebookMoreMenu(event) {
+            event?.stopPropagation?.();
+            const root = event?.currentTarget?.closest?.('[data-notebook-more]');
+            if (!root) return;
+            const willOpen = !root.classList.contains('is-open');
+            closeNotebookMoreMenus();
+            closeHeaderMoreMenu();
+            if (!willOpen) return;
+            root.classList.add('is-open');
+            event.currentTarget.setAttribute('aria-expanded', 'true');
+            if (typeof lucide?.createIcons === 'function') lucide.createIcons();
+        }
+
+        function pushChromeHistoryState() {
+            if (chromeBackAction == null) return;
+            try {
+                history.pushState({ uculiChrome: true, view: currentView, action: chromeBackAction }, '');
+                chromeHistoryDepth += 1;
+            } catch (_) { /* ignore */ }
+        }
+
         function syncHeaderBackButton() {
             const back = document.getElementById('header-back');
             const show = chromeBackAction != null;
+            const wasShowing = Boolean(back && !back.hidden);
             if (back) back.hidden = !show;
             document.body.classList.toggle('chrome-push', show);
-            const gear = document.getElementById('header-open-settings');
-            const help = document.getElementById('header-help');
-            if (gear) gear.hidden = currentView === 'settings';
-            if (help) help.hidden = currentView !== 'settings';
+            if (show && !wasShowing) pushChromeHistoryState();
+            syncHeaderPageTitle();
+            syncHeaderOverflowMenu();
             syncChromeLabels();
         }
 
@@ -14941,34 +15323,58 @@
             syncHeaderBackButton();
         }
 
-        function handleTopBackAction() {
+        function handleTopBackAction(options = {}) {
+            const fromPopstate = Boolean(options.fromPopstate);
             const action = chromeBackAction;
-            if (activeDetailRecipeId !== null || action === 'list') {
+            const run = () => {
+                if (activeDetailRecipeId !== null || action === 'list') {
+                    renderList();
+                    return;
+                }
+                if (action === 'cancel-editor' || currentView === 'add') {
+                    cancelRecipeEditor();
+                    return;
+                }
+                if (action === 'profile') {
+                    renderProfile();
+                    return;
+                }
+                if (action === 'shop') {
+                    renderShoppingList();
+                    return;
+                }
+                if (action === 'browse') {
+                    renderBrowse();
+                    return;
+                }
+                if (action === 'settings') {
+                    renderSettings();
+                    return;
+                }
                 renderList();
-                return;
+            };
+            run();
+            if (!fromPopstate && chromeHistoryDepth > 0) {
+                ignoreChromePopstate = true;
+                chromeHistoryDepth = Math.max(0, chromeHistoryDepth - 1);
+                try { history.back(); } catch (_) { ignoreChromePopstate = false; }
             }
-            if (action === 'cancel-editor' || currentView === 'add') {
-                cancelRecipeEditor();
-                return;
-            }
-            if (action === 'profile') {
-                renderProfile();
-                return;
-            }
-            if (action === 'shop') {
-                renderShoppingList();
-                return;
-            }
-            if (action === 'browse') {
-                renderBrowse();
-                return;
-            }
-            if (action === 'settings') {
-                renderSettings();
-                return;
-            }
-            renderList();
         }
+
+        window.addEventListener('popstate', () => {
+            if (ignoreChromePopstate) {
+                ignoreChromePopstate = false;
+                return;
+            }
+            if (chromeBackAction == null) return;
+            chromeHistoryDepth = Math.max(0, chromeHistoryDepth - 1);
+            handleTopBackAction({ fromPopstate: true });
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest?.('#header-more')) closeHeaderMoreMenu();
+            if (!event.target.closest?.('[data-notebook-more]')) closeNotebookMoreMenus();
+        });
 
         function isDesktopNavAutoHideEnabled() {
             return desktopNavAutoHideMedia.matches;
@@ -15494,52 +15900,65 @@
         function syncNotificationBell() {
             const button = document.getElementById('notifications-button');
             const badge = document.getElementById('notifications-badge');
-            if (!button || !badge) return;
-
+            const moreItem = document.getElementById('header-more-notifications');
+            const moreLabel = document.getElementById('header-more-notifications-label');
             const hasActiveFamilies = getActiveFamiliesForCurrentUser().length > 0;
             const shouldShowBell = hasActiveFamilies || hasModerationNotifications();
-            button.classList.toggle('hidden', !shouldShowBell);
-            button.classList.toggle('inline-flex', shouldShowBell);
-            if (!shouldShowBell) {
-                badge.classList.add('hidden');
-                badge.textContent = '';
-                return;
-            }
-
-            const unread = getUnreadFamilyNotificationCount();
-            const pendingVotes = getPendingDeletionVoteActionCount() + getPendingPublicationVoteActionCount();
+            const unread = shouldShowBell ? getUnreadFamilyNotificationCount() : 0;
+            const pendingVotes = shouldShowBell
+                ? (getPendingDeletionVoteActionCount() + getPendingPublicationVoteActionCount())
+                : 0;
             const displayCount = Math.max(unread, pendingVotes);
-            if (displayCount > 0) {
-                badge.classList.remove('hidden');
-                badge.textContent = displayCount > 99 ? '99+' : String(displayCount);
-            } else {
+            const nl = userSettings.language === 'nl';
+            const label = displayCount > 0
+                ? (nl ? `Meldingen (${displayCount > 99 ? '99+' : displayCount})` : `Notifications (${displayCount > 99 ? '99+' : displayCount})`)
+                : (nl ? 'Meldingen' : 'Notifications');
+
+            if (button) {
+                button.hidden = true;
+                button.classList.add('hidden');
+                button.classList.remove('inline-flex');
+            }
+            if (badge) {
                 badge.classList.add('hidden');
                 badge.textContent = '';
             }
+            if (moreItem) {
+                moreItem.hidden = !shouldShowBell;
+                moreItem.setAttribute('aria-label', label);
+            }
+            if (moreLabel) moreLabel.textContent = label;
+            if (typeof syncHeaderOverflowMenu === 'function') syncHeaderOverflowMenu();
         }
 
         function syncRecipeUndoButton() {
             const undoButton = document.getElementById('undo-delete-button');
             const undoLabel = document.getElementById('undo-delete-label');
-            if (!undoButton) return;
-
+            const moreItem = document.getElementById('header-more-undo');
+            const moreLabel = document.getElementById('header-more-undo-label');
             const undoEntry = getActiveRecipeUndoEntry();
             const shouldShow = Boolean(undoEntry);
-            undoButton.classList.toggle('hidden', !shouldShow);
-            undoButton.classList.toggle('inline-flex', shouldShow);
+            const nl = userSettings.language === 'nl';
+            let label = nl ? 'Ongedaan maken' : 'Undo';
             if (shouldShow) {
                 const msLeft = Math.max(0, new Date(undoEntry.expiresAt).getTime() - Date.now());
                 const minutesLeft = Math.max(1, Math.ceil(msLeft / 60000));
-                undoButton.title = `Undo last delete (${minutesLeft}m left)`;
-                if (undoLabel) {
-                    undoLabel.textContent = `Undo ${minutesLeft}m`;
-                }
-            } else {
-                undoButton.title = 'Undo last delete';
-                if (undoLabel) {
-                    undoLabel.textContent = 'Undo';
-                }
+                label = nl ? `Ongedaan maken (${minutesLeft}m)` : `Undo (${minutesLeft}m)`;
             }
+
+            if (undoButton) {
+                undoButton.hidden = true;
+                undoButton.classList.add('hidden');
+                undoButton.classList.remove('inline-flex');
+                undoButton.title = label;
+            }
+            if (undoLabel) undoLabel.textContent = label;
+            if (moreItem) {
+                moreItem.hidden = !shouldShow;
+                moreItem.setAttribute('aria-label', label);
+            }
+            if (moreLabel) moreLabel.textContent = label;
+            if (typeof syncHeaderOverflowMenu === 'function') syncHeaderOverflowMenu();
         }
 
         function addFamilyNotification({ type, title, message, familyId = '', recipeId = 0, recipeTitle = '', action = null }) {
@@ -16166,7 +16585,7 @@
                                             ${visibleInstructions.map((step, stepIndex) => `<li>${stepIndex + 1}. ${escapeHTML(getRecipeInstructionText(step))}</li>`).join('')}
                                         </ol>
                                         ${(entry.instructions || []).length > visibleInstructions.length ? `<p class="mt-3 text-xs font-semibold text-sage">+ ${(entry.instructions || []).length - visibleInstructions.length} more step${(entry.instructions || []).length - visibleInstructions.length === 1 ? '' : 's'}</p>` : ''}
-                                        ${entry.tips ? `<div class="mt-4 rounded-2xl border border-parchmentDark bg-parchment p-4"><p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Chef's notes</p><p class="mt-2 text-sm font-semibold leading-relaxed text-forest">${escapeHTML(entry.tips)}</p></div>` : ''}
+                                        ${entry.tips ? `<div class="mt-4 rounded-2xl border border-parchmentDark bg-parchment p-4"><p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${uiText("Chef's notes", 'Chefsnotities')}</p><p class="mt-2 text-sm font-semibold leading-relaxed text-forest">${escapeHTML(entry.tips)}</p></div>` : ''}
                                     </div>
                                 </div>
                             </details>
@@ -19048,47 +19467,51 @@
                     <div class="notebook-chrome">
                         <div class="notebook-chrome-kicker">
                             <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-80">${uiText('Notebook mode', 'Schriftmodus')}</p>
-                            <p class="notebook-chrome-page">${uiText('Page', 'Pagina')} ${notebookPageLabel}</p>
                         </div>
                         ${hasActiveFilters ? `<p class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">${uiText(`Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}`, `Gefilterde openslag: ${activeFilters.length} actieve filter${activeFilters.length === 1 ? '' : 's'}`)}</p>` : ''}
                         <div class="notebook-chrome-bar">
-                            <div class="notebook-chrome-group" role="group" aria-label="${uiText('View', 'Weergave')}">
-                                <button type="button" onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest" title="${uiText('Cards view', 'Kaartenweergave')}" aria-label="${uiText('Cards view', 'Kaartenweergave')}">
+                            <div class="notebook-view-segment" role="group" aria-label="${uiText('View', 'Weergave')}">
+                                <button type="button" onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('Cards view', 'Kaartenweergave')}" aria-label="${uiText('Cards view', 'Kaartenweergave')}" aria-pressed="false">
                                     <i data-lucide="layout-grid" class="h-4 w-4"></i>
                                     <span class="notebook-tool-label">${uiText('Cards', 'Kaarten')}</span>
                                 </button>
-                                <button type="button" onclick="setIndexViewMode('list')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest" title="${uiText('List view', 'Lijstweergave')}" aria-label="${uiText('List view', 'Lijstweergave')}">
+                                <button type="button" onclick="setIndexViewMode('list')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('List view', 'Lijstweergave')}" aria-label="${uiText('List view', 'Lijstweergave')}" aria-pressed="false">
                                     <i data-lucide="list" class="h-4 w-4"></i>
                                     <span class="notebook-tool-label">${uiText('List', 'Lijst')}</span>
                                 </button>
-                                <button type="button" onclick="setIndexViewMode('book')" class="notebook-view-toggle is-active inline-flex items-center justify-center rounded-lg text-white transition-all" title="${uiText('Notebook view', 'Schriftweergave')}" aria-label="${uiText('Notebook view', 'Schriftweergave')}">
+                                <button type="button" onclick="setIndexViewMode('book')" class="notebook-view-toggle is-active inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('Notebook view', 'Schriftweergave')}" aria-label="${uiText('Notebook view', 'Schriftweergave')}" aria-pressed="true">
                                     <i data-lucide="book-open" class="h-4 w-4"></i>
                                     <span class="notebook-tool-label">${uiText('Book', 'Boek')}</span>
                                 </button>
                             </div>
-                            <div class="notebook-chrome-group" role="group" aria-label="${uiText('Notes', 'Notities')}">
-                                <button type="button" title="${notebookNoteActionLabel}" aria-label="${notebookNoteActionLabel}" onclick="openNotebookStickyNotesEditor(${recipe.id})" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-gold transition-all hover:bg-surface-muted hover:text-forest notebook-note-control notebook-note-control--manage notebook-note-control--icon" data-notebook-note-control="manage-notes">
-                                    <i data-lucide="sticky-note" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${uiText('Notes', 'Notities')}</span>
-                                </button>
-                                <button type="button" title="${notebookVisibilityActionLabel}" aria-label="${notebookVisibilityActionLabel}" onclick="toggleNotebookStickyNotesVisibility()" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all ${showNotebookStickyNotes ? 'text-sage' : 'text-gold'} hover:bg-surface-muted hover:text-forest notebook-note-control notebook-note-control--toggle notebook-note-control--icon" data-notebook-note-control="toggle-visibility">
-                                    <i data-lucide="${showNotebookStickyNotes ? 'eye-off' : 'eye'}" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${showNotebookStickyNotes ? uiText('Hide', 'Verberg') : uiText('Show', 'Toon')}</span>
-                                </button>
-                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook relative inline-flex items-center justify-center gap-2 rounded-lg text-xs font-bold uppercase tracking-wider text-white" data-notebook-note-control="open-cook">
-                                    <i data-lucide="chef-hat" class="h-4 w-4"></i>
+                            <div class="notebook-chrome-actions">
+                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook header-icon-button relative inline-flex items-center justify-center" data-notebook-note-control="open-cook">
+                                    <i data-lucide="chef-hat" class="w-5 h-5" aria-hidden="true"></i>
                                     <span class="notebook-cook-label">${uiText('Cook', 'Koken')}</span>
                                 </button>
-                            </div>
-                            <div class="notebook-chrome-group" role="group" aria-label="${uiText('PDF export', 'PDF-export')}">
-                                <button type="button" title="${pdfActions.recipe}" aria-label="${pdfActions.recipe}" onclick="${pdfActions.recipeAction}" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg ${accountHasPremiumPlan() ? 'text-forest' : 'text-sage'} transition-all hover:bg-surface-muted hover:text-forest">
-                                    <i data-lucide="${accountHasPremiumPlan() ? 'file-text' : 'lock'}" class="h-4 w-4 ${accountHasPremiumPlan() ? '' : 'text-gold'}"></i>
-                                    <span class="notebook-tool-label">PDF</span>
-                                </button>
-                                <button type="button" title="${pdfActions.book}" aria-label="${pdfActions.book}" onclick="${pdfActions.bookAction}" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg ${accountHasPremiumPlan() ? 'text-forest' : 'text-sage'} transition-all hover:bg-surface-muted hover:text-forest">
-                                    <i data-lucide="${accountHasPremiumPlan() ? 'files' : 'lock'}" class="h-4 w-4 ${accountHasPremiumPlan() ? '' : 'text-gold'}"></i>
-                                    <span class="notebook-tool-label">${uiText('Book', 'Boek')}</span>
-                                </button>
+                                <div class="notebook-more" data-notebook-more>
+                                    <button type="button" class="notebook-more-toggle" aria-label="${uiText('More', 'Meer')}" aria-haspopup="menu" aria-expanded="false" title="${uiText('More', 'Meer')}" onclick="toggleNotebookMoreMenu(event)">
+                                        <i data-lucide="ellipsis" class="w-5 h-5" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="notebook-more-menu" role="menu">
+                                        <button type="button" role="menuitem" class="notebook-more-item" title="${notebookNoteActionLabel}" onclick="openNotebookStickyNotesEditor(${recipe.id}); closeNotebookMoreMenus();">
+                                            <i data-lucide="sticky-note" aria-hidden="true"></i>
+                                            <span>${uiText('Sticky note', 'Plakbriefje')}</span>
+                                        </button>
+                                        <button type="button" role="menuitem" class="notebook-more-item" title="${notebookVisibilityActionLabel}" onclick="toggleNotebookStickyNotesVisibility(); closeNotebookMoreMenus();">
+                                            <i data-lucide="${showNotebookStickyNotes ? 'eye-off' : 'eye'}" aria-hidden="true"></i>
+                                            <span>${showNotebookStickyNotes ? uiText('Hide notes', 'Notities verbergen') : uiText('Show notes', 'Notities tonen')}</span>
+                                        </button>
+                                        <button type="button" role="menuitem" class="notebook-more-item" title="${pdfActions.recipe}" onclick="closeNotebookMoreMenus(); ${pdfActions.recipeAction}">
+                                            <i data-lucide="${accountHasPremiumPlan() ? 'file-text' : 'lock'}" aria-hidden="true"></i>
+                                            <span>${pdfActions.recipe || 'PDF'}</span>
+                                        </button>
+                                        <button type="button" role="menuitem" class="notebook-more-item" title="${uiText('Copy', 'Kopiëren')}" onclick="shareRecipe(${recipe.id}); closeNotebookMoreMenus();">
+                                            <i data-lucide="copy" aria-hidden="true"></i>
+                                            <span>${uiText('Copy', 'Kopiëren')}</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -19100,36 +19523,22 @@
                             <div class="grid h-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-0">
                                 <section class="notebook-paper notebook-paper-left relative rounded-[24px] border border-white border-opacity-70 px-4 py-4 md:h-full md:rounded-r-none md:border-r-0 md:px-6 md:py-6 ${notebookMobileSide !== 'left' ? 'hidden md:flex' : ''} ${notebookLeafTurnClass('left')}" data-notebook-paper-side="left">
                                     ${renderNotebookLeftPage(currentSpread.left)}
-
-                                    <div class="notebook-paper__footer hidden items-end justify-start md:flex">
-                                        <button type="button" title="${uiText('Previous page', 'Vorige bladzijde')}" aria-label="${uiText('Previous page', 'Vorige bladzijde')}" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
-                                            <i data-lucide="chevron-left" class="h-4 w-4"></i>
-                                        </button>
-                                    </div>
-
                                     ${renderNotebookStickyNotes(recipe.id, notebookStickyNotes, 'left', showNotebookStickyNotes)}
                                 </section>
 
                                 <section class="notebook-paper notebook-paper-right relative rounded-[24px] border border-white border-opacity-70 px-4 py-4 md:h-full md:rounded-l-none md:px-6 md:py-6 ${notebookMobileSide !== 'right' ? 'hidden md:flex' : ''} ${notebookLeafTurnClass('right')}" data-notebook-paper-side="right">
                                     ${renderNotebookRightPage(currentSpread.right)}
-
-                                    <div class="notebook-paper__footer hidden items-end justify-end md:flex">
-                                        <button type="button" title="${uiText('Next page', 'Volgende bladzijde')}" aria-label="${uiText('Next page', 'Volgende bladzijde')}" onclick="goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-page-nav notebook-page-nav--primary">
-                                            <i data-lucide="chevron-right" class="h-4 w-4"></i>
-                                        </button>
-                                    </div>
-
                                     ${renderNotebookStickyNotes(recipe.id, notebookStickyNotes, 'right', showNotebookStickyNotes)}
                                 </section>
                             </div>
                         </div>
                     </div>
 
-                    <div class="notebook-mobile-pager flex items-center justify-between gap-3 md:hidden">
+                    <div class="notebook-page-under" data-notebook-pager>
                         <button type="button" title="${uiText('Previous page', 'Vorige bladzijde')}" aria-label="${uiText('Previous page', 'Vorige bladzijde')}" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
                             <i data-lucide="chevron-left" class="h-4 w-4"></i>
                         </button>
-                        <span data-notebook-page-label="${notebookPageLabel}" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-parchmentDark bg-white/90 px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-sage shadow-sm">${uiText('Page', 'Pagina')} ${notebookPageLabel}</span>
+                        <span data-notebook-page-label="${notebookPageLabel}" class="notebook-page-label">${uiText('Page', 'Pagina')} ${notebookPageLabel}</span>
                         <button type="button" title="${uiText('Next page', 'Volgende bladzijde')}" aria-label="${uiText('Next page', 'Volgende bladzijde')}" onclick="goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-page-nav notebook-page-nav--primary">
                             <i data-lucide="chevron-right" class="h-4 w-4"></i>
                         </button>
