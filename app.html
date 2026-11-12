@@ -6454,7 +6454,7 @@
     <div id="app-shell" class="w-full max-w-7xl mx-auto flex flex-col h-[100dvh] max-h-[100dvh] relative shadow-2xl bg-parchment overflow-hidden border-x border-parchmentDark">
         
         <header id="main-header" class="text-forest transition-all" translate="no">
-                <button id="header-back" type="button" onclick="handleTopBackAction()" class="header-icon-button" hidden aria-label="Back" title="Back">
+                <button id="header-back" type="button" onclick="handleTopBackAction()" class="header-icon-button" hidden aria-label="Terug" title="Terug">
                     <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i>
                     <span class="header-icon-label" aria-hidden="true"></span>
                 </button>
@@ -6490,7 +6490,7 @@
             </div>
         </header>
 
-        <button id="floating-back-button" onclick="handleTopBackAction()" class="floating-back-button" title="Back" aria-label="Back">
+        <button id="floating-back-button" onclick="handleTopBackAction()" class="floating-back-button" title="Terug" aria-label="Terug">
             <i data-lucide="arrow-left" class="w-5 h-5"></i>
         </button>
 
@@ -17235,6 +17235,8 @@
             lucide.createIcons();
             markViewEnter();
             syncAuthGateButtons();
+            if (typeof syncHeaderBackButton === 'function') syncHeaderBackButton();
+            else if (typeof syncChromeLabels === 'function') syncChromeLabels();
         }
 
         async function renderAccessManagement() {
