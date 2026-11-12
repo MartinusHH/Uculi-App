@@ -283,6 +283,37 @@
             flex: 0 0 auto;
         }
 
+        /* Top row: at most three equal icon slots (primary / ⋯ / gear). */
+        .app-header-actions > .header-icon-button,
+        .app-header-actions > .header-more > .header-icon-button,
+        .app-header-actions > #header-add-recipe {
+            width: 2.75rem;
+            height: 2.75rem;
+            min-width: 2.75rem;
+            min-height: 2.75rem;
+            flex: 0 0 2.75rem;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 899px) {
+            .app-header-actions > #header-add-recipe {
+                padding: 0;
+            }
+
+            .app-header-actions > #header-add-recipe .header-add-label {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 900px) {
+            .app-header-actions > #header-add-recipe {
+                width: auto;
+                min-width: 2.75rem;
+                flex: 0 0 auto;
+                padding: 0 0.9rem;
+            }
+        }
+
         .header-more {
             position: relative;
         }
@@ -15109,7 +15140,8 @@
         function syncHeaderAddButton() {
             const button = document.getElementById('header-add-recipe');
             if (!button) return;
-            button.hidden = !(currentView === 'index' && activeDetailRecipeId == null);
+            // Primary action only on the Index start screen (keeps right cluster ≤ 3 icons).
+            button.hidden = !(currentView === 'index' && activeDetailRecipeId == null && chromeBackAction == null);
         }
 
         function shouldShowTopBackButton() {
@@ -15123,10 +15155,10 @@
             const add = document.getElementById('header-add-recipe');
             const back = document.getElementById('header-back');
             const optionsLabel = nl ? 'Opties' : 'Options';
-            // Requested aria pair on Opties: Back → Terug, Help → Help (EN Back/Help).
+            // Soft-launch chrome: Back aria is always Terug; Help stays Help.
             const helpLabel = 'Help';
             const addLabel = nl ? 'Recept' : 'Add Recipe';
-            const backLabel = nl ? 'Terug' : 'Back';
+            const backLabel = 'Terug';
             const navLabels = {
                 index: uiText('Index', 'Recepten'),
                 shopping: nl ? 'Boodschappen' : 'Shop',
