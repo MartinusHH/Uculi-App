@@ -4210,8 +4210,14 @@
 
         .notebook-view-segment .notebook-view-toggle.is-active {
             background: #929D75;
+            background-color: #929D75;
             color: #1c1410;
             box-shadow: inset 0 0 0 1px rgba(28, 20, 16, 0.06);
+        }
+
+        .notebook-view-segment .notebook-view-toggle.is-active [data-lucide],
+        .notebook-view-segment .notebook-view-toggle.is-active svg {
+            color: #1c1410;
         }
 
         .notebook-chrome-actions {
@@ -4328,16 +4334,13 @@
             text-transform: uppercase;
         }
 
-        .notebook-chrome-bar button,
-        .notebook-chrome-bar .notebook-note-control--cook {
+        .notebook-chrome-bar .notebook-view-segment .notebook-view-toggle {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.35rem;
-            flex: 0 0 2.55rem;
-            width: 2.55rem;
+            flex: 1 1 0;
             min-width: 2.55rem;
-            max-width: 2.55rem;
             height: 2.55rem;
             min-height: 2.55rem;
             padding: 0;
@@ -4347,6 +4350,43 @@
             font-weight: 800;
             letter-spacing: 0.1em;
             text-transform: uppercase;
+        }
+
+        /* Cook + ⋯ match gear: 2.75rem, sage icon (never orange). */
+        .notebook-chrome-bar .notebook-note-control--cook,
+        .notebook-chrome-bar .notebook-more-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 2.75rem;
+            width: 2.75rem;
+            min-width: 2.75rem;
+            max-width: 2.75rem;
+            height: 2.75rem;
+            min-height: 2.75rem;
+            padding: 0;
+            border-radius: 0.85rem;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            background: #fbf8f3;
+            color: #929D75;
+            box-shadow: none;
+        }
+
+        .notebook-chrome-bar .notebook-note-control--cook:hover,
+        .notebook-chrome-bar .notebook-more-toggle:hover {
+            border-color: rgba(146, 157, 117, 0.65);
+            background: rgba(146, 157, 117, 0.14);
+            color: #6f7a52;
+        }
+
+        .notebook-chrome-bar .notebook-note-control--cook [data-lucide],
+        .notebook-chrome-bar .notebook-note-control--cook svg,
+        .notebook-chrome-bar .notebook-more-toggle [data-lucide],
+        .notebook-chrome-bar .notebook-more-toggle svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke-width: 2;
+            color: inherit;
         }
 
         .notebook-tool-label,
