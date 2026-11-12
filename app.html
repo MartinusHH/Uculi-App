@@ -4314,7 +4314,13 @@
             justify-content: space-between;
             gap: 0.75rem;
             margin-top: 0.75rem;
+            margin-bottom: 0.35rem;
             width: 100%;
+            /* Keep Vorige/Volgende clear of the floating bottom nav when scrolled into view. */
+            scroll-margin-bottom: calc(var(--app-nav-clearance) + 0.75rem);
+            padding-bottom: 0.15rem;
+            position: relative;
+            z-index: 2;
         }
 
         .notebook-page-under .notebook-page-label {
@@ -4326,6 +4332,13 @@
             letter-spacing: 0.16em;
             text-transform: uppercase;
             color: var(--text-muted);
+        }
+
+        @media (max-width: 767px) {
+            .notebook-page-under {
+                scroll-margin-bottom: calc(var(--app-nav-clearance-phone) + 0.5rem);
+                margin-bottom: 0.55rem;
+            }
         }
 
         .notebook-chrome-kicker {
@@ -4679,6 +4692,20 @@
             .notebook-page-hero-copy h3 {
                 padding-right: 0.25rem;
             }
+
+            .notebook-page-hero-copy .notebook-meta-line {
+                max-width: 100%;
+            }
+        }
+
+        /* Category · level · country stay on one tidy row (no floating dots/flag). */
+        .notebook-meta-line {
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            gap: 0.35rem;
+            align-items: baseline;
         }
 
         .notebook-page-photo-frame {
@@ -7757,6 +7784,57 @@
             return getActiveUiLanguage() === 'nl' ? dutch : english;
         }
 
+        function splitLeadingFlagEmoji(value) {
+            const raw = String(value ?? '').trim();
+            if (!raw) return { flag: '', name: '' };
+            try {
+                const match = raw.match(/^((?:\p{Extended_Pictographic}|\uFE0F|\u200D)+)\s*(.*)$/u);
+                if (match) return { flag: match[1], name: String(match[2] || '').trim() };
+            } catch (_error) {
+                // Older runtimes without Unicode property escapes: strip common flag surrogate pairs.
+                const legacy = raw.match(/^((?:[\uD83C][\uDDE6-\uDDFF]){2})\s*(.*)$/);
+                if (legacy) return { flag: legacy[1], name: String(legacy[2] || '').trim() };
+            }
+            return { flag: '', name: raw };
+        }
+
+        let regionDisplayNameCache = null;
+
+        function translateRegionDisplayName(name) {
+            const cleaned = String(name || '').trim();
+            if (!cleaned) return '';
+            if (getActiveUiLanguage() !== 'nl') return cleaned;
+
+            try {
+                if (!regionDisplayNameCache) {
+                    const en = new Intl.DisplayNames(['en'], { type: 'region' });
+                    const nl = new Intl.DisplayNames(['nl'], { type: 'region' });
+                    const byEnglish = new Map();
+                    const codes = [
+                        'AD','AE','AF','AG','AI','AL','AM','AO','AQ','AR','AS','AT','AU','AW','AX','AZ','BA','BB','BD','BE','BF','BG','BH','BI','BJ','BL','BM','BN','BO','BQ','BR','BS','BT','BV','BW','BY','BZ','CA','CC','CD','CF','CG','CH','CI','CK','CL','CM','CN','CO','CR','CU','CV','CW','CX','CY','CZ','DE','DJ','DK','DM','DO','DZ','EC','EE','EG','EH','ER','ES','ET','FI','FJ','FK','FM','FO','FR','GA','GB','GD','GE','GF','GG','GH','GI','GL','GM','GN','GP','GQ','GR','GS','GT','GU','GW','GY','HK','HM','HN','HR','HT','HU','ID','IE','IL','IM','IN','IO','IQ','IR','IS','IT','JE','JM','JO','JP','KE','KG','KH','KI','KM','KN','KP','KR','KW','KY','KZ','LA','LB','LC','LI','LK','LR','LS','LT','LU','LV','LY','MA','MC','MD','ME','MF','MG','MH','MK','ML','MM','MN','MO','MP','MQ','MR','MS','MT','MU','MV','MW','MX','MY','MZ','NA','NC','NE','NF','NG','NI','NL','NO','NP','NR','NU','NZ','OM','PA','PE','PF','PG','PH','PK','PL','PM','PN','PR','PS','PT','PW','PY','QA','RE','RO','RS','RU','RW','SA','SB','SC','SD','SE','SG','SH','SI','SJ','SK','SL','SM','SN','SO','SR','SS','ST','SV','SX','SY','SZ','TC','TD','TF','TG','TH','TJ','TK','TL','TM','TN','TO','TR','TT','TV','TW','TZ','UA','UG','UM','US','UY','UZ','VA','VC','VE','VG','VI','VN','VU','WF','WS','YE','YT','ZA','ZM','ZW'
+                    ];
+                    codes.forEach(code => {
+                        const english = String(en.of(code) || '').trim();
+                        const dutch = String(nl.of(code) || '').trim();
+                        if (english && dutch) byEnglish.set(english.toLowerCase(), dutch);
+                    });
+                    // Common aliases stored on recipes / country pickers.
+                    byEnglish.set('netherlands', 'Nederland');
+                    byEnglish.set('united states', 'Verenigde Staten');
+                    byEnglish.set('united states of america', 'Verenigde Staten');
+                    byEnglish.set('united kingdom', 'Verenigd Koninkrijk');
+                    byEnglish.set('south korea', 'Zuid-Korea');
+                    byEnglish.set('north korea', 'Noord-Korea');
+                    byEnglish.set('czech republic', 'Tsjechië');
+                    byEnglish.set('czechia', 'Tsjechië');
+                    regionDisplayNameCache = byEnglish;
+                }
+                return regionDisplayNameCache.get(cleaned.toLowerCase()) || cleaned;
+            } catch (_error) {
+                return cleaned;
+            }
+        }
+
         // Single recipe-meta translator used on cards, detail, and notebook reader.
         function localizeRecipeLabel(kind, value) {
             const type = String(kind || '').toLowerCase();
@@ -7781,7 +7859,11 @@
                 return '';
             }
 
-            const key = raw.toLowerCase();
+            const { flag, name } = (type === 'cuisine' || type === 'country')
+                ? splitLeadingFlagEmoji(raw)
+                : { flag: '', name: raw };
+            const lookupValue = name || raw;
+            const key = lookupValue.toLowerCase();
             const maps = {
                 category: {
                     cooking: uiText('Cooking', 'Koken'),
@@ -7830,7 +7912,15 @@
             };
 
             const table = maps[type] || maps.category;
-            return table[key] || raw;
+            let localized = table[key];
+            if (!localized && (type === 'cuisine' || type === 'country')) {
+                localized = translateRegionDisplayName(lookupValue);
+            }
+            if (!localized) localized = lookupValue || raw;
+            if (flag && (type === 'cuisine' || type === 'country')) {
+                return `${flag} ${localized}`.trim();
+            }
+            return localized;
         }
 
         function localizeRecipeCategoryLabel(value) {
@@ -8922,6 +9012,7 @@
             userSettings.language = normalizedLanguage;
             document.documentElement.lang = normalizedLanguage;
             localStorage.setItem(globalUiLanguageStorageKey, normalizedLanguage);
+            regionDisplayNameCache = null;
             saveData();
 
             if (!silent) {
@@ -16673,14 +16764,20 @@
         }
 
         function getRecipeCardSourceLabel(recipe) {
-            if (recipe?.source === 'published') return 'Saved from Browse';
+            if (recipe?.source === 'published') {
+                return uiText('Saved from Browse', 'Opgeslagen uit Browse');
+            }
 
             const family = getRecipeFamily(recipe);
             if (family) return family.label;
 
-            if (isRecipePublishedLive(recipe)) return 'Published live';
-            if (recipe?.publishedId) return 'Private draft with publish history';
-            return 'Private recipe';
+            if (isRecipePublishedLive(recipe)) {
+                return uiText('Published live', 'Live gepubliceerd');
+            }
+            if (recipe?.publishedId) {
+                return uiText('Private draft with publish history', 'Privéconcept met publicatiegeschiedenis');
+            }
+            return uiText('Private recipe', 'Privérecept');
         }
 
         function getRecipeDetailLocationLabel(recipe) {
@@ -18875,12 +18972,24 @@
             element.style.aspectRatio = '1 / 1.414';
         }
 
+        function getNotebookPagerReservePx() {
+            const pager = contentDiv?.querySelector('[data-notebook-pager]');
+            if (pager) {
+                const styles = window.getComputedStyle(pager);
+                const marginTop = Number.parseFloat(styles.marginTop) || 0;
+                const marginBottom = Number.parseFloat(styles.marginBottom) || 0;
+                return Math.max(56, Math.ceil(pager.getBoundingClientRect().height + marginTop + marginBottom + 8));
+            }
+            return window.innerWidth < 768 ? 64 : 72;
+        }
+
         function syncNotebookViewportHeight() {
             if (!contentDiv || currentView !== 'index' || indexViewMode !== 'book') return;
 
             const notebookFrame = contentDiv.querySelector('[data-notebook-frame]');
             const notebookSurface = notebookFrame?.querySelector('.notebook-book-spread-surface');
             const coverSurface = contentDiv.querySelector('#notebook-cover-surface');
+            const pagerReserve = getNotebookPagerReservePx();
 
             if (window.innerWidth < 768) {
                 const coverFrame = coverSurface?.closest('.notebook-landing-cover-frame');
@@ -18901,7 +19010,8 @@
                     const viewportHeight = Math.floor(window.visualViewport?.height || window.innerHeight || 0);
                     const navTop = navRect ? Math.min(navRect.top, viewportHeight) : viewportHeight;
                     const surfaceTop = notebookSurface.getBoundingClientRect().top;
-                    const fittedHeight = Math.max(320, Math.ceil(navTop - surfaceTop));
+                    // Leave room so Vorige/Volgende sit visibly above the bottom nav.
+                    const fittedHeight = Math.max(280, Math.ceil(navTop - surfaceTop - pagerReserve));
                     notebookSurface.style.paddingBottom = '0px';
                     notebookSurface.style.width = '100%';
                     notebookSurface.style.maxWidth = '100%';
@@ -18919,10 +19029,13 @@
             const navRect = document.getElementById('main-nav')?.getBoundingClientRect();
             const viewportHeight = Math.floor(window.visualViewport?.height || window.innerHeight || 0);
             const bottomLimit = navRect ? Math.min(navRect.top, viewportHeight) : viewportHeight;
-            const bottomReserve = 20;
+            const bottomReserve = 12;
             const fallbackHeight = 560;
-            const minHeight = 360;
-            const availableHeight = Math.max(minHeight, Math.floor(bottomLimit - frameRect.top - bottomReserve));
+            const minHeight = 320;
+            const availableHeight = Math.max(
+                minHeight,
+                Math.floor(bottomLimit - frameRect.top - bottomReserve - pagerReserve)
+            );
             let fittedHeight = availableHeight || fallbackHeight;
 
             const fittedWidth = Math.max(320, Math.floor(notebookFrame.clientWidth));
@@ -19452,6 +19565,9 @@
             const safeRecipeCountry = recipe.country
                 ? escapeHTML(localizeRecipeCuisineLabel(recipe.country) || recipe.country)
                 : '';
+            const notebookMetaLine = [safeRecipeCategory, safeRecipeDifficulty, safeRecipeCountry]
+                .filter(Boolean)
+                .join(' · ');
             const safeRecipeAuthor = escapeHTML(getRecipeAuthorLabel(recipe) || uiText('Chef', 'Kok'));
             const dietText = (recipe.diet || []).length > 0
                 ? escapeHTML(recipe.diet.map(tag => localizeRecipeDietLabel(tag)).join(' · '))
@@ -19583,11 +19699,7 @@
                             <h3 class="mt-2 font-fantasy text-2xl md:text-3xl font-bold text-forest leading-[1.02]">${safeRecipeTitle}</h3>
                             <div class="notebook-paper__section notebook-ruled-block mt-3 text-xs font-semibold text-sage">
                                 <div class="notebook-line-row">${recipeMood}</div>
-                                <div class="notebook-line-row text-[10px] font-bold uppercase tracking-[0.22em]">
-                                    <span>${safeRecipeCategory}</span>
-                                    ${safeRecipeDifficulty ? `<span>· ${safeRecipeDifficulty}</span>` : ''}
-                                    ${safeRecipeCountry ? `<span>· ${safeRecipeCountry}</span>` : ''}
-                                </div>
+                                <div class="notebook-line-row notebook-meta-line text-[10px] font-bold uppercase tracking-[0.22em]">${notebookMetaLine}</div>
                             </div>
                             <div class="notebook-paper__section notebook-ruled-block mt-3 text-xs font-semibold text-sage">
                                 <div class="notebook-line-row">${prepCookServesLine}</div>
@@ -19606,11 +19718,7 @@
                                     <h3 class="mt-2 font-fantasy text-3xl md:text-5xl font-bold text-forest leading-[1.02]">${safeRecipeTitle}</h3>
                                     <div class="notebook-ruled-block mt-3 text-sm font-semibold text-sage">
                                         <div class="notebook-line-row">${recipeMood}</div>
-                                        <div class="notebook-line-row text-[11px] font-bold uppercase tracking-[0.22em]">
-                                            <span>${safeRecipeCategory}</span>
-                                            ${safeRecipeDifficulty ? `<span>· ${safeRecipeDifficulty}</span>` : ''}
-                                            ${safeRecipeCountry ? `<span>· ${safeRecipeCountry}</span>` : ''}
-                                        </div>
+                                        <div class="notebook-line-row notebook-meta-line text-[11px] font-bold uppercase tracking-[0.22em]">${notebookMetaLine}</div>
                                     </div>
                                 </div>
                             </div>
