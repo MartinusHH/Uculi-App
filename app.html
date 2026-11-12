@@ -4675,7 +4675,8 @@
         /* Tablet: keep title + category·level·country together; photo overlays instead of splitting them. */
         @media (min-width: 768px) and (max-width: 1023px) {
             .notebook-page-hero {
-                padding-right: 5.25rem;
+                /* Must exceed photo width (4.55rem) so title/meta never collide with the overlay. */
+                padding-right: 5.85rem;
             }
 
             .notebook-page-photo-cluster {
@@ -4690,11 +4691,13 @@
             }
 
             .notebook-page-hero-copy h3 {
-                padding-right: 0.25rem;
+                /* Larger than the photo so the title clears the overlay. */
+                padding-right: 5.1rem;
             }
 
             .notebook-page-hero-copy .notebook-meta-line {
                 max-width: 100%;
+                white-space: nowrap;
             }
         }
 
@@ -5254,10 +5257,31 @@
                 font-size: 0.875rem;
                 line-height: 34px;
             }
+        }
 
+        @media (min-width: 1024px) {
             .notebook-page-photo-cluster {
                 width: 6.15rem;
                 max-width: 6.15rem;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .notebook-page-photo-cluster {
+                width: 4.55rem;
+                max-width: 4.55rem;
+            }
+
+            .notebook-page-hero {
+                padding-right: 5.85rem;
+            }
+
+            .notebook-page-hero-copy h3 {
+                padding-right: 5.1rem;
+            }
+
+            .notebook-page-hero-copy .notebook-meta-line {
+                white-space: nowrap;
             }
         }
 
@@ -7787,13 +7811,18 @@
         function splitLeadingFlagEmoji(value) {
             const raw = String(value ?? '').trim();
             if (!raw) return { flag: '', name: '' };
+            // National flags are two regional-indicator code units — match that first.
+            const flagPair = raw.match(/^((?:[\uD83C][\uDDE6-\uDDFF]){2})\s*(.*)$/);
+            if (flagPair) {
+                return { flag: flagPair[1], name: String(flagPair[2] || '').trim() };
+            }
             try {
-                const match = raw.match(/^((?:\p{Extended_Pictographic}|\uFE0F|\u200D)+)\s*(.*)$/u);
-                if (match) return { flag: match[1], name: String(match[2] || '').trim() };
+                const match = raw.match(/^(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*)\s*(.*)$/u);
+                if (match && match[2]) {
+                    return { flag: match[1], name: String(match[2] || '').trim() };
+                }
             } catch (_error) {
-                // Older runtimes without Unicode property escapes: strip common flag surrogate pairs.
-                const legacy = raw.match(/^((?:[\uD83C][\uDDE6-\uDDFF]){2})\s*(.*)$/);
-                if (legacy) return { flag: legacy[1], name: String(legacy[2] || '').trim() };
+                // Ignore Unicode-property failures on older runtimes.
             }
             return { flag: '', name: raw };
         }
@@ -18973,14 +19002,15 @@
         }
 
         function getNotebookPagerReservePx() {
+            // Pager chrome is ~46px tall; never fall back to the old 20px reserve.
+            const minReserve = window.innerWidth < 768 ? 64 : 72;
             const pager = contentDiv?.querySelector('[data-notebook-pager]');
-            if (pager) {
-                const styles = window.getComputedStyle(pager);
-                const marginTop = Number.parseFloat(styles.marginTop) || 0;
-                const marginBottom = Number.parseFloat(styles.marginBottom) || 0;
-                return Math.max(56, Math.ceil(pager.getBoundingClientRect().height + marginTop + marginBottom + 8));
-            }
-            return window.innerWidth < 768 ? 64 : 72;
+            if (!pager) return minReserve;
+            const styles = window.getComputedStyle(pager);
+            const marginTop = Number.parseFloat(styles.marginTop) || 0;
+            const marginBottom = Number.parseFloat(styles.marginBottom) || 0;
+            const measured = Math.ceil(pager.getBoundingClientRect().height + marginTop + marginBottom + 10);
+            return Math.max(minReserve, measured || 56);
         }
 
         function syncNotebookViewportHeight() {
@@ -19952,7 +19982,7 @@
                         </div>
                     </div>
 
-                    <div class="notebook-page-under" data-notebook-pager>
+                    <div class="notebook-page-under notebook-mobile-pager" data-notebook-pager>
                         <button type="button" title="${uiText('Previous page', 'Vorige bladzijde')}" aria-label="${uiText('Previous page', 'Vorige bladzijde')}" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
                             <i data-lucide="chevron-left" class="h-4 w-4"></i>
                         </button>
@@ -21025,7 +21055,7 @@
 
                         <div class="detail-toolbar-row detail-panel">
                             <div class="detail-status-chips">
-                                ${(recipe.diet && recipe.diet.length > 0) ? recipe.diet.map(d => `<span class="detail-chip">${d}</span>`).join('') : ''}
+                                ${(recipe.diet && recipe.diet.length > 0) ? recipe.diet.map(d => `<span class="detail-chip">${escapeHTML(localizeRecipeDietLabel(d))}</span>`).join('') : ''}
                                 ${versionLabel ? `<span class="detail-chip">${versionLabel}</span>` : ''}
                             </div>
                             ${publishedActionsMarkup}
@@ -22507,7 +22537,7 @@
                         <div class="detail-toolbar-row detail-panel">
                             <div class="detail-status-chips">
                                 <span class="detail-chip">${escapeHTML(localizeRecipeCategoryLabel(recipe.category))}</span>
-                                ${recipe.diet && recipe.diet.length > 0 ? recipe.diet.map(d => `<span class="detail-chip">${d}</span>`).join('') : ''}
+                                ${recipe.diet && recipe.diet.length > 0 ? recipe.diet.map(d => `<span class="detail-chip">${escapeHTML(localizeRecipeDietLabel(d))}</span>`).join('') : ''}
                                 ${recipeFamilyChip}
                                 ${isSavedCommunityRecipe ? `<span class="detail-chip">${uiText('Saved community recipe', 'Opgeslagen communityrecept')}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
                                 ${!isSavedCommunityRecipe && recipe.publishedId ? `<span class="detail-chip">${recipeIsLive ? uiText('Live in Browse', 'Live in Bladeren') : uiText('Removed from Browse', 'Weg uit Bladeren')}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
