@@ -4319,8 +4319,13 @@
         }
 
         .notebook-chrome-page {
-            display: none;
+            display: block;
             margin: 0;
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
         }
 
         .notebook-chrome-bar button,
@@ -19255,9 +19260,11 @@
             const hasNextNotebookPage = isMobileNotebook
                 ? (mobileLeafIndex < mobileLeafCount - 1 || notebookPageIndex < totalPages - 1)
                 : (notebookSpreadPageIndex < notebookRecipeSpreads.length - 1 || notebookPageIndex < totalPages - 1);
+            const notebookPageOf = uiText('of', 'van');
             const notebookPageLabel = isMobileNotebook
-                ? `${mobileLeafIndex + 1} / ${mobileLeafCount}`
-                : `${notebookSpreadPageIndex + 1} / ${notebookRecipeSpreads.length}`;
+                ? `${mobileLeafIndex + 1} ${notebookPageOf} ${mobileLeafCount}`
+                : `${notebookSpreadPageIndex + 1} ${notebookPageOf} ${notebookRecipeSpreads.length}`;
+            const notebookPageHeading = `${uiText('Page', 'Pagina')} ${notebookPageLabel}`;
             const notebookLeafTurnClass = side => {
                 if (!notebookPageTurnDirection) return '';
                 const turningForward = notebookPageTurnDirection > 0;
@@ -19537,6 +19544,7 @@
                     <div class="notebook-chrome">
                         <div class="notebook-chrome-kicker">
                             <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-80">${uiText('Notebook mode', 'Schriftmodus')}</p>
+                            <p class="notebook-chrome-page">${notebookPageHeading}</p>
                         </div>
                         ${hasActiveFilters ? `<p class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">${uiText(`Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}`, `Gefilterde openslag: ${activeFilters.length} actieve filter${activeFilters.length === 1 ? '' : 's'}`)}</p>` : ''}
                         <div class="notebook-chrome-bar">
@@ -19555,10 +19563,6 @@
                                 </button>
                             </div>
                             <div class="notebook-chrome-actions">
-                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook header-icon-button relative inline-flex items-center justify-center" data-notebook-note-control="open-cook">
-                                    <i data-lucide="chef-hat" class="w-5 h-5" aria-hidden="true"></i>
-                                    <span class="notebook-cook-label">${uiText('Cook', 'Koken')}</span>
-                                </button>
                                 <div class="notebook-more" data-notebook-more>
                                     <button type="button" class="notebook-more-toggle" aria-label="${uiText('More', 'Meer')}" aria-haspopup="menu" aria-expanded="false" title="${uiText('More', 'Meer')}" onclick="toggleNotebookMoreMenu(event)">
                                         <i data-lucide="ellipsis" class="w-5 h-5" aria-hidden="true"></i>
@@ -19570,11 +19574,15 @@
                                         </button>
                                         <button type="button" role="menuitem" class="notebook-more-item" title="${notebookVisibilityActionLabel}" onclick="toggleNotebookStickyNotesVisibility(); closeNotebookMoreMenus();">
                                             <i data-lucide="${showNotebookStickyNotes ? 'eye-off' : 'eye'}" aria-hidden="true"></i>
-                                            <span>${showNotebookStickyNotes ? uiText('Hide notes', 'Notities verbergen') : uiText('Show notes', 'Notities tonen')}</span>
+                                            <span>${showNotebookStickyNotes ? uiText('Hide notes', 'Verbergen') : uiText('Show notes', 'Tonen')}</span>
+                                        </button>
+                                        <button type="button" role="menuitem" class="notebook-more-item" title="${notebookCookActionLabel}" onclick="closeNotebookMoreMenus(); openNotebookRecipeForCooking(${recipe.id});">
+                                            <i data-lucide="chef-hat" aria-hidden="true"></i>
+                                            <span>${uiText('Cook mode', 'Kookmodus')}</span>
                                         </button>
                                         <button type="button" role="menuitem" class="notebook-more-item" title="${pdfActions.recipe}" onclick="closeNotebookMoreMenus(); ${pdfActions.recipeAction}">
                                             <i data-lucide="${accountHasPremiumPlan() ? 'file-text' : 'lock'}" aria-hidden="true"></i>
-                                            <span>${pdfActions.recipe || 'PDF'}</span>
+                                            <span>${pdfActions.recipe || uiText('PDF', 'PDF')}</span>
                                         </button>
                                         <button type="button" role="menuitem" class="notebook-more-item" title="${uiText('Copy', 'Kopiëren')}" onclick="shareRecipe(${recipe.id}); closeNotebookMoreMenus();">
                                             <i data-lucide="copy" aria-hidden="true"></i>
@@ -19608,7 +19616,7 @@
                         <button type="button" title="${uiText('Previous page', 'Vorige bladzijde')}" aria-label="${uiText('Previous page', 'Vorige bladzijde')}" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
                             <i data-lucide="chevron-left" class="h-4 w-4"></i>
                         </button>
-                        <span data-notebook-page-label="${notebookPageLabel}" class="notebook-page-label">${uiText('Page', 'Pagina')} ${notebookPageLabel}</span>
+                        <span data-notebook-page-label="${notebookPageLabel}" class="notebook-page-label">${notebookPageHeading}</span>
                         <button type="button" title="${uiText('Next page', 'Volgende bladzijde')}" aria-label="${uiText('Next page', 'Volgende bladzijde')}" onclick="goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-page-nav notebook-page-nav--primary">
                             <i data-lucide="chevron-right" class="h-4 w-4"></i>
                         </button>
