@@ -238,10 +238,10 @@
             position: sticky;
             top: 0;
             z-index: 25;
-            display: flex;
+            display: grid;
+            grid-template-columns: 2.75rem minmax(0, 1fr) auto;
             align-items: center;
-            justify-content: space-between;
-            gap: var(--space-4);
+            column-gap: 0.55rem;
             padding: calc(var(--space-4) + env(safe-area-inset-top, 0px)) var(--space-5) var(--space-4);
             background: rgba(251, 248, 243, 0.85); /* parchment but slightly transparent */
             border-bottom: 1px solid rgba(144, 152, 112, 0.28);
@@ -250,11 +250,151 @@
             -webkit-backdrop-filter: blur(12px);
         }
 
+        .app-header-leading {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            width: 2.75rem;
+            min-width: 2.75rem;
+        }
+
+        .app-header-leading-spacer {
+            display: block;
+            width: 2.75rem;
+            height: 2.75rem;
+            flex: 0 0 2.75rem;
+        }
+
+        .app-header-titles {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .app-header-page-title {
+            margin: 0;
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            line-height: 1.15;
+            color: #1c1410;
+            text-align: center;
+        }
+
+        .app-header-actions {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.45rem;
+            flex: 0 0 auto;
+            min-width: 2.75rem;
+        }
+
+        /* Right cluster: at most two equal slots (action or ⋯, plus gear). */
+        .app-header-actions > .header-icon-button,
+        .app-header-actions > .header-more > .header-icon-button,
+        .app-header-actions > #header-add-recipe {
+            width: 2.75rem;
+            height: 2.75rem;
+            min-width: 2.75rem;
+            min-height: 2.75rem;
+            flex: 0 0 2.75rem;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 899px) {
+            .app-header-actions > #header-add-recipe {
+                padding: 0;
+            }
+
+            .app-header-actions > #header-add-recipe .header-add-label {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 900px) {
+            #main-header {
+                grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+            }
+
+            .app-header-actions > #header-add-recipe {
+                width: auto;
+                min-width: 2.75rem;
+                flex: 0 0 auto;
+                padding: 0 0.9rem;
+            }
+        }
+
+        .header-more {
+            position: relative;
+        }
+
+        .header-more-menu {
+            position: absolute;
+            top: calc(100% + 0.35rem);
+            right: 0;
+            z-index: 40;
+            display: grid;
+            gap: 0.2rem;
+            min-width: 11.5rem;
+            padding: 0.35rem;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            border-radius: 0.9rem;
+            background: #fffdf9;
+            box-shadow: 0 16px 32px rgba(28, 20, 16, 0.14);
+        }
+
+        .header-more-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            width: 100%;
+            min-height: 2.55rem;
+            padding: 0.55rem 0.7rem;
+            border: 0;
+            border-radius: 0.7rem;
+            background: transparent;
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 0.84rem;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .header-more-item:hover,
+        .header-more-item:focus-visible {
+            background: rgba(146, 157, 117, 0.16);
+            outline: none;
+        }
+
+        /* Keep legacy icon slots out of the visible top row; they live in ⋯. */
+        #main-header #header-help,
+        #main-header #notifications-button,
+        #main-header #undo-delete-button {
+            display: none !important;
+        }
+
         .app-header-brand {
             min-width: 0;
             display: flex;
             align-items: center;
             gap: 0.85rem;
+        }
+
+        /* Brand mark no longer lives in the top bar; title is always centered. */
+        #main-header .app-header-brand {
+            display: none !important;
+        }
+
+        #main-header .app-header-page-title {
+            display: block;
         }
 
         .app-header-mark {
@@ -467,9 +607,25 @@
             width: 2.75rem;
             height: 2.75rem;
             padding: 0;
+            color: #1c1410;
         }
 
-        /* Settings stays a gear-only control on every viewport (label via aria). */
+        /* Match gear: same SVG size, stroke, and color for Back + Help. */
+        #main-header #header-back [data-lucide],
+        #main-header #header-help [data-lucide],
+        #main-header #header-open-settings [data-lucide],
+        #main-header #header-back svg,
+        #main-header #header-help svg,
+        #main-header #header-open-settings svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke-width: 2;
+            color: inherit;
+        }
+
+        /* Back / Help / Opties stay icon-only on every viewport (label via aria). */
+        #main-header #header-back .header-icon-label,
+        #main-header #header-help .header-icon-label,
         #main-header #header-open-settings .header-icon-label {
             display: none !important;
         }
@@ -593,6 +749,92 @@
             width: 100%;
         }
 
+        /* Toegang beheren: equal-height add row + ellipsis list rows */
+        .access-add-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        .access-add-row .access-add-input,
+        .access-add-row .access-add-submit {
+            width: 100%;
+            height: var(--touch-min);
+            min-height: var(--touch-min);
+            max-height: var(--touch-min);
+            border-radius: 0.75rem;
+            box-sizing: border-box;
+        }
+
+        .access-add-row .access-add-input {
+            margin: 0;
+            border: 1px solid rgba(144, 152, 112, 0.3);
+            background: #fff;
+            color: var(--text-primary);
+            font-family: var(--font-ui);
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0 1rem;
+            outline: none;
+        }
+
+        .access-add-row .access-add-input:focus {
+            border-color: var(--brand-gold);
+        }
+
+        .access-add-row .access-add-submit {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .access-grant-list {
+            display: grid;
+            gap: 0.35rem;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .access-grant-row {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            width: 100%;
+            min-width: 0;
+            min-height: var(--touch-min);
+            padding: 0.25rem 0;
+        }
+
+        .access-grant-row .access-grant-email {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text-primary);
+            font-family: var(--font-ui);
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .access-grant-row .access-grant-remove {
+            flex: 0 0 auto;
+            max-width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .access-add-row {
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 0.65rem;
+                align-items: center;
+            }
+
+            .access-add-row .access-add-submit {
+                width: auto;
+            }
+        }
+
         .settings-legal {
             display: grid;
             gap: 0.15rem;
@@ -674,13 +916,7 @@
             }
 
             #main-header #header-back,
-            #main-header #header-help {
-                width: auto;
-                min-width: 2.75rem;
-                padding: 0 0.9rem;
-                gap: 0.4rem;
-            }
-
+            #main-header #header-help,
             #main-header #header-open-settings {
                 width: 2.75rem;
                 min-width: 2.75rem;
@@ -696,8 +932,120 @@
                 text-transform: uppercase;
             }
 
+            /* Back / Help / Opties stay icon-only; labels live in aria-label. */
+            #main-header #header-back .header-icon-label,
+            #main-header #header-help .header-icon-label,
             #main-header #header-open-settings .header-icon-label {
                 display: none !important;
+            }
+        }
+
+        /* Settings (Opties): shared left edge, equal widths, equal height on one row. */
+        .settings-sheet .settings-prefs {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.65rem;
+            width: 100%;
+        }
+
+        .settings-sheet .settings-prefs-pair {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.65rem;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        @media (min-width: 640px) {
+            .settings-sheet .settings-prefs-pair {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .settings-sheet .settings-prefs .settings-row,
+        .settings-sheet .settings-prefs-pair .settings-field {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.35rem;
+            align-items: stretch;
+            width: 100%;
+            min-width: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .settings-sheet .settings-prefs .settings-row > span,
+        .settings-sheet .settings-prefs-pair .settings-field > span {
+            min-width: 0;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .settings-sheet .settings-control,
+        .settings-sheet .settings-prefs .settings-select,
+        .settings-sheet .settings-prefs select,
+        .settings-sheet .settings-prefs input:not([type="checkbox"]),
+        .settings-sheet .access-add-row .access-add-input,
+        .settings-sheet #admin-account-email,
+        .settings-sheet input[type="email"],
+        .settings-sheet input[type="text"] {
+            box-sizing: border-box;
+            width: 100%;
+            max-width: none;
+            min-width: 0;
+            height: var(--touch-min);
+            min-height: var(--touch-min);
+            margin: 0;
+            padding: 0 1rem;
+            border: 1px solid rgba(144, 152, 112, 0.3);
+            border-radius: 0.75rem;
+            background: #fff;
+            color: var(--text-primary);
+            font-family: var(--font-ui);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-align: left;
+            justify-self: stretch;
+        }
+
+        .settings-sheet .settings-prefs .settings-row--full {
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+        }
+
+        .settings-sheet .settings-prefs .settings-row--full > span {
+            text-transform: none;
+            letter-spacing: 0;
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Side-by-side controls (e.g. email + action) share one row height. */
+        .settings-sheet .settings-inline-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.5rem;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        @media (min-width: 640px) {
+            .settings-sheet .settings-inline-row {
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: stretch;
+            }
+
+            .settings-sheet .settings-inline-row > .settings-control,
+            .settings-sheet .settings-inline-row > input,
+            .settings-sheet .settings-inline-row > button,
+            .settings-sheet .settings-inline-row > .access-add-submit {
+                height: var(--touch-min);
+                min-height: var(--touch-min);
+                max-height: var(--touch-min);
             }
         }
 
@@ -2188,7 +2536,36 @@
         button.auth-gate-action-locked,
         button.auth-gate-action-locked:hover {
             opacity: 0.45;
-            pointer-events: none;
+            /* Keep clickable so a tap can nudge the agreement checkbox. */
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .auth-agreement-intro {
+            margin: 0 0 0.55rem;
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.45;
+        }
+
+        .auth-agreement.is-attention {
+            border-radius: 0.75rem;
+            background: rgba(146, 157, 117, 0.22);
+            box-shadow: 0 0 0 3px rgba(146, 157, 117, 0.55);
+            animation: authAgreementPulse 0.85s ease;
+        }
+
+        .auth-agreement.is-attention .auth-agreement-check {
+            accent-color: #929D75;
+            outline: 2px solid #929D75;
+            outline-offset: 2px;
+        }
+
+        @keyframes authAgreementPulse {
+            0%, 100% { background: rgba(146, 157, 117, 0.08); box-shadow: 0 0 0 0 rgba(146, 157, 117, 0); }
+            35% { background: rgba(146, 157, 117, 0.28); box-shadow: 0 0 0 4px rgba(146, 157, 117, 0.55); }
         }
 
         .legal-page {
@@ -2326,6 +2703,11 @@
         }
 
         button.notebook-view-toggle.is-active {
+            background-color: #929D75;
+            color: #1c1410;
+        }
+
+        .notebook-view-segment button.notebook-view-toggle.is-active {
             background-color: #929D75;
             color: #1c1410;
         }
@@ -2849,16 +3231,17 @@
             }
 
             .app-overlay {
-                padding: 0;
+                /* Keep side margin so sheets stay inside narrow viewports (e.g. 360px). */
+                padding: 0.75rem;
+                padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
                 align-items: flex-end;
             }
 
             .app-modal-panel {
                 width: 100%;
-                border-radius: 1rem 1rem 0 0;
-                border-left: 0;
-                border-right: 0;
-                border-bottom: 0;
+                max-width: 100%;
+                max-height: min(88vh, 88dvh);
+                border-radius: 1rem;
             }
         }
 
@@ -3545,11 +3928,31 @@
             align-content: start;
         }
 
+        .notebook-sticky-note__text {
+            margin: 0;
+            color: var(--sticky-note-ink, #5d4516);
+            font-family: Outfit, sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            line-height: 1.35;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+        }
+
+        .notebook-sticky-note__placeholder {
+            margin: 0;
+            color: var(--sticky-note-ink, #5d4516);
+            font-family: Outfit, sans-serif;
+            font-size: 0.78rem;
+            font-weight: 600;
+            line-height: 1.35;
+            opacity: 0.55;
+            font-style: italic;
+        }
+
         .notebook-sticky-note__scribble-stack {
-            width: 100%;
-            display: grid;
-            gap: 0.18rem;
-            padding-top: 0.1rem;
+            display: none;
         }
 
         .notebook-sticky-note__scribble-line {
@@ -3734,17 +4137,28 @@
         }
 
         .notebook-note-control--cook {
-            min-width: 6.25rem;
-            border: 1px solid rgba(200, 144, 80, 0.92);
-            background: linear-gradient(135deg, rgba(236, 210, 118, 0.96) 0%, rgba(219, 177, 77, 0.96) 100%);
-            color: #fffdf6;
-            box-shadow: 0 14px 28px rgba(200, 144, 80, 0.24);
+            min-width: 2.75rem;
+            width: 2.75rem;
+            height: 2.75rem;
+            padding: 0;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            border-radius: 0.85rem;
+            background: #fbf8f3;
+            color: #929D75;
+            box-shadow: none;
         }
 
         .notebook-note-control--cook:hover {
-            border-color: rgba(166, 127, 38, 0.94);
-            background: linear-gradient(135deg, rgba(220, 185, 95, 0.98) 0%, rgba(194, 150, 55, 0.98) 100%);
-            color: #fffdf6;
+            border-color: rgba(146, 157, 117, 0.65);
+            background: rgba(146, 157, 117, 0.14);
+            color: #6f7a52;
+        }
+
+        .notebook-note-control--cook [data-lucide],
+        .notebook-note-control--cook svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke-width: 2;
         }
 
         .notebook-chrome {
@@ -3758,7 +4172,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 0.65rem;
+            gap: 0.55rem;
             width: 100%;
             padding: 0.3rem;
             border: 1px solid rgba(228, 215, 196, 0.85);
@@ -3777,6 +4191,156 @@
             background: transparent;
         }
 
+        .notebook-view-segment {
+            display: inline-flex;
+            align-items: stretch;
+            gap: 0.15rem;
+            min-width: 0;
+            padding: 0.15rem;
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 0.85rem;
+            background: rgba(246, 241, 232, 0.72);
+        }
+
+        .notebook-view-segment .notebook-view-toggle {
+            flex: 1 1 0;
+            min-width: 2.55rem;
+            color: var(--text-muted);
+        }
+
+        .notebook-view-segment .notebook-view-toggle.is-active {
+            background: #929D75;
+            background-color: #929D75;
+            color: #1c1410;
+            box-shadow: inset 0 0 0 1px rgba(28, 20, 16, 0.06);
+        }
+
+        .notebook-view-segment .notebook-view-toggle.is-active [data-lucide],
+        .notebook-view-segment .notebook-view-toggle.is-active svg {
+            color: #1c1410;
+        }
+
+        .notebook-chrome-leading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            min-width: 0;
+            flex: 1 1 auto;
+        }
+
+        .notebook-chrome-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-left: auto;
+            flex: 0 0 auto;
+        }
+
+        /* Cook stays glued to the Kaarten/Lijst/Boek switch. */
+        .notebook-chrome-leading .notebook-note-control--cook {
+            flex: 0 0 2.75rem;
+        }
+
+        .notebook-more {
+            position: relative;
+        }
+
+        .notebook-more-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            min-width: 2.75rem;
+            border-radius: 0.85rem;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            background: #fbf8f3;
+            color: #1c1410;
+        }
+
+        .notebook-more-menu {
+            position: absolute;
+            top: calc(100% + 0.35rem);
+            right: 0;
+            z-index: 40;
+            display: none;
+            min-width: 13.5rem;
+            padding: 0.35rem;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            border-radius: 0.9rem;
+            background: #fffdf9;
+            box-shadow: 0 16px 32px rgba(28, 20, 16, 0.14);
+        }
+
+        .notebook-more.is-open .notebook-more-menu {
+            display: grid;
+            gap: 0.2rem;
+        }
+
+        .notebook-more-item {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            width: 100%;
+            min-height: 2.55rem;
+            padding: 0.55rem 0.7rem;
+            border: 0;
+            border-radius: 0.7rem;
+            background: transparent;
+            color: #1c1410;
+            font-family: Outfit, sans-serif;
+            font-size: 0.84rem;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .notebook-more-item:hover,
+        .notebook-more-item:focus-visible {
+            background: rgba(146, 157, 117, 0.16);
+            outline: none;
+        }
+
+        .notebook-more-item i,
+        .notebook-more-item svg {
+            width: 1.1rem;
+            height: 1.1rem;
+            flex: 0 0 auto;
+            color: #929D75;
+        }
+
+        .notebook-page-under {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            margin-bottom: 0.35rem;
+            width: 100%;
+            /* Keep Vorige/Volgende clear of the floating bottom nav when scrolled into view. */
+            scroll-margin-bottom: calc(var(--app-nav-clearance) + 0.75rem);
+            padding-bottom: 0.15rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .notebook-page-under .notebook-page-label {
+            flex: 1 1 auto;
+            min-width: 0;
+            text-align: center;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 767px) {
+            .notebook-page-under {
+                scroll-margin-bottom: calc(var(--app-nav-clearance-phone) + 0.5rem);
+                margin-bottom: 0.55rem;
+            }
+        }
+
         .notebook-chrome-kicker {
             display: flex;
             align-items: baseline;
@@ -3787,20 +4351,22 @@
         }
 
         .notebook-chrome-page {
-            display: none;
+            display: block;
             margin: 0;
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
         }
 
-        .notebook-chrome-bar button,
-        .notebook-chrome-bar .notebook-note-control--cook {
+        .notebook-chrome-bar .notebook-view-segment .notebook-view-toggle {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.35rem;
-            flex: 0 0 2.55rem;
-            width: 2.55rem;
+            flex: 1 1 0;
             min-width: 2.55rem;
-            max-width: 2.55rem;
             height: 2.55rem;
             min-height: 2.55rem;
             padding: 0;
@@ -3810,6 +4376,43 @@
             font-weight: 800;
             letter-spacing: 0.1em;
             text-transform: uppercase;
+        }
+
+        /* Cook + ⋯ match gear: 2.75rem, sage icon (never orange). */
+        .notebook-chrome-bar .notebook-note-control--cook,
+        .notebook-chrome-bar .notebook-more-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 2.75rem;
+            width: 2.75rem;
+            min-width: 2.75rem;
+            max-width: 2.75rem;
+            height: 2.75rem;
+            min-height: 2.75rem;
+            padding: 0;
+            border-radius: 0.85rem;
+            border: 1px solid rgba(144, 152, 112, 0.28);
+            background: #fbf8f3;
+            color: #929D75;
+            box-shadow: none;
+        }
+
+        .notebook-chrome-bar .notebook-note-control--cook:hover,
+        .notebook-chrome-bar .notebook-more-toggle:hover {
+            border-color: rgba(146, 157, 117, 0.65);
+            background: rgba(146, 157, 117, 0.14);
+            color: #6f7a52;
+        }
+
+        .notebook-chrome-bar .notebook-note-control--cook [data-lucide],
+        .notebook-chrome-bar .notebook-note-control--cook svg,
+        .notebook-chrome-bar .notebook-more-toggle [data-lucide],
+        .notebook-chrome-bar .notebook-more-toggle svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            stroke-width: 2;
+            color: inherit;
         }
 
         .notebook-tool-label,
@@ -3870,22 +4473,28 @@
                 background: rgba(246, 241, 232, 0.55);
             }
 
-            .notebook-chrome-bar button,
-            .notebook-chrome-bar .notebook-note-control--cook {
+            .notebook-chrome-bar .notebook-view-segment .notebook-view-toggle {
                 flex: 0 0 auto;
-                flex-direction: row;
-                flex-wrap: nowrap;
                 width: auto;
                 min-width: 2.55rem;
                 max-width: none;
                 height: 2.7rem;
                 min-height: 2.7rem;
-                padding: 0 0.85rem;
+                padding: 0 0.75rem;
                 white-space: nowrap;
             }
 
-            .notebook-chrome-bar .notebook-tool-label,
-            .notebook-chrome-bar .notebook-cook-label {
+            .notebook-chrome-bar .notebook-note-control--cook,
+            .notebook-chrome-bar .notebook-more-toggle {
+                width: 2.75rem;
+                min-width: 2.75rem;
+                max-width: 2.75rem;
+                height: 2.75rem;
+                min-height: 2.75rem;
+                padding: 0;
+            }
+
+            .notebook-chrome-bar .notebook-tool-label {
                 position: static;
                 width: auto;
                 height: auto;
@@ -3893,6 +4502,18 @@
                 overflow: visible;
                 clip: auto;
                 white-space: nowrap;
+            }
+
+            .notebook-chrome-bar .notebook-cook-label {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
+                white-space: nowrap;
+                border: 0;
             }
         }
 
@@ -4036,6 +4657,12 @@
             clear: both;
         }
 
+        .notebook-page-hero-copy {
+            position: relative;
+            z-index: 1;
+            min-width: 0;
+        }
+
         .notebook-page-photo-cluster {
             float: right;
             width: clamp(6.15rem, 28%, 7.35rem);
@@ -4043,6 +4670,49 @@
             margin: 0.1rem 0 0.85rem 0.95rem;
             shape-outside: inset(0 round 0.85rem);
             shape-margin: 0.6rem;
+        }
+
+        /* Tablet: keep title + category·level·country together; photo overlays instead of splitting them. */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .notebook-page-hero {
+                /* Title clears the photo via h3 padding; meta uses full width below. */
+                padding-right: 0;
+            }
+
+            .notebook-page-photo-cluster {
+                float: none;
+                position: absolute;
+                top: 0.15rem;
+                right: 0;
+                width: 4.55rem;
+                margin: 0;
+                shape-outside: none;
+                z-index: 2;
+            }
+
+            .notebook-page-hero-copy h3 {
+                /* Larger than the photo (4.55rem) so the title clears the overlay. */
+                padding-right: 5.1rem;
+            }
+
+            .notebook-page-hero-copy .notebook-meta-line {
+                max-width: 100%;
+                width: 100%;
+                white-space: nowrap;
+                overflow: visible;
+                text-overflow: clip;
+                letter-spacing: 0.14em;
+            }
+        }
+
+        /* Category · level · country stay on one tidy row (no floating dots/flag). */
+        .notebook-meta-line {
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            gap: 0.35rem;
+            align-items: baseline;
         }
 
         .notebook-page-photo-frame {
@@ -4384,7 +5054,8 @@
                 padding: 0;
                 letter-spacing: 0;
                 box-shadow: none;
-                background: #c89050;
+                background: #fbf8f3;
+                color: #929D75;
             }
 
             .notebook-paper__body {
@@ -4428,17 +5099,20 @@
                 min-height: 2.75rem;
             }
 
+            /* Keep pager in document flow under the page (like tablet), never overlaying content. */
             .notebook-mobile-pager {
-                position: fixed;
-                left: 0.7rem;
-                right: 0.7rem;
-                bottom: calc(3.15rem + 0.7rem + env(safe-area-inset-bottom, 0px));
-                z-index: 30;
-                width: auto;
-                margin-top: 0;
-                padding: 0.3rem;
-                border-radius: 0.9rem;
-                background: rgba(246, 241, 232, 0.94);
+                position: relative;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                z-index: 2;
+                width: 100%;
+                margin-top: 0.65rem;
+                margin-bottom: 0.55rem;
+                padding: 0.2rem 0.1rem;
+                border-radius: 0;
+                background: transparent;
+                box-shadow: none;
             }
 
             .notebook-page-summary-grid {
@@ -4590,10 +5264,34 @@
                 font-size: 0.875rem;
                 line-height: 34px;
             }
+        }
 
+        @media (min-width: 1024px) {
             .notebook-page-photo-cluster {
                 width: 6.15rem;
                 max-width: 6.15rem;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .notebook-page-photo-cluster {
+                width: 4.55rem;
+                max-width: 4.55rem;
+            }
+
+            .notebook-page-hero {
+                padding-right: 0;
+            }
+
+            .notebook-page-hero-copy h3 {
+                padding-right: 5.1rem;
+            }
+
+            .notebook-page-hero-copy .notebook-meta-line {
+                white-space: nowrap;
+                overflow: visible;
+                text-overflow: clip;
+                letter-spacing: 0.14em;
             }
         }
 
@@ -6196,43 +6894,72 @@
     <div id="app-shell" class="w-full max-w-7xl mx-auto flex flex-col h-[100dvh] max-h-[100dvh] relative shadow-2xl bg-parchment overflow-hidden border-x border-parchmentDark">
         
         <header id="main-header" class="text-forest transition-all" translate="no">
-            <button id="header-back" type="button" onclick="handleTopBackAction()" class="header-icon-button" hidden aria-label="Back">
-                <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i>
-                <span class="header-icon-label">Back</span>
-            </button>
-            <div class="app-header-brand">
-                <div class="app-header-mark">
-                    <img src="assets/uculi-boekje.jpg" alt="Uculi" width="46" height="46" />
-                </div>
-                <div class="app-header-copy">
-                    <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
-                    <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
-                </div>
+            <div class="app-header-leading">
+                <button id="header-back" type="button" onclick="handleTopBackAction()" class="header-icon-button" hidden aria-label="Terug" title="Terug">
+                    <i data-lucide="arrow-left" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="header-icon-label" aria-hidden="true"></span>
+                </button>
+                <span id="header-back-spacer" class="app-header-leading-spacer" aria-hidden="true"></span>
             </div>
-            <div class="flex items-center gap-2">
-                <button id="notifications-button" onclick="showNotificationsModal()" class="header-icon-button relative hidden" title="Notifications" aria-label="Notifications">
+            <div class="app-header-titles">
+                <div class="app-header-brand" id="header-brand" hidden>
+                    <div class="app-header-mark">
+                        <img src="assets/uculi-boekje.jpg" alt="Uculi" width="46" height="46" />
+                    </div>
+                    <div class="app-header-copy">
+                        <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
+                        <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
+                    </div>
+                </div>
+                <h1 id="header-page-title" class="app-header-page-title">Uculi</h1>
+            </div>
+            <div class="app-header-actions">
+                <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="header-primary-action flex h-11 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
+                    <i data-lucide="plus" class="w-4 h-4"></i> <span class="header-add-label">Add Recipe</span>
+                </button>
+                <div class="header-more" id="header-more" hidden>
+                    <button id="header-more-toggle" type="button" class="header-icon-button" aria-label="Meer" title="Meer" aria-haspopup="menu" aria-expanded="false" onclick="toggleHeaderMoreMenu(event)">
+                        <i data-lucide="ellipsis" class="w-5 h-5" aria-hidden="true"></i>
+                    </button>
+                    <div id="header-more-menu" class="header-more-menu" role="menu" hidden>
+                        <button id="header-more-add" type="button" role="menuitem" class="header-more-item" hidden onclick="closeHeaderMoreMenu(); renderAddForm();">
+                            <i data-lucide="plus" class="w-4 h-4" aria-hidden="true"></i>
+                            <span id="header-more-add-label">Recept</span>
+                        </button>
+                        <button id="header-more-help" type="button" role="menuitem" class="header-more-item" onclick="closeHeaderMoreMenu(); showUsageGuide();">
+                            <i data-lucide="circle-help" class="w-4 h-4" aria-hidden="true"></i>
+                            <span>Help</span>
+                        </button>
+                        <button id="header-more-notifications" type="button" role="menuitem" class="header-more-item" hidden onclick="closeHeaderMoreMenu(); showNotificationsModal();">
+                            <i data-lucide="bell" class="w-4 h-4" aria-hidden="true"></i>
+                            <span id="header-more-notifications-label">Notifications</span>
+                        </button>
+                        <button id="header-more-undo" type="button" role="menuitem" class="header-more-item" hidden onclick="closeHeaderMoreMenu(); undoDeletedRecipe();">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4" aria-hidden="true"></i>
+                            <span id="header-more-undo-label">Undo</span>
+                        </button>
+                    </div>
+                </div>
+                <button id="notifications-button" onclick="showNotificationsModal()" class="header-icon-button relative hidden" hidden title="Notifications" aria-label="Notifications">
                     <i data-lucide="bell" class="w-5 h-5"></i>
                     <span id="notifications-badge" class="absolute -right-1 -top-1 hidden min-w-[1.15rem] rounded-full bg-coral px-1 text-[10px] font-bold leading-5 text-white"></span>
                 </button>
-                <button id="undo-delete-button" onclick="undoDeletedRecipe()" class="header-icon-button hidden" title="Undo last delete" aria-label="Undo last delete">
+                <button id="undo-delete-button" onclick="undoDeletedRecipe()" class="header-icon-button hidden" hidden title="Undo last delete" aria-label="Undo last delete">
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                     <span id="undo-delete-label">Undo</span>
                 </button>
                 <button id="header-help" type="button" onclick="showUsageGuide()" class="header-icon-button" hidden aria-label="Help" title="Help">
-                    <i data-lucide="info" class="w-5 h-5" aria-hidden="true"></i>
-                    <span class="header-icon-label">Help</span>
+                    <i data-lucide="circle-help" class="w-5 h-5" aria-hidden="true"></i>
+                    <span class="header-icon-label" aria-hidden="true"></span>
                 </button>
                 <button id="header-open-settings" type="button" onclick="renderSettings()" class="header-icon-button" aria-label="Opties" title="Opties">
                     <i data-lucide="settings" class="w-5 h-5" aria-hidden="true"></i>
                     <span class="header-icon-label" aria-hidden="true"></span>
                 </button>
-                <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="flex h-11 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
-                    <i data-lucide="plus" class="w-4 h-4"></i> <span class="header-add-label">Add Recipe</span>
-                </button>
             </div>
         </header>
 
-        <button id="floating-back-button" onclick="handleTopBackAction()" class="floating-back-button" title="Back" aria-label="Back">
+        <button id="floating-back-button" onclick="handleTopBackAction()" class="floating-back-button" title="Terug" aria-label="Terug">
             <i data-lucide="arrow-left" class="w-5 h-5"></i>
         </button>
 
@@ -6941,6 +7668,9 @@
                 lastModerationNotificationId: '',
                 recipeUndo: null,
                 hasCompletedTutorial: false,
+                termsAccepted: false,
+                termsAcceptedAt: '',
+                termsAcceptedVersion: '',
                 favorites: [],
                 myRecipeRatings: {}
             };
@@ -7086,6 +7816,166 @@
         // Visible UI copy: English first (fallback), Dutch when language is nl.
         function uiText(english, dutch) {
             return getActiveUiLanguage() === 'nl' ? dutch : english;
+        }
+
+        function splitLeadingFlagEmoji(value) {
+            const raw = String(value ?? '').trim();
+            if (!raw) return { flag: '', name: '' };
+            // National flags are two regional-indicator code units — match that first.
+            const flagPair = raw.match(/^((?:[\uD83C][\uDDE6-\uDDFF]){2})\s*(.*)$/);
+            if (flagPair) {
+                return { flag: flagPair[1], name: String(flagPair[2] || '').trim() };
+            }
+            try {
+                const match = raw.match(/^(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*)\s*(.*)$/u);
+                if (match && match[2]) {
+                    return { flag: match[1], name: String(match[2] || '').trim() };
+                }
+            } catch (_error) {
+                // Ignore Unicode-property failures on older runtimes.
+            }
+            return { flag: '', name: raw };
+        }
+
+        let regionDisplayNameCache = null;
+
+        function translateRegionDisplayName(name) {
+            const cleaned = String(name || '').trim();
+            if (!cleaned) return '';
+            if (getActiveUiLanguage() !== 'nl') return cleaned;
+
+            try {
+                if (!regionDisplayNameCache) {
+                    const en = new Intl.DisplayNames(['en'], { type: 'region' });
+                    const nl = new Intl.DisplayNames(['nl'], { type: 'region' });
+                    const byEnglish = new Map();
+                    const codes = [
+                        'AD','AE','AF','AG','AI','AL','AM','AO','AQ','AR','AS','AT','AU','AW','AX','AZ','BA','BB','BD','BE','BF','BG','BH','BI','BJ','BL','BM','BN','BO','BQ','BR','BS','BT','BV','BW','BY','BZ','CA','CC','CD','CF','CG','CH','CI','CK','CL','CM','CN','CO','CR','CU','CV','CW','CX','CY','CZ','DE','DJ','DK','DM','DO','DZ','EC','EE','EG','EH','ER','ES','ET','FI','FJ','FK','FM','FO','FR','GA','GB','GD','GE','GF','GG','GH','GI','GL','GM','GN','GP','GQ','GR','GS','GT','GU','GW','GY','HK','HM','HN','HR','HT','HU','ID','IE','IL','IM','IN','IO','IQ','IR','IS','IT','JE','JM','JO','JP','KE','KG','KH','KI','KM','KN','KP','KR','KW','KY','KZ','LA','LB','LC','LI','LK','LR','LS','LT','LU','LV','LY','MA','MC','MD','ME','MF','MG','MH','MK','ML','MM','MN','MO','MP','MQ','MR','MS','MT','MU','MV','MW','MX','MY','MZ','NA','NC','NE','NF','NG','NI','NL','NO','NP','NR','NU','NZ','OM','PA','PE','PF','PG','PH','PK','PL','PM','PN','PR','PS','PT','PW','PY','QA','RE','RO','RS','RU','RW','SA','SB','SC','SD','SE','SG','SH','SI','SJ','SK','SL','SM','SN','SO','SR','SS','ST','SV','SX','SY','SZ','TC','TD','TF','TG','TH','TJ','TK','TL','TM','TN','TO','TR','TT','TV','TW','TZ','UA','UG','UM','US','UY','UZ','VA','VC','VE','VG','VI','VN','VU','WF','WS','YE','YT','ZA','ZM','ZW'
+                    ];
+                    codes.forEach(code => {
+                        const english = String(en.of(code) || '').trim();
+                        const dutch = String(nl.of(code) || '').trim();
+                        if (english && dutch) byEnglish.set(english.toLowerCase(), dutch);
+                    });
+                    // Common aliases stored on recipes / country pickers.
+                    byEnglish.set('netherlands', 'Nederland');
+                    byEnglish.set('united states', 'Verenigde Staten');
+                    byEnglish.set('united states of america', 'Verenigde Staten');
+                    byEnglish.set('united kingdom', 'Verenigd Koninkrijk');
+                    byEnglish.set('south korea', 'Zuid-Korea');
+                    byEnglish.set('north korea', 'Noord-Korea');
+                    byEnglish.set('czech republic', 'Tsjechië');
+                    byEnglish.set('czechia', 'Tsjechië');
+                    regionDisplayNameCache = byEnglish;
+                }
+                return regionDisplayNameCache.get(cleaned.toLowerCase()) || cleaned;
+            } catch (_error) {
+                return cleaned;
+            }
+        }
+
+        // Single recipe-meta translator used on cards, detail, and notebook reader.
+        function localizeRecipeLabel(kind, value) {
+            const type = String(kind || '').toLowerCase();
+            if (type === 'prep' || type === 'cook' || type === 'serves') {
+                const amount = Math.max(0, Number(value) || 0);
+                if (type === 'prep') return uiText(`${amount}m prep`, `${amount}m voorb.`);
+                if (type === 'cook') return uiText(`${amount}m cook`, `${amount}m koken`);
+                return uiText(`serves ${amount}`, `${amount} porties`);
+            }
+
+            const raw = String(value ?? '').trim();
+            if (type === 'chef') {
+                if (!raw || /^chef$/i.test(raw)) return uiText('Chef', 'Kok');
+                if (/^house recipe$/i.test(raw) || /^huisrecept$/i.test(raw)) {
+                    return uiText('House Recipe', 'Huisrecept');
+                }
+                return raw;
+            }
+
+            if (!raw) {
+                if (type === 'category') return uiText('Recipe', 'Recept');
+                return '';
+            }
+
+            const { flag, name } = (type === 'cuisine' || type === 'country')
+                ? splitLeadingFlagEmoji(raw)
+                : { flag: '', name: raw };
+            const lookupValue = name || raw;
+            const key = lookupValue.toLowerCase();
+            const maps = {
+                category: {
+                    cooking: uiText('Cooking', 'Koken'),
+                    baking: uiText('Baking', 'Bakken'),
+                    dessert: uiText('Dessert', 'Dessert'),
+                    drink: uiText('Drink', 'Drank'),
+                    breakfast: uiText('Breakfast', 'Ontbijt'),
+                    lunch: uiText('Lunch', 'Lunch'),
+                    dinner: uiText('Dinner', 'Diner'),
+                    snack: uiText('Snack', 'Tussendoortje'),
+                    other: uiText('Other', 'Overig'),
+                    recipe: uiText('Recipe', 'Recept'),
+                    misc: uiText('Misc', 'Divers')
+                },
+                difficulty: {
+                    easy: uiText('Easy', 'Makkelijk'),
+                    medium: uiText('Medium', 'Gemiddeld'),
+                    hard: uiText('Hard', 'Moeilijk')
+                },
+                diet: {
+                    vegan: uiText('Vegan', 'Veganistisch'),
+                    vegetarian: uiText('Vegetarian', 'Vegetarisch'),
+                    pescatarian: uiText('Pescatarian', 'Pescotarisch'),
+                    'gluten-free': uiText('Gluten-free', 'Glutenvrij'),
+                    'dairy-free': uiText('Dairy-free', 'Zonder zuivel'),
+                    'nut-free': uiText('Nut-free', 'Notenvrij'),
+                    'egg-free': uiText('Egg-free', 'Zonder ei'),
+                    'soy-free': uiText('Soy-free', 'Sojavrij'),
+                    halal: uiText('Halal', 'Halal'),
+                    kosher: uiText('Kosher', 'Kosjer'),
+                    'low-carb': uiText('Low-carb', 'Koolhydraatarm'),
+                    keto: uiText('Keto', 'Keto'),
+                    paleo: uiText('Paleo', 'Paleo')
+                },
+                cuisine: {
+                    european: uiText('European', 'Europees'),
+                    asian: uiText('Asian', 'Aziatisch'),
+                    american: uiText('American', 'Amerikaans'),
+                    mediterranean: uiText('Mediterranean', 'Mediterraan'),
+                    mexican: uiText('Mexican', 'Mexicaans'),
+                    italian: uiText('Italian', 'Italiaans'),
+                    french: uiText('French', 'Frans'),
+                    dutch: uiText('Dutch', 'Nederlands'),
+                    netherlands: uiText('Netherlands', 'Nederland')
+                }
+            };
+
+            const table = maps[type] || maps.category;
+            let localized = table[key];
+            if (!localized && (type === 'cuisine' || type === 'country')) {
+                localized = translateRegionDisplayName(lookupValue);
+            }
+            if (!localized) localized = lookupValue || raw;
+            if (flag && (type === 'cuisine' || type === 'country')) {
+                return `${flag} ${localized}`.trim();
+            }
+            return localized;
+        }
+
+        function localizeRecipeCategoryLabel(value) {
+            return localizeRecipeLabel('category', value);
+        }
+
+        function localizeRecipeDifficultyLabel(value) {
+            return localizeRecipeLabel('difficulty', value);
+        }
+
+        function localizeRecipeCuisineLabel(value) {
+            return localizeRecipeLabel('cuisine', value);
+        }
+
+        function localizeRecipeDietLabel(value) {
+            return localizeRecipeLabel('diet', value);
         }
 
         function getAuthI18n() {
@@ -7459,16 +8349,45 @@
             return isDeveloperBypassSession() && !isProductionUculiHost() && isLocalDeveloperPreviewContext();
         }
 
-        // Enige plan-check per account: Firestore billing (lokaal gespiegeld) of Testmodus.
-        // When PREMIUM_ENABLED is false, everyone is unlocked (Stripe not live yet).
-        function accountHasPremiumPlan() {
+        // Hard-coded access superuser (must match firestore.rules exactly).
+        const ACCESS_SUPERUSER_EMAIL = 'm.holtzapffel@gmail.com';
+        let currentUserAccessGrant = false;
+        let accessGrantListCache = [];
+        let accessGrantLoadPromise = null;
+
+        function normalizeAccessEmail(value = '') {
+            return normalizeAdminEmail(value);
+        }
+
+        function isAccessSuperuser() {
+            if (!isAuthenticated || !currentUser) return false;
+            // Match rules: request.auth.token.email == 'm.holtzapffel@gmail.com'
+            // && request.auth.token.email_verified == true
+            return currentUser.email === ACCESS_SUPERUSER_EMAIL
+                && currentUser.emailVerified === true;
+        }
+
+        function hasCachedAccessGrant() {
+            return currentUserAccessGrant === true;
+        }
+
+        // Single entitlement helper for paid/full features.
+        // Superuser always has full access without an access/{email} grant doc.
+        function hasFullAccess() {
+            if (isAccessSuperuser()) return true;
+            if (hasCachedAccessGrant()) return true;
             if (!isPremiumEnforced()) return true;
             if (isLocalTestPremiumSession()) return true;
             return hasPremiumBillingStatus(getAccountPlan().status);
         }
 
+        // Legacy names — all premium gates go through hasFullAccess().
+        function accountHasPremiumPlan() {
+            return hasFullAccess();
+        }
+
         function hasPremiumAccess() {
-            return accountHasPremiumPlan();
+            return hasFullAccess();
         }
 
         function countLocalRecipes() {
@@ -7476,8 +8395,157 @@
         }
 
         function canAddLocalRecipe() {
-            if (!isPremiumEnforced()) return true;
-            return accountHasPremiumPlan() || countLocalRecipes() < freeLocalRecipeLimit;
+            return hasFullAccess() || countLocalRecipes() < freeLocalRecipeLimit;
+        }
+
+        async function refreshCurrentUserAccessGrant() {
+            currentUserAccessGrant = false;
+            if (!firebaseInitialized || !isAuthenticated || !currentUser?.email) return false;
+            if (isDeveloperBypassSession()) return false;
+            // Superuser does not need a grant doc; keep cache false so UI stays honest.
+            if (isAccessSuperuser()) return false;
+            if (currentUser.emailVerified !== true) return false;
+
+            const emailLower = normalizeAccessEmail(currentUser.email);
+            if (!emailLower) return false;
+
+            try {
+                const snapshot = await firebase.firestore().collection('access').doc(emailLower).get();
+                currentUserAccessGrant = snapshot.exists === true;
+                return currentUserAccessGrant;
+            } catch (error) {
+                console.error('Access grant load failed:', error);
+                currentUserAccessGrant = false;
+                return false;
+            }
+        }
+
+        async function loadAccessGrantListForSuperuser() {
+            accessGrantListCache = [];
+            if (!isAccessSuperuser() || !firebaseInitialized) return [];
+
+            try {
+                const snapshot = await firebase.firestore().collection('access').get();
+                accessGrantListCache = snapshot.docs
+                    .map(doc => normalizeAccessEmail(doc.id))
+                    .filter(Boolean)
+                    .sort((a, b) => a.localeCompare(b));
+                return accessGrantListCache;
+            } catch (error) {
+                console.error('Access grant list load failed:', error);
+                showToast(uiText('Could not load access list.', 'Toegangslijst laden mislukt.'), 'alert-circle');
+                return [];
+            }
+        }
+
+        async function addAccessGrantEmail(rawEmail) {
+            if (!isAccessSuperuser()) {
+                showToast(uiText('Superuser access required.', 'Alleen de superuser mag dit.'), 'alert-circle');
+                return false;
+            }
+
+            const emailLower = normalizeAccessEmail(rawEmail);
+            if (!emailLower || !emailLower.includes('@')) {
+                showToast(uiText('Provide a valid email address.', 'Vul een geldig e-mailadres in.'), 'alert-circle');
+                return false;
+            }
+
+            if (emailLower === normalizeAccessEmail(ACCESS_SUPERUSER_EMAIL)) {
+                showToast(uiText('Superuser already has full access.', 'De superuser heeft al volledige toegang.'), 'info');
+                return false;
+            }
+
+            try {
+                const ref = firebase.firestore().collection('access').doc(emailLower);
+                const existing = await ref.get();
+                if (existing.exists) {
+                    showToast(uiText('That email already has access.', 'Dat e-mailadres staat al op de lijst.'), 'info');
+                    return false;
+                }
+
+                // Create only — rules forbid update on access docs.
+                await ref.set({
+                    email: emailLower,
+                    grantedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    grantedByUid: currentUser.uid,
+                    grantedByEmail: ACCESS_SUPERUSER_EMAIL
+                });
+
+                await loadAccessGrantListForSuperuser();
+                showToast(uiText(`Access granted to ${emailLower}.`, `Toegang gegeven aan ${emailLower}.`), 'check-circle');
+                return true;
+            } catch (error) {
+                console.error('Access grant create failed:', error);
+                showToast(uiText('Could not add access.', 'Toegang toevoegen mislukt.'), 'alert-circle');
+                return false;
+            }
+        }
+
+        async function removeAccessGrantEmail(rawEmail) {
+            if (!isAccessSuperuser()) {
+                showToast(uiText('Superuser access required.', 'Alleen de superuser mag dit.'), 'alert-circle');
+                return false;
+            }
+
+            const emailLower = normalizeAccessEmail(rawEmail);
+            if (!emailLower) return false;
+
+            try {
+                await firebase.firestore().collection('access').doc(emailLower).delete();
+                await loadAccessGrantListForSuperuser();
+                showToast(uiText(`Access removed for ${emailLower}.`, `Toegang verwijderd voor ${emailLower}.`), 'check-circle');
+                return true;
+            } catch (error) {
+                console.error('Access grant delete failed:', error);
+                showToast(uiText('Could not remove access.', 'Toegang verwijderen mislukt.'), 'alert-circle');
+                return false;
+            }
+        }
+
+        async function submitAccessGrantAdd() {
+            const input = document.getElementById('access-grant-email');
+            const ok = await addAccessGrantEmail(input?.value || '');
+            if (ok && input) input.value = '';
+            if (currentView === 'access' || document.getElementById('access-grant-list')) {
+                renderAccessManagement();
+            }
+        }
+
+        function confirmAccessGrantRemove(email) {
+            const emailLower = normalizeAccessEmail(email);
+            if (!emailLower || !isAccessSuperuser()) return;
+            const nl = userSettings.language === 'nl';
+            let modalId = null;
+            modalId = createModal(
+                nl ? 'Toegang verwijderen' : 'Remove access',
+                `<div class="space-y-3 text-inkDark">
+                    <p class="text-sm font-semibold leading-relaxed text-forest">${nl
+                        ? 'Dit e-mailadres verliest volledige (betaalde) functies.'
+                        : 'This email will lose full (paid) features.'}</p>
+                    <p class="rounded-xl border border-parchmentDark bg-parchment px-3 py-2 text-sm font-bold text-forest" style="overflow-wrap:anywhere;">${escapeHTML(emailLower)}</p>
+                </div>`,
+                [
+                    {
+                        text: nl ? 'Annuleren' : 'Cancel',
+                        onClick: () => closeModal(modalId)
+                    },
+                    {
+                        text: nl ? 'Verwijderen' : 'Remove',
+                        danger: true,
+                        onClick: async () => {
+                            closeModal(modalId);
+                            await removeAccessGrantEmail(emailLower);
+                            if (currentView === 'access' || document.getElementById('access-grant-list')) {
+                                renderAccessManagement();
+                            }
+                        }
+                    }
+                ]
+            );
+        }
+
+        async function submitAccessGrantRemove(email) {
+            confirmAccessGrantRemove(email);
         }
 
         async function persistAccountPlanToFirestore(billingProfile = userSettings.billing) {
@@ -7575,6 +8643,32 @@
         }
 
         function getBillingStatusMeta() {
+            if (isAccessSuperuser()) {
+                const nl = getActiveUiLanguage() === 'nl';
+                return {
+                    state: 'superuser',
+                    badge: nl ? 'Volledige toegang' : 'Full access',
+                    summary: nl
+                        ? 'Superuser-account: alle betaalde functies staan open zonder grant-document.'
+                        : 'Superuser account: all paid features are unlocked without a grant document.',
+                    sourceLabel: 'Superuser',
+                    actionLabel: nl ? 'Superuser' : 'Superuser'
+                };
+            }
+
+            if (hasCachedAccessGrant()) {
+                const nl = getActiveUiLanguage() === 'nl';
+                return {
+                    state: 'access-grant',
+                    badge: nl ? 'Volledige toegang' : 'Full access',
+                    summary: nl
+                        ? 'Je e-mailadres staat op de toegangslijst. Alle betaalde functies zijn beschikbaar.'
+                        : 'Your email is on the access list. All paid features are available.',
+                    sourceLabel: nl ? 'Toegangslijst' : 'Access list',
+                    actionLabel: nl ? 'Via toegang' : 'Via access list'
+                };
+            }
+
             if (isLocalTestPremiumSession()) {
                 return {
                     state: 'testmodus',
@@ -7659,6 +8753,12 @@
         }
 
         function refreshCurrentViewAfterBillingChange() {
+            if (currentView === 'access') {
+                if (isAccessSuperuser()) renderAccessManagement();
+                else renderSettings();
+                return;
+            }
+
             if (currentView === 'settings') {
                 renderSettings();
                 return;
@@ -7951,6 +9051,7 @@
             userSettings.language = normalizedLanguage;
             document.documentElement.lang = normalizedLanguage;
             localStorage.setItem(globalUiLanguageStorageKey, normalizedLanguage);
+            regionDisplayNameCache = null;
             saveData();
 
             if (!silent) {
@@ -8608,7 +9709,7 @@
 
         function getNotebookStickyNotePreviewText(note) {
             const rawText = String(note?.text ?? '').trim();
-            if (!rawText) return 'Write here';
+            if (!rawText) return uiText('Write here', 'Schrijf hier');
 
             const previewLimit = getNotebookStickyNotePreviewLimit(note);
             if (rawText.length <= previewLimit) return rawText;
@@ -8618,62 +9719,10 @@
 
         function getNotebookStickyNotePreviewMarkup(note) {
             const rawText = String(note?.text ?? '').trim();
-            const seedSource = `${note?.id || ''}${rawText || 'preview'}`;
-            const seed = Array.from(seedSource).reduce((total, char, index) => total + (char.charCodeAt(0) * (index + 3)), 0) || 97;
-            const lineCount = rawText ? Math.max(4, Math.min(6, Math.ceil(rawText.length / 24))) : 4;
-            const fragments = ['mn', 'ul', 're', 'va', 'cl', 'ae', 'so', 'ni', 'tra', 'xo', 'lia', 'ves', 'quo'];
-
-            const buildPseudoWord = (wordSeed, isSignature = false) => {
-                const chunkCount = isSignature ? 2 + (wordSeed % 2) : 2 + (wordSeed % 3);
-                let word = '';
-                for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex += 1) {
-                    word += fragments[(wordSeed + chunkIndex * 5) % fragments.length];
-                }
-                return word;
-            };
-
-            const buildPseudoLine = (lineSeed, { header = false, signature = false } = {}) => {
-                const wordCount = header ? 2 : signature ? 2 : 3 + (lineSeed % 2);
-                const words = header ? ['Rx'] : [];
-
-                for (let wordIndex = 0; wordIndex < wordCount; wordIndex += 1) {
-                    words.push(buildPseudoWord(lineSeed + wordIndex * 17, signature));
-                }
-
-                if (signature && words.length) {
-                    words[words.length - 1] = `${words[words.length - 1]}.`;
-                }
-
-                return words.join(' ');
-            };
-
-            return `
-                <div class="notebook-sticky-note__scribble-stack" aria-hidden="true">
-                    ${Array.from({ length: lineCount }, (_, index) => {
-                        const isHeader = index === 0;
-                        const isSignature = index === lineCount - 1;
-                        const width = isHeader
-                            ? 42 + ((seed + index * 9) % 18)
-                            : isSignature
-                                ? 34 + ((seed + index * 7) % 14)
-                                : 58 + ((seed + index * 17) % 24);
-                        const indent = isHeader
-                            ? ((seed + index * 5) % 4)
-                            : isSignature
-                                ? 16 + ((seed + index * 11) % 10)
-                                : 2 + ((seed + index * 13) % 7);
-                        const tilt = isHeader
-                            ? -8 + ((seed + index * 3) % 7)
-                            : isSignature
-                                ? -12 + ((seed + index * 5) % 9)
-                                : -6 + ((seed + index * 7) % 8);
-                        const opacity = (isHeader ? 0.72 : isSignature ? 0.54 : 0.58 + (((seed + index * 5) % 3) * 0.06)).toFixed(2);
-                        const lineClass = `notebook-sticky-note__scribble-line${isHeader ? ' is-header' : ''}${isSignature ? ' is-signature' : ''}`;
-                        const lineText = buildPseudoLine(seed + index * 19, { header: isHeader, signature: isSignature });
-                        return `<span class="${lineClass}" style="--scribble-width:${width}%;--scribble-indent:${indent}%;--scribble-tilt:${tilt}deg;--scribble-opacity:${opacity};">${lineText}</span>`;
-                    }).join('')}
-                </div>
-            `;
+            if (!rawText) {
+                return `<p class="notebook-sticky-note__placeholder">${escapeHTML(uiText('Write here', 'Schrijf hier'))}</p>`;
+            }
+            return `<p class="notebook-sticky-note__text">${escapeHTML(getNotebookStickyNotePreviewText(note))}</p>`;
         }
 
         function normalizeNotebookStickyNotes(notes) {
@@ -9774,6 +10823,9 @@
             userSettings.notifications = normalizeFamilyNotifications(userSettings.notifications);
             userSettings.recipeUndo = normalizeRecipeUndoEntry(userSettings.recipeUndo);
             userSettings.hasCompletedTutorial = userSettings.hasCompletedTutorial === true;
+            userSettings.termsAccepted = userSettings.termsAccepted === true;
+            userSettings.termsAcceptedAt = String(userSettings.termsAcceptedAt || '');
+            userSettings.termsAcceptedVersion = String(userSettings.termsAcceptedVersion || '');
             document.getElementById('body')?.classList.remove('theme-dark');
             applyUserModeClasses();
             document.documentElement.style.colorScheme = 'light';
@@ -11688,6 +12740,9 @@
             recipes = [];
             userFamilies = [];
             currentUserModerationStatus = getDefaultModerationStatus();
+            currentUserAccessGrant = false;
+            accessGrantListCache = [];
+            accessGrantLoadPromise = null;
             indexViewMode = 'cards';
             notebookPageIndex = 0;
             notebookSpreadPageIndex = 0;
@@ -11940,16 +12995,18 @@
                                         </div>
                                     </div>
 
-                                    <div class="mt-5 space-y-2.5">
+                                    ${shouldShowAuthAgreementFields() ? `
+                                    <div class="mt-5 space-y-2.5" id="auth-agreement-block">
                                         ${authAgreementFieldsMarkup()}
                                     </div>
+                                    ` : ''}
 
                                     <div class="mt-5 space-y-2.5">
-                                        <button type="button" data-auth-gate-action="submit" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} auth-gate-submit auth-gate-action-locked">
+                                        <button type="button" data-auth-gate-action="submit" onclick="${showRegister ? 'registerWithEmailPassword()' : 'signInWithEmailPassword()'}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })} auth-gate-submit${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}">
                                             <i data-lucide="${showRegister ? 'user-plus' : 'log-in'}" class="h-4 w-4"></i>${showRegister ? authText.submitRegister : authText.submitLogin}
                                         </button>
                                         <p class="text-center text-[10px] font-bold uppercase tracking-[0.22em] text-sage">${authText.orDivider || 'or'}</p>
-                                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })} auth-gate-social auth-gate-action-locked">
+                                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('auth-gate')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}">
                                             <i data-lucide="globe-2" class="h-4 w-4"></i>${authText.continueGoogle}
                                         </button>
                                         ${localTestModeButtonMarkup('local-test-mode-auth')}
@@ -11968,16 +13025,58 @@
             syncAuthGateButtons();
         }
 
+        function hasAcceptedCurrentTermsVersion() {
+            return userSettings?.termsAccepted === true
+                && String(userSettings?.termsAcceptedVersion || '') === AGREEMENT_VERSION;
+        }
+
+        // Only brand-new accounts must see the blocking terms modal.
+        // Existing accounts missing a local termsAcceptedVersion keep using the app.
+        function shouldShowTermsAcceptanceModal() {
+            if (hasAcceptedCurrentTermsVersion()) return false;
+            if (hasPendingAgreement()) return true;
+            if (userSettings?.isNewAccount === true) return true;
+            if (sessionStorage.getItem('uculiNewAccountTerms') === '1') return true;
+            return false;
+        }
+
+        function markCurrentAccountAsNewForTerms() {
+            userSettings.isNewAccount = true;
+            sessionStorage.setItem('uculiNewAccountTerms', '1');
+        }
+
+        function clearNewAccountTermsMarker() {
+            if (userSettings) userSettings.isNewAccount = false;
+            sessionStorage.removeItem('uculiNewAccountTerms');
+        }
+
+        // New accounts (register) must agree once for the current AGREEMENT_VERSION.
+        // Returning users with a saved termsAcceptedVersion skip the checkbox.
+        function shouldShowAuthAgreementFields() {
+            if (hasAcceptedCurrentTermsVersion()) return false;
+            if (currentView === 'auth') return authViewMode === 'register';
+            // Settings cloud link / other non-auth surfaces: only when current version is missing.
+            return true;
+        }
+
+        function authGateRequiresAgreement() {
+            return shouldShowAuthAgreementFields();
+        }
+
+        function getAuthAgreementIntroCopy() {
+            return uiText(
+                'First, please agree: check below that you have read the privacy policy and the terms. After that you can log in.',
+                'Eerst even akkoord: vink hieronder aan dat je de privacyverklaring en de voorwaarden hebt gelezen. Daarna kun je inloggen.'
+            );
+        }
+
         function authAgreementFieldsMarkup() {
             const copy = getAgreementCopy();
             return `
-                <label class="auth-agreement">
-                    <input id="auth-read-privacy" type="checkbox" class="auth-agreement-check" onchange="syncAuthGateButtons()">
-                    <span>${copy.readPrivacy} <a href="${legalPageHref('privacy')}" onclick="event.preventDefault(); event.stopPropagation(); showLegalDocument('privacy');">${copy.privacyName}</a> ${copy.readSuffix}</span>
-                </label>
-                <label class="auth-agreement">
-                    <input id="auth-agree-terms" type="checkbox" class="auth-agreement-check" onchange="syncAuthGateButtons()">
-                    <span>${copy.readTerms} <a href="${legalPageHref('terms')}" onclick="event.preventDefault(); event.stopPropagation(); showLegalDocument('terms');">${copy.termsName}</a> ${copy.readSuffix}</span>
+                <p class="auth-agreement-intro">${getAuthAgreementIntroCopy()}</p>
+                <label class="auth-agreement" id="auth-agreement-row">
+                    <input id="auth-agree-current" type="checkbox" class="auth-agreement-check" onchange="syncAuthGateButtons()">
+                    <span>${copy.readPrivacy} <a href="${legalPageHref('privacy')}" onclick="event.preventDefault(); event.stopPropagation(); showLegalDocument('privacy');">${copy.privacyName}</a> ${copy.andWord || '&'} ${copy.readTerms} <a href="${legalPageHref('terms')}" onclick="event.preventDefault(); event.stopPropagation(); showLegalDocument('terms');">${copy.termsName}</a> ${copy.readSuffix}</span>
                 </label>
             `;
         }
@@ -11998,45 +13097,50 @@
                 en: {
                     readPrivacy: 'I have read the',
                     privacyName: 'privacy policy',
-                    readTerms: 'I have read the',
+                    readTerms: 'the',
                     agreeTerms: 'I have read the',
-                    termsName: 'terms of use',
+                    termsName: 'terms',
+                    andWord: 'and',
                     readSuffix: 'and agree',
                     needAgreements: 'Read the privacy policy and terms of use before you continue.'
                 },
                 nl: {
-                    readPrivacy: 'Ik heb het',
-                    privacyName: 'privacybeleid',
-                    readTerms: 'Ik heb de',
+                    readPrivacy: 'Ik heb de',
+                    privacyName: 'privacyverklaring',
+                    readTerms: 'de',
                     agreeTerms: 'Ik heb de',
-                    termsName: 'gebruiksvoorwaarden',
+                    termsName: 'voorwaarden',
+                    andWord: 'en',
                     readSuffix: 'gelezen en ga akkoord',
-                    needAgreements: 'Lees het privacybeleid en de gebruiksvoorwaarden voordat je verdergaat.'
+                    needAgreements: 'Lees de privacyverklaring en de voorwaarden voordat je verdergaat.'
                 },
                 fr: {
                     readPrivacy: 'J\'ai lu la',
                     privacyName: 'politique de confidentialité',
-                    readTerms: 'J\'ai lu les',
+                    readTerms: 'les',
                     agreeTerms: 'J\'ai lu les',
                     termsName: 'conditions d\'utilisation',
+                    andWord: 'et',
                     readSuffix: 'et j\'accepte',
                     needAgreements: 'Lisez la politique de confidentialité et les conditions d\'utilisation avant de continuer.'
                 },
                 de: {
                     readPrivacy: 'Ich habe die',
                     privacyName: 'Datenschutzerklärung',
-                    readTerms: 'Ich habe die',
+                    readTerms: 'die',
                     agreeTerms: 'Ich habe die',
                     termsName: 'Nutzungsbedingungen',
+                    andWord: 'und',
                     readSuffix: 'gelesen und stimme zu',
                     needAgreements: 'Bitte Datenschutzerklärung und Nutzungsbedingungen lesen, bevor du weitermachst.'
                 },
                 es: {
                     readPrivacy: 'He leído la',
                     privacyName: 'política de privacidad',
-                    readTerms: 'He leído las',
+                    readTerms: 'las',
                     agreeTerms: 'He leído las',
                     termsName: 'condiciones de uso',
+                    andWord: 'y',
                     readSuffix: 'y acepto',
                     needAgreements: 'Lee la política de privacidad y las condiciones de uso antes de continuar.'
                 }
@@ -12045,22 +13149,39 @@
         }
 
         function authAgreementsChecked() {
-            const privacyChecked = Boolean(document.getElementById('auth-read-privacy')?.checked);
-            const termsChecked = Boolean(document.getElementById('auth-agree-terms')?.checked);
-            return privacyChecked && termsChecked;
+            if (!authGateRequiresAgreement()) return true;
+            return Boolean(document.getElementById('auth-agree-current')?.checked);
+        }
+
+        function pulseAuthAgreementPrompt() {
+            const row = document.getElementById('auth-agreement-row') || document.querySelector('#auth-agreement-block .auth-agreement');
+            if (!row) return;
+            row.classList.remove('is-attention');
+            // Retrigger CSS animation.
+            void row.offsetWidth;
+            row.classList.add('is-attention');
+            clearTimeout(window.__authAgreementPulseTimer);
+            window.__authAgreementPulseTimer = setTimeout(() => {
+                row.classList.remove('is-attention');
+            }, 900);
+            try {
+                document.getElementById('auth-agree-current')?.focus({ preventScroll: true });
+            } catch (_) { /* ignore */ }
         }
 
         function syncAuthGateButtons() {
-            const unlocked = authAgreementsChecked();
+            const requires = authGateRequiresAgreement();
+            const unlocked = !requires || authAgreementsChecked();
             document.querySelectorAll('[data-auth-gate-action]').forEach(button => {
-                button.classList.toggle('auth-gate-action-locked', !unlocked);
+                button.classList.toggle('auth-gate-action-locked', requires && !unlocked);
                 button.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
             });
         }
 
         function authAgreementsAccepted() {
+            if (!authGateRequiresAgreement()) return true;
             if (authAgreementsChecked()) return true;
-            showToast(getAgreementCopy().needAgreements, 'alert-circle');
+            pulseAuthAgreementPrompt();
             return false;
         }
 
@@ -12129,6 +13250,7 @@
         async function recordNewAccountAgreement(result, forceNew = false) {
             const uid = result?.user?.uid;
             if (!uid || (!forceNew && !isNewFirebaseAccount(result))) return;
+            markCurrentAccountAsNewForTerms();
             try {
                 await savePrivateAgreementOnce(uid);
             } catch (error) {
@@ -12166,7 +13288,7 @@
             localStorage.setItem('uculiLocalAccounts', JSON.stringify(accounts));
         }
 
-        function activateLocalAccountSession(account) {
+        function activateLocalAccountSession(account, { isNewAccount = false } = {}) {
             currentUser = {
                 uid: account.uid,
                 email: account.email,
@@ -12178,15 +13300,21 @@
             loadData();
             userSettings.name = userSettings.name || currentUser.displayName;
             userSettings.email = account.email;
-            userSettings.termsAccepted = true;
-            userSettings.termsAcceptedAt = userSettings.termsAcceptedAt || new Date().toISOString();
-            userSettings.termsAcceptedVersion = userSettings.termsAcceptedVersion || AGREEMENT_VERSION;
+            // Do not invent termsAcceptedVersion here — new accounts set it via
+            // pending agreement; existing accounts keep the saved version.
+            applyPendingAgreementToSettings();
+            if (isNewAccount) markCurrentAccountAsNewForTerms();
             saveData();
             syncAuthenticatedAppChrome();
             document.getElementById('app-landing')?.remove();
             sessionStorage.setItem(landingSessionKey, '1');
             dismissAuthLoadingScreen();
             renderList();
+            if (shouldShowTermsAcceptanceModal()) {
+                showTermsAcceptanceModal();
+            } else {
+                maybeShowFirstRunTutorial();
+            }
         }
 
         function restoreLocalAccountSession() {
@@ -12214,7 +13342,8 @@
             };
             accounts.push(account);
             writeLocalAccounts(accounts);
-            activateLocalAccountSession(account);
+            markCurrentAccountAsNewForTerms();
+            activateLocalAccountSession(account, { isNewAccount: true });
             showToast('Account saved on this device.', 'check-circle');
             return true;
         }
@@ -12303,7 +13432,7 @@
                         syncAuthenticatedAppChrome();
                         // Always render the list first so there's a real screen behind any modal
                         renderList();
-                        if (!userSettings.termsAccepted) {
+                        if (shouldShowTermsAcceptanceModal()) {
                             maybeShowFirstRunTutorial();
                             showTermsAcceptanceModal();
                         } else {
@@ -12316,6 +13445,15 @@
                         loadAccountPlanFromFirestore()
                             .then(() => refreshCurrentViewAfterBillingChange())
                             .catch(error => console.error('Account plan refresh error:', error));
+                        accessGrantLoadPromise = refreshCurrentUserAccessGrant()
+                            .then(() => {
+                                if (isAccessSuperuser()) {
+                                    return loadAccessGrantListForSuperuser();
+                                }
+                                return null;
+                            })
+                            .then(() => refreshCurrentViewAfterBillingChange())
+                            .catch(error => console.error('Access grant refresh error:', error));
                         loadFamiliesFromFirestore();
                         setTimeout(() => checkFamilyRemovals(), 1000);
                         bootstrapShoppingListCloud().catch(error => console.error('Shopping cloud bootstrap error:', error));
@@ -12340,7 +13478,7 @@
         }
 
         async function signInWithEmailPassword() {
-            if (!authAgreementsAccepted()) return;
+            // Existing accounts: no checkbox. Current termsVersion is checked after loadData.
             const email = document.getElementById('auth-email')?.value?.trim();
             const password = document.getElementById('auth-password')?.value || '';
 
@@ -12349,10 +13487,8 @@
                 return;
             }
 
-            notePendingAgreement();
             if (!isCloudAuthConfigured() || !firebaseInitialized) {
                 signInLocalAccount(email, password);
-                clearPendingAgreement();
                 return;
             }
 
@@ -12361,12 +13497,8 @@
 
             try {
                 await firebase.auth().signInWithEmailAndPassword(email, password);
-                applyPendingAgreementToSettings();
-                saveData();
-                if (!sessionStorage.getItem(agreementRetryStorageKey)) clearPendingAgreement();
-                // onAuthStateChanged handles navigation
+                // onAuthStateChanged handles navigation + termsVersion modal if needed
             } catch (error) {
-                clearPendingAgreement();
                 const authText = getAuthI18n();
                 showToast(getReadableAuthErrorMessage(error), 'alert-circle');
                 if (btn) { btn.disabled = false; btn.innerHTML = `<i data-lucide="log-in" class="h-4 w-4"></i>${authText.submitLogin}`; lucide.createIcons(); }
@@ -12394,7 +13526,7 @@
             notePendingAgreement();
             if (!isCloudAuthConfigured() || !firebaseInitialized) {
                 registerLocalAccount({ firstName, lastName, email, password });
-                clearPendingAgreement();
+                if (!sessionStorage.getItem(agreementRetryStorageKey)) clearPendingAgreement();
                 return;
             }
 
@@ -12434,13 +13566,14 @@
         }
 
         async function signInWithGoogle(origin = 'app') {
-            if (!authAgreementsAccepted()) return;
+            // Agreement only for new-account surfaces (register / settings without current termsVersion).
+            if (authGateRequiresAgreement() && !authAgreementsAccepted()) return;
             if (!firebaseInitialized) {
                 showCloudSetupStatusModal(origin);
                 return;
             }
 
-            notePendingAgreement();
+            if (authGateRequiresAgreement()) notePendingAgreement();
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 if (shouldUseRedirectForGoogleSignIn()) {
@@ -13972,93 +15105,136 @@
                 return false;
             }
 
-            const seedElement = document.createElement('div');
-            seedElement.textContent = 'seed';
-            seedElement.setAttribute('aria-hidden', 'true');
-            seedElement.style.position = 'absolute';
-            seedElement.style.left = '-10000px';
-            seedElement.style.top = '0';
-            seedElement.style.pointerEvents = 'none';
-            document.body.appendChild(seedElement);
+            // In-viewport, fully opaque capture target. Opacity 0 / -200vw yields blank pages
+            // that only keep the footer/page numbers.
+            const host = document.createElement('div');
+            host.setAttribute('aria-hidden', 'true');
+            host.style.cssText = [
+                'position:fixed',
+                'left:0',
+                'top:0',
+                'width:794px',
+                'background:#ffffff',
+                'pointer-events:none',
+                'z-index:-1'
+            ].join(';');
+            host.innerHTML = html;
+            document.body.appendChild(host);
 
-            const templateRoot = document.createElement('div');
-            templateRoot.setAttribute('aria-hidden', 'true');
-            templateRoot.style.position = 'absolute';
-            templateRoot.style.left = '-200vw';
-            templateRoot.style.top = '0';
-            templateRoot.style.width = '794px';
-            templateRoot.style.background = '#ffffff';
-            templateRoot.style.pointerEvents = 'none';
-            templateRoot.style.zIndex = '-1';
-            templateRoot.innerHTML = html;
-            document.body.appendChild(templateRoot);
+            const captureRoot = host.querySelector('.pdf-shell') || host.firstElementChild || host;
 
             try {
-                const worker = html2pdf().set({ jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' } }).from(seedElement).toPdf();
-                await worker;
-                const pdf = await worker.get('pdf');
-
-                if (!pdf || typeof pdf.text !== 'function' || typeof pdf.html !== 'function') {
-                    throw new Error('jsPDF instance unavailable');
-                }
-
-                if (typeof pdf.internal?.getNumberOfPages === 'function' && pdf.internal.getNumberOfPages() > 0 && typeof pdf.deletePage === 'function') {
-                    pdf.deletePage(1);
-                }
-                if (typeof pdf.internal?.getNumberOfPages === 'function' && pdf.internal.getNumberOfPages() === 0 && typeof pdf.addPage === 'function') {
-                    pdf.addPage();
-                }
-
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-                const margin = 18;
-
-                const drawPageFooter = (pageNumber, totalPages) => {
-                    const footerY = pageHeight - 10;
-                    pdf.setDrawColor(239, 239, 239);
-                    pdf.setLineWidth(0.5);
-                    pdf.line(margin, footerY - 4, pageWidth - margin, footerY - 4);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setFontSize(8);
-                    pdf.setTextColor(144, 152, 112);
-                    pdf.text('Uculi · A Sneezing Donkey product', margin, footerY);
-                    pdf.text(`${nl ? 'Pagina' : 'Page'} ${pageNumber} ${nl ? 'van' : 'of'} ${totalPages}`, pageWidth - margin, footerY, { align: 'right' });
-                };
-
                 if (document.fonts?.ready) {
                     await document.fonts.ready;
                 }
                 await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-                await new Promise((resolve) => {
-                    pdf.html(templateRoot, {
-                        x: 0,
-                        y: 0,
-                        margin: [0, 0, 0, 0],
-                        width: pageWidth,
-                        windowWidth: 794,
-                        autoPaging: 'text',
-                        html2canvas: {
-                            scale: 1.15,
-                            useCORS: true,
-                            backgroundColor: '#FFFFFF',
-                            logging: false
-                        },
-                        callback: () => resolve()
-                    });
-                });
+                const html2canvasFn = window.html2canvas;
+                const JsPDFCtor = window.jspdf?.jsPDF || window.jsPDF;
 
+                if (typeof html2canvasFn === 'function' && typeof JsPDFCtor === 'function') {
+                    const canvas = await html2canvasFn(captureRoot, {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: '#FFFFFF',
+                        logging: false,
+                        windowWidth: 794,
+                        scrollX: 0,
+                        scrollY: 0
+                    });
+
+                    const pdf = new JsPDFCtor({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const margin = 12;
+                    const footerGap = 10;
+                    const usableWidth = pageWidth - margin * 2;
+                    const usableHeight = pageHeight - margin * 2 - footerGap;
+                    const imgWidth = usableWidth;
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    const imgData = canvas.toDataURL('image/jpeg', 0.96);
+
+                    let heightLeft = imgHeight;
+                    let offsetY = margin;
+
+                    pdf.addImage(imgData, 'JPEG', margin, offsetY, imgWidth, imgHeight);
+                    heightLeft -= usableHeight;
+
+                    while (heightLeft > 1) {
+                        offsetY = margin - (imgHeight - heightLeft);
+                        pdf.addPage();
+                        pdf.addImage(imgData, 'JPEG', margin, offsetY, imgWidth, imgHeight);
+                        heightLeft -= usableHeight;
+                    }
+
+                    const totalPages = pdf.internal.getNumberOfPages();
+                    for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
+                        pdf.setPage(pageNumber);
+                        const footerY = pageHeight - 8;
+                        pdf.setDrawColor(239, 239, 239);
+                        pdf.setLineWidth(0.4);
+                        pdf.line(margin, footerY - 4, pageWidth - margin, footerY - 4);
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setFontSize(8);
+                        pdf.setTextColor(144, 152, 112);
+                        pdf.text('Uculi · A Sneezing Donkey product', margin, footerY);
+                        pdf.text(
+                            `${nl ? 'Pagina' : 'Page'} ${pageNumber} ${nl ? 'van' : 'of'} ${totalPages}`,
+                            pageWidth - margin,
+                            footerY,
+                            { align: 'right' }
+                        );
+                    }
+
+                    pdf.save(filename);
+                    return true;
+                }
+
+                // Fallback: html2pdf pipeline (still in-viewport / opaque).
+                const worker = html2pdf().set({
+                    margin: [10, 12, 16, 12],
+                    filename,
+                    image: { type: 'jpeg', quality: 0.96 },
+                    html2canvas: {
+                        scale: 2,
+                        useCORS: true,
+                        backgroundColor: '#FFFFFF',
+                        logging: false,
+                        windowWidth: 794
+                    },
+                    jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' },
+                    pagebreak: { mode: ['css', 'legacy'] }
+                }).from(captureRoot);
+
+                const pdf = await worker.toPdf().get('pdf');
+                if (!pdf) throw new Error('jsPDF instance unavailable');
+
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const footerMargin = 12;
                 const totalPages = pdf.internal.getNumberOfPages();
                 for (let pageNumber = 1; pageNumber <= totalPages; pageNumber += 1) {
                     pdf.setPage(pageNumber);
-                    drawPageFooter(pageNumber, totalPages);
+                    const footerY = pageHeight - 8;
+                    pdf.setDrawColor(239, 239, 239);
+                    pdf.setLineWidth(0.4);
+                    pdf.line(footerMargin, footerY - 4, pageWidth - footerMargin, footerY - 4);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(144, 152, 112);
+                    pdf.text('Uculi · A Sneezing Donkey product', footerMargin, footerY);
+                    pdf.text(
+                        `${nl ? 'Pagina' : 'Page'} ${pageNumber} ${nl ? 'van' : 'of'} ${totalPages}`,
+                        pageWidth - footerMargin,
+                        footerY,
+                        { align: 'right' }
+                    );
                 }
 
                 pdf.save(filename);
                 return true;
             } finally {
-                templateRoot.remove();
-                seedElement.remove();
+                host.remove();
             }
         }
 
@@ -14313,9 +15489,8 @@
         }
 
         function syncHeaderAddButton() {
-            const button = document.getElementById('header-add-recipe');
-            if (!button) return;
-            button.hidden = !(currentView === 'index' && activeDetailRecipeId == null);
+            // Visibility is decided in syncHeaderOverflowMenu (≤ 2 right icons).
+            if (typeof syncHeaderOverflowMenu === 'function') syncHeaderOverflowMenu();
         }
 
         function shouldShowTopBackButton() {
@@ -14329,9 +15504,10 @@
             const add = document.getElementById('header-add-recipe');
             const back = document.getElementById('header-back');
             const optionsLabel = nl ? 'Opties' : 'Options';
-            const helpLabel = uiText('Help', 'Hulp');
+            // Soft-launch chrome: Back aria is always Terug; Help stays Help.
+            const helpLabel = 'Help';
             const addLabel = nl ? 'Recept' : 'Add Recipe';
-            const backLabel = nl ? 'Terug' : 'Back';
+            const backLabel = 'Terug';
             const navLabels = {
                 index: uiText('Index', 'Recepten'),
                 shopping: nl ? 'Boodschappen' : 'Shop',
@@ -14351,7 +15527,10 @@
                 help.setAttribute('aria-label', helpLabel);
                 help.title = helpLabel;
                 const helpText = help.querySelector('.header-icon-label');
-                if (helpText) helpText.textContent = helpLabel;
+                // Icon-only — never show text beside the icon.
+                if (helpText) helpText.textContent = '';
+                const helpIcon = help.querySelector('[data-lucide]');
+                if (helpIcon) helpIcon.setAttribute('data-lucide', 'circle-help');
             }
             const coverPersonalize = document.getElementById('cover-editor-personalize-copy');
             if (coverPersonalize) {
@@ -14369,7 +15548,10 @@
                 back.setAttribute('aria-label', backLabel);
                 back.title = backLabel;
                 const backText = back.querySelector('.header-icon-label');
-                if (backText) backText.textContent = backLabel;
+                // Icon-only — never show "Back"/"Terug" text beside the icon.
+                if (backText) backText.textContent = '';
+                const backIcon = back.querySelector('[data-lucide]');
+                if (backIcon) backIcon.setAttribute('data-lucide', 'arrow-left');
             }
             document.querySelectorAll('#main-nav .app-nav-button[data-nav-view]').forEach(button => {
                 const view = button.getAttribute('data-nav-view');
@@ -14387,17 +15569,149 @@
                 if (apple) createdBy.appendChild(apple);
                 createdBy.append(nl ? 'Gemaakt door Mholt' : 'Created by Mholt');
             }
+            if (typeof lucide?.createIcons === 'function') lucide.createIcons();
+        }
+
+        let chromeHistoryDepth = 0;
+        let ignoreChromePopstate = false;
+
+        function getHeaderPageTitle() {
+            const nl = userSettings.language === 'nl';
+            if (currentView === 'settings') return nl ? 'Opties' : 'Options';
+            if (currentView === 'access') return nl ? 'Toegang beheren' : 'Manage access';
+            if (currentView === 'add') return nl ? 'Recept' : 'Recipe';
+            if (currentView === 'shopping') return nl ? 'Boodschappen' : 'Shopping';
+            if (currentView === 'browse') return nl ? 'Bladeren' : 'Browse';
+            if (currentView === 'profile') return nl ? 'Profiel' : 'Profile';
+            if (currentView === 'detail' || activeDetailRecipeId != null) {
+                const recipe = recipes.find(item => item.id === activeDetailRecipeId);
+                return recipe?.title || (nl ? 'Recept' : 'Recipe');
+            }
+            if (currentView === 'index' && indexViewMode === 'book' && chromeBackAction) {
+                return nl ? 'Schrift' : 'Notebook';
+            }
+            if (currentView === 'index') return nl ? 'Recepten' : 'Recipes';
+            return 'Uculi';
+        }
+
+        function syncHeaderPageTitle() {
+            const header = document.getElementById('main-header');
+            const titleEl = document.getElementById('header-page-title');
+            const showBack = chromeBackAction != null;
+            if (header) header.classList.toggle('is-subview', showBack);
+            if (titleEl) {
+                titleEl.hidden = false;
+                titleEl.textContent = getHeaderPageTitle();
+            }
+        }
+
+        function syncHeaderOverflowMenu() {
+            const more = document.getElementById('header-more');
+            const moreToggle = document.getElementById('header-more-toggle');
+            const moreMenu = document.getElementById('header-more-menu');
+            const moreAdd = document.getElementById('header-more-add');
+            const moreAddLabel = document.getElementById('header-more-add-label');
+            const moreHelp = document.getElementById('header-more-help');
+            const moreNotifications = document.getElementById('header-more-notifications');
+            const moreUndo = document.getElementById('header-more-undo');
+            const gear = document.getElementById('header-open-settings');
+            const help = document.getElementById('header-help');
+            const add = document.getElementById('header-add-recipe');
+            const nl = userSettings.language === 'nl';
+            const addLabel = nl ? 'Recept' : 'Add Recipe';
+            const canShowPrimary = currentView === 'index' && activeDetailRecipeId == null && chromeBackAction == null;
+            const showGear = !(currentView === 'settings' || currentView === 'access');
+            const showHelp = currentView === 'settings' || currentView === 'access';
+            const showNotifications = Boolean(moreNotifications && moreNotifications.dataset.available === '1');
+            const showUndo = Boolean(moreUndo && moreUndo.dataset.available === '1');
+            const overflowExtras = showHelp || showNotifications || showUndo;
+            // Right side ≤ 2: (primary|⋯) + gear. If primary and overflow both needed, fold primary into ⋯.
+            const foldPrimaryIntoMore = canShowPrimary && overflowExtras && showGear;
+            const showPrimaryButton = canShowPrimary && !foldPrimaryIntoMore;
+            const showMore = overflowExtras || foldPrimaryIntoMore;
+
+            if (help) help.hidden = true;
+            if (add) add.hidden = !showPrimaryButton;
+            if (moreAdd) {
+                moreAdd.hidden = !foldPrimaryIntoMore;
+                if (moreAddLabel) moreAddLabel.textContent = addLabel;
+            }
+            if (moreHelp) {
+                moreHelp.hidden = !showHelp;
+                const helpSpan = moreHelp.querySelector('span');
+                if (helpSpan) helpSpan.textContent = 'Help';
+            }
+            if (moreNotifications) moreNotifications.hidden = !showNotifications;
+            if (moreUndo) moreUndo.hidden = !showUndo;
+            if (more) more.hidden = !showMore;
+            if (moreMenu && more.hidden) moreMenu.hidden = true;
+            if (moreToggle) {
+                moreToggle.setAttribute('aria-expanded', moreMenu && !moreMenu.hidden ? 'true' : 'false');
+                moreToggle.setAttribute('aria-label', nl ? 'Meer' : 'More');
+                moreToggle.title = nl ? 'Meer' : 'More';
+            }
+            if (gear) gear.hidden = !showGear;
+        }
+
+        function closeHeaderMoreMenu() {
+            const moreMenu = document.getElementById('header-more-menu');
+            const moreToggle = document.getElementById('header-more-toggle');
+            if (moreMenu) moreMenu.hidden = true;
+            if (moreToggle) moreToggle.setAttribute('aria-expanded', 'false');
+        }
+
+        function toggleHeaderMoreMenu(event) {
+            event?.stopPropagation?.();
+            const moreMenu = document.getElementById('header-more-menu');
+            const moreToggle = document.getElementById('header-more-toggle');
+            if (!moreMenu || !moreToggle) return;
+            const open = moreMenu.hidden;
+            closeNotebookMoreMenus();
+            moreMenu.hidden = !open;
+            moreToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (open && typeof lucide?.createIcons === 'function') lucide.createIcons();
+        }
+
+        function closeNotebookMoreMenus() {
+            document.querySelectorAll('[data-notebook-more].is-open').forEach(node => {
+                node.classList.remove('is-open');
+                const toggle = node.querySelector('.notebook-more-toggle');
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+            });
+        }
+
+        function toggleNotebookMoreMenu(event) {
+            event?.stopPropagation?.();
+            const root = event?.currentTarget?.closest?.('[data-notebook-more]');
+            if (!root) return;
+            const willOpen = !root.classList.contains('is-open');
+            closeNotebookMoreMenus();
+            closeHeaderMoreMenu();
+            if (!willOpen) return;
+            root.classList.add('is-open');
+            event.currentTarget.setAttribute('aria-expanded', 'true');
+            if (typeof lucide?.createIcons === 'function') lucide.createIcons();
+        }
+
+        function pushChromeHistoryState() {
+            if (chromeBackAction == null) return;
+            try {
+                history.pushState({ uculiChrome: true, view: currentView, action: chromeBackAction }, '');
+                chromeHistoryDepth += 1;
+            } catch (_) { /* ignore */ }
         }
 
         function syncHeaderBackButton() {
             const back = document.getElementById('header-back');
+            const spacer = document.getElementById('header-back-spacer');
             const show = chromeBackAction != null;
+            const wasShowing = Boolean(back && !back.hidden);
             if (back) back.hidden = !show;
+            if (spacer) spacer.hidden = show;
             document.body.classList.toggle('chrome-push', show);
-            const gear = document.getElementById('header-open-settings');
-            const help = document.getElementById('header-help');
-            if (gear) gear.hidden = currentView === 'settings';
-            if (help) help.hidden = currentView !== 'settings';
+            if (show && !wasShowing) pushChromeHistoryState();
+            syncHeaderPageTitle();
+            syncHeaderOverflowMenu();
             syncChromeLabels();
         }
 
@@ -14410,30 +15724,58 @@
             syncHeaderBackButton();
         }
 
-        function handleTopBackAction() {
+        function handleTopBackAction(options = {}) {
+            const fromPopstate = Boolean(options.fromPopstate);
             const action = chromeBackAction;
-            if (activeDetailRecipeId !== null || action === 'list') {
+            const run = () => {
+                if (activeDetailRecipeId !== null || action === 'list') {
+                    renderList();
+                    return;
+                }
+                if (action === 'cancel-editor' || currentView === 'add') {
+                    cancelRecipeEditor();
+                    return;
+                }
+                if (action === 'profile') {
+                    renderProfile();
+                    return;
+                }
+                if (action === 'shop') {
+                    renderShoppingList();
+                    return;
+                }
+                if (action === 'browse') {
+                    renderBrowse();
+                    return;
+                }
+                if (action === 'settings') {
+                    renderSettings();
+                    return;
+                }
                 renderList();
-                return;
+            };
+            run();
+            if (!fromPopstate && chromeHistoryDepth > 0) {
+                ignoreChromePopstate = true;
+                chromeHistoryDepth = Math.max(0, chromeHistoryDepth - 1);
+                try { history.back(); } catch (_) { ignoreChromePopstate = false; }
             }
-            if (action === 'cancel-editor' || currentView === 'add') {
-                cancelRecipeEditor();
-                return;
-            }
-            if (action === 'profile') {
-                renderProfile();
-                return;
-            }
-            if (action === 'shop') {
-                renderShoppingList();
-                return;
-            }
-            if (action === 'browse') {
-                renderBrowse();
-                return;
-            }
-            renderList();
         }
+
+        window.addEventListener('popstate', () => {
+            if (ignoreChromePopstate) {
+                ignoreChromePopstate = false;
+                return;
+            }
+            if (chromeBackAction == null) return;
+            chromeHistoryDepth = Math.max(0, chromeHistoryDepth - 1);
+            handleTopBackAction({ fromPopstate: true });
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest?.('#header-more')) closeHeaderMoreMenu();
+            if (!event.target.closest?.('[data-notebook-more]')) closeNotebookMoreMenus();
+        });
 
         function isDesktopNavAutoHideEnabled() {
             return desktopNavAutoHideMedia.matches;
@@ -14959,52 +16301,65 @@
         function syncNotificationBell() {
             const button = document.getElementById('notifications-button');
             const badge = document.getElementById('notifications-badge');
-            if (!button || !badge) return;
-
+            const moreItem = document.getElementById('header-more-notifications');
+            const moreLabel = document.getElementById('header-more-notifications-label');
             const hasActiveFamilies = getActiveFamiliesForCurrentUser().length > 0;
             const shouldShowBell = hasActiveFamilies || hasModerationNotifications();
-            button.classList.toggle('hidden', !shouldShowBell);
-            button.classList.toggle('inline-flex', shouldShowBell);
-            if (!shouldShowBell) {
-                badge.classList.add('hidden');
-                badge.textContent = '';
-                return;
-            }
-
-            const unread = getUnreadFamilyNotificationCount();
-            const pendingVotes = getPendingDeletionVoteActionCount() + getPendingPublicationVoteActionCount();
+            const unread = shouldShowBell ? getUnreadFamilyNotificationCount() : 0;
+            const pendingVotes = shouldShowBell
+                ? (getPendingDeletionVoteActionCount() + getPendingPublicationVoteActionCount())
+                : 0;
             const displayCount = Math.max(unread, pendingVotes);
-            if (displayCount > 0) {
-                badge.classList.remove('hidden');
-                badge.textContent = displayCount > 99 ? '99+' : String(displayCount);
-            } else {
+            const nl = userSettings.language === 'nl';
+            const label = displayCount > 0
+                ? (nl ? `Meldingen (${displayCount > 99 ? '99+' : displayCount})` : `Notifications (${displayCount > 99 ? '99+' : displayCount})`)
+                : (nl ? 'Meldingen' : 'Notifications');
+
+            if (button) {
+                button.hidden = true;
+                button.classList.add('hidden');
+                button.classList.remove('inline-flex');
+            }
+            if (badge) {
                 badge.classList.add('hidden');
                 badge.textContent = '';
             }
+            if (moreItem) {
+                moreItem.dataset.available = shouldShowBell ? '1' : '0';
+                moreItem.setAttribute('aria-label', label);
+            }
+            if (moreLabel) moreLabel.textContent = label;
+            if (typeof syncHeaderOverflowMenu === 'function') syncHeaderOverflowMenu();
         }
 
         function syncRecipeUndoButton() {
             const undoButton = document.getElementById('undo-delete-button');
             const undoLabel = document.getElementById('undo-delete-label');
-            if (!undoButton) return;
-
+            const moreItem = document.getElementById('header-more-undo');
+            const moreLabel = document.getElementById('header-more-undo-label');
             const undoEntry = getActiveRecipeUndoEntry();
             const shouldShow = Boolean(undoEntry);
-            undoButton.classList.toggle('hidden', !shouldShow);
-            undoButton.classList.toggle('inline-flex', shouldShow);
+            const nl = userSettings.language === 'nl';
+            let label = nl ? 'Ongedaan maken' : 'Undo';
             if (shouldShow) {
                 const msLeft = Math.max(0, new Date(undoEntry.expiresAt).getTime() - Date.now());
                 const minutesLeft = Math.max(1, Math.ceil(msLeft / 60000));
-                undoButton.title = `Undo last delete (${minutesLeft}m left)`;
-                if (undoLabel) {
-                    undoLabel.textContent = `Undo ${minutesLeft}m`;
-                }
-            } else {
-                undoButton.title = 'Undo last delete';
-                if (undoLabel) {
-                    undoLabel.textContent = 'Undo';
-                }
+                label = nl ? `Ongedaan maken (${minutesLeft}m)` : `Undo (${minutesLeft}m)`;
             }
+
+            if (undoButton) {
+                undoButton.hidden = true;
+                undoButton.classList.add('hidden');
+                undoButton.classList.remove('inline-flex');
+                undoButton.title = label;
+            }
+            if (undoLabel) undoLabel.textContent = label;
+            if (moreItem) {
+                moreItem.dataset.available = shouldShow ? '1' : '0';
+                moreItem.setAttribute('aria-label', label);
+            }
+            if (moreLabel) moreLabel.textContent = label;
+            if (typeof syncHeaderOverflowMenu === 'function') syncHeaderOverflowMenu();
         }
 
         function addFamilyNotification({ type, title, message, familyId = '', recipeId = 0, recipeTitle = '', action = null }) {
@@ -15448,14 +16803,20 @@
         }
 
         function getRecipeCardSourceLabel(recipe) {
-            if (recipe?.source === 'published') return 'Saved from Browse';
+            if (recipe?.source === 'published') {
+                return uiText('Saved from Browse', 'Opgeslagen uit Browse');
+            }
 
             const family = getRecipeFamily(recipe);
             if (family) return family.label;
 
-            if (isRecipePublishedLive(recipe)) return 'Published live';
-            if (recipe?.publishedId) return 'Private draft with publish history';
-            return 'Private recipe';
+            if (isRecipePublishedLive(recipe)) {
+                return uiText('Published live', 'Live gepubliceerd');
+            }
+            if (recipe?.publishedId) {
+                return uiText('Private draft with publish history', 'Privéconcept met publicatiegeschiedenis');
+            }
+            return uiText('Private recipe', 'Privérecept');
         }
 
         function getRecipeDetailLocationLabel(recipe) {
@@ -15470,19 +16831,25 @@
 
         function getRecipeAuthorLabel(recipe) {
             const raw = String(recipe?.author ?? '').trim();
-            if (raw === 'House Recipe') return uiText('House Recipe', 'Huisrecept');
-            if (raw) return raw;
+            if (raw) return localizeRecipeLabel('chef', raw);
             const profileName = String(userSettings?.name || currentUser?.displayName || '').trim();
             if (profileName) return profileName;
-            return uiText('Unknown chef', 'Onbekende kok');
+            return localizeRecipeLabel('chef', 'Chef');
+        }
+
+        function getRecipeAuthorByline(recipe) {
+            const author = getRecipeAuthorLabel(recipe);
+            const raw = String(recipe?.author ?? '').trim();
+            const isHouse = /^house recipe$/i.test(raw) || /^huisrecept$/i.test(author);
+            if (isHouse) return author; // "Huisrecept", never "Door Huisrecept"
+            return uiText(`By ${author}`, `Door ${author}`);
         }
 
         function getRecipeCountryLabel(recipe, { fallback = true } = {}) {
-            const nl = userSettings.language === 'nl';
             const raw = String(recipe?.country ?? '').trim();
-            if (raw) return raw;
+            if (raw) return localizeRecipeCuisineLabel(raw);
             if (!fallback) return '';
-            return nl ? 'Onbekend land' : 'Unknown country';
+            return uiText('Unknown country', 'Onbekend land');
         }
 
         function getNotebookRecipeMoodLabel(recipe) {
@@ -15631,7 +16998,7 @@
                                             ${visibleInstructions.map((step, stepIndex) => `<li>${stepIndex + 1}. ${escapeHTML(getRecipeInstructionText(step))}</li>`).join('')}
                                         </ol>
                                         ${(entry.instructions || []).length > visibleInstructions.length ? `<p class="mt-3 text-xs font-semibold text-sage">+ ${(entry.instructions || []).length - visibleInstructions.length} more step${(entry.instructions || []).length - visibleInstructions.length === 1 ? '' : 's'}</p>` : ''}
-                                        ${entry.tips ? `<div class="mt-4 rounded-2xl border border-parchmentDark bg-parchment p-4"><p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Chef's notes</p><p class="mt-2 text-sm font-semibold leading-relaxed text-forest">${escapeHTML(entry.tips)}</p></div>` : ''}
+                                        ${entry.tips ? `<div class="mt-4 rounded-2xl border border-parchmentDark bg-parchment p-4"><p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${uiText("Chef's notes", 'Chefsnotities')}</p><p class="mt-2 text-sm font-semibold leading-relaxed text-forest">${escapeHTML(entry.tips)}</p></div>` : ''}
                                     </div>
                                 </div>
                             </details>
@@ -16356,9 +17723,9 @@
                 `
                 : `
                     <p class="text-sm font-semibold text-sage mb-5">${firebaseInitialized ? 'Log in or create your account now so cloud sync, publishing, and cross-device access can be connected later. Premium still gates sync, publishing, and family collaboration.' : 'Google login is still in setup. Keep using the app locally for now, and only treat cloud sync, publishing, and shared families as live once Firebase is fully connected.'}</p>
-                    <div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>
+                    ${shouldShowAuthAgreementFields() ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
                     <div class="${settingsActionGridClass}">
-                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses(cloudAuthActionVariant, { fullWidth: true, size: 'lg' })} auth-gate-social auth-gate-action-locked">
+                        <button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses(cloudAuthActionVariant, { fullWidth: true, size: 'lg' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}">
                             <i data-lucide="${cloudAuthActionIcon}" class="w-4 h-4"></i> ${cloudAuthActionLabel}
                         </button>
                         ${firebaseInitialized
@@ -16427,9 +17794,9 @@
                         <div class="rounded-xl border border-parchmentDark bg-white p-4">
                             <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">Admin accounts</p>
                             <p class="mt-2 text-sm font-semibold text-sage">Add or remove admin rights per account email.</p>
-                            <div class="mt-3 flex flex-col gap-2 sm:flex-row">
-                                <input id="admin-account-email" type="email" placeholder="account@email.com" class="${inputClass} h-11" />
-                                <button onclick="submitAdminAccountToggle(true)" class="${getAppButtonClasses('primary', { size: 'lg' })}">
+                            <div class="mt-3 settings-inline-row">
+                                <input id="admin-account-email" type="email" placeholder="account@email.com" class="settings-control" />
+                                <button onclick="submitAdminAccountToggle(true)" class="${getAppButtonClasses('primary', { size: 'sm' })}">
                                     <i data-lucide="shield-check" class="w-4 h-4"></i> Set admin
                                 </button>
                             </div>
@@ -16623,37 +17990,39 @@
                                         <span>Account</span>
                                         <span class="settings-status">${escapeHTML(accountStatus)}</span>
                                     </div>
-                                    ${offerCloudSignIn ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
+                                    ${offerCloudSignIn && shouldShowAuthAgreementFields() ? `<div class="settings-auth-agreements">${authAgreementFieldsMarkup()}</div>` : ''}
                                     <div class="settings-actions button-pair">
                                         <button type="submit" class="${getAppButtonClasses('primary', { size: 'sm' })}">
                                             <i data-lucide="save" class="w-4 h-4"></i>${settingsNl ? 'Opslaan' : 'Save'}
                                         </button>
                                         ${isAuthenticated
                                             ? `<button type="button" onclick="signOut()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="log-out" class="w-4 h-4"></i>${settingsNl ? 'Uitloggen' : 'Sign Out'}</button>`
-                                            : `<button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { size: 'sm' })} auth-gate-social auth-gate-action-locked"><i data-lucide="log-in" class="w-4 h-4"></i>Google</button>`}
+                                            : `<button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { size: 'sm' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}"><i data-lucide="log-in" class="w-4 h-4"></i>Google</button>`}
                                     </div>
-                                    ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'sm' })} auth-gate-social auth-gate-action-locked"><i data-lucide="link" class="w-4 h-4"></i>${settingsNl ? 'Koppel Google' : 'Link Google'}</button></div>` : ''}
+                                    ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'sm' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}"><i data-lucide="link" class="w-4 h-4"></i>${settingsNl ? 'Koppel Google' : 'Link Google'}</button></div>` : ''}
                                 </div>
                                 <div>
                                     <p class="settings-panel-kicker">${settingsNl ? 'Voorkeuren' : 'Preferences'}</p>
                                     <div class="settings-prefs">
-                                        <label class="settings-row">
-                                            <span>${settingsNl ? 'Maten' : 'Measurement'}</span>
-                                            <select id="settings-measurement" class="settings-select">
-                                                <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>${uiText('Metric', 'Metriek')}</option>
-                                                <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>${uiText('Imperial', 'Imperiaal')}</option>
-                                            </select>
-                                        </label>
-                                        <label class="settings-row">
-                                            <span>${settingsNl ? 'Taal' : 'Language'}</span>
-                                            <select id="settings-language" class="settings-select">
-                                                <option value="en" ${userSettings.language === 'en' ? 'selected' : ''}>English</option>
-                                                <option value="nl" ${userSettings.language === 'nl' ? 'selected' : ''}>Nederlands</option>
-                                                <option value="fr" ${userSettings.language === 'fr' ? 'selected' : ''}>Français</option>
-                                                <option value="de" ${userSettings.language === 'de' ? 'selected' : ''}>Deutsch</option>
-                                                <option value="es" ${userSettings.language === 'es' ? 'selected' : ''}>Español</option>
-                                            </select>
-                                        </label>
+                                        <div class="settings-prefs-pair">
+                                            <label class="settings-field">
+                                                <span>${settingsNl ? 'Maten' : 'Measurement'}</span>
+                                                <select id="settings-measurement" class="settings-control settings-select">
+                                                    <option value="Metric" ${userSettings.measurementSystem === 'Metric' ? 'selected' : ''}>${uiText('Metric', 'Metriek')}</option>
+                                                    <option value="Imperial" ${userSettings.measurementSystem === 'Imperial' ? 'selected' : ''}>${uiText('Imperial', 'Imperiaal')}</option>
+                                                </select>
+                                            </label>
+                                            <label class="settings-field">
+                                                <span>${settingsNl ? 'Taal' : 'Language'}</span>
+                                                <select id="settings-language" class="settings-control settings-select">
+                                                    <option value="en" ${userSettings.language === 'en' ? 'selected' : ''}>English</option>
+                                                    <option value="nl" ${userSettings.language === 'nl' ? 'selected' : ''}>Nederlands</option>
+                                                    <option value="fr" ${userSettings.language === 'fr' ? 'selected' : ''}>Français</option>
+                                                    <option value="de" ${userSettings.language === 'de' ? 'selected' : ''}>Deutsch</option>
+                                                    <option value="es" ${userSettings.language === 'es' ? 'selected' : ''}>Español</option>
+                                                </select>
+                                            </label>
+                                        </div>
                                         <label class="settings-row settings-row--full">
                                             <span>${uiText('Auto-publish', 'Automatisch publiceren')}</span>
                                             <input type="checkbox" id="settings-auto-publish" ${userSettings.autoPublish ? 'checked' : ''}>
@@ -16677,6 +18046,20 @@
                             </div>
                         </section>
 
+                        ${isAccessSuperuser() ? `
+                        <section class="settings-panel settings-panel--wide">
+                            <p class="settings-panel-kicker">${settingsNl ? 'Toegang' : 'Access'}</p>
+                            <p class="text-sm font-semibold text-sage mb-3">${settingsNl
+                                ? 'Beheer welke e-mailadressen volledige (betaalde) functies krijgen.'
+                                : 'Manage which emails receive full (paid) features.'}</p>
+                            <div class="settings-actions">
+                                <button type="button" onclick="renderAccessManagement()" class="${getAppButtonClasses('primary', { size: 'sm' })}">
+                                    <i data-lucide="key-round" class="w-4 h-4"></i>${settingsNl ? 'Toegang beheren' : 'Manage access'}
+                                </button>
+                            </div>
+                        </section>
+                        ` : ''}
+
                         ${isCurrentUserAdmin() ? `<section class="settings-panel settings-panel--wide"><p class="settings-panel-kicker">Admin</p>${adminManagementContent}</section>` : ''}
                     </form>
                 </div>
@@ -16684,6 +18067,75 @@
             lucide.createIcons();
             markViewEnter();
             syncAuthGateButtons();
+            if (typeof syncHeaderBackButton === 'function') syncHeaderBackButton();
+            else if (typeof syncChromeLabels === 'function') syncChromeLabels();
+        }
+
+        async function renderAccessManagement() {
+            if (!ensureAuthenticatedAccess()) return;
+            if (!isAccessSuperuser()) {
+                showToast(uiText('Superuser access required.', 'Alleen de superuser mag dit.'), 'alert-circle');
+                renderSettings();
+                return;
+            }
+
+            chromeBackAction = 'settings';
+            activeDetailRecipeId = null;
+            setActiveNav('settings');
+            currentView = 'access';
+
+            await loadAccessGrantListForSuperuser();
+            const nl = userSettings.language === 'nl';
+            const rows = accessGrantListCache.length
+                ? accessGrantListCache.map(email => {
+                    const safeEmail = escapeHTML(email);
+                    const safeAttr = escapeHTML(email).replace(/"/g, '&quot;');
+                    return `
+                    <div class="access-grant-row" data-access-email="${safeAttr}">
+                        <span class="access-grant-email" title="${safeAttr}">${safeEmail}</span>
+                        <button type="button" class="access-grant-remove ${getAppButtonClasses('secondary', { size: 'sm' })}" data-email="${safeAttr}" onclick="confirmAccessGrantRemove(this.dataset.email)" aria-label="${nl ? 'Verwijderen' : 'Remove'} ${safeAttr}">
+                            <i data-lucide="user-minus" class="w-4 h-4" aria-hidden="true"></i><span>${nl ? 'Verwijderen' : 'Remove'}</span>
+                        </button>
+                    </div>`;
+                }).join('')
+                : `<p class="text-sm font-semibold text-sage" style="margin:0;">${nl ? 'Nog geen e-mailadressen op de lijst.' : 'No emails on the list yet.'}</p>`;
+
+            contentDiv.innerHTML = `
+                <div class="settings-sheet push-sheet" id="access-grant-list">
+                    <header class="settings-hero">
+                        <h2>${nl ? 'Toegang beheren' : 'Manage access'}</h2>
+                        <p>${nl
+                            ? 'E-mailadressen op deze lijst krijgen volledige (betaalde) functies. Jij hebt als superuser altijd toegang.'
+                            : 'Emails on this list get full (paid) features. As superuser you always have access.'}</p>
+                    </header>
+                    <div class="settings-grid">
+                        <section class="settings-panel settings-panel--wide">
+                            <p class="settings-panel-kicker">${nl ? 'Toevoegen' : 'Add'}</p>
+                            <div class="access-add-row settings-inline-row">
+                                <input id="access-grant-email" class="access-add-input settings-control" type="email" autocomplete="email" inputmode="email" placeholder="naam@email.com" aria-label="${nl ? 'E-mailadres' : 'Email address'}" />
+                                <button type="button" onclick="submitAccessGrantAdd()" class="access-add-submit ${getAppButtonClasses('primary', { size: 'sm' })}">
+                                    <i data-lucide="user-plus" class="w-4 h-4" aria-hidden="true"></i>${nl ? 'Toevoegen' : 'Add'}
+                                </button>
+                            </div>
+                        </section>
+                        <section class="settings-panel settings-panel--wide">
+                            <p class="settings-panel-kicker">${nl ? 'Lijst' : 'List'}</p>
+                            <div class="access-grant-list">${rows}</div>
+                        </section>
+                        <section class="settings-panel settings-panel--wide">
+                            <div class="settings-actions">
+                                <button type="button" onclick="renderSettings()" class="${getAppButtonClasses('secondary', { size: 'sm' })}">
+                                    <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>${nl ? 'Terug naar Opties' : 'Back to Options'}
+                                </button>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            markViewEnter();
+            if (typeof syncHeaderBackButton === 'function') syncHeaderBackButton();
+            if (typeof syncTopBackButton === 'function') syncTopBackButton();
         }
 
         function showAppInfo() {
@@ -16739,13 +18191,20 @@
         }
 
         function prepareInteractiveTutorialStep(stepIndex) {
+            activeDetailRecipeId = null;
+            // Language step opens Settings so #settings-language is a visible target.
+            if (stepIndex === 4 && typeof renderSettings === 'function') {
+                renderSettings();
+                if (typeof lucide?.createIcons === 'function') lucide.createIcons();
+                return;
+            }
+
             // Keep the shell on the index surface so header gear / add / nav stay visible.
             const needsIndexSurface = currentView !== 'index'
                 || activeDetailRecipeId != null
                 || !document.getElementById('header-add-recipe')
                 || document.getElementById('header-add-recipe')?.hidden
                 || Boolean(document.querySelector('#content h2')?.textContent?.match(/^(Opties|Options)$/i));
-            activeDetailRecipeId = null;
             chromeBackAction = null;
             if (needsIndexSurface && typeof renderList === 'function') {
                 renderList();
@@ -16766,9 +18225,12 @@
             const tourSteps = [
                 {
                     title: 'Welkom bij Uculi',
-                    body: 'Dit is je persoonlijke receptenarchief. We nemen je in 4 stappen mee langs de belangrijkste onderdelen.',
+                    body: uiText(
+                        'This is your personal recipe archive. We walk you through the main parts in 5 short steps.',
+                        'Dit is je persoonlijke receptenarchief. We nemen je in 5 stappen mee langs de belangrijkste onderdelen.'
+                    ),
                     icon: 'sparkles',
-                    targets: ['.app-header-brand', '#main-header'],
+                    targets: ['#header-page-title', '#main-header'],
                     prefer: 'below'
                 },
                 {
@@ -16790,6 +18252,16 @@
                     body: 'Opties open je via het tandwiel. Daar staan account, taal en backup.',
                     icon: 'settings',
                     targets: ['#header-open-settings'],
+                    prefer: 'below'
+                },
+                {
+                    title: uiText('Language', 'Taal'),
+                    body: uiText(
+                        'Prefer a different language? You choose that in Settings. Do not forget to tap Save, or everything stays as it was.',
+                        'Liever een andere taal? Die kies je bij Instellingen. Vergeet niet op Opslaan te tikken, anders blijft alles zoals het was.'
+                    ),
+                    icon: 'languages',
+                    targets: ['#settings-language', 'button[type="submit"].app-btn-primary', '#header-open-settings'],
                     prefer: 'below'
                 }
             ];
@@ -16850,7 +18322,7 @@
                     }
                 } else {
                     // Fallback: still show a visible spotlight on the header so the step never floats aimlessly.
-                    const fallback = resolveTourTarget(['#main-header', '.app-header-brand']);
+                    const fallback = resolveTourTarget(['#main-header', '#header-page-title']);
                     if (fallback) {
                         const fr = fallback.getBoundingClientRect();
                         backdropHtml = `<div style="position:fixed;pointer-events:none;left:${Math.max(0, fr.left - PAD)}px;top:${Math.max(0, fr.top - PAD)}px;width:${fr.width + PAD * 2}px;height:${fr.height + PAD * 2}px;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.60);z-index:301;"></div>`;
@@ -17138,18 +18610,24 @@
         function syncTermsAcceptButton() {
             const privacyChecked = Boolean(document.getElementById('terms-accept-privacy')?.checked);
             const termsChecked = Boolean(document.getElementById('terms-accept-terms')?.checked);
+            const singleChecked = Boolean(document.getElementById('auth-agree-current')?.checked);
             const button = document.getElementById('terms-accept-confirm-btn');
-            if (button) button.disabled = !(privacyChecked && termsChecked);
+            if (button) button.disabled = !((privacyChecked && termsChecked) || singleChecked);
         }
 
         function confirmTermsAcceptance() {
-            if (!document.getElementById('terms-accept-privacy')?.checked || !document.getElementById('terms-accept-terms')?.checked) {
+            const dualOk = Boolean(document.getElementById('terms-accept-privacy')?.checked)
+                && Boolean(document.getElementById('terms-accept-terms')?.checked);
+            const singleOk = Boolean(document.getElementById('auth-agree-current')?.checked);
+            if (!dualOk && !singleOk) {
                 showToast(getAgreementCopy().needAgreements, 'alert-circle');
                 return;
             }
             userSettings.termsAccepted = true;
             userSettings.termsAcceptedAt = new Date().toISOString();
             userSettings.termsAcceptedVersion = AGREEMENT_VERSION;
+            clearNewAccountTermsMarker();
+            clearPendingAgreement();
             saveData();
             const modal = document.getElementById('terms-accept-modal');
             if (modal) modal.remove();
@@ -17533,12 +19011,25 @@
             element.style.aspectRatio = '1 / 1.414';
         }
 
+        function getNotebookPagerReservePx() {
+            // Pager chrome is ~46px tall; never fall back to the old 20px reserve.
+            const minReserve = window.innerWidth < 768 ? 64 : 72;
+            const pager = contentDiv?.querySelector('[data-notebook-pager]');
+            if (!pager) return minReserve;
+            const styles = window.getComputedStyle(pager);
+            const marginTop = Number.parseFloat(styles.marginTop) || 0;
+            const marginBottom = Number.parseFloat(styles.marginBottom) || 0;
+            const measured = Math.ceil(pager.getBoundingClientRect().height + marginTop + marginBottom + 10);
+            return Math.max(minReserve, measured || 56);
+        }
+
         function syncNotebookViewportHeight() {
             if (!contentDiv || currentView !== 'index' || indexViewMode !== 'book') return;
 
             const notebookFrame = contentDiv.querySelector('[data-notebook-frame]');
             const notebookSurface = notebookFrame?.querySelector('.notebook-book-spread-surface');
             const coverSurface = contentDiv.querySelector('#notebook-cover-surface');
+            const pagerReserve = getNotebookPagerReservePx();
 
             if (window.innerWidth < 768) {
                 const coverFrame = coverSurface?.closest('.notebook-landing-cover-frame');
@@ -17559,7 +19050,8 @@
                     const viewportHeight = Math.floor(window.visualViewport?.height || window.innerHeight || 0);
                     const navTop = navRect ? Math.min(navRect.top, viewportHeight) : viewportHeight;
                     const surfaceTop = notebookSurface.getBoundingClientRect().top;
-                    const fittedHeight = Math.max(320, Math.ceil(navTop - surfaceTop));
+                    // Leave room so Vorige/Volgende sit visibly above the bottom nav.
+                    const fittedHeight = Math.max(280, Math.ceil(navTop - surfaceTop - pagerReserve));
                     notebookSurface.style.paddingBottom = '0px';
                     notebookSurface.style.width = '100%';
                     notebookSurface.style.maxWidth = '100%';
@@ -17577,10 +19069,13 @@
             const navRect = document.getElementById('main-nav')?.getBoundingClientRect();
             const viewportHeight = Math.floor(window.visualViewport?.height || window.innerHeight || 0);
             const bottomLimit = navRect ? Math.min(navRect.top, viewportHeight) : viewportHeight;
-            const bottomReserve = 20;
+            const bottomReserve = 12;
             const fallbackHeight = 560;
-            const minHeight = 360;
-            const availableHeight = Math.max(minHeight, Math.floor(bottomLimit - frameRect.top - bottomReserve));
+            const minHeight = 320;
+            const availableHeight = Math.max(
+                minHeight,
+                Math.floor(bottomLimit - frameRect.top - bottomReserve - pagerReserve)
+            );
             let fittedHeight = availableHeight || fallbackHeight;
 
             const fittedWidth = Math.max(320, Math.floor(notebookFrame.clientWidth));
@@ -17739,7 +19234,7 @@
                 node.innerHTML = nextPreviewMarkup;
             });
             document.querySelectorAll(`[data-notebook-note-plaintext="${noteId}"]`).forEach(node => {
-                node.textContent = nextText || 'Empty sticky note. Click to edit.';
+                node.textContent = nextText || uiText('Empty sticky note. Click to edit.', 'Leeg plakbriefje. Tik om te bewerken.');
             });
         }
 
@@ -18103,9 +19598,20 @@
                 ? uiText('Hide notes', 'Notities verbergen')
                 : uiText('Show notes', 'Notities tonen');
             const safeRecipeTitle = escapeHTML(recipe.title || uiText('Untitled recipe', 'Naamloos recept'));
-            const safeRecipeCategory = escapeHTML(recipe.category || uiText('Recipe', 'Recept'));
-            const safeRecipeAuthor = escapeHTML(getRecipeAuthorLabel(recipe) || 'Chef');
-            const dietText = (recipe.diet || []).length > 0 ? escapeHTML(recipe.diet.join(' · ')) : uiText('No diet tags', 'Geen dieettags');
+            const safeRecipeCategory = escapeHTML(localizeRecipeCategoryLabel(recipe.category));
+            const safeRecipeDifficulty = recipe.difficulty
+                ? escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))
+                : '';
+            const safeRecipeCountry = recipe.country
+                ? escapeHTML(localizeRecipeCuisineLabel(recipe.country) || recipe.country)
+                : '';
+            const notebookMetaLine = [safeRecipeCategory, safeRecipeDifficulty, safeRecipeCountry]
+                .filter(Boolean)
+                .join(' · ');
+            const safeRecipeAuthor = escapeHTML(getRecipeAuthorLabel(recipe) || uiText('Chef', 'Kok'));
+            const dietText = (recipe.diet || []).length > 0
+                ? escapeHTML(recipe.diet.map(tag => localizeRecipeDietLabel(tag)).join(' · '))
+                : uiText('No diet tags', 'Geen dieettags');
             const notebookCookActionLabel = totalInstructions > 0
                 ? uiText('Start cooking', 'Begin met koken')
                 : uiText('Open recipe', 'Open recept');
@@ -18122,9 +19628,11 @@
             const hasNextNotebookPage = isMobileNotebook
                 ? (mobileLeafIndex < mobileLeafCount - 1 || notebookPageIndex < totalPages - 1)
                 : (notebookSpreadPageIndex < notebookRecipeSpreads.length - 1 || notebookPageIndex < totalPages - 1);
+            const notebookPageOf = uiText('of', 'van');
             const notebookPageLabel = isMobileNotebook
-                ? `${mobileLeafIndex + 1} / ${mobileLeafCount}`
-                : `${notebookSpreadPageIndex + 1} / ${notebookRecipeSpreads.length}`;
+                ? `${mobileLeafIndex + 1} ${notebookPageOf} ${mobileLeafCount}`
+                : `${notebookSpreadPageIndex + 1} ${notebookPageOf} ${notebookRecipeSpreads.length}`;
+            const notebookPageHeading = `${uiText('Page', 'Pagina')} ${notebookPageLabel}`;
             const notebookLeafTurnClass = side => {
                 if (!notebookPageTurnDirection) return '';
                 const turningForward = notebookPageTurnDirection > 0;
@@ -18217,10 +19725,11 @@
                     `;
                 }
 
-                const prepCookServesLine = uiText(
-                    `${recipe.prepTime || 0}m prep · ${recipe.cookTime || 0}m cook · serves ${recipe.servings || 0}`,
-                    `${recipe.prepTime || 0}m voorb. · ${recipe.cookTime || 0}m koken · ${recipe.servings || 0} porties`
-                );
+                const prepCookServesLine = [
+                    localizeRecipeLabel('prep', recipe.prepTime || 0),
+                    localizeRecipeLabel('cook', recipe.cookTime || 0),
+                    localizeRecipeLabel('serves', recipe.servings || 0)
+                ].join(' · ');
 
                 return `
                     <div class="notebook-paper__body">
@@ -18230,11 +19739,7 @@
                             <h3 class="mt-2 font-fantasy text-2xl md:text-3xl font-bold text-forest leading-[1.02]">${safeRecipeTitle}</h3>
                             <div class="notebook-paper__section notebook-ruled-block mt-3 text-xs font-semibold text-sage">
                                 <div class="notebook-line-row">${recipeMood}</div>
-                                <div class="notebook-line-row text-[10px] font-bold uppercase tracking-[0.22em]">
-                                    <span>${safeRecipeCategory}</span>
-                                    ${recipe.difficulty ? `<span>· ${escapeHTML(recipe.difficulty)}</span>` : ''}
-                                    ${recipe.country ? `<span>· ${escapeHTML(recipe.country)}</span>` : ''}
-                                </div>
+                                <div class="notebook-line-row notebook-meta-line text-[10px] font-bold uppercase tracking-[0.22em]">${notebookMetaLine}</div>
                             </div>
                             <div class="notebook-paper__section notebook-ruled-block mt-3 text-xs font-semibold text-sage">
                                 <div class="notebook-line-row">${prepCookServesLine}</div>
@@ -18247,15 +19752,13 @@
                                         <div class="notebook-page-photo-card" style="background-image:url('${recipe.profile || defaultPlaceholderProfile}')"></div>
                                     </div>
                                 </div>
-                                <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Recipe page', 'Receptpagina')}</p>
-                                ${notebookFamilyBadge ? `<div class="mt-3">${notebookFamilyBadge}</div>` : ''}
-                                <h3 class="mt-2 font-fantasy text-3xl md:text-5xl font-bold text-forest leading-[1.02]">${safeRecipeTitle}</h3>
-                                <div class="notebook-ruled-block mt-3 text-sm font-semibold text-sage">
-                                    <div class="notebook-line-row">${recipeMood}</div>
-                                    <div class="notebook-line-row text-[11px] font-bold uppercase tracking-[0.22em]">
-                                        <span>${safeRecipeCategory}</span>
-                                        ${recipe.difficulty ? `<span>· ${escapeHTML(recipe.difficulty)}</span>` : ''}
-                                        ${recipe.country ? `<span>· ${escapeHTML(recipe.country)}</span>` : ''}
+                                <div class="notebook-page-hero-copy">
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-sage opacity-80">${uiText('Recipe page', 'Receptpagina')}</p>
+                                    ${notebookFamilyBadge ? `<div class="mt-3">${notebookFamilyBadge}</div>` : ''}
+                                    <h3 class="mt-2 font-fantasy text-3xl md:text-5xl font-bold text-forest leading-[1.02]">${safeRecipeTitle}</h3>
+                                    <div class="notebook-ruled-block mt-3 text-sm font-semibold text-sage">
+                                        <div class="notebook-line-row">${recipeMood}</div>
+                                        <div class="notebook-line-row notebook-meta-line text-[11px] font-bold uppercase tracking-[0.22em]">${notebookMetaLine}</div>
                                     </div>
                                 </div>
                             </div>
@@ -18292,12 +19795,17 @@
             };
 
             const renderNotebookRightPage = page => {
+                const openedLocale = getActiveUiLanguage() === 'nl' ? 'nl-NL' : undefined;
+                const openedDate = recipe.lastOpened
+                    ? new Date(recipe.lastOpened).toLocaleDateString(openedLocale)
+                    : '';
+                const authorByline = getRecipeAuthorByline(recipe);
                 const byAuthorLine = recipe.lastOpened
                     ? uiText(
-                        `By ${safeRecipeAuthor} · last opened ${new Date(recipe.lastOpened).toLocaleDateString()}`,
-                        `Door ${safeRecipeAuthor} · laatst geopend ${new Date(recipe.lastOpened).toLocaleDateString('nl-NL')}`
+                        `${authorByline} · last opened ${openedDate}`,
+                        `${authorByline} · laatst geopend ${openedDate}`
                     )
-                    : uiText(`By ${safeRecipeAuthor}`, `Door ${safeRecipeAuthor}`);
+                    : authorByline;
 
                 if (!page || page.kind === 'blank') {
                     return `
@@ -18361,8 +19869,12 @@
                     ? activeFilters.map(filter => `<span class="notebook-landing-pill">${escapeHTML(filter)}</span>`).join('')
                     : '';
                 const noteCount = notebookStickyNotes.length;
-                const recipeWord = totalPages === 1 ? 'recept' : 'recepten';
-                const noteWord = noteCount === 1 ? 'notitie' : 'notities';
+                const recipeWord = totalPages === 1
+                    ? uiText('recipe', 'recept')
+                    : uiText('recipes', 'recepten');
+                const noteWord = noteCount === 1
+                    ? uiText('note', 'notitie')
+                    : uiText('notes', 'notities');
 
                 return `
                     <div class="mb-4">
@@ -18377,20 +19889,26 @@
                                 </div>
 
                                 <div class="notebook-landing-invite">
-                                    <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">Klaar om te openen</p>
+                                    <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Ready to open', 'Klaar om te openen')}</p>
                                     <h2>${safeRecipeTitle}</h2>
-                                    <p>${totalIngredients} ingrediënten · ${totalInstructions} stappen. Open het schrift om te koken, notities te maken of bladzijden om te slaan.</p>
+                                    <p>${uiText(
+                                        `${totalIngredients} ingredients · ${totalInstructions} steps. Open the notebook to cook, take notes, or turn pages.`,
+                                        `${totalIngredients} ingrediënten · ${totalInstructions} stappen. Open het schrift om te koken, notities te maken of bladzijden om te slaan.`
+                                    )}</p>
                                     <div class="notebook-landing-action-row">
                                         <button onclick="openNotebookCover()" class="${getAppButtonClasses('primary', { size: 'lg' })} rounded-2xl shadow-[0_16px_28px_rgba(45,77,52,0.24)]" translate="no">
-                                            <i data-lucide="book-open" class="h-4 w-4"></i>Open schrift
+                                            <i data-lucide="book-open" class="h-4 w-4"></i>${uiText('Open notebook', 'Open schrift')}
                                         </button>
                                         <button type="button" onclick="${pdfActions.bookAction}" class="${getAppButtonClasses(accountHasPremiumPlan() ? 'secondary' : 'locked', { size: 'lg' })} rounded-2xl" title="${pdfActions.book}" aria-label="${pdfActions.book}">
                                             <i data-lucide="${accountHasPremiumPlan() ? 'file-down' : 'lock'}" class="h-4 w-4"></i>${pdfActions.book}
                                         </button>
                                     </div>
-                                    <p class="notebook-landing-hint notebook-landing-hint-desktop">Klik op de kaft of de knop om de volledige openslag te openen.</p>
-                                    <p class="notebook-landing-hint notebook-landing-hint-touch">Tik op de kaft om de volledige openslag te openen.</p>
-                                    <p class="notebook-landing-meta">${totalPages} ${recipeWord} · ${notebookRecipeSpreads.length} openslagen · ${noteCount} ${noteWord}</p>
+                                    <p class="notebook-landing-hint notebook-landing-hint-desktop">${uiText('Click the cover or button to open the full spread.', 'Klik op de kaft of de knop om de volledige openslag te openen.')}</p>
+                                    <p class="notebook-landing-hint notebook-landing-hint-touch">${uiText('Tap the cover to open the full spread.', 'Tik op de kaft om de volledige openslag te openen.')}</p>
+                                    <p class="notebook-landing-meta">${uiText(
+                                        `${totalPages} ${recipeWord} · ${notebookRecipeSpreads.length} spreads · ${noteCount} ${noteWord}`,
+                                        `${totalPages} ${recipeWord} · ${notebookRecipeSpreads.length} openslagen · ${noteCount} ${noteWord}`
+                                    )}</p>
                                     ${hasActiveFilters ? `<div class="notebook-landing-pill-row">${activeFilterPills}</div>` : ''}
                                 </div>
                             </div>
@@ -18404,47 +19922,54 @@
                     <div class="notebook-chrome">
                         <div class="notebook-chrome-kicker">
                             <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-sage opacity-80">${uiText('Notebook mode', 'Schriftmodus')}</p>
-                            <p class="notebook-chrome-page">${uiText('Page', 'Pagina')} ${notebookPageLabel}</p>
+                            <p class="notebook-chrome-page">${notebookPageHeading}</p>
                         </div>
                         ${hasActiveFilters ? `<p class="mt-1 text-[10px] font-bold uppercase tracking-[0.16em] text-gold">${uiText(`Filtered spread: ${activeFilters.length} active filter${activeFilters.length === 1 ? '' : 's'}`, `Gefilterde openslag: ${activeFilters.length} actieve filter${activeFilters.length === 1 ? '' : 's'}`)}</p>` : ''}
                         <div class="notebook-chrome-bar">
-                            <div class="notebook-chrome-group" role="group" aria-label="${uiText('View', 'Weergave')}">
-                                <button type="button" onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest" title="${uiText('Cards view', 'Kaartenweergave')}" aria-label="${uiText('Cards view', 'Kaartenweergave')}">
-                                    <i data-lucide="layout-grid" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${uiText('Cards', 'Kaarten')}</span>
-                                </button>
-                                <button type="button" onclick="setIndexViewMode('list')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-sage transition-all hover:bg-surface-muted hover:text-forest" title="${uiText('List view', 'Lijstweergave')}" aria-label="${uiText('List view', 'Lijstweergave')}">
-                                    <i data-lucide="list" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${uiText('List', 'Lijst')}</span>
-                                </button>
-                                <button type="button" onclick="setIndexViewMode('book')" class="notebook-view-toggle is-active inline-flex items-center justify-center rounded-lg text-white transition-all" title="${uiText('Notebook view', 'Schriftweergave')}" aria-label="${uiText('Notebook view', 'Schriftweergave')}">
-                                    <i data-lucide="book-open" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${uiText('Book', 'Boek')}</span>
-                                </button>
-                            </div>
-                            <div class="notebook-chrome-group" role="group" aria-label="${uiText('Notes', 'Notities')}">
-                                <button type="button" title="${notebookNoteActionLabel}" aria-label="${notebookNoteActionLabel}" onclick="openNotebookStickyNotesEditor(${recipe.id})" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg text-gold transition-all hover:bg-surface-muted hover:text-forest notebook-note-control notebook-note-control--manage notebook-note-control--icon" data-notebook-note-control="manage-notes">
-                                    <i data-lucide="sticky-note" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${uiText('Notes', 'Notities')}</span>
-                                </button>
-                                <button type="button" title="${notebookVisibilityActionLabel}" aria-label="${notebookVisibilityActionLabel}" onclick="toggleNotebookStickyNotesVisibility()" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all ${showNotebookStickyNotes ? 'text-sage' : 'text-gold'} hover:bg-surface-muted hover:text-forest notebook-note-control notebook-note-control--toggle notebook-note-control--icon" data-notebook-note-control="toggle-visibility">
-                                    <i data-lucide="${showNotebookStickyNotes ? 'eye-off' : 'eye'}" class="h-4 w-4"></i>
-                                    <span class="notebook-tool-label">${showNotebookStickyNotes ? uiText('Hide', 'Verberg') : uiText('Show', 'Toon')}</span>
-                                </button>
-                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook relative inline-flex items-center justify-center gap-2 rounded-lg text-xs font-bold uppercase tracking-wider text-white" data-notebook-note-control="open-cook">
-                                    <i data-lucide="chef-hat" class="h-4 w-4"></i>
-                                    <span class="notebook-cook-label">${uiText('Cook', 'Koken')}</span>
+                            <div class="notebook-chrome-leading">
+                                <div class="notebook-view-segment" role="group" aria-label="${uiText('View', 'Weergave')}">
+                                    <button type="button" onclick="setIndexViewMode('cards')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('Cards view', 'Kaartenweergave')}" aria-label="${uiText('Cards view', 'Kaartenweergave')}" aria-pressed="false">
+                                        <i data-lucide="layout-grid" class="h-4 w-4"></i>
+                                        <span class="notebook-tool-label">${uiText('Cards', 'Kaarten')}</span>
+                                    </button>
+                                    <button type="button" onclick="setIndexViewMode('list')" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('List view', 'Lijstweergave')}" aria-label="${uiText('List view', 'Lijstweergave')}" aria-pressed="false">
+                                        <i data-lucide="list" class="h-4 w-4"></i>
+                                        <span class="notebook-tool-label">${uiText('List', 'Lijst')}</span>
+                                    </button>
+                                    <button type="button" onclick="setIndexViewMode('book')" class="notebook-view-toggle is-active inline-flex items-center justify-center rounded-lg transition-all" title="${uiText('Notebook view', 'Schriftweergave')}" aria-label="${uiText('Notebook view', 'Schriftweergave')}" aria-pressed="true">
+                                        <i data-lucide="book-open" class="h-4 w-4"></i>
+                                        <span class="notebook-tool-label">${uiText('Book', 'Boek')}</span>
+                                    </button>
+                                </div>
+                                <button type="button" title="${notebookCookActionLabel}" aria-label="${notebookCookActionLabel}" onclick="openNotebookRecipeForCooking(${recipe.id})" class="notebook-note-control notebook-note-control--cook header-icon-button relative inline-flex items-center justify-center" data-notebook-note-control="open-cook">
+                                    <i data-lucide="chef-hat" class="w-5 h-5" aria-hidden="true"></i>
+                                    <span class="notebook-cook-label">${uiText('Cook mode', 'Kookmodus')}</span>
                                 </button>
                             </div>
-                            <div class="notebook-chrome-group" role="group" aria-label="${uiText('PDF export', 'PDF-export')}">
-                                <button type="button" title="${pdfActions.recipe}" aria-label="${pdfActions.recipe}" onclick="${pdfActions.recipeAction}" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg ${accountHasPremiumPlan() ? 'text-forest' : 'text-sage'} transition-all hover:bg-surface-muted hover:text-forest">
-                                    <i data-lucide="${accountHasPremiumPlan() ? 'file-text' : 'lock'}" class="h-4 w-4 ${accountHasPremiumPlan() ? '' : 'text-gold'}"></i>
-                                    <span class="notebook-tool-label">PDF</span>
-                                </button>
-                                <button type="button" title="${pdfActions.book}" aria-label="${pdfActions.book}" onclick="${pdfActions.bookAction}" class="notebook-view-toggle inline-flex items-center justify-center rounded-lg ${accountHasPremiumPlan() ? 'text-forest' : 'text-sage'} transition-all hover:bg-surface-muted hover:text-forest">
-                                    <i data-lucide="${accountHasPremiumPlan() ? 'files' : 'lock'}" class="h-4 w-4 ${accountHasPremiumPlan() ? '' : 'text-gold'}"></i>
-                                    <span class="notebook-tool-label">${uiText('Book', 'Boek')}</span>
-                                </button>
+                            <div class="notebook-chrome-actions">
+                                <div class="notebook-more" data-notebook-more>
+                                    <button type="button" class="notebook-more-toggle" aria-label="${uiText('More', 'Meer')}" aria-haspopup="menu" aria-expanded="false" title="${uiText('More', 'Meer')}" onclick="toggleNotebookMoreMenu(event)">
+                                        <i data-lucide="ellipsis" class="w-5 h-5" aria-hidden="true"></i>
+                                    </button>
+                                    <div class="notebook-more-menu" role="menu">
+                                        <button type="button" role="menuitem" class="notebook-more-item" title="${notebookNoteActionLabel}" onclick="openNotebookStickyNotesEditor(${recipe.id}); closeNotebookMoreMenus();">
+                                            <i data-lucide="sticky-note" aria-hidden="true"></i>
+                                            <span>${uiText('Sticky note', 'Plakbriefje')}</span>
+                                        </button>
+                                        <button type="button" role="menuitem" class="notebook-more-item" title="${notebookVisibilityActionLabel}" onclick="toggleNotebookStickyNotesVisibility(); closeNotebookMoreMenus();">
+                                            <i data-lucide="${showNotebookStickyNotes ? 'eye-off' : 'eye'}" aria-hidden="true"></i>
+                                            <span>${showNotebookStickyNotes ? uiText('Hide notes', 'Verbergen') : uiText('Show notes', 'Tonen')}</span>
+                                        </button>
+                                        <button type="button" role="menuitem" class="notebook-more-item" title="${pdfActions.recipe}" onclick="closeNotebookMoreMenus(); ${pdfActions.recipeAction}">
+                                            <i data-lucide="${accountHasPremiumPlan() ? 'file-text' : 'lock'}" aria-hidden="true"></i>
+                                            <span>${pdfActions.recipe || uiText('PDF', 'PDF')}</span>
+                                        </button>
+                                        <button type="button" role="menuitem" class="notebook-more-item" title="${uiText('Copy', 'Kopiëren')}" onclick="shareRecipe(${recipe.id}); closeNotebookMoreMenus();">
+                                            <i data-lucide="copy" aria-hidden="true"></i>
+                                            <span>${uiText('Copy', 'Kopiëren')}</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -18456,36 +19981,22 @@
                             <div class="grid h-full grid-cols-1 gap-4 md:grid-cols-2 md:gap-0">
                                 <section class="notebook-paper notebook-paper-left relative rounded-[24px] border border-white border-opacity-70 px-4 py-4 md:h-full md:rounded-r-none md:border-r-0 md:px-6 md:py-6 ${notebookMobileSide !== 'left' ? 'hidden md:flex' : ''} ${notebookLeafTurnClass('left')}" data-notebook-paper-side="left">
                                     ${renderNotebookLeftPage(currentSpread.left)}
-
-                                    <div class="notebook-paper__footer hidden items-end justify-start md:flex">
-                                        <button type="button" title="${uiText('Previous page', 'Vorige bladzijde')}" aria-label="${uiText('Previous page', 'Vorige bladzijde')}" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
-                                            <i data-lucide="chevron-left" class="h-4 w-4"></i>
-                                        </button>
-                                    </div>
-
                                     ${renderNotebookStickyNotes(recipe.id, notebookStickyNotes, 'left', showNotebookStickyNotes)}
                                 </section>
 
                                 <section class="notebook-paper notebook-paper-right relative rounded-[24px] border border-white border-opacity-70 px-4 py-4 md:h-full md:rounded-l-none md:px-6 md:py-6 ${notebookMobileSide !== 'right' ? 'hidden md:flex' : ''} ${notebookLeafTurnClass('right')}" data-notebook-paper-side="right">
                                     ${renderNotebookRightPage(currentSpread.right)}
-
-                                    <div class="notebook-paper__footer hidden items-end justify-end md:flex">
-                                        <button type="button" title="${uiText('Next page', 'Volgende bladzijde')}" aria-label="${uiText('Next page', 'Volgende bladzijde')}" onclick="goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-page-nav notebook-page-nav--primary">
-                                            <i data-lucide="chevron-right" class="h-4 w-4"></i>
-                                        </button>
-                                    </div>
-
                                     ${renderNotebookStickyNotes(recipe.id, notebookStickyNotes, 'right', showNotebookStickyNotes)}
                                 </section>
                             </div>
                         </div>
                     </div>
 
-                    <div class="notebook-mobile-pager flex items-center justify-between gap-3 md:hidden">
+                    <div class="notebook-page-under notebook-mobile-pager" data-notebook-pager>
                         <button type="button" title="${uiText('Previous page', 'Vorige bladzijde')}" aria-label="${uiText('Previous page', 'Vorige bladzijde')}" onclick="goToNotebookPage(-1)" ${hasPreviousNotebookPage ? '' : 'disabled'} class="notebook-page-nav">
                             <i data-lucide="chevron-left" class="h-4 w-4"></i>
                         </button>
-                        <span data-notebook-page-label="${notebookPageLabel}" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-parchmentDark bg-white/90 px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-sage shadow-sm">${uiText('Page', 'Pagina')} ${notebookPageLabel}</span>
+                        <span data-notebook-page-label="${notebookPageLabel}" class="notebook-page-label">${notebookPageHeading}</span>
                         <button type="button" title="${uiText('Next page', 'Volgende bladzijde')}" aria-label="${uiText('Next page', 'Volgende bladzijde')}" onclick="goToNotebookPage(1)" ${hasNextNotebookPage ? '' : 'disabled'} class="notebook-page-nav notebook-page-nav--primary">
                             <i data-lucide="chevron-right" class="h-4 w-4"></i>
                         </button>
@@ -18895,8 +20406,8 @@
                                     ${totalMinutes ? `<span>${totalMinutes}m</span>` : ''}
                                 </div>
                                 <div class="index-card-tags">
-                                    <span class="index-card-tag">${escapeHTML(recipe.category || 'Misc')}</span>
-                                    ${recipe.difficulty ? `<span class="index-card-tag">${escapeHTML(recipe.difficulty)}</span>` : ''}
+                                    <span class="index-card-tag">${escapeHTML(localizeRecipeCategoryLabel(recipe.category || 'Misc'))}</span>
+                                    ${recipe.difficulty ? `<span class="index-card-tag">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</span>` : ''}
                                     ${familyChipMarkup || ''}
                                 </div>
                             </div>
@@ -18922,19 +20433,19 @@
                                     ${recipeVersionLabel ? `<span>${escapeHTML(recipeVersionLabel)}</span>` : ''}
                                 </div>
                                 <div class="index-card-stats">
-                                    ${recipe.prepTime ? `<span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i>${recipe.prepTime}m prep</span>` : ''}
-                                    ${recipe.cookTime ? `<span class="flex items-center gap-1"><i data-lucide="flame" class="w-3 h-3"></i>${recipe.cookTime}m cook</span>` : ''}
-                                    ${recipe.servings ? `<span class="flex items-center gap-1"><i data-lucide="users" class="w-3 h-3"></i>${recipe.servings}</span>` : ''}
+                                    ${recipe.prepTime ? `<span class="flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i>${localizeRecipeLabel('prep', recipe.prepTime)}</span>` : ''}
+                                    ${recipe.cookTime ? `<span class="flex items-center gap-1"><i data-lucide="flame" class="w-3 h-3"></i>${localizeRecipeLabel('cook', recipe.cookTime)}</span>` : ''}
+                                    ${recipe.servings ? `<span class="flex items-center gap-1"><i data-lucide="users" class="w-3 h-3"></i>${localizeRecipeLabel('serves', recipe.servings)}</span>` : ''}
                                 </div>
                                 <div class="index-card-tags">
-                                    <span class="index-card-tag">${escapeHTML(recipe.category || 'Misc')}</span>
-                                    ${recipe.difficulty ? `<span class="index-card-tag">${escapeHTML(recipe.difficulty)}</span>` : ''}
-                                    ${recipe.country ? `<span class="index-card-tag">${escapeHTML(recipe.country)}</span>` : ''}
-                                    ${recipe.source === 'published' ? '<span class="index-card-tag">Saved</span>' : ''}
+                                    <span class="index-card-tag">${escapeHTML(localizeRecipeCategoryLabel(recipe.category || 'Misc'))}</span>
+                                    ${recipe.difficulty ? `<span class="index-card-tag">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</span>` : ''}
+                                    ${recipe.country ? `<span class="index-card-tag">${escapeHTML(localizeRecipeCuisineLabel(recipe.country))}</span>` : ''}
+                                    ${recipe.source === 'published' ? `<span class="index-card-tag">${uiText('Saved', 'Opgeslagen')}</span>` : ''}
                                     ${recipe.source !== 'published' && isRecipePublishedLive(recipe) ? '<span class="index-card-tag">Live</span>' : ''}
                                     ${savedRecipeOutdated ? '<span class="index-card-tag">Update</span>' : ''}
                                     ${recipeNeedsAttention(recipe) && !savedRecipeOutdated ? '<span class="index-card-tag">Attention</span>' : ''}
-                                    ${(recipe.diet || []).slice(0, 3).map(d => `<span class="index-card-tag">${escapeHTML(d)}</span>`).join('')}
+                                    ${(recipe.diet || []).slice(0, 3).map(d => `<span class="index-card-tag">${escapeHTML(localizeRecipeDietLabel(d))}</span>`).join('')}
                                 </div>
                                 <div class="index-card-footer">
                                     ${familyChipMarkup || escapeHTML(recipeSourceLabel)}
@@ -19460,9 +20971,9 @@
                                     ${versionLabel ? `<span>${escapeHTML(versionLabel)}</span>` : ''}
                                 </div>
                                 <div class="flex flex-wrap gap-2 mt-1">
-                                    <span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${escapeHTML(recipe.category || 'Misc')}</span>
-                                    ${recipe.difficulty ? `<span class="text-[10px] bg-gold bg-opacity-20 text-sage font-bold px-2 py-1 rounded-sm">${escapeHTML(recipe.difficulty)}</span>` : ''}
-                                    ${recipe.cuisine ? `<span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${escapeHTML(recipe.cuisine)}</span>` : ''}
+                                    <span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${escapeHTML(localizeRecipeCategoryLabel(recipe.category || 'Misc'))}</span>
+                                    ${recipe.difficulty ? `<span class="text-[10px] bg-gold bg-opacity-20 text-sage font-bold px-2 py-1 rounded-sm">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</span>` : ''}
+                                    ${recipe.cuisine ? `<span class="text-[10px] bg-accent text-sage font-bold px-2 py-1 rounded-sm uppercase tracking-wider border border-sage border-opacity-20">${escapeHTML(localizeRecipeCuisineLabel(recipe.cuisine))}</span>` : ''}
                                 </div>
                             </div>
                             <div class="browse-card-actions">
@@ -19548,13 +21059,13 @@
                             ${recipe.prepTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Prep', 'Voorb.')}</div><div class="detail-meta-value">${recipe.prepTime}m</div></div>` : ''}
                             ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cook', 'Koken')}</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
                             ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Servings', 'Porties')}</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
-                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${recipe.difficulty}</div></div>` : ''}
-                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
+                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</div></div>` : ''}
+                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${escapeHTML(localizeRecipeCuisineLabel(recipe.cuisine))}</div></div>` : ''}
                         </div>` : ''}
 
                         <div class="detail-toolbar-row detail-panel">
                             <div class="detail-status-chips">
-                                ${(recipe.diet && recipe.diet.length > 0) ? recipe.diet.map(d => `<span class="detail-chip">${d}</span>`).join('') : ''}
+                                ${(recipe.diet && recipe.diet.length > 0) ? recipe.diet.map(d => `<span class="detail-chip">${escapeHTML(localizeRecipeDietLabel(d))}</span>`).join('') : ''}
                                 ${versionLabel ? `<span class="detail-chip">${versionLabel}</span>` : ''}
                             </div>
                             ${publishedActionsMarkup}
@@ -21029,14 +22540,14 @@
                             ${recipe.prepTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="clock" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Prep', 'Voorb.')}</div><div class="detail-meta-value">${recipe.prepTime}m</div></div>` : ''}
                             ${recipe.cookTime ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="flame" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cook', 'Koken')}</div><div class="detail-meta-value">${recipe.cookTime}m</div></div>` : ''}
                             ${recipe.servings ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="users" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Servings', 'Porties')}</div><div class="detail-meta-value">${recipe.servings}</div></div>` : ''}
-                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${recipe.difficulty}</div></div>` : ''}
-                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${recipe.cuisine}</div></div>` : ''}
+                            ${recipe.difficulty ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="zap" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Difficulty', 'Moeilijkheid')}</div><div class="detail-meta-value">${escapeHTML(localizeRecipeDifficultyLabel(recipe.difficulty))}</div></div>` : ''}
+                            ${recipe.cuisine ? `<div class="detail-meta-item"><div class="flex justify-center"><i data-lucide="globe" class="w-5 h-5 text-gold"></i></div><div class="detail-meta-label">${uiText('Cuisine', 'Keuken')}</div><div class="detail-meta-value">${escapeHTML(localizeRecipeCuisineLabel(recipe.cuisine))}</div></div>` : ''}
                         </div>` : ''}
 
                         <div class="detail-toolbar-row detail-panel">
                             <div class="detail-status-chips">
-                                <span class="detail-chip">${recipe.category || uiText('Recipe', 'Recept')}</span>
-                                ${recipe.diet && recipe.diet.length > 0 ? recipe.diet.map(d => `<span class="detail-chip">${d}</span>`).join('') : ''}
+                                <span class="detail-chip">${escapeHTML(localizeRecipeCategoryLabel(recipe.category))}</span>
+                                ${recipe.diet && recipe.diet.length > 0 ? recipe.diet.map(d => `<span class="detail-chip">${escapeHTML(localizeRecipeDietLabel(d))}</span>`).join('') : ''}
                                 ${recipeFamilyChip}
                                 ${isSavedCommunityRecipe ? `<span class="detail-chip">${uiText('Saved community recipe', 'Opgeslagen communityrecept')}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
                                 ${!isSavedCommunityRecipe && recipe.publishedId ? `<span class="detail-chip">${recipeIsLive ? uiText('Live in Browse', 'Live in Bladeren') : uiText('Removed from Browse', 'Weg uit Bladeren')}${recipeVersionLabel ? ` ${recipeVersionLabel}` : ''}</span>` : ''}
