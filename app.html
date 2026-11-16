@@ -7801,6 +7801,7 @@
         window.PREMIUM_ENABLED = false;
         const supportedAppLanguages = ['en', 'nl', 'fr', 'de', 'es'];
         const globalUiLanguageStorageKey = 'uculiPreferredUiLanguage';
+        const uiLanguageChosenStorageKey = 'uculiUiLanguageChosen';
         const uiLanguageQueryParam = 'lang';
 
         function isPremiumEnforced() {
@@ -7829,23 +7830,79 @@
             return 'en';
         }
 
+        // Guests without a saved language choice: nl browser → Dutch, otherwise English.
+        function detectGuestBrowserUiLanguage() {
+            const candidates = [];
+            if (Array.isArray(navigator?.languages)) {
+                candidates.push(...navigator.languages);
+            }
+            candidates.push(navigator?.language, navigator?.userLanguage);
+
+            for (const candidate of candidates) {
+                if (resolveSupportedLanguage(candidate) === 'nl') return 'nl';
+            }
+
+            return 'en';
+        }
+
+        function hasExplicitUiLanguageChoice() {
+            return localStorage.getItem(uiLanguageChosenStorageKey) === '1';
+        }
+
+        function markExplicitUiLanguageChoice() {
+            localStorage.setItem(uiLanguageChosenStorageKey, '1');
+        }
+
+        function isSignedInUiSession() {
+            return Boolean(isAuthenticated && currentUser);
+        }
+
         function getRequestedUiLanguage() {
             return resolveSupportedLanguage(new URLSearchParams(window.location.search || '').get(uiLanguageQueryParam));
         }
 
         function getActiveUiLanguage() {
-            return (
-                resolveSupportedLanguage(userSettings?.language)
-                || resolveSupportedLanguage(localStorage.getItem(globalUiLanguageStorageKey))
-                || detectPreferredSupportedLanguage()
-            );
+            const requested = getRequestedUiLanguage();
+            if (requested) return requested;
+
+            // Signed-in: account settings first, then a stored preference.
+            if (isSignedInUiSession()) {
+                return (
+                    resolveSupportedLanguage(userSettings?.language)
+                    || resolveSupportedLanguage(localStorage.getItem(globalUiLanguageStorageKey))
+                    || detectGuestBrowserUiLanguage()
+                );
+            }
+
+            // Guest: only honor a language the user (or ?lang=) explicitly chose.
+            // Do not treat the default userSettings.language ("en") as a choice.
+            if (hasExplicitUiLanguageChoice()) {
+                const chosen = resolveSupportedLanguage(localStorage.getItem(globalUiLanguageStorageKey));
+                if (chosen) return chosen;
+            }
+
+            return detectGuestBrowserUiLanguage();
         }
 
         function ensureUiLanguagePreference() {
-            const language = getRequestedUiLanguage() || getActiveUiLanguage() || 'en';
+            const requested = getRequestedUiLanguage();
+            if (requested) {
+                userSettings.language = requested;
+                document.documentElement.lang = requested;
+                localStorage.setItem(globalUiLanguageStorageKey, requested);
+                markExplicitUiLanguageChoice();
+                return requested;
+            }
+
+            const language = getActiveUiLanguage() || 'en';
             userSettings.language = language;
             document.documentElement.lang = language;
-            localStorage.setItem(globalUiLanguageStorageKey, language);
+
+            // Persist only after sign-in or an explicit choice — never lock browser detection.
+            if (isSignedInUiSession() || hasExplicitUiLanguageChoice()) {
+                localStorage.setItem(globalUiLanguageStorageKey, language);
+            }
+
             return language;
         }
 
@@ -9087,6 +9144,7 @@
             userSettings.language = normalizedLanguage;
             document.documentElement.lang = normalizedLanguage;
             localStorage.setItem(globalUiLanguageStorageKey, normalizedLanguage);
+            markExplicitUiLanguageChoice();
             regionDisplayNameCache = null;
             saveData();
 
