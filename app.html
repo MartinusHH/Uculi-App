@@ -4691,12 +4691,13 @@
             }
 
             .notebook-page-hero-copy h3 {
-                /* Keep glyphs out of the rotated photo; JS tightens to ≥0.75rem clearance. */
+                /* Clearance refined in syncNotebookHeroTitleClearance(); no mid-word breaks here. */
                 max-width: calc(100% - 7rem);
                 padding-right: 0;
-                overflow-wrap: anywhere;
-                word-break: break-word;
-                hyphens: auto;
+                overflow-wrap: normal;
+                word-break: normal;
+                hyphens: manual;
+                -webkit-hyphens: manual;
                 line-height: 1.05;
             }
 
@@ -4707,6 +4708,16 @@
                 overflow: visible;
                 text-overflow: clip;
                 letter-spacing: 0.14em;
+            }
+        }
+
+        /* Desktop spread: never mid-word-break titles; JS shrinks/hyphenates to clear the spine. */
+        @media (min-width: 1024px) {
+            .notebook-page-hero-copy h3 {
+                overflow-wrap: normal;
+                word-break: normal;
+                hyphens: manual;
+                -webkit-hyphens: manual;
             }
         }
 
@@ -5305,9 +5316,10 @@
             .notebook-page-hero-copy h3 {
                 max-width: calc(100% - 7rem);
                 padding-right: 0;
-                overflow-wrap: anywhere;
-                word-break: break-word;
-                hyphens: auto;
+                overflow-wrap: normal;
+                word-break: normal;
+                hyphens: manual;
+                -webkit-hyphens: manual;
                 line-height: 1.05;
             }
 
@@ -19047,46 +19059,115 @@
             return Math.max(minReserve, measured || 56);
         }
 
-        // Tablet: title glyphs must stay ≥0.75rem left of the rotated photo bbox.
+        // Keep notebook titles clear of the rotated photo / spine without mid-word hard breaks.
+        // 1) shrink font until the longest word fits  2) wrap between words only
+        // 3) hyphens:auto + html lang=nl only as last resort (never overflow-wrap:anywhere / break-all).
         function syncNotebookHeroTitleClearance() {
             const titles = contentDiv
                 ? Array.from(contentDiv.querySelectorAll('.notebook-page-hero-copy h3'))
                 : [];
             const isTablet = window.matchMedia('(min-width: 768px) and (max-width: 1023px)').matches;
+            const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
 
             titles.forEach(titleEl => {
                 titleEl.style.maxWidth = '';
                 titleEl.style.fontSize = '';
                 titleEl.style.paddingRight = '';
+                titleEl.style.overflowWrap = '';
+                titleEl.style.wordBreak = '';
+                titleEl.style.whiteSpace = '';
+                titleEl.style.hyphens = '';
+                titleEl.style.webkitHyphens = '';
             });
-            if (!isTablet || !titles.length) return;
+            if ((!isTablet && !isDesktop) || !titles.length) return;
 
             const minGapPx = 0.75 * 16;
+            const minFontPx = 1.35 * 16;
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const uiLang = getActiveUiLanguage();
+
             titles.forEach(titleEl => {
                 const hero = titleEl.closest('.notebook-page-hero');
+                const paper = titleEl.closest('.notebook-paper__body') || titleEl.closest('.notebook-paper');
                 const frame = hero?.querySelector('.notebook-page-photo-frame');
-                if (!hero || !frame) return;
+                const cluster = hero?.querySelector('.notebook-page-photo-cluster');
+                if (!hero) return;
 
                 const heroRect = hero.getBoundingClientRect();
-                const frameRect = frame.getBoundingClientRect();
-                // AABB already includes rotate(4.2deg); keep an extra 0.75rem breath.
-                const maxRight = frameRect.left - minGapPx;
+                const paperRect = (paper || hero).getBoundingClientRect();
+                const frameRect = frame?.getBoundingClientRect();
+                const clusterRect = cluster?.getBoundingClientRect();
+                const words = String(titleEl.textContent || '').trim().split(/\s+/).filter(Boolean);
+                if (!words.length) return;
+
+                let maxRight;
+                if (isTablet && frameRect) {
+                    // Absolute overlay photo: keep a gap from the rotated frame.
+                    maxRight = frameRect.left - minGapPx;
+                } else if (frameRect && clusterRect && clusterRect.top < heroRect.top + heroRect.height * 0.55) {
+                    // Floated desktop photo: title column is left of the float; also stay inside the page (spine).
+                    maxRight = Math.min(frameRect.left - minGapPx, paperRect.right - minGapPx);
+                } else {
+                    // No usable photo geometry — stay inside the page so the spine never clips.
+                    maxRight = paperRect.right - minGapPx;
+                }
+
                 const maxWidth = Math.max(72, Math.floor(maxRight - heroRect.left));
+
                 titleEl.style.boxSizing = 'border-box';
                 titleEl.style.maxWidth = `${maxWidth}px`;
-                titleEl.style.overflowWrap = 'anywhere';
-                titleEl.style.wordBreak = 'break-word';
-                titleEl.style.hyphens = 'auto';
+                titleEl.style.overflowWrap = 'normal';
+                titleEl.style.wordBreak = 'normal';
+                titleEl.style.whiteSpace = 'nowrap';
+                titleEl.style.hyphens = 'manual';
+                titleEl.style.webkitHyphens = 'manual';
 
                 let fontSize = Number.parseFloat(window.getComputedStyle(titleEl).fontSize) || 32;
-                for (let step = 0; step < 12; step += 1) {
+                const syncMeasureFont = () => {
+                    titleEl.style.fontSize = `${fontSize.toFixed(2)}px`;
+                    const cs = window.getComputedStyle(titleEl);
+                    ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+                };
+                const longestWordWidth = () => words.reduce((widest, word) => (
+                    Math.max(widest, ctx.measureText(word).width)
+                ), 0);
+
+                syncMeasureFont();
+                while (fontSize > minFontPx + 0.05 && longestWordWidth() > maxWidth - 0.5) {
+                    fontSize = Math.max(minFontPx, fontSize * 0.92);
+                    syncMeasureFont();
+                }
+
+                // Wrap between words only — never anywhere/break-all.
+                titleEl.style.whiteSpace = 'normal';
+                titleEl.style.overflowWrap = 'normal';
+                titleEl.style.wordBreak = 'normal';
+
+                const textExceedsClearance = () => {
                     const range = document.createRange();
                     range.selectNodeContents(titleEl);
                     const textRect = range.getBoundingClientRect();
-                    const overlapsY = textRect.bottom > frameRect.top + 1 && textRect.top < frameRect.bottom - 1;
-                    if (!overlapsY || textRect.right <= maxRight + 0.5) break;
-                    fontSize *= 0.9;
-                    titleEl.style.fontSize = `${fontSize.toFixed(2)}px`;
+                    if (isTablet && frameRect) {
+                        const overlapsY = textRect.bottom > frameRect.top + 1 && textRect.top < frameRect.bottom - 1;
+                        return overlapsY && textRect.right > maxRight + 0.5;
+                    }
+                    // Desktop / spine: any overflow past the page edge is a clip.
+                    return textRect.right > maxRight + 0.5 || longestWordWidth() > maxWidth - 0.5;
+                };
+
+                // Last resort: Dutch hyphenation (html lang=nl so Chrome can emit Tomaten-soep).
+                if (longestWordWidth() > maxWidth - 0.5 || textExceedsClearance()) {
+                    if (uiLang === 'nl') {
+                        document.documentElement.lang = 'nl';
+                        titleEl.setAttribute('lang', 'nl');
+                    }
+                    titleEl.style.hyphens = 'auto';
+                    titleEl.style.webkitHyphens = 'auto';
+                    while (fontSize > minFontPx + 0.05 && textExceedsClearance()) {
+                        fontSize = Math.max(minFontPx, fontSize * 0.92);
+                        titleEl.style.fontSize = `${fontSize.toFixed(2)}px`;
+                    }
                 }
             });
         }
