@@ -4691,8 +4691,13 @@
             }
 
             .notebook-page-hero-copy h3 {
-                /* Clear 4.55rem photo rotated 4.2deg so long titles do not run under it. */
-                padding-right: 6.25rem;
+                /* Keep glyphs out of the rotated photo; JS tightens to ≥0.75rem clearance. */
+                max-width: calc(100% - 7rem);
+                padding-right: 0;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+                hyphens: auto;
+                line-height: 1.05;
             }
 
             .notebook-page-hero-copy .notebook-meta-line {
@@ -5273,6 +5278,20 @@
             }
         }
 
+        @media (min-width: 768px) {
+            /* Don't rely on Tailwind md: alone for the notebook spread. */
+            .notebook-book-spread-surface > .grid {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+                gap: 0 !important;
+            }
+
+            .notebook-paper-left.hidden,
+            .notebook-paper-right.hidden {
+                display: flex !important;
+            }
+        }
+
         @media (min-width: 768px) and (max-width: 1023px) {
             .notebook-page-photo-cluster {
                 width: 4.55rem;
@@ -5284,7 +5303,12 @@
             }
 
             .notebook-page-hero-copy h3 {
-                padding-right: 6.25rem;
+                max-width: calc(100% - 7rem);
+                padding-right: 0;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+                hyphens: auto;
+                line-height: 1.05;
             }
 
             .notebook-page-hero-copy .notebook-meta-line {
@@ -19023,6 +19047,50 @@
             return Math.max(minReserve, measured || 56);
         }
 
+        // Tablet: title glyphs must stay ≥0.75rem left of the rotated photo bbox.
+        function syncNotebookHeroTitleClearance() {
+            const titles = contentDiv
+                ? Array.from(contentDiv.querySelectorAll('.notebook-page-hero-copy h3'))
+                : [];
+            const isTablet = window.matchMedia('(min-width: 768px) and (max-width: 1023px)').matches;
+
+            titles.forEach(titleEl => {
+                titleEl.style.maxWidth = '';
+                titleEl.style.fontSize = '';
+                titleEl.style.paddingRight = '';
+            });
+            if (!isTablet || !titles.length) return;
+
+            const minGapPx = 0.75 * 16;
+            titles.forEach(titleEl => {
+                const hero = titleEl.closest('.notebook-page-hero');
+                const frame = hero?.querySelector('.notebook-page-photo-frame');
+                if (!hero || !frame) return;
+
+                const heroRect = hero.getBoundingClientRect();
+                const frameRect = frame.getBoundingClientRect();
+                // AABB already includes rotate(4.2deg); keep an extra 0.75rem breath.
+                const maxRight = frameRect.left - minGapPx;
+                const maxWidth = Math.max(72, Math.floor(maxRight - heroRect.left));
+                titleEl.style.boxSizing = 'border-box';
+                titleEl.style.maxWidth = `${maxWidth}px`;
+                titleEl.style.overflowWrap = 'anywhere';
+                titleEl.style.wordBreak = 'break-word';
+                titleEl.style.hyphens = 'auto';
+
+                let fontSize = Number.parseFloat(window.getComputedStyle(titleEl).fontSize) || 32;
+                for (let step = 0; step < 12; step += 1) {
+                    const range = document.createRange();
+                    range.selectNodeContents(titleEl);
+                    const textRect = range.getBoundingClientRect();
+                    const overlapsY = textRect.bottom > frameRect.top + 1 && textRect.top < frameRect.bottom - 1;
+                    if (!overlapsY || textRect.right <= maxRight + 0.5) break;
+                    fontSize *= 0.9;
+                    titleEl.style.fontSize = `${fontSize.toFixed(2)}px`;
+                }
+            });
+        }
+
         function syncNotebookViewportHeight() {
             if (!contentDiv || currentView !== 'index' || indexViewMode !== 'book') return;
 
@@ -19060,10 +19128,14 @@
                     notebookSurface.style.minHeight = `${fittedHeight}px`;
                     notebookSurface.style.maxHeight = 'none';
                 }
+                syncNotebookHeroTitleClearance();
                 return;
             }
 
-            if (!notebookFrame || !notebookSurface) return;
+            if (!notebookFrame || !notebookSurface) {
+                syncNotebookHeroTitleClearance();
+                return;
+            }
 
             const frameRect = notebookFrame.getBoundingClientRect();
             const navRect = document.getElementById('main-nav')?.getBoundingClientRect();
@@ -19087,6 +19159,7 @@
             notebookSurface.style.aspectRatio = 'auto';
             notebookSurface.style.height = `${fittedHeight}px`;
             notebookSurface.style.minHeight = `${fittedHeight}px`;
+            syncNotebookHeroTitleClearance();
         }
 
         function nudgeNotebookPage(direction) {
