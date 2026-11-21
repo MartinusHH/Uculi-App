@@ -7726,6 +7726,7 @@
                 email: "",
                 measurementSystem: "Metric",
                 language: "en",
+                legacyPremium: false,
                 autoPublish: false,
                 indexViewMode: "cards",
                 notebookCover: getDefaultNotebookCover(),
@@ -8477,9 +8478,10 @@
             return isDeveloperBypassSession() && !isProductionUculiHost() && isLocalDeveloperPreviewContext();
         }
 
-        // Hard-coded access superuser (must match firestore.rules exactly).
-        const ACCESS_SUPERUSER_EMAIL = 'm.holtzapffel@gmail.com';
+        // Superuser is claim-only (Admin SDK setCustomUserClaims). Never trust a client-writable field.
         let currentUserAccessGrant = false;
+        let currentUserSuperuserClaim = false;
+        let forcedAuthTokenRefreshUid = null;
         let accessGrantListCache = [];
         let accessGrantLoadPromise = null;
 
@@ -8489,20 +8491,50 @@
 
         function isAccessSuperuser() {
             if (!isAuthenticated || !currentUser) return false;
-            // Match rules: request.auth.token.email == 'm.holtzapffel@gmail.com'
-            // && request.auth.token.email_verified == true
-            return currentUser.email === ACCESS_SUPERUSER_EMAIL
-                && currentUser.emailVerified === true;
+            // Match Firestore rules: admin claim + verified email.
+            return currentUserSuperuserClaim === true && currentUser.emailVerified === true;
+        }
+
+        // Force one token refresh per signed-in uid so a newly set admin claim
+        // is visible after sign-in / app start without requiring a logout.
+        async function forceRefreshAuthTokenOnce() {
+            if (!isAuthenticated || !currentUser || typeof currentUser.getIdToken !== 'function') return false;
+            if (forcedAuthTokenRefreshUid === currentUser.uid) return true;
+            try {
+                await currentUser.getIdToken(true);
+                forcedAuthTokenRefreshUid = currentUser.uid;
+                return true;
+            } catch (_error) {
+                return false;
+            }
+        }
+
+        async function refreshCurrentUserSuperuserClaim(forceRefresh = false) {
+            currentUserSuperuserClaim = false;
+            if (!isAuthenticated || !currentUser || typeof currentUser.getIdTokenResult !== 'function') return false;
+            try {
+                if (forceRefresh) await forceRefreshAuthTokenOnce();
+                const token = await currentUser.getIdTokenResult(Boolean(forceRefresh));
+                currentUserSuperuserClaim = token?.claims?.admin === true;
+            } catch (_error) {
+                currentUserSuperuserClaim = false;
+            }
+            return currentUserSuperuserClaim;
         }
 
         function hasCachedAccessGrant() {
             return currentUserAccessGrant === true;
         }
 
+        function hasLegacyPremiumEntitlement() {
+            return userSettings?.legacyPremium === true;
+        }
+
         // Single entitlement helper for paid/full features.
-        // Superuser always has full access without an access/{email} grant doc.
+        // Superuser claim and legacyPremium both unlock full access when enforcement is on.
         function hasFullAccess() {
             if (isAccessSuperuser()) return true;
+            if (hasLegacyPremiumEntitlement()) return true;
             if (hasCachedAccessGrant()) return true;
             if (!isPremiumEnforced()) return true;
             if (isLocalTestPremiumSession()) return true;
@@ -8530,6 +8562,7 @@
             currentUserAccessGrant = false;
             if (!firebaseInitialized || !isAuthenticated || !currentUser?.email) return false;
             if (isDeveloperBypassSession()) return false;
+            await refreshCurrentUserSuperuserClaim(true);
             // Superuser does not need a grant doc; keep cache false so UI stays honest.
             if (isAccessSuperuser()) return false;
             if (currentUser.emailVerified !== true) return false;
@@ -8578,11 +8611,6 @@
                 return false;
             }
 
-            if (emailLower === normalizeAccessEmail(ACCESS_SUPERUSER_EMAIL)) {
-                showToast(uiText('Superuser already has full access.', 'De superuser heeft al volledige toegang.'), 'info');
-                return false;
-            }
-
             try {
                 const ref = firebase.firestore().collection('access').doc(emailLower);
                 const existing = await ref.get();
@@ -8596,7 +8624,7 @@
                     email: emailLower,
                     grantedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     grantedByUid: currentUser.uid,
-                    grantedByEmail: ACCESS_SUPERUSER_EMAIL
+                    grantedByEmail: normalizeAccessEmail(currentUser?.email || '')
                 });
 
                 await loadAccessGrantListForSuperuser();
@@ -8716,6 +8744,9 @@
                     const remoteBilling = remoteData.billing && typeof remoteData.billing === 'object'
                         ? remoteData.billing
                         : null;
+
+                    // legacyPremium is server-owned (Admin SDK). Mirror for local gates only.
+                    userSettings.legacyPremium = remoteData.legacyPremium === true;
 
                     if (remoteBilling) {
                         userSettings.billing = normalizeBillingProfile({
@@ -12882,6 +12913,8 @@
             userFamilies = [];
             currentUserModerationStatus = getDefaultModerationStatus();
             currentUserAccessGrant = false;
+            currentUserSuperuserClaim = false;
+            forcedAuthTokenRefreshUid = null;
             accessGrantListCache = [];
             accessGrantLoadPromise = null;
             indexViewMode = 'cards';
@@ -13603,7 +13636,8 @@
                         loadAccountPlanFromFirestore()
                             .then(() => refreshCurrentViewAfterBillingChange())
                             .catch(error => console.error('Account plan refresh error:', error));
-                        accessGrantLoadPromise = refreshCurrentUserAccessGrant()
+                        accessGrantLoadPromise = refreshCurrentUserSuperuserClaim(true)
+                            .then(() => refreshCurrentUserAccessGrant())
                             .then(() => {
                                 if (isAccessSuperuser()) {
                                     return loadAccessGrantListForSuperuser();

@@ -38,14 +38,69 @@ service cloud.firestore {
       return isSelf(uid) || (resource.data.isPublic == true);
     }
 
+    // Superuser only via Auth custom claim `admin` (Admin SDK) + verified email — never from client writes.
+    function isAccessSuperuser() {
+      return signedIn()
+        && request.auth.token.admin == true
+        && request.auth.token.email_verified == true;
+    }
+
+    // Entitlement fields are Admin-SDK-only (rules bypass). Clients may not set/change them.
+    function isPaidBillingStatus(status) {
+      return status == 'active'
+        || status == 'trialing'
+        || status == 'past_due'
+        || status == 'lifetime'
+        || status == 'premium'
+        || status == 'grace'
+        || status == 'restored';
+    }
+
+    function entitlementFieldsImmutableOnCreate() {
+      return !('legacyPremium' in request.resource.data && request.resource.data.legacyPremium == true)
+        && !('premium' in request.resource.data && request.resource.data.premium == true)
+        && !('superuser' in request.resource.data && request.resource.data.superuser == true)
+        && !(
+          'billing' in request.resource.data
+          && request.resource.data.billing is map
+          && 'status' in request.resource.data.billing
+          && isPaidBillingStatus(request.resource.data.billing.status)
+        );
+    }
+
+    function entitlementFieldsImmutableOnUpdate() {
+      return (!('legacyPremium' in request.resource.data)
+          || request.resource.data.legacyPremium == resource.data.get('legacyPremium', false))
+        && (!('premium' in request.resource.data)
+          || request.resource.data.premium == resource.data.get('premium', false))
+        && (!('superuser' in request.resource.data)
+          || request.resource.data.superuser == resource.data.get('superuser', false))
+        && (
+          !('billing' in request.resource.data)
+          || !(request.resource.data.billing is map)
+          || !('status' in request.resource.data.billing)
+          || !isPaidBillingStatus(request.resource.data.billing.status)
+          || (
+            resource.data.keys().hasAny(['billing'])
+            && resource.data.billing is map
+            && request.resource.data.billing.status == resource.data.billing.get('status', 'free')
+          )
+        );
+    }
+
     match /users/{uid} {
       allow read: if canReadPublicProfile(uid) || isAdminEmail();
-      allow create: if isSelf(uid);
-      allow update: if isSelf(uid)
-        && !('moderationProfileClearedAt' in request.resource.data)
-        && !('socialIsolation' in request.resource.data)
-        && !('publishBlocked' in request.resource.data)
-        || isAdminEmail();
+      allow create: if isSelf(uid) && entitlementFieldsImmutableOnCreate();
+      allow update: if (
+          isSelf(uid)
+          && entitlementFieldsImmutableOnUpdate()
+          && !('moderationProfileClearedAt' in request.resource.data)
+          && !('socialIsolation' in request.resource.data)
+          && !('publishBlocked' in request.resource.data)
+        ) || (
+          isAdminEmail()
+          && entitlementFieldsImmutableOnUpdate()
+        );
       allow delete: if isSelf(uid) || isAdminEmail();
 
       match /private/agreement {
@@ -88,13 +143,6 @@ service cloud.firestore {
 
     function shoppingAuthEmail() {
       return authEmail() != '' ? authEmail().lower() : '';
-    }
-
-    // Hard-coded access superuser (exact email + verified). No admins doc involved.
-    function isAccessSuperuser() {
-      return signedIn()
-        && request.auth.token.email == 'm.holtzapffel@gmail.com'
-        && request.auth.token.email_verified == true;
     }
 
     function authEmailLower() {
@@ -257,7 +305,7 @@ service cloud.firestore {
     }
 
     // Full-access grants keyed by lowercase email. Users may only read their own doc.
-    // Only the hard-coded superuser may list, create, or delete. Nobody may update grants.
+    // Only a claim-based superuser may list, create, or delete. Nobody may update grants.
     match /access/{emailLower} {
       allow get: if canReadOwnAccessGrant(emailLower) || isAccessSuperuser();
       allow list: if isAccessSuperuser();

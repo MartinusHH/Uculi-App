@@ -71,6 +71,7 @@ If a note overlaps with one of these files, merge it into the relevant canonical
 - Security headers and a restrictive Content Security Policy are set at the hosting layer before launch.
 - Keep `.firebaserc` and `firebase-config.js` local so the public repo does not carry live project bindings.
 - Treat `.noop/` as disposable local runtime scratch, not as product source.
+- Before deploying rules that require the Auth `admin` claim, run `scripts/set-superuser-claim.mjs` for existing superuser accounts (see `scripts/README.md`). Do not deploy this claim rename without that step.
 
 For `www.uculi.com`, use `www` as the primary production host and redirect the apex `uculi.com` domain to it once Hosting is connected.
 
