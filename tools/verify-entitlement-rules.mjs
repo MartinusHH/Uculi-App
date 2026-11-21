@@ -1,6 +1,7 @@
 /**
  * Emulator proof: a regular signed-in user cannot set legacyPremium, superuser,
- * or paid premium entitlement fields on their user doc.
+ * admin, premium, or paid premium entitlement fields on their user doc — on
+ * create or update.
  *
  * Also proves access-superuser rules:
  * - admin claim + email_verified false → denied
@@ -161,6 +162,21 @@ async function mintAdminSession({ email, password, emailVerified }) {
   return { uid, idToken: session.idToken, email };
 }
 
+async function freshUser(label) {
+  const email = `${label}.${Date.now()}.${Math.random().toString(16).slice(2, 8)}@uculi.test`;
+  const password = 'testpass123';
+  const signed = await signUp(email, password);
+  return { email, password, uid: signed.localId, idToken: signed.idToken };
+}
+
+const baseFreeProfile = (email) => ({
+  email,
+  displayName: 'Entitlement Tester',
+  premium: false,
+  legacyPremium: false,
+  billing: { status: 'free', planId: 'premium' }
+});
+
 // Soft nudge: ensure rules file is the one the emulator watches.
 const load = spawnSync('npx', ['--yes', 'firebase-tools@latest', 'emulators:exec', '--only', 'firestore', '--project', PROJECT, 'true'], {
   cwd: '/workspace',
@@ -178,24 +194,19 @@ try {
   const { localId: uid, idToken } = user;
 
   // Seed a harmless free profile first (allowed).
-  const seed = await createUserDoc(uid, idToken, {
-    email,
-    displayName: 'Entitlement Tester',
-    premium: false,
-    legacyPremium: false,
-    billing: { status: 'free', planId: 'premium' }
-  });
+  const seed = await createUserDoc(uid, idToken, baseFreeProfile(email));
   log('user can create free profile', seed.status === 200 || seed.status === 201, JSON.stringify({ status: seed.status, err: seed.json?.error?.status || seed.json?.error || '' }));
 
-  // If create collided because doc exists, continue with patches.
-  const attempts = [
+  // Update attempts: entitlement fields must stay immutable.
+  const updateAttempts = [
     ['legacyPremium true blocked', { legacyPremium: true }],
     ['superuser field true blocked', { superuser: true }],
+    ['admin field true blocked', { admin: true }],
     ['premium true blocked', { premium: true }],
     ['paid billing.status blocked', { billing: { status: 'active', planId: 'premium' } }]
   ];
 
-  for (const [name, fields] of attempts) {
+  for (const [name, fields] of updateAttempts) {
     const result = await patchUser(uid, idToken, fields);
     log(name, denied(result), JSON.stringify({ status: result.status, message: result.json?.error?.message || result.json?.error?.status || '' }));
   }
@@ -203,6 +214,24 @@ try {
   // Harmless profile update still allowed.
   const okUpdate = await patchUser(uid, idToken, { displayName: 'Still Free' });
   log('user can update non-entitlement fields', okUpdate.status === 200, JSON.stringify({ status: okUpdate.status }));
+
+  // Create attempts: each needs a fresh uid (documentId = uid).
+  const createAttempts = [
+    ['create with admin true blocked', { admin: true }],
+    ['create with premium true blocked', { premium: true }],
+    ['create with legacyPremium true blocked', { legacyPremium: true }],
+    ['create with superuser true blocked', { superuser: true }],
+    ['create with paid billing.status blocked', { billing: { status: 'active', planId: 'premium' } }]
+  ];
+
+  for (const [name, extra] of createAttempts) {
+    const fresh = await freshUser('create.block');
+    const result = await createUserDoc(fresh.uid, fresh.idToken, {
+      ...baseFreeProfile(fresh.email),
+      ...extra
+    });
+    log(name, denied(result), JSON.stringify({ status: result.status, message: result.json?.error?.message || result.json?.error?.status || '' }));
+  }
 
   // Regular user cannot list access grants.
   const regularList = await listAccessCollection(idToken);

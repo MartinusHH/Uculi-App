@@ -8460,11 +8460,11 @@
             return currentUserSuperuserClaim === true && currentUser.emailVerified === true;
         }
 
-        // Force one token refresh per signed-in uid so a newly set admin claim
-        // is visible after sign-in / app start without requiring a logout.
+        // Force getIdToken(true) / getIdTokenResult(true) at most once per signed-in uid
+        // so a newly set admin claim applies after sign-in / app start without logout.
         async function forceRefreshAuthTokenOnce() {
             if (!isAuthenticated || !currentUser || typeof currentUser.getIdToken !== 'function') return false;
-            if (forcedAuthTokenRefreshUid === currentUser.uid) return true;
+            if (forcedAuthTokenRefreshUid === currentUser.uid) return false;
             try {
                 await currentUser.getIdToken(true);
                 forcedAuthTokenRefreshUid = currentUser.uid;
@@ -8478,8 +8478,10 @@
             currentUserSuperuserClaim = false;
             if (!isAuthenticated || !currentUser || typeof currentUser.getIdTokenResult !== 'function') return false;
             try {
-                if (forceRefresh) await forceRefreshAuthTokenOnce();
-                const token = await currentUser.getIdTokenResult(Boolean(forceRefresh));
+                const shouldForce = Boolean(forceRefresh) && forcedAuthTokenRefreshUid !== currentUser.uid;
+                if (shouldForce) await forceRefreshAuthTokenOnce();
+                // Only force the ID token result on that same first refresh; later calls reuse cache.
+                const token = await currentUser.getIdTokenResult(shouldForce);
                 currentUserSuperuserClaim = token?.claims?.admin === true;
             } catch (_error) {
                 currentUserSuperuserClaim = false;

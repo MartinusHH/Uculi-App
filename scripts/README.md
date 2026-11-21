@@ -6,7 +6,7 @@ Do not commit service-account JSON or `firebase-config.js` secrets.
 ## set-superuser-claim.mjs
 
 Sets or clears the Auth custom claim `admin` for one account.
-Firestorestore rules require `admin == true` and `email_verified == true` for superuser access.
+Firestore rules require `admin == true` and `email_verified == true` for superuser access.
 
 ```bash
 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 \
