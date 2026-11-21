@@ -60,6 +60,8 @@ service cloud.firestore {
       return !('legacyPremium' in request.resource.data && request.resource.data.legacyPremium == true)
         && !('premium' in request.resource.data && request.resource.data.premium == true)
         && !('superuser' in request.resource.data && request.resource.data.superuser == true)
+        // Prefer .get('admin') — bare `.admin` can collide with auth token claim access patterns.
+        && request.resource.data.get('admin', false) != true
         && !(
           'billing' in request.resource.data
           && request.resource.data.billing is map
@@ -75,6 +77,7 @@ service cloud.firestore {
           || request.resource.data.premium == resource.data.get('premium', false))
         && (!('superuser' in request.resource.data)
           || request.resource.data.superuser == resource.data.get('superuser', false))
+        && request.resource.data.get('admin', false) == resource.data.get('admin', false)
         && (
           !('billing' in request.resource.data)
           || !(request.resource.data.billing is map)
