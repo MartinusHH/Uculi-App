@@ -1554,14 +1554,14 @@
 
             .index-view-switch > .index-tool-btn,
             .index-tool-actions > .index-tool-btn {
-                flex: 1 1 0;
-                width: auto;
-                min-width: 0;
-                padding: 0 0.85rem;
+                flex: 0 0 auto;
+                width: 2.75rem;
+                min-width: 2.75rem;
+                padding: 0;
             }
 
             .index-tool-label {
-                display: inline;
+                display: none;
             }
 
             .index-recipe-grid {
@@ -2887,10 +2887,19 @@
             .index-plan-note {
                 margin-top: 0.55rem;
                 padding: 0.7rem 0.8rem;
+                overflow: visible;
+            }
+
+            .index-plan-kicker {
+                letter-spacing: 0.1em;
+                line-height: 1.35;
+                overflow-wrap: anywhere;
             }
 
             .index-plan-detail {
-                display: none;
+                display: block;
+                font-size: 0.85rem;
+                line-height: 1.4;
             }
 
             .index-card-media {
@@ -2990,7 +2999,6 @@
                 background-image: none;
             }
 
-            #app-content .index-plan-note,
             #app-content .quiet-panel {
                 background-color: transparent;
                 border-width: 0;
@@ -2998,6 +3006,15 @@
                 box-shadow: none;
                 padding-left: 0;
                 padding-right: 0;
+            }
+
+            #app-content .index-plan-note {
+                background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+                border: 1px solid rgba(28, 20, 16, 0.08);
+                border-radius: 1rem;
+                box-shadow: none;
+                padding: 0.7rem 0.85rem;
+                overflow: visible;
             }
 
             #app-content .screen-sheet > .border-b,
@@ -4495,13 +4512,15 @@
             }
 
             .notebook-chrome-bar .notebook-tool-label {
-                position: static;
-                width: auto;
-                height: auto;
-                margin: 0;
-                overflow: visible;
-                clip: auto;
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
                 white-space: nowrap;
+                border: 0;
             }
 
             .notebook-chrome-bar .notebook-cook-label {
@@ -4517,7 +4536,7 @@
             }
         }
 
-        @media (max-width: 767px) {
+            @media (max-width: 767px) {
             #toast {
                 top: auto;
                 bottom: calc(var(--app-nav-clearance-phone, 5.5rem) + 0.35rem);
@@ -4526,7 +4545,19 @@
                 width: auto;
                 max-width: none;
                 transform: none;
-                justify-content: center;
+                justify-content: flex-start;
+                align-items: flex-start;
+                text-align: left;
+                white-space: normal;
+                line-height: 1.35;
+                padding: 0.75rem 0.9rem;
+                box-sizing: border-box;
+            }
+
+            #toast #toast-message {
+                flex: 1 1 auto;
+                min-width: 0;
+                overflow-wrap: anywhere;
             }
 
             body.toast-open .notebook-chrome,
@@ -8767,12 +8798,15 @@
             }
 
             if (isLocalTestPremiumSession()) {
+                const nl = getActiveUiLanguage() === 'nl';
                 return {
                     state: 'testmodus',
-                    badge: 'Testmodus Premium',
-                    summary: 'Premium staat open in deze testsessie. Alles blijft lokaal op dit apparaat, zonder betaling.',
-                    sourceLabel: 'Testmodus',
-                    actionLabel: 'Lokaal in testmodus'
+                    badge: nl ? 'Testmodus Premium' : 'Test mode Premium',
+                    summary: nl
+                        ? 'Premium staat open in deze testsessie. Alles blijft lokaal op dit apparaat, zonder betaling.'
+                        : 'Premium is open in this test session. Everything stays local on this device, with no payment.',
+                    sourceLabel: nl ? 'Testmodus' : 'Test mode',
+                    actionLabel: nl ? 'Lokaal in testmodus' : 'Local test mode'
                 };
             }
 
@@ -9142,7 +9176,7 @@
         }
 
         function changeGlobalLanguage(langCode, options = {}) {
-            const { silent = false } = options;
+            const { silent = false, refreshView = true } = options;
             const normalizedLanguage = resolveSupportedLanguage(langCode) || 'en';
 
             userSettings.language = normalizedLanguage;
@@ -9152,8 +9186,17 @@
             regionDisplayNameCache = null;
             saveData();
 
+            if (typeof syncChromeLabels === 'function') syncChromeLabels();
+            if (typeof syncHeaderPageTitle === 'function') syncHeaderPageTitle();
+            if (refreshView && typeof refreshCurrentViewAfterBillingChange === 'function') {
+                refreshCurrentViewAfterBillingChange();
+            }
+
             if (!silent) {
-                showToast('Display language updated.', 'languages');
+                showToast(
+                    normalizedLanguage === 'nl' ? 'Weergavetaal bijgewerkt.' : 'Display language updated.',
+                    'languages'
+                );
             }
         }
 
@@ -12982,30 +13025,47 @@
 
         // Zonder account toch naar binnen, alleen op een preview-adres. Nooit op uculi.com.
         function startLocalTestModeFromGate() {
+            const nl = getActiveUiLanguage() === 'nl';
             if (isProductionUculiHost() || !isLocalDeveloperPreviewContext()) {
-                showToast('Testmodus is hier niet beschikbaar. Log in om verder te gaan.', 'shield-off');
+                showToast(
+                    nl
+                        ? 'Testmodus is hier niet beschikbaar. Log in om verder te gaan.'
+                        : 'Test mode is not available here. Sign in to continue.',
+                    'shield-off'
+                );
                 return false;
             }
 
             localStorage.setItem(developerBypassStorageKey, '1');
             if (!activateDeveloperBypassSession()) {
-                showToast('Testmodus kon niet starten. Log in om verder te gaan.', 'alert-circle');
+                showToast(
+                    nl
+                        ? 'Testmodus kon niet starten. Log in om verder te gaan.'
+                        : 'Test mode could not start. Sign in to continue.',
+                    'alert-circle'
+                );
                 return false;
             }
 
-            showToast('Testmodus staat aan. Premium is lokaal open op dit apparaat, zonder login.', 'shield');
+            showToast(
+                nl
+                    ? 'Testmodus staat aan. Premium is lokaal open op dit apparaat, zonder login.'
+                    : 'Test mode is on. Premium is open locally on this device, without signing in.',
+                'shield'
+            );
             enterAppFromLanding('local-test-mode');
             return true;
         }
 
         function localTestModeButtonMarkup(buttonId) {
             if (!isLocalDeveloperPreviewContext()) return '';
+            const nl = getActiveUiLanguage() === 'nl';
             return `
                 <div class="flex w-full flex-col items-center gap-1 sm:w-auto">
                     <button type="button" id="${buttonId}" onclick="startLocalTestModeFromGate()" class="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-gold bg-paper px-4 text-sm font-bold text-forest transition-colors hover:border-sage sm:w-auto">
-                        Doorgaan zonder inloggen (test)
+                        ${nl ? 'Doorgaan zonder inloggen (test)' : 'Continue without signing in (test)'}
                     </button>
-                    <p class="max-w-xs text-center text-xs font-semibold leading-relaxed text-sage">Recepten blijven alleen op dit apparaat.</p>
+                    <p class="max-w-xs text-center text-xs font-semibold leading-relaxed text-sage">${nl ? 'Recepten blijven alleen op dit apparaat.' : 'Recipes stay on this device only.'}</p>
                 </div>
             `;
         }
@@ -15596,18 +15656,20 @@
         }
 
         function syncChromeLabels() {
-            const nl = userSettings.language === 'nl';
+            const nl = getActiveUiLanguage() === 'nl';
             const gear = document.getElementById('header-open-settings');
             const help = document.getElementById('header-help');
             const add = document.getElementById('header-add-recipe');
             const back = document.getElementById('header-back');
+            const moreAdd = document.getElementById('header-more-add');
+            const moreAddLabel = document.getElementById('header-more-add-label');
             const optionsLabel = nl ? 'Opties' : 'Options';
-            // Soft-launch chrome: Back aria is always Terug; Help stays Help.
             const helpLabel = 'Help';
             const addLabel = nl ? 'Recept' : 'Add Recipe';
-            const backLabel = 'Terug';
+            const backLabel = nl ? 'Terug' : 'Back';
+            const floatingBack = document.getElementById('floating-back-button');
             const navLabels = {
-                index: uiText('Index', 'Recepten'),
+                index: nl ? 'Recepten' : 'Recipes',
                 shopping: nl ? 'Boodschappen' : 'Shop',
                 browse: nl ? 'Bladeren' : 'Browse',
                 profile: nl ? 'Profiel' : 'Profile'
@@ -15639,9 +15701,15 @@
             }
             if (add) {
                 add.setAttribute('aria-label', addLabel);
+                add.title = addLabel;
                 const addText = add.querySelector('.header-add-label');
                 if (addText) addText.textContent = addLabel;
             }
+            if (moreAdd) {
+                moreAdd.setAttribute('aria-label', addLabel);
+                moreAdd.title = addLabel;
+            }
+            if (moreAddLabel) moreAddLabel.textContent = addLabel;
             if (back) {
                 back.setAttribute('aria-label', backLabel);
                 back.title = backLabel;
@@ -15650,6 +15718,10 @@
                 if (backText) backText.textContent = '';
                 const backIcon = back.querySelector('[data-lucide]');
                 if (backIcon) backIcon.setAttribute('data-lucide', 'arrow-left');
+            }
+            if (floatingBack) {
+                floatingBack.setAttribute('aria-label', backLabel);
+                floatingBack.title = backLabel;
             }
             document.querySelectorAll('#main-nav .app-nav-button[data-nav-view]').forEach(button => {
                 const view = button.getAttribute('data-nav-view');
@@ -15674,7 +15746,7 @@
         let ignoreChromePopstate = false;
 
         function getHeaderPageTitle() {
-            const nl = userSettings.language === 'nl';
+            const nl = getActiveUiLanguage() === 'nl';
             if (currentView === 'settings') return nl ? 'Opties' : 'Options';
             if (currentView === 'access') return nl ? 'Toegang beheren' : 'Manage access';
             if (currentView === 'add') return nl ? 'Recept' : 'Recipe';
@@ -21658,7 +21730,7 @@
         });
 
         function showPlansModal() {
-            if (!isPremiumEnforced()) return;
+            // Plans & pricing stay viewable during soft launch (PREMIUM_ENABLED=false).
             trackLaunchEvent('plansModalOpened');
             const planCardBase = 'rounded-2xl border p-5 flex flex-col gap-3';
             const checkIcon = `<i data-lucide="check" class="w-4 h-4 text-gold flex-shrink-0"></i>`;
