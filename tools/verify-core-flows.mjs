@@ -403,7 +403,9 @@ try {
   await sleep(400);
   await dismissGates(phoneRecipe);
   const clearBtnBox = await phoneRecipe.evaluate(() => {
-    const btn = [...document.querySelectorAll('button.index-clear-filters-btn, button')].find((b) => /Clear filters/i.test(b.textContent || ''));
+    // Session is often nl (browserSignIn sets language=nl) — match either locale or the stable class.
+    const btn = document.querySelector('button.index-clear-filters-btn')
+      || [...document.querySelectorAll('button')].find((b) => /Clear filters|Filters wissen/i.test(b.textContent || ''));
     if (!btn) return null;
     btn.scrollIntoView({ block: 'center' });
     const r = btn.getBoundingClientRect();
@@ -421,7 +423,8 @@ try {
     await phoneRecipe.touchscreen.tap(clearBtnBox.x, clearBtnBox.y);
   } else if (clearBtnBox) {
     await phoneRecipe.evaluate(() => {
-      const btn = [...document.querySelectorAll('button')].find((b) => /Clear filters/i.test(b.textContent || ''));
+      const btn = document.querySelector('button.index-clear-filters-btn')
+        || [...document.querySelectorAll('button')].find((b) => /Clear filters|Filters wissen/i.test(b.textContent || ''));
       btn?.click();
     });
   }

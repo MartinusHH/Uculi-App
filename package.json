@@ -3,14 +3,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tools/verify-core-flows.mjs",
+    "test": "node tools/verify-core-flows.mjs && node tools/verify-entitlement-rules.mjs",
     "test:core": "node tools/verify-core-flows.mjs",
     "test:plan": "node tools/verify-plan-check.mjs",
     "test:shopping-share": "node tools/verify-shopping-share.mjs",
     "test:cover-stickers": "node tools/verify-cover-stickers.mjs",
     "test:audit-screens": "node tools/audit-screens.mjs",
     "test:hierarchy": "node tools/verify-hierarchy.mjs",
-    "test:all": "node tools/verify-core-flows.mjs && node tools/verify-plan-check.mjs && node tools/verify-shopping-share.mjs && node tools/verify-cover-stickers.mjs && node tools/verify-hierarchy.mjs"
+    "test:all": "node tools/verify-core-flows.mjs && node tools/verify-plan-check.mjs && node tools/verify-shopping-share.mjs && node tools/verify-cover-stickers.mjs && node tools/verify-hierarchy.mjs && node tools/verify-entitlement-rules.mjs",
+    "test:entitlements": "node tools/verify-entitlement-rules.mjs"
   },
   "devDependencies": {
     "puppeteer-core": "^24.22.0"
