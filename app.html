@@ -160,8 +160,8 @@
         button.app-btn-primary:hover,
         label.app-btn-primary:hover,
         a.app-btn-primary:hover {
-            background-color: #869371 !important;
-            border-color: #869371 !important;
+            background-color: #929D75 !important;
+            border-color: #929D75 !important;
             color: var(--brand-ink) !important;
             filter: none;
         }
@@ -1554,14 +1554,14 @@
 
             .index-view-switch > .index-tool-btn,
             .index-tool-actions > .index-tool-btn {
-                flex: 1 1 0;
-                width: auto;
-                min-width: 0;
-                padding: 0 0.85rem;
+                flex: 0 0 auto;
+                width: 2.75rem;
+                min-width: 2.75rem;
+                padding: 0;
             }
 
             .index-tool-label {
-                display: inline;
+                display: none;
             }
 
             .index-recipe-grid {
@@ -1612,8 +1612,8 @@
         }
 
         .quick-add-submit:hover {
-            background: #8f9a6f;
-            border-color: #8f9a6f;
+            background: #929D75;
+            border-color: #929D75;
             color: #1c1410;
         }
 
@@ -2887,10 +2887,19 @@
             .index-plan-note {
                 margin-top: 0.55rem;
                 padding: 0.7rem 0.8rem;
+                overflow: visible;
+            }
+
+            .index-plan-kicker {
+                letter-spacing: 0.1em;
+                line-height: 1.35;
+                overflow-wrap: anywhere;
             }
 
             .index-plan-detail {
-                display: none;
+                display: block;
+                font-size: 0.85rem;
+                line-height: 1.4;
             }
 
             .index-card-media {
@@ -2990,7 +2999,6 @@
                 background-image: none;
             }
 
-            #app-content .index-plan-note,
             #app-content .quiet-panel {
                 background-color: transparent;
                 border-width: 0;
@@ -2998,6 +3006,15 @@
                 box-shadow: none;
                 padding-left: 0;
                 padding-right: 0;
+            }
+
+            #app-content .index-plan-note {
+                background: linear-gradient(160deg, rgba(255, 253, 249, 0.98) 0%, rgba(247, 241, 230, 0.94) 100%);
+                border: 1px solid rgba(28, 20, 16, 0.08);
+                border-radius: 1rem;
+                box-shadow: none;
+                padding: 0.7rem 0.85rem;
+                overflow: visible;
             }
 
             #app-content .screen-sheet > .border-b,
@@ -3467,7 +3484,7 @@
         textarea:focus-visible,
         .custom-file-upload:focus-within {
             outline: none;
-            box-shadow: 0 0 0 3px rgba(200, 144, 80, 0.24);
+            box-shadow: 0 0 0 3px rgba(146, 157, 117, 0.55); /* #929D75 */
         }
 
         .cooking-step-highlight {
@@ -4495,13 +4512,15 @@
             }
 
             .notebook-chrome-bar .notebook-tool-label {
-                position: static;
-                width: auto;
-                height: auto;
-                margin: 0;
-                overflow: visible;
-                clip: auto;
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                padding: 0;
+                margin: -1px;
+                overflow: hidden;
+                clip: rect(0, 0, 0, 0);
                 white-space: nowrap;
+                border: 0;
             }
 
             .notebook-chrome-bar .notebook-cook-label {
@@ -4517,20 +4536,33 @@
             }
         }
 
-        @media (max-width: 767px) {
+            @media (max-width: 767px) {
             #toast {
-                top: calc(3.8rem + env(safe-area-inset-top, 0px));
+                top: auto;
+                bottom: calc(var(--app-nav-clearance-phone, 5.5rem) + 0.35rem);
                 right: 0.55rem;
                 left: 0.55rem;
                 width: auto;
                 max-width: none;
                 transform: none;
-                justify-content: center;
+                justify-content: flex-start;
+                align-items: flex-start;
+                text-align: left;
+                white-space: normal;
+                line-height: 1.35;
+                padding: 0.75rem 0.9rem;
+                box-sizing: border-box;
+            }
+
+            #toast #toast-message {
+                flex: 1 1 auto;
+                min-width: 0;
+                overflow-wrap: anywhere;
             }
 
             body.toast-open .notebook-chrome,
             body.toast-open .shop-sheet {
-                margin-top: var(--toast-clearance, 0px);
+                margin-bottom: var(--toast-clearance, 0px);
             }
         }
 
@@ -6064,7 +6096,8 @@
         }
 
         .cooking-mode-active #toast {
-            top: calc(5.4rem + env(safe-area-inset-top, 0px));
+            top: auto;
+            bottom: calc(var(--app-nav-clearance, 5rem) + 0.5rem);
             z-index: 130;
         }
 
@@ -6484,8 +6517,8 @@
 
         .cook-nav-btn--next,
         .cook-begin {
-            background: #8f9a6f;
-            border-color: #8f9a6f;
+            background: #929D75;
+            border-color: #929D75;
             color: #14110d;
         }
 
@@ -7081,7 +7114,7 @@
             </div>
         </nav>
 
-        <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-forest text-white px-6 py-3 rounded-sm shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-50 text-center text-sm font-bold flex items-center gap-2" translate="no">
+        <div id="toast" class="fixed left-1/2 transform -translate-x-1/2 bg-forest text-white px-6 py-3 rounded-sm shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-50 text-center text-sm font-bold flex items-center gap-2 translate-y-4" style="top:auto; bottom: calc(var(--app-nav-clearance, 5rem) + 0.75rem);" translate="no">
             <i id="toast-icon" data-lucide="info" class="w-5 h-5"></i>
             <span id="toast-message"></span>
         </div>
@@ -7799,6 +7832,8 @@
         const freeLocalRecipeLimit = 3;
         // Soft launch: Stripe is not live — keep all premium locks off until this is true.
         window.PREMIUM_ENABLED = false;
+        // Lifetime plan is priced but not offered until this flag is true.
+        window.LIFETIME_ENABLED = false;
         const supportedAppLanguages = ['en', 'nl', 'fr', 'de', 'es'];
         const globalUiLanguageStorageKey = 'uculiPreferredUiLanguage';
         const uiLanguageChosenStorageKey = 'uculiUiLanguageChosen';
@@ -8763,12 +8798,15 @@
             }
 
             if (isLocalTestPremiumSession()) {
+                const nl = getActiveUiLanguage() === 'nl';
                 return {
                     state: 'testmodus',
-                    badge: 'Testmodus Premium',
-                    summary: 'Premium staat open in deze testsessie. Alles blijft lokaal op dit apparaat, zonder betaling.',
-                    sourceLabel: 'Testmodus',
-                    actionLabel: 'Lokaal in testmodus'
+                    badge: nl ? 'Testmodus Premium' : 'Test mode Premium',
+                    summary: nl
+                        ? 'Premium staat open in deze testsessie. Alles blijft lokaal op dit apparaat, zonder betaling.'
+                        : 'Premium is open in this test session. Everything stays local on this device, with no payment.',
+                    sourceLabel: nl ? 'Testmodus' : 'Test mode',
+                    actionLabel: nl ? 'Lokaal in testmodus' : 'Local test mode'
                 };
             }
 
@@ -9138,7 +9176,7 @@
         }
 
         function changeGlobalLanguage(langCode, options = {}) {
-            const { silent = false } = options;
+            const { silent = false, refreshView = true } = options;
             const normalizedLanguage = resolveSupportedLanguage(langCode) || 'en';
 
             userSettings.language = normalizedLanguage;
@@ -9148,8 +9186,17 @@
             regionDisplayNameCache = null;
             saveData();
 
+            if (typeof syncChromeLabels === 'function') syncChromeLabels();
+            if (typeof syncHeaderPageTitle === 'function') syncHeaderPageTitle();
+            if (refreshView && typeof refreshCurrentViewAfterBillingChange === 'function') {
+                refreshCurrentViewAfterBillingChange();
+            }
+
             if (!silent) {
-                showToast('Display language updated.', 'languages');
+                showToast(
+                    normalizedLanguage === 'nl' ? 'Weergavetaal bijgewerkt.' : 'Display language updated.',
+                    'languages'
+                );
             }
         }
 
@@ -12978,30 +13025,47 @@
 
         // Zonder account toch naar binnen, alleen op een preview-adres. Nooit op uculi.com.
         function startLocalTestModeFromGate() {
+            const nl = getActiveUiLanguage() === 'nl';
             if (isProductionUculiHost() || !isLocalDeveloperPreviewContext()) {
-                showToast('Testmodus is hier niet beschikbaar. Log in om verder te gaan.', 'shield-off');
+                showToast(
+                    nl
+                        ? 'Testmodus is hier niet beschikbaar. Log in om verder te gaan.'
+                        : 'Test mode is not available here. Sign in to continue.',
+                    'shield-off'
+                );
                 return false;
             }
 
             localStorage.setItem(developerBypassStorageKey, '1');
             if (!activateDeveloperBypassSession()) {
-                showToast('Testmodus kon niet starten. Log in om verder te gaan.', 'alert-circle');
+                showToast(
+                    nl
+                        ? 'Testmodus kon niet starten. Log in om verder te gaan.'
+                        : 'Test mode could not start. Sign in to continue.',
+                    'alert-circle'
+                );
                 return false;
             }
 
-            showToast('Testmodus staat aan. Premium is lokaal open op dit apparaat, zonder login.', 'shield');
+            showToast(
+                nl
+                    ? 'Testmodus staat aan. Premium is lokaal open op dit apparaat, zonder login.'
+                    : 'Test mode is on. Premium is open locally on this device, without signing in.',
+                'shield'
+            );
             enterAppFromLanding('local-test-mode');
             return true;
         }
 
         function localTestModeButtonMarkup(buttonId) {
             if (!isLocalDeveloperPreviewContext()) return '';
+            const nl = getActiveUiLanguage() === 'nl';
             return `
                 <div class="flex w-full flex-col items-center gap-1 sm:w-auto">
                     <button type="button" id="${buttonId}" onclick="startLocalTestModeFromGate()" class="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-gold bg-paper px-4 text-sm font-bold text-forest transition-colors hover:border-sage sm:w-auto">
-                        Doorgaan zonder inloggen (test)
+                        ${nl ? 'Doorgaan zonder inloggen (test)' : 'Continue without signing in (test)'}
                     </button>
-                    <p class="max-w-xs text-center text-xs font-semibold leading-relaxed text-sage">Recepten blijven alleen op dit apparaat.</p>
+                    <p class="max-w-xs text-center text-xs font-semibold leading-relaxed text-sage">${nl ? 'Recepten blijven alleen op dit apparaat.' : 'Recipes stay on this device only.'}</p>
                 </div>
             `;
         }
@@ -13467,7 +13531,7 @@
 
         function openRequestedLegalDocument() {
             const kind = new URLSearchParams(window.location.search || '').get('legal');
-            if (kind === 'privacy' || kind === 'terms') showLegalDocument(kind);
+            if (kind === 'privacy' || kind === 'terms' || kind === 'cookies') showLegalDocument(kind);
         }
 
         function initializeFirebase() {
@@ -15592,18 +15656,20 @@
         }
 
         function syncChromeLabels() {
-            const nl = userSettings.language === 'nl';
+            const nl = getActiveUiLanguage() === 'nl';
             const gear = document.getElementById('header-open-settings');
             const help = document.getElementById('header-help');
             const add = document.getElementById('header-add-recipe');
             const back = document.getElementById('header-back');
+            const moreAdd = document.getElementById('header-more-add');
+            const moreAddLabel = document.getElementById('header-more-add-label');
             const optionsLabel = nl ? 'Opties' : 'Options';
-            // Soft-launch chrome: Back aria is always Terug; Help stays Help.
             const helpLabel = 'Help';
             const addLabel = nl ? 'Recept' : 'Add Recipe';
-            const backLabel = 'Terug';
+            const backLabel = nl ? 'Terug' : 'Back';
+            const floatingBack = document.getElementById('floating-back-button');
             const navLabels = {
-                index: uiText('Index', 'Recepten'),
+                index: nl ? 'Recepten' : 'Recipes',
                 shopping: nl ? 'Boodschappen' : 'Shop',
                 browse: nl ? 'Bladeren' : 'Browse',
                 profile: nl ? 'Profiel' : 'Profile'
@@ -15635,9 +15701,15 @@
             }
             if (add) {
                 add.setAttribute('aria-label', addLabel);
+                add.title = addLabel;
                 const addText = add.querySelector('.header-add-label');
                 if (addText) addText.textContent = addLabel;
             }
+            if (moreAdd) {
+                moreAdd.setAttribute('aria-label', addLabel);
+                moreAdd.title = addLabel;
+            }
+            if (moreAddLabel) moreAddLabel.textContent = addLabel;
             if (back) {
                 back.setAttribute('aria-label', backLabel);
                 back.title = backLabel;
@@ -15646,6 +15718,10 @@
                 if (backText) backText.textContent = '';
                 const backIcon = back.querySelector('[data-lucide]');
                 if (backIcon) backIcon.setAttribute('data-lucide', 'arrow-left');
+            }
+            if (floatingBack) {
+                floatingBack.setAttribute('aria-label', backLabel);
+                floatingBack.title = backLabel;
             }
             document.querySelectorAll('#main-nav .app-nav-button[data-nav-view]').forEach(button => {
                 const view = button.getAttribute('data-nav-view');
@@ -15670,7 +15746,7 @@
         let ignoreChromePopstate = false;
 
         function getHeaderPageTitle() {
-            const nl = userSettings.language === 'nl';
+            const nl = getActiveUiLanguage() === 'nl';
             if (currentView === 'settings') return nl ? 'Opties' : 'Options';
             if (currentView === 'access') return nl ? 'Toegang beheren' : 'Manage access';
             if (currentView === 'add') return nl ? 'Recept' : 'Recipe';
@@ -15998,14 +16074,23 @@
                 document.documentElement.style.removeProperty('--toast-clearance');
                 return;
             }
+            const nav = document.getElementById('main-nav');
             const target = document.querySelector('.notebook-chrome') || document.querySelector('.shop-sheet');
-            if (!target) {
+            if (!toastEl) {
                 document.documentElement.style.removeProperty('--toast-clearance');
                 return;
             }
-            document.documentElement.style.setProperty('--toast-clearance', '0px');
-            const overlap = Math.ceil(toastEl.getBoundingClientRect().bottom - target.getBoundingClientRect().top + 10);
-            if (overlap > 0) document.documentElement.style.setProperty('--toast-clearance', `${overlap}px`);
+            const toastRect = toastEl.getBoundingClientRect();
+            let clearance = 0;
+            if (nav) {
+                const gap = Math.ceil(nav.getBoundingClientRect().top - toastRect.bottom);
+                if (gap < 8) clearance = Math.max(clearance, 8 - gap);
+            }
+            if (target) {
+                const overlap = Math.ceil(toastRect.bottom - target.getBoundingClientRect().top + 10);
+                if (overlap > 0) clearance = Math.max(clearance, overlap);
+            }
+            if (clearance > 0) document.documentElement.style.setProperty('--toast-clearance', `${clearance}px`);
             else document.documentElement.style.removeProperty('--toast-clearance');
         }
 
@@ -16013,12 +16098,12 @@
             document.getElementById('toast-icon').setAttribute('data-lucide', iconName);
             toastMessage.textContent = message;
             lucide.createIcons();
-            toastEl.classList.remove('opacity-0', '-translate-y-4');
+            toastEl.classList.remove('opacity-0', 'translate-y-4', '-translate-y-4');
             document.body.classList.add('toast-open');
             requestAnimationFrame(placeNotebookToastClearance);
             clearTimeout(toastHideTimer);
             toastHideTimer = setTimeout(() => {
-                toastEl.classList.add('opacity-0', '-translate-y-4');
+                toastEl.classList.add('opacity-0', 'translate-y-4');
                 document.body.classList.remove('toast-open');
                 document.documentElement.style.removeProperty('--toast-clearance');
             }, prefersReducedMotion() ? 2200 : 3000);
@@ -16213,6 +16298,7 @@
                                 <div class="landing-footer-links">
                                     <a class="landing-legal-link" href="${legalPageHref('privacy')}" onclick="event.preventDefault(); showLegalDocument('privacy');">${getLegalLabels().privacy}</a>
                                     <a class="landing-legal-link" href="${legalPageHref('terms')}" onclick="event.preventDefault(); showLegalDocument('terms');">${getLegalLabels().terms}</a>
+                                    <a class="landing-legal-link" href="${legalPageHref('cookies')}" onclick="event.preventDefault(); showLegalDocument('cookies');">${getLegalLabels().cookies}</a>
                                     <a href="#" class="text-[10px] font-bold uppercase tracking-[0.2em] text-sage hover:text-gold transition-colors">Instagram</a>
                                 </div>
                             </div>
@@ -18529,12 +18615,63 @@
 
         function getLegalLabels() {
             return getActiveUiLanguage() === 'nl'
-                ? { privacy: 'Privacybeleid', terms: 'Gebruiksvoorwaarden', back: 'Terug', accept: 'Akkoord en verder', acceptIntro: 'Lees het privacybeleid en de gebruiksvoorwaarden en vink beide vakjes aan voordat je verdergaat.' }
-                : { privacy: 'Privacy policy', terms: 'Terms of use', back: 'Back', accept: 'Agree and continue', acceptIntro: 'Read the privacy policy and terms of use and tick both boxes before you continue.' };
+                ? {
+                    privacy: 'Privacybeleid',
+                    terms: 'Gebruiksvoorwaarden',
+                    cookies: 'Cookiebeleid',
+                    back: '← Terug naar Uculi',
+                    accept: 'Akkoord en verder',
+                    acceptIntro: 'Lees het privacybeleid en de gebruiksvoorwaarden en vink beide vakjes aan voordat je verdergaat.',
+                    updated: 'Laatst bijgewerkt: 21 november 2026',
+                    createdBy: 'Created by Mholt',
+                    controller: 'Mholt · KvK 42175873 · mholt.apps@gmail.com'
+                }
+                : {
+                    privacy: 'Privacy policy',
+                    terms: 'Terms of use',
+                    cookies: 'Cookie policy',
+                    back: '← Back to Uculi',
+                    accept: 'Agree and continue',
+                    acceptIntro: 'Read the privacy policy and terms of use and tick both boxes before you continue.',
+                    updated: 'Last updated: 21 November 2026',
+                    createdBy: 'Created by Mholt',
+                    controller: 'Mholt · KvK 42175873 · mholt.apps@gmail.com'
+                };
         }
 
         function getLegalDocument(kind) {
             const en = getActiveUiLanguage() !== 'nl';
+            const labels = getLegalLabels();
+            const controllerLine = en
+                ? 'Controller: Mholt (KvK 42175873). Contact: mholt.apps@gmail.com.'
+                : 'Verantwoordelijke: Mholt (KvK 42175873). Contact: mholt.apps@gmail.com.';
+
+            if (kind === 'cookies') {
+                return en ? {
+                    id: 'cookies',
+                    kicker: 'Cookies',
+                    title: 'Cookie policy',
+                    intro: 'Uculi keeps cookies and similar storage minimal. This page explains what we use.',
+                    sections: [
+                        ['Essential only', 'We use essential storage for sign-in, language preference, and keeping your recipes on this device. We do not use advertising cookies.'],
+                        ['Account & Firebase', 'With an account, Google Firebase Authentication may set session cookies needed to keep you signed in securely.'],
+                        ['Your choices', 'You can clear site data in your browser at any time. Without an account, everything stays local on this device.'],
+                        ['Controller', controllerLine]
+                    ]
+                } : {
+                    id: 'cookies',
+                    kicker: 'Cookies',
+                    title: 'Cookiebeleid',
+                    intro: 'Uculi gebruikt cookies en vergelijkbare opslag spaarzaam. Deze pagina legt uit wat we gebruiken.',
+                    sections: [
+                        ['Alleen essentieel', 'We gebruiken essentiële opslag voor inloggen, taalkeuze en je recepten op dit apparaat. We gebruiken geen advertentiecookies.'],
+                        ['Account & Firebase', 'Met een account kan Google Firebase Authentication sessiecookies zetten die nodig zijn om je veilig ingelogd te houden.'],
+                        ['Jouw keuzes', 'Je kunt sitegegevens in je browser altijd wissen. Zonder account blijft alles lokaal op dit apparaat.'],
+                        ['Verantwoordelijke', controllerLine]
+                    ]
+                };
+            }
+
             if (kind === 'terms') {
                 return en ? {
                     id: 'terms',
@@ -18547,7 +18684,8 @@
                         ['Publishing', 'If you publish a recipe to Browse, that public copy can be read by others. Unpublish timing follows the in-app rules (immediate in the first hour, then a 24-hour schedule).'],
                         ['Account', 'You sign in with email and password, or with Google. For Google we only use your name and email address. You are responsible for the name, email, and recipes under your login.'],
                         ['No medical advice', 'Uculi is a recipe notebook. It does not give medical, nutrition, or allergy advice.'],
-                        ['Changes', `Uculi may change to stay reliable and safe. These terms are version ${AGREEMENT_VERSION}. Questions? Email mholt.apps@gmail.com.`]
+                        ['Changes', `Uculi may change to stay reliable and safe. These terms are version ${AGREEMENT_VERSION}. ${labels.updated}`],
+                        ['Controller', controllerLine]
                     ]
                 } : {
                     id: 'terms',
@@ -18560,10 +18698,12 @@
                         ['Publiceren', 'Publiceer je een recept in Browse, dan kan die openbare kopie door anderen gelezen worden. Unpublish volgt de regels in de app (direct in het eerste uur, daarna een planning van 24 uur).'],
                         ['Account', 'Je logt in met e-mail en wachtwoord, of met Google. Bij Google gebruiken we alleen je naam en je e-mailadres. Jij bent verantwoordelijk voor de naam, het e-mailadres en de recepten onder je login.'],
                         ['Geen medisch advies', 'Uculi is een receptenschrift. Het geeft geen medisch, voedings- of allergieadvies.'],
-                        ['Wijzigingen', `Het schrift kan veranderen om betrouwbaar en veilig te blijven. Deze voorwaarden zijn versie ${AGREEMENT_VERSION}. Vragen? Mail naar mholt.apps@gmail.com.`]
+                        ['Wijzigingen', `Het schrift kan veranderen om betrouwbaar en veilig te blijven. Deze voorwaarden zijn versie ${AGREEMENT_VERSION}. ${labels.updated}`],
+                        ['Verantwoordelijke', controllerLine]
                     ]
                 };
             }
+
             return en ? {
                 id: 'privacy',
                 kicker: 'Privacy',
@@ -18575,7 +18715,8 @@
                     ['Published recipes', 'Recipes you publish to Browse are publicly readable. Private recipes, notes, and settings stay with your account or this device.'],
                     ['Agreement record', 'When you create an account we also store when you accepted these documents: version and timestamp, kept privately with your user record in Firebase.'],
                     ['Your choices', 'You can edit or delete recipes and sign out. Without an account, clear this browser’s site data. With an account you can ask for access, correction, or deletion of what is stored in Firebase via mholt.apps@gmail.com.'],
-                    ['Controller', 'Uculi is an app by Mholt. For questions about your data, email mholt.apps@gmail.com.']
+                    ['Controller', controllerLine],
+                    ['Updated', labels.updated]
                 ]
             } : {
                 id: 'privacy',
@@ -18588,20 +18729,26 @@
                     ['Gepubliceerde recepten', 'Recepten die je in Browse publiceert zijn openbaar leesbaar. Privérecepten, notities en instellingen blijven bij jouw account of dit apparaat.'],
                     ['Akkoordmoment', 'Maak je een account, dan bewaren we ook wanneer je akkoord ging: de voorwaardenversie en het tijdstip, privé bij jouw gebruikersrecord in Firebase.'],
                     ['Jouw keuzes', 'Je kunt recepten bewerken of verwijderen en uitloggen. Zonder account wis je de sitegegevens in deze browser. Met een account kun je inzage, correctie of verwijdering vragen van wat in Firebase staat via mholt.apps@gmail.com.'],
-                    ['Verantwoordelijke', 'Uculi is een app van Mholt. Voor vragen over je gegevens mail je naar mholt.apps@gmail.com.']
+                    ['Verantwoordelijke', controllerLine],
+                    ['Bijgewerkt', labels.updated]
                 ]
             };
         }
 
         function renderLegalDocumentMarkup(kind) {
-            const doc = getLegalDocument(kind);
-            const otherKind = kind === 'privacy' ? 'terms' : 'privacy';
-            const other = getLegalDocument(otherKind);
+            const normalized = kind === 'terms' ? 'terms' : (kind === 'cookies' ? 'cookies' : 'privacy');
+            const doc = getLegalDocument(normalized);
+            const labels = getLegalLabels();
+            const cross = ['privacy', 'terms', 'cookies'].filter(id => id !== doc.id).map(id => {
+                const other = getLegalDocument(id);
+                return `<button type="button" onclick="showLegalDocument('${id}')" class="font-bold underline decoration-gold underline-offset-4">${other.title}</button>`;
+            }).join('<span> · </span>');
             return `
                 <article class="mx-auto w-full max-w-2xl space-y-4 text-forest">
                     <div class="rounded-[28px] border border-[#e4d3b6] bg-[#fbf8f3] p-5 md:p-6">
                         <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sage">${doc.kicker}</p>
                         <h3 class="mt-2 font-fantasy text-3xl font-bold text-forest">${doc.title}</h3>
+                        <p class="mt-2 text-xs font-semibold text-sage">${labels.updated}</p>
                         <p class="mt-3 text-sm font-semibold leading-relaxed text-sage">${doc.intro}</p>
                     </div>
                     <div class="space-y-3">
@@ -18612,21 +18759,28 @@
                             </section>
                         `).join('')}
                     </div>
-                    <p class="text-sm font-semibold text-forest">
-                        <button type="button" onclick="showLegalDocument('${otherKind}')" class="font-bold underline decoration-gold underline-offset-4">${other.title}</button>
-                    </p>
+                    <p class="text-sm font-semibold text-forest">${cross}</p>
+                    <p class="text-sm font-semibold text-forest">${labels.controller}</p>
+                    <p class="inline-flex items-center gap-1.5 text-sm font-semibold text-sage"><img src="assets/mholt-apple.png" alt="" class="brand-apple h-4 w-4 rounded-full object-cover" />${labels.createdBy}</p>
                 </article>
             `;
         }
 
         function legalPageHref(kind) {
-            return `app.html?legal=${kind === 'terms' ? 'terms' : 'privacy'}`;
+            if (kind === 'terms') return 'app.html?legal=terms';
+            if (kind === 'cookies') return 'app.html?legal=cookies';
+            return 'app.html?legal=privacy';
         }
 
         function showLegalDocument(kind) {
-            const doc = getLegalDocument(kind === 'terms' ? 'terms' : 'privacy');
-            const otherKind = doc.id === 'privacy' ? 'terms' : 'privacy';
-            const other = getLegalDocument(otherKind);
+            const normalized = kind === 'terms' ? 'terms' : (kind === 'cookies' ? 'cookies' : 'privacy');
+            const doc = getLegalDocument(normalized);
+            const labels = getLegalLabels();
+            const crossKinds = ['privacy', 'terms', 'cookies'].filter(id => id !== doc.id);
+            const crossLinks = crossKinds.map(id => {
+                const other = getLegalDocument(id);
+                return `<button type="button" class="legal-page-cross-link" onclick="showLegalDocument('${id}')">${other.title}</button>`;
+            }).join('<span aria-hidden="true"> · </span>');
             const sections = doc.sections.map(([heading, body]) => `
                 <section class="legal-page-section">
                     <h2>${heading}</h2>
@@ -18638,14 +18792,17 @@
                 <div id="legal-page" class="legal-page" data-legal-kind="${doc.id}">
                     <div class="legal-page-frame">
                         <header class="legal-page-header">
-                            <button type="button" class="legal-page-back" onclick="closeLegalDocument()">${getLegalLabels().back}</button>
+                            <button type="button" class="legal-page-back" onclick="closeLegalDocument()">${labels.back}</button>
                             <p class="legal-page-kicker">${doc.kicker}</p>
                             <h1 class="legal-page-title">${doc.title}</h1>
+                            <p class="mt-2 text-xs font-semibold text-sage">${labels.updated}</p>
                         </header>
                         <article class="legal-page-paper">
                             <p class="legal-page-intro">${doc.intro}</p>
                             ${sections}
-                            <p class="legal-page-cross"><button type="button" class="legal-page-cross-link" onclick="showLegalDocument('${otherKind}')">${other.title}</button></p>
+                            <p class="legal-page-cross">${crossLinks}</p>
+                            <p class="mt-6 text-sm font-semibold text-forest">${labels.controller}</p>
+                            <p class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-sage"><img src="assets/mholt-apple.png" alt="" class="brand-apple h-4 w-4 rounded-full object-cover" />${labels.createdBy}</p>
                         </article>
                     </div>
                 </div>
@@ -18662,6 +18819,14 @@
 
         function showTermsOfUse() {
             showLegalDocument('terms');
+        }
+
+        function showCookiePolicy() {
+            showLegalDocument('cookies');
+        }
+
+        function isLifetimeEnabled() {
+            return window.LIFETIME_ENABLED === true;
         }
 
         function showTermsAcceptanceModal() {
@@ -21565,7 +21730,7 @@
         });
 
         function showPlansModal() {
-            if (!isPremiumEnforced()) return;
+            // Plans & pricing stay viewable during soft launch (PREMIUM_ENABLED=false).
             trackLaunchEvent('plansModalOpened');
             const planCardBase = 'rounded-2xl border p-5 flex flex-col gap-3';
             const checkIcon = `<i data-lucide="check" class="w-4 h-4 text-gold flex-shrink-0"></i>`;
@@ -21573,62 +21738,80 @@
             function featureRow(icon, label) {
                 return `<li class="flex items-center gap-2 text-sm font-semibold text-forest">${icon}<span>${label}</span></li>`;
             }
-            createModal("Plans & Pricing", `
+            const nl = getActiveUiLanguage() === 'nl';
+            const vatNote = nl ? 'inclusief btw' : 'incl. VAT';
+            const lifetimeEnabled = window.LIFETIME_ENABLED === true;
+            const lifetimeCard = lifetimeEnabled ? `
+                    <div class="${planCardBase} border-forest bg-[#fbf8f3] shadow-md">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-forest">${nl ? 'Premium Lifetime' : 'Premium Lifetime'}</p>
+                                <p class="font-fantasy text-2xl font-bold text-forest mt-1">€74,99 <span class="text-base font-normal text-sage">${nl ? '/ eenmalig' : '/ once'}</span></p>
+                                <p class="mt-1 text-xs font-semibold text-sage">${vatNote}</p>
+                            </div>
+                            <span class="text-xs font-bold uppercase tracking-wide bg-forest bg-opacity-10 text-forest px-2 py-1 rounded-full">${nl ? 'Eenmalig' : 'One-time'}</span>
+                        </div>
+                        <ul class="space-y-2">
+                            ${featureRow(checkIcon, nl ? 'Alles in Premium' : 'Everything in Premium')}
+                            ${featureRow(checkIcon, nl ? 'Één keer betalen, voor altijd' : 'Pay once, use forever')}
+                            ${featureRow(checkIcon, nl ? 'Alle toekomstige updates' : 'All future updates included')}
+                        </ul>
+                    </div>` : '';
+            createModal(nl ? 'Abonnementen & prijzen' : 'Plans & Pricing', `
                 <div class="space-y-4 p-2">
-                    <!-- Free -->
-                    <div class="${planCardBase} border-parchmentDark bg-parchment">
+                    <div class="${planCardBase} border-parchmentDark bg-[#fbf8f3]">
                         <div>
-                            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sage">Free</p>
-                            <p class="font-fantasy text-2xl font-bold text-forest mt-1">€0 <span class="text-base font-normal text-sage">/ forever</span></p>
+                            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sage">${nl ? 'Gratis' : 'Free'}</p>
+                            <p class="font-fantasy text-2xl font-bold text-forest mt-1">€0 <span class="text-base font-normal text-sage">${nl ? '/ voor altijd' : '/ forever'}</span></p>
                         </div>
                         <ul class="space-y-2">
-                            ${featureRow(checkIcon, 'Up to 3 recipes')}
-                            ${featureRow(lockIcon, 'Unlimited recipes')}
-                            ${featureRow(lockIcon, 'Notebook / schrift')}
-                            ${featureRow(lockIcon, 'Cloud sync')}
-                            ${featureRow(lockIcon, 'Share recipes')}
+                            ${featureRow(checkIcon, nl ? 'Tot 3 recepten' : 'Up to 3 recipes')}
+                            ${featureRow(lockIcon, nl ? 'Onbeperkt recepten' : 'Unlimited recipes')}
+                            ${featureRow(lockIcon, nl ? 'Notebook / schrift' : 'Notebook / schrift')}
+                            ${featureRow(lockIcon, nl ? 'Cloud-sync' : 'Cloud sync')}
+                            ${featureRow(lockIcon, nl ? 'Recepten delen' : 'Share recipes')}
                             ${featureRow(lockIcon, 'PDF export')}
-                            ${featureRow(lockIcon, 'Publish & families')}
-                            ${featureRow(lockIcon, 'Backup & restore')}
+                            ${featureRow(lockIcon, nl ? 'Publiceren & families' : 'Publish & families')}
+                            ${featureRow(lockIcon, nl ? 'Backup & herstel' : 'Backup & restore')}
                         </ul>
                     </div>
-                    <!-- Premium Monthly -->
-                    <div class="${planCardBase} border-gold bg-white shadow-md">
-                        <div class="flex items-start justify-between">
+                    <div class="${planCardBase} border-gold bg-[#fbf8f3] shadow-md">
+                        <div class="flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">Premium Monthly</p>
-                                <p class="font-fantasy text-2xl font-bold text-forest mt-1">Coming soon</p>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">${nl ? 'Premium maandelijks' : 'Premium Monthly'}</p>
+                                <p class="font-fantasy text-2xl font-bold text-forest mt-1">€4,49 <span class="text-base font-normal text-sage">${nl ? '/ maand' : '/ month'}</span></p>
+                                <p class="mt-1 text-xs font-semibold text-sage">${vatNote}</p>
                             </div>
-                            <span class="text-xs font-bold uppercase tracking-wide bg-gold bg-opacity-15 text-gold px-2 py-1 rounded-full">Monthly</span>
+                            <span class="text-xs font-bold uppercase tracking-wide bg-gold bg-opacity-15 text-gold px-2 py-1 rounded-full">${nl ? 'Maand' : 'Monthly'}</span>
                         </div>
                         <ul class="space-y-2">
-                            ${featureRow(checkIcon, 'Everything in Free')}
-                            ${featureRow(checkIcon, 'Unlimited recipes')}
-                            ${featureRow(checkIcon, 'Notebook / schrift')}
-                            ${featureRow(checkIcon, 'Cloud sync')}
-                            ${featureRow(checkIcon, 'Share & PDF export')}
-                            ${featureRow(checkIcon, 'Publish & families')}
-                            ${featureRow(checkIcon, 'Backup & restore')}
+                            ${featureRow(checkIcon, nl ? 'Alles in Gratis' : 'Everything in Free')}
+                            ${featureRow(checkIcon, nl ? 'Onbeperkt recepten' : 'Unlimited recipes')}
+                            ${featureRow(checkIcon, nl ? 'Notebook / schrift' : 'Notebook / schrift')}
+                            ${featureRow(checkIcon, nl ? 'Cloud-sync' : 'Cloud sync')}
+                            ${featureRow(checkIcon, nl ? 'Delen & PDF-export' : 'Share & PDF export')}
+                            ${featureRow(checkIcon, nl ? 'Publiceren & families' : 'Publish & families')}
+                            ${featureRow(checkIcon, nl ? 'Backup & herstel' : 'Backup & restore')}
                         </ul>
-                        <p class="text-xs text-sage font-semibold">Billing available once checkout is live.</p>
+                        <p class="text-xs text-sage font-semibold">${nl ? 'Betalen gaat open zodra checkout live is. Alles betaald blijft achter Premium.' : 'Checkout opens when billing goes live. All paid features stay behind Premium.'}</p>
                     </div>
-                    <!-- Premium Lifetime -->
-                    <div class="${planCardBase} border-forest bg-white shadow-md">
-                        <div class="flex items-start justify-between">
+                    <div class="${planCardBase} border-[#929D75] bg-[#fbf8f3] shadow-md">
+                        <div class="flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-forest">Premium Lifetime</p>
-                                <p class="font-fantasy text-2xl font-bold text-forest mt-1">Coming soon</p>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-[#929D75]">${nl ? 'Premium jaarlijks' : 'Premium Yearly'}</p>
+                                <p class="font-fantasy text-2xl font-bold text-forest mt-1">€27,99 <span class="text-base font-normal text-sage">${nl ? '/ jaar' : '/ year'}</span></p>
+                                <p class="mt-1 text-xs font-semibold text-sage">${vatNote}</p>
                             </div>
-                            <span class="text-xs font-bold uppercase tracking-wide bg-forest bg-opacity-10 text-forest px-2 py-1 rounded-full">One-time</span>
+                            <span class="text-xs font-bold uppercase tracking-wide bg-[#929D75] bg-opacity-15 text-[#929D75] px-2 py-1 rounded-full">${nl ? 'Jaar' : 'Yearly'}</span>
                         </div>
                         <ul class="space-y-2">
-                            ${featureRow(checkIcon, 'Everything in Premium')}
-                            ${featureRow(checkIcon, 'Pay once, use forever')}
-                            ${featureRow(checkIcon, 'All future updates included')}
+                            ${featureRow(checkIcon, nl ? 'Alles in Premium maandelijks' : 'Everything in Premium Monthly')}
+                            ${featureRow(checkIcon, nl ? 'Voordeliger per maand' : 'Better value per month')}
                         </ul>
-                        <p class="text-xs text-sage font-semibold">Billing available once checkout is live.</p>
+                        <p class="text-xs text-sage font-semibold">${vatNote}</p>
                     </div>
-                    <p class="text-center text-xs text-sage font-semibold pt-1">Pricing will be confirmed when billing goes live.</p>
+                    ${lifetimeCard}
+                    <p class="text-center text-xs text-sage font-semibold pt-1">${nl ? 'Tijdens soft launch staan functies open via PREMIUM_ENABLED=false. Prijzen zijn inclusief btw.' : 'During soft launch features stay open via PREMIUM_ENABLED=false. Prices include VAT.'}</p>
                 </div>
             `);
         }
@@ -21895,17 +22078,17 @@
             const modalHtml = `
                 <div id="${modalId}" class="app-overlay fixed inset-0 bg-black bg-opacity-60 hidden opacity-0 z-[180] flex" role="dialog" aria-modal="true">
                     <div class="app-modal-panel max-w-3xl w-full scale-95" id="${modalId}-content">
-                        <div class="p-4 md:p-6 border-b border-parchmentDark flex items-center justify-between bg-parchment shrink-0">
+                        <div class="p-4 md:p-6 border-b border-parchmentDark flex items-center justify-between shrink-0" style="background:#fbf8f3;">
                             <h2 class="font-serif font-bold text-xl md:text-2xl text-forest">${title}</h2>
-                            <button onclick="closeModal('${modalId}')" class="${getAppButtonClasses('secondary', { iconOnly: true })}" aria-label="Close dialog">
-                                <i data-lucide="x" class="w-5 h-5"></i>
+                            <button type="button" onclick="closeModal('${modalId}')" class="inline-flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-parchmentDark bg-[#fbf8f3] text-forest shadow-sm transition-colors hover:border-[#929D75] hover:text-[#929D75]" aria-label="${getActiveUiLanguage() === 'nl' ? 'Dialoog sluiten' : 'Close dialog'}" title="${getActiveUiLanguage() === 'nl' ? 'Sluiten' : 'Close'}">
+                                <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
                             </button>
                         </div>
-                        <div class="app-modal-body p-4 md:p-6">
+                        <div class="app-modal-body p-4 md:p-6" style="background:#fbf8f3;">
                             ${contentHTML}
                         </div>
                         ${buttons.length ? `
-                        <div class="app-modal-footer p-4 md:p-6 border-t border-parchmentDark bg-parchment shrink-0">
+                        <div class="app-modal-footer p-4 md:p-6 border-t border-parchmentDark shrink-0" style="background:#fbf8f3;">
                             ${buttons.map((btn, idx) => {
                                 const clickFn = btn.onClick || btn.onclick;
                                 if (clickFn) window[`dynamic-modal-btn-${modalId}-${idx}`] = clickFn;

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install Uculi</title>
+    <meta name="description" content="Add Uculi to your home screen for quick access to your recipe notebook.">
+    <link rel="icon" type="image/png" href="assets/mholt-apple.png">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-olive: #929D75;
+            --forest: #1c1410;
+            --sage: #6b5f57;
+            --paper: #fbf8f3;
+            --parchment: #f6f1e8;
+            --border: #E4D7C4;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Outfit, sans-serif;
+            color: var(--forest);
+            background: var(--parchment);
+        }
+        .frame {
+            width: min(36rem, calc(100% - 2rem));
+            margin: 0 auto;
+            padding: 2rem 0 3rem;
+        }
+        .card {
+            background: var(--paper);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+        }
+        h1 {
+            font-family: Fraunces, serif;
+            font-size: 2rem;
+            margin: 0.75rem 0 0.5rem;
+        }
+        .kicker {
+            margin: 0;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--brand-olive);
+        }
+        p { color: var(--sage); font-weight: 600; line-height: 1.5; }
+        ol { padding-left: 1.2rem; color: var(--sage); font-weight: 600; line-height: 1.55; }
+        a.back {
+            display: inline-flex;
+            margin-bottom: 1rem;
+            color: var(--forest);
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 0.2em;
+        }
+        .cta {
+            display: inline-flex;
+            margin-top: 1rem;
+            padding: 0.85rem 1.2rem;
+            border-radius: 0.9rem;
+            background: var(--brand-olive);
+            color: var(--forest);
+            font-weight: 700;
+            text-decoration: none;
+        }
+        .footer {
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--sage);
+        }
+        .footer img { width: 1rem; height: 1rem; border-radius: 999px; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <main class="frame">
+        <a class="back" href="app.html" id="back-link">← Back to Uculi</a>
+        <article class="card">
+            <p class="kicker" id="kicker">Install</p>
+            <h1 id="title">Add Uculi to your home screen</h1>
+            <p id="intro">Open Uculi like an app on your phone. No extra store install is required.</p>
+            <ol id="steps">
+                <li>Open Uculi in Safari (iPhone) or Chrome (Android).</li>
+                <li>Use Share / Add to Home Screen (or Install app).</li>
+                <li>Confirm — Uculi appears on your home screen.</li>
+            </ol>
+            <a class="cta" href="app.html" id="open-app">Open Uculi</a>
+            <p class="footer"><img src="assets/mholt-apple.png" alt="" />Created by Mholt · KvK 42175873</p>
+        </article>
+    </main>
+    <script>
+        (function () {
+            const preferNl = String(navigator.language || '').toLowerCase().startsWith('nl');
+            if (!preferNl) return;
+            document.documentElement.lang = 'nl';
+            document.title = 'Uculi installeren';
+            document.getElementById('back-link').textContent = '← Terug naar Uculi';
+            document.getElementById('kicker').textContent = 'Installeren';
+            document.getElementById('title').textContent = 'Zet Uculi op je beginscherm';
+            document.getElementById('intro').textContent = 'Open Uculi als een app op je telefoon. Je hoeft niets uit een store te installeren.';
+            document.getElementById('steps').innerHTML = [
+                'Open Uculi in Safari (iPhone) of Chrome (Android).',
+                'Kies Delen / Zet op beginscherm (of App installeren).',
+                'Bevestig — Uculi staat op je beginscherm.'
+            ].map((t) => `<li>${t}</li>`).join('');
+            document.getElementById('open-app').textContent = 'Open Uculi';
+        })();
+    </script>
+</body>
+</html>
