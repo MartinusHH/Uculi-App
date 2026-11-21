@@ -1,5 +1,6 @@
 /**
- * Admin SDK only: set or clear the Auth custom claim `superuser`.
+ * Admin SDK only: set or clear the Auth custom claim `admin`.
+ * Firestore rules treat admin + email_verified as access superuser.
  * Never call this from the client. For emulator testing, set:
  *   FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099
  *
@@ -38,12 +39,14 @@ const user = uidArg
   ? await auth.getUser(uidArg)
   : await auth.getUserByEmail(emailArg);
 const nextClaims = { ...(user.customClaims || {}) };
-if (clear) delete nextClaims.superuser;
-else nextClaims.superuser = true;
+if (clear) delete nextClaims.admin;
+else nextClaims.admin = true;
+// Drop legacy claim name if present so rules and tokens stay aligned.
+delete nextClaims.superuser;
 await auth.setCustomUserClaims(user.uid, nextClaims);
 console.log(JSON.stringify({
   ok: true,
   uid: user.uid,
   email: user.email || '',
-  superuser: nextClaims.superuser === true
+  admin: nextClaims.admin === true
 }, null, 2));

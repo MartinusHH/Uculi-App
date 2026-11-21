@@ -2,10 +2,18 @@
  * Emulator proof: a regular signed-in user cannot set legacyPremium, superuser,
  * or paid premium entitlement fields on their user doc.
  *
+ * Also proves access-superuser rules:
+ * - admin claim + email_verified false → denied
+ * - admin claim + email_verified true → allowed
+ *
  * Requires Auth :9099 and Firestore :8080 emulators + rules loaded.
  */
 import fs from 'fs';
+import { createRequire } from 'module';
 import { spawnSync } from 'child_process';
+
+const require = createRequire(import.meta.url);
+const admin = require('../functions/node_modules/firebase-admin');
 
 const ART = '/opt/cursor/artifacts';
 fs.mkdirSync(ART, { recursive: true });
@@ -13,11 +21,19 @@ const PROJECT = 'mholt-uculi';
 const AUTH = 'http://127.0.0.1:9099';
 const FIRESTORE = 'http://127.0.0.1:8080';
 
+process.env.FIREBASE_AUTH_EMULATOR_HOST = '127.0.0.1:9099';
+process.env.FIRESTORE_EMULATOR_HOST = '127.0.0.1:8080';
+
 const results = [];
 const log = (name, ok, detail = '') => {
   results.push({ name, ok, detail: String(detail).slice(0, 280) });
   console.log(`${ok ? 'PASS' : 'FAIL'} | ${name}${detail ? ' — ' + String(detail).slice(0, 180) : ''}`);
 };
+
+if (!admin.apps.length) {
+  admin.initializeApp({ projectId: PROJECT });
+}
+const authAdmin = admin.auth();
 
 async function signUp(email, password) {
   const res = await fetch(`${AUTH}/identitytoolkit.googleapis.com/v1/accounts:signUp?key=demo-${PROJECT}`, {
@@ -27,6 +43,17 @@ async function signUp(email, password) {
   });
   const data = await res.json();
   if (!data.idToken || !data.localId) throw new Error(`signUp failed: ${JSON.stringify(data)}`);
+  return data;
+}
+
+async function signIn(email, password) {
+  const res = await fetch(`${AUTH}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=demo-${PROJECT}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password, returnSecureToken: true })
+  });
+  const data = await res.json();
+  if (!data.idToken || !data.localId) throw new Error(`signIn failed: ${JSON.stringify(data)}`);
   return data;
 }
 
@@ -82,17 +109,64 @@ async function createUserDoc(uid, idToken, fields) {
   return { status: res.status, json };
 }
 
+async function listAccessCollection(idToken) {
+  const url = `${FIRESTORE}/v1/projects/${PROJECT}/databases/(default)/documents/access`;
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${idToken}` }
+  });
+  const text = await res.text();
+  let json = null;
+  try { json = JSON.parse(text); } catch (_e) { json = { raw: text }; }
+  return { status: res.status, json };
+}
+
+async function createAccessGrant(idToken, emailLower) {
+  const body = {
+    fields: {
+      email: encodeValue(emailLower),
+      grantedAt: encodeValue(new Date().toISOString())
+    }
+  };
+  const url = `${FIRESTORE}/v1/projects/${PROJECT}/databases/(default)/documents/access?documentId=${encodeURIComponent(emailLower)}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${idToken}`
+    },
+    body: JSON.stringify(body)
+  });
+  const text = await res.text();
+  let json = null;
+  try { json = JSON.parse(text); } catch (_e) { json = { raw: text }; }
+  return { status: res.status, json };
+}
+
 function denied(result) {
   return result.status === 403 || /PERMISSION_DENIED|permission/i.test(JSON.stringify(result.json || {}));
 }
 
-// Ensure latest rules are loaded into the emulator.
+function allowed(result) {
+  return result.status >= 200 && result.status < 300;
+}
+
+async function mintAdminSession({ email, password, emailVerified }) {
+  const signed = await signUp(email, password);
+  const uid = signed.localId;
+  await authAdmin.setCustomUserClaims(uid, { admin: true });
+  await authAdmin.updateUser(uid, { emailVerified: Boolean(emailVerified) });
+  // Fresh sign-in so the ID token picks up claims + email_verified.
+  const session = await signIn(email, password);
+  return { uid, idToken: session.idToken, email };
+}
+
+// Soft nudge: ensure rules file is the one the emulator watches.
 const load = spawnSync('npx', ['--yes', 'firebase-tools@latest', 'emulators:exec', '--only', 'firestore', '--project', PROJECT, 'true'], {
   cwd: '/workspace',
   encoding: 'utf8',
   timeout: 5000
 });
-// Prefer rules reload via REST if emulator already running: write rules file is enough when emulator started with project.
 void load;
 
 const stamp = Date.now();
@@ -129,6 +203,38 @@ try {
   // Harmless profile update still allowed.
   const okUpdate = await patchUser(uid, idToken, { displayName: 'Still Free' });
   log('user can update non-entitlement fields', okUpdate.status === 200, JSON.stringify({ status: okUpdate.status }));
+
+  // Regular user cannot list access grants.
+  const regularList = await listAccessCollection(idToken);
+  log('regular user access list denied', denied(regularList), JSON.stringify({ status: regularList.status }));
+
+  // admin claim without verified email → no superuser access.
+  const unverified = await mintAdminSession({
+    email: `admin.unverified.${stamp}@uculi.test`,
+    password,
+    emailVerified: false
+  });
+  const unverifiedList = await listAccessCollection(unverified.idToken);
+  const unverifiedCreate = await createAccessGrant(unverified.idToken, `denied.${stamp}@uculi.test`);
+  log(
+    'admin claim + email_verified false denied',
+    denied(unverifiedList) && denied(unverifiedCreate),
+    JSON.stringify({ list: unverifiedList.status, create: unverifiedCreate.status })
+  );
+
+  // admin claim with verified email → superuser access.
+  const verified = await mintAdminSession({
+    email: `admin.verified.${stamp}@uculi.test`,
+    password,
+    emailVerified: true
+  });
+  const verifiedList = await listAccessCollection(verified.idToken);
+  const verifiedCreate = await createAccessGrant(verified.idToken, `allowed.${stamp}@uculi.test`);
+  log(
+    'admin claim + email_verified true allowed',
+    allowed(verifiedList) && allowed(verifiedCreate),
+    JSON.stringify({ list: verifiedList.status, create: verifiedCreate.status })
+  );
 } catch (error) {
   log('fatal', false, error?.stack || error);
 }

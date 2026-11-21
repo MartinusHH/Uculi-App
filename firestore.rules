@@ -38,9 +38,11 @@ service cloud.firestore {
       return isSelf(uid) || (resource.data.isPublic == true);
     }
 
-    // Superuser only via Auth custom claim set by Admin SDK — never from client writes.
+    // Superuser only via Auth custom claim `admin` (Admin SDK) + verified email — never from client writes.
     function isAccessSuperuser() {
-      return signedIn() && request.auth.token.superuser == true;
+      return signedIn()
+        && request.auth.token.admin == true
+        && request.auth.token.email_verified == true;
     }
 
     // Entitlement fields are Admin-SDK-only (rules bypass). Clients may not set/change them.

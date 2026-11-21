@@ -8446,6 +8446,7 @@
         // Superuser is claim-only (Admin SDK setCustomUserClaims). Never trust a client-writable field.
         let currentUserAccessGrant = false;
         let currentUserSuperuserClaim = false;
+        let forcedAuthTokenRefreshUid = null;
         let accessGrantListCache = [];
         let accessGrantLoadPromise = null;
 
@@ -8455,15 +8456,31 @@
 
         function isAccessSuperuser() {
             if (!isAuthenticated || !currentUser) return false;
-            return currentUserSuperuserClaim === true;
+            // Match Firestore rules: admin claim + verified email.
+            return currentUserSuperuserClaim === true && currentUser.emailVerified === true;
+        }
+
+        // Force one token refresh per signed-in uid so a newly set admin claim
+        // is visible after sign-in / app start without requiring a logout.
+        async function forceRefreshAuthTokenOnce() {
+            if (!isAuthenticated || !currentUser || typeof currentUser.getIdToken !== 'function') return false;
+            if (forcedAuthTokenRefreshUid === currentUser.uid) return true;
+            try {
+                await currentUser.getIdToken(true);
+                forcedAuthTokenRefreshUid = currentUser.uid;
+                return true;
+            } catch (_error) {
+                return false;
+            }
         }
 
         async function refreshCurrentUserSuperuserClaim(forceRefresh = false) {
             currentUserSuperuserClaim = false;
             if (!isAuthenticated || !currentUser || typeof currentUser.getIdTokenResult !== 'function') return false;
             try {
+                if (forceRefresh) await forceRefreshAuthTokenOnce();
                 const token = await currentUser.getIdTokenResult(Boolean(forceRefresh));
-                currentUserSuperuserClaim = token?.claims?.superuser === true;
+                currentUserSuperuserClaim = token?.claims?.admin === true;
             } catch (_error) {
                 currentUserSuperuserClaim = false;
             }
@@ -12850,6 +12867,7 @@
             currentUserModerationStatus = getDefaultModerationStatus();
             currentUserAccessGrant = false;
             currentUserSuperuserClaim = false;
+            forcedAuthTokenRefreshUid = null;
             accessGrantListCache = [];
             accessGrantLoadPromise = null;
             indexViewMode = 'cards';
