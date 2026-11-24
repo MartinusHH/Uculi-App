@@ -142,6 +142,59 @@ try {
   assertLink('footer en 390', enFooter, expectedEn, 'Report a problem');
   log('footer en 390: english form', enFooter.href.includes('1FAIpQLSdiCbTVI_mGQSOI7eB7g5nxx10mCH0Pf6reA1TNTGzz8paluQ'), enFooter.href);
   await enContext.close();
+
+  const alignWidths = [
+    { lang: 'nl', width: 390, label: 'Probleem melden' },
+    { lang: 'nl', width: 820, label: 'Probleem melden' },
+    { lang: 'nl', width: 1280, label: 'Probleem melden' },
+    { lang: 'nl', width: 1920, label: 'Probleem melden' },
+    { lang: 'en', width: 390, label: 'Report a problem' }
+  ];
+  for (const { lang, width, label } of alignWidths) {
+    const alignContext = await browser.newContext({ viewport: { width, height: width === 390 ? 844 : 1000 } });
+    const alignPage = await alignContext.newPage();
+    await alignPage.goto(`${APP}/app.html?dev-bypass=1&lang=${lang}`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await sleep(700);
+    await quiet(alignPage);
+    const boxes = await alignPage.evaluate((language) => {
+      localStorage.setItem('uculiDeveloperBypass', '1');
+      if (typeof activateDeveloperBypassSession === 'function') activateDeveloperBypassSession();
+      if (typeof userSettings !== 'undefined') {
+        userSettings.language = language;
+        userSettings.termsAccepted = true;
+      }
+      renderSettings();
+      if (typeof alignProblemReportButton === 'function') alignProblemReportButton();
+      const paid = document.querySelector('.family-code-panel .family-code-row > button');
+      const report = document.getElementById('report-problem-settings');
+      const paidBox = paid?.getBoundingClientRect();
+      const reportBox = report?.getBoundingClientRect();
+      const reportStyle = report ? getComputedStyle(report) : null;
+      const paidStyle = paid ? getComputedStyle(paid) : null;
+      return {
+        paidText: (paid?.textContent || '').replace(/\s+/g, ' ').trim(),
+        reportText: (report?.textContent || '').replace(/\s+/g, ' ').trim(),
+        paid: paidBox ? { left: paidBox.left, right: paidBox.right, height: paidBox.height } : null,
+        report: reportBox ? { left: reportBox.left, right: reportBox.right, height: reportBox.height } : null,
+        reportClass: report?.className || '',
+        paidRadius: paidStyle?.borderRadius || '',
+        reportRadius: reportStyle?.borderRadius || '',
+        paidPad: paidStyle ? `${paidStyle.paddingTop} ${paidStyle.paddingRight}` : '',
+        reportPad: reportStyle ? `${reportStyle.paddingTop} ${reportStyle.paddingRight}` : '',
+        justify: reportStyle?.justifyContent || ''
+      };
+    }, lang);
+    const left = boxes.paid && boxes.report ? Math.abs(boxes.paid.left - boxes.report.left) : 99;
+    const right = boxes.paid && boxes.report ? Math.abs(boxes.paid.right - boxes.report.right) : 99;
+    const height = boxes.paid && boxes.report ? Math.abs(boxes.paid.height - boxes.report.height) : 99;
+    log(`align ${lang} ${width}: left`, left <= 1, `Δ${left.toFixed(2)} paid=${boxes.paid?.left?.toFixed?.(1)} report=${boxes.report?.left?.toFixed?.(1)}`);
+    log(`align ${lang} ${width}: right`, right <= 1, `Δ${right.toFixed(2)} paid=${boxes.paid?.right?.toFixed?.(1)} report=${boxes.report?.right?.toFixed?.(1)}`);
+    log(`align ${lang} ${width}: height`, height <= 1, `Δ${height.toFixed(2)} paid=${boxes.paid?.height?.toFixed?.(1)} report=${boxes.report?.height?.toFixed?.(1)}`);
+    log(`align ${lang} ${width}: secondary sm`, boxes.reportClass.includes('app-btn-secondary') && boxes.reportClass.includes('h-11') && boxes.reportClass.includes('rounded-xl') && boxes.reportClass.includes('px-4'), boxes.reportClass);
+    log(`align ${lang} ${width}: label`, boxes.reportText === label, boxes.reportText);
+    log(`align ${lang} ${width}: centered`, boxes.justify === 'center', boxes.justify);
+    await alignContext.close();
+  }
 } catch (error) {
   log('fatal', false, error?.stack || error);
 } finally {
