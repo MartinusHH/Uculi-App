@@ -3399,6 +3399,12 @@
                 padding: 0.15rem 0.75rem 0.75rem;
             }
 
+            /* Match card inset so editor title/intro do not kiss the left edge at 390. */
+            body.chrome-push .editor-sheet {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+
             .settings-sheet > .settings-hero h2,
             .settings-sheet > h2 {
                 font-size: 1.2rem;
@@ -6349,11 +6355,13 @@
             justify-content: space-between;
             gap: 0.75rem 1rem;
             margin-top: 0.85rem;
+            margin-bottom: 0.35rem;
             padding: 0.85rem 1rem;
             border: 1px solid rgba(28, 20, 16, 0.1);
             border-radius: 1rem;
             background: rgba(255, 253, 249, 0.96);
             box-shadow: 0 10px 22px rgba(28, 20, 16, 0.05);
+            scroll-margin-top: calc(5.75rem + env(safe-area-inset-top, 0px));
         }
 
         .recipe-draft-restored-notice p {
@@ -6366,6 +6374,26 @@
 
         .recipe-draft-restored-notice button {
             flex: 0 0 auto;
+        }
+
+        .editor-hero,
+        #add-recipe-form > .editor-panel {
+            scroll-margin-top: calc(5.75rem + env(safe-area-inset-top, 0px));
+        }
+
+        @media (min-width: 820px) {
+            .editor-hero {
+                margin-bottom: var(--space-4);
+            }
+
+            .recipe-draft-restored-notice {
+                margin-top: 0.65rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .editor-sheet.has-draft-notice .editor-layout {
+                padding-top: 0.15rem;
+            }
         }
 
         .editor-layout {
@@ -8799,6 +8827,7 @@
                     dessert: uiText('Dessert', 'Dessert'),
                     drink: uiText('Drink', 'Drank'),
                     breakfast: uiText('Breakfast', 'Ontbijt'),
+                    brunch: uiText('Brunch', 'Brunch'),
                     lunch: uiText('Lunch', 'Lunch'),
                     dinner: uiText('Dinner', 'Diner'),
                     snack: uiText('Snack', 'Tussendoortje'),
@@ -8852,6 +8881,10 @@
         }
 
         function localizeRecipeCategoryLabel(value) {
+            return localizeRecipeLabel('category', value);
+        }
+
+        function localizeRecipeMealTypeLabel(value) {
             return localizeRecipeLabel('category', value);
         }
 
@@ -14285,6 +14318,10 @@
             notebookCoverOpen = false;
             activeNotebookStickyNoteMenu = null;
             currentIndexRecipeIds = [];
+            // Detach in-memory editor draft state after logout flush (listeners unbound in signOut).
+            if (typeof detachRecipeEditorDraftMemory === 'function') {
+                detachRecipeEditorDraftMemory();
+            }
         }
 
         function syncAuthenticatedAppChrome() {
@@ -15194,6 +15231,18 @@
         }
 
         async function signOut() {
+            // Flush the current editor draft under this user, then detach listeners/state
+            // so the next account never sees leftover autosave handlers or in-memory draft UI.
+            try {
+                if (typeof persistRecipeEditorDraftNow === 'function') persistRecipeEditorDraftNow();
+            } catch (_error) { /* ignore */ }
+            try {
+                if (typeof unbindRecipeEditorDraftAutosave === 'function') unbindRecipeEditorDraftAutosave();
+            } catch (_error) { /* ignore */ }
+            try {
+                if (typeof hideRecipeDraftRestoredNotice === 'function') hideRecipeDraftRestoredNotice();
+            } catch (_error) { /* ignore */ }
+
             if (isDeveloperBypassSession()) {
                 clearDeveloperBypassPreference();
                 currentUser = null;
@@ -24758,10 +24807,12 @@
         }
 
         function sanitizeRecipeDraftForStorage(snapshot) {
+            const savedAtMs = Number(snapshot?.savedAt ?? snapshot?.updatedAt) || Date.now();
             const copy = {
                 version: 1,
                 recipeId: getRecipeDraftKeyId(snapshot?.recipeId),
-                updatedAt: Number(snapshot?.updatedAt) || Date.now(),
+                savedAt: savedAtMs,
+                updatedAt: savedAtMs,
                 title: String(snapshot?.title || ''),
                 author: String(snapshot?.author || ''),
                 category: String(snapshot?.category || ''),
@@ -24779,12 +24830,51 @@
                 steps: normalizeRecipeInstructions(snapshot?.steps || []).map((step) => ({
                     text: step.text,
                     minutes: step.minutes,
-                    image: isLargeDataUrl(step.image) ? '' : (step.image || '')
+                    image: isLargeDataUrl(step.image) ? '' : (sanitizeRecipeStepImageUrl(step.image) || '')
                 })),
                 profile: isLargeDataUrl(snapshot?.profile) ? null : (snapshot?.profile || null),
                 detailsOpen: Boolean(snapshot?.detailsOpen)
             };
             return copy;
+        }
+
+        function getDraftSavedAtMs(draft) {
+            if (!draft) return 0;
+            const raw = draft.savedAt ?? draft.updatedAt;
+            const ms = typeof raw === 'number' ? raw : new Date(raw).getTime();
+            return Number.isFinite(ms) && ms > 0 ? ms : 0;
+        }
+
+        function getRecipeUpdatedAtMs(recipe) {
+            if (!recipe) return 0;
+            const candidates = [recipe.updatedAt, recipe.savedAt, recipe.lastSavedAt];
+            for (const raw of candidates) {
+                if (raw == null || raw === '') continue;
+                const ms = typeof raw === 'number' ? raw : new Date(raw).getTime();
+                if (Number.isFinite(ms) && ms > 0) return ms;
+            }
+            return 0;
+        }
+
+        function isRecipeEditorDraftStale(draft, recipe) {
+            if (!draft || !recipe) return false;
+            const recipeMs = getRecipeUpdatedAtMs(recipe);
+            const draftMs = getDraftSavedAtMs(draft);
+            if (!recipeMs || !draftMs) return false;
+            return recipeMs > draftMs;
+        }
+
+        function detachRecipeEditorDraftMemory() {
+            draftIngredients = [];
+            draftSteps = [];
+            draftProfile = null;
+            editingRecipeId = null;
+            recipeDraftBaselineFingerprint = '';
+            recipeDraftRestoredActive = false;
+            try {
+                document.getElementById('recipe-draft-restored-notice')?.remove();
+                document.querySelector('.editor-sheet')?.classList.remove('has-draft-notice');
+            } catch (_error) { /* ignore */ }
         }
 
         function fingerprintRecipeDraft(snapshot) {
@@ -24817,9 +24907,11 @@
                 .filter(Boolean);
             const diet = Array.from(document.querySelectorAll('.diet-checkbox:checked')).map((cb) => cb.value);
             const detailsPanel = document.getElementById('recipe-details-panel');
+            const nowMs = Date.now();
             return sanitizeRecipeDraftForStorage({
                 recipeId: getRecipeDraftKeyId(editingRecipeId),
-                updatedAt: Date.now(),
+                savedAt: nowMs,
+                updatedAt: nowMs,
                 title: document.getElementById('r-title')?.value || '',
                 author: document.getElementById('r-author')?.value || '',
                 category: document.getElementById('r-category')?.value || '',
@@ -25016,12 +25108,14 @@
                 <button type="button" onclick="discardRestoredRecipeDraft()" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${uiText('Discard', 'Weggooien')}" title="${uiText('Discard', 'Weggooien')}">${uiText('Discard', 'Weggooien')}</button>
             `;
             hero.appendChild(notice);
+            document.querySelector('.editor-sheet')?.classList.add('has-draft-notice');
             recipeDraftRestoredActive = true;
             try { lucide.createIcons(); } catch (_error) { /* ignore */ }
         }
 
         function hideRecipeDraftRestoredNotice() {
             document.getElementById('recipe-draft-restored-notice')?.remove();
+            document.querySelector('.editor-sheet')?.classList.remove('has-draft-notice');
             recipeDraftRestoredActive = false;
         }
 
@@ -25044,7 +25138,7 @@
                 const profilePreview = document.getElementById('profile-preview');
                 if (profilePreview && !draftProfile) {
                     profilePreview.style.backgroundImage = '';
-                    profilePreview.innerHTML = `<i data-lucide="camera" class="w-8 h-8 mb-2"></i><span class="text-xs font-bold uppercase tracking-wider">Upload</span>`;
+                    profilePreview.innerHTML = `<i data-lucide="camera" class="w-8 h-8 mb-2"></i><span class="text-xs font-bold uppercase tracking-wider">${uiText('Upload', 'Uploaden')}</span>`;
                     try { lucide.createIcons(); } catch (_error) { /* ignore */ }
                 }
             } else {
@@ -25094,6 +25188,7 @@
             window.addEventListener('pagehide', handleRecipeEditorPageHide);
             window.addEventListener('beforeunload', handleRecipeEditorBeforeUnload);
             recipeDraftAutosaveBound = true;
+            window.recipeDraftAutosaveBound = true;
         }
 
         function unbindRecipeEditorDraftAutosave() {
@@ -25104,6 +25199,7 @@
             window.removeEventListener('pagehide', handleRecipeEditorPageHide);
             window.removeEventListener('beforeunload', handleRecipeEditorBeforeUnload);
             recipeDraftAutosaveBound = false;
+            window.recipeDraftAutosaveBound = false;
             if (recipeDraftPersistTimer) {
                 clearTimeout(recipeDraftPersistTimer);
                 recipeDraftPersistTimer = null;
@@ -25120,6 +25216,12 @@
         window.buildRecipeBaselineSnapshot = buildRecipeBaselineSnapshot;
         window.sanitizeRecipeDraftForStorage = sanitizeRecipeDraftForStorage;
         window.getRecipeDraftStorageKey = getRecipeDraftStorageKey;
+        window.isRecipeEditorDraftStale = isRecipeEditorDraftStale;
+        window.getDraftSavedAtMs = getDraftSavedAtMs;
+        window.getRecipeUpdatedAtMs = getRecipeUpdatedAtMs;
+        window.unbindRecipeEditorDraftAutosave = unbindRecipeEditorDraftAutosave;
+        window.detachRecipeEditorDraftMemory = detachRecipeEditorDraftMemory;
+        window.hideRecipeDraftRestoredNotice = hideRecipeDraftRestoredNotice;
 
         function renderAddForm(recipeId = null) {
             activeDetailRecipeId = null;
@@ -25139,20 +25241,36 @@
             draftIngredients = recipeToEdit ? [...(recipeToEdit.ingredients || [])] : [];
             draftSteps = recipeToEdit ? normalizeRecipeInstructions(recipeToEdit.instructions) : [];
             draftProfile = recipeToEdit?.profile && recipeToEdit.profile !== defaultPlaceholderProfile ? recipeToEdit.profile : null;
-            const formTitle = recipeToEdit ? 'Recept bewerken' : 'Recept maken';
-            const submitLabel = recipeToEdit ? 'Recept bijwerken' : 'Recept opslaan';
+            const formTitle = recipeToEdit
+                ? uiText('Edit recipe', 'Recept bewerken')
+                : uiText('Create recipe', 'Recept maken');
+            const submitLabel = recipeToEdit
+                ? uiText('Update recipe', 'Recept bijwerken')
+                : uiText('Save recipe', 'Recept opslaan');
             const publishSubmitLabel = recipeToEdit
-                ? (recipeToEdit.publishedId ? (isRecipePublishedLive(recipeToEdit) ? 'Opslaan & publicatie bijwerken' : 'Opslaan & herpubliceren') : 'Opslaan & publiceren')
-                : 'Opslaan & publiceren';
+                ? (recipeToEdit.publishedId ? (isRecipePublishedLive(recipeToEdit) ? uiText('Save & update publication', 'Opslaan & publicatie bijwerken') : uiText('Save & republish', 'Opslaan & herpubliceren')) : uiText('Save & publish', 'Opslaan & publiceren'))
+                : uiText('Save & publish', 'Opslaan & publiceren');
             const editorGuidance = recipeToEdit
-                ? 'Update the recipe basics here. Optional details stay in one section below when you need them.'
-                : 'Start with the essentials: title, category, ingredients, and steps. Optional details stay available below.';
+                ? uiText(
+                    'Update the recipe basics here. Optional details stay in one section below when you need them.',
+                    'Werk hier de basis van het recept bij. Optionele details staan eronder wanneer je ze nodig hebt.'
+                )
+                : uiText(
+                    'Start with the essentials: title, category, ingredients, and steps. Optional details stay available below.',
+                    'Begin met de basis: titel, categorie, ingrediënten en stappen. Optionele details staan eronder.'
+                );
             const activeFamilies = getActiveFamiliesForCurrentUser();
-            const familyOptionsMarkup = [`<option value="">${getActiveUiLanguage() === 'nl' ? 'Persoonlijk archief' : 'Personal archive'}</option>`, ...activeFamilies.map(family => `<option value="${family.id}">${escapeHTML(family.name)}</option>`)].join('');
+            const familyOptionsMarkup = [`<option value="">${uiText('Personal archive', 'Persoonlijk archief')}</option>`, ...activeFamilies.map(family => `<option value="${family.id}">${escapeHTML(family.name)}</option>`)].join('');
             const recipeFamily = recipeToEdit ? getRecipeFamily(recipeToEdit) : null;
             const familyHelperText = activeFamilies.length > 0
-                ? 'Choose a family book if this recipe belongs in a shared archive. Personal recipes stay private to your account.'
-                : 'This recipe stays in your personal archive until you create or join a family book.';
+                ? uiText(
+                    'Choose a family book if this recipe belongs in a shared archive. Personal recipes stay private to your account.',
+                    'Kies een familieboek als dit recept in een gedeeld archief hoort. Persoonlijke recepten blijven privé op jouw account.'
+                )
+                : uiText(
+                    'This recipe stays in your personal archive until you create or join a family book.',
+                    'Dit recept blijft in je persoonlijke archief tot je een familieboek maakt of eraan deelneemt.'
+                );
             const dietOptionsMarkup = dietOptions.map(option => {
                 const label = localizeRecipeDietLabel(option);
                 const desc = getDietDescription(option);
@@ -25164,6 +25282,12 @@
                     </span>
                 </label>`;
             }).join('');
+            const categoryOptionsMarkup = ['Cooking', 'Baking', 'Dessert', 'Drink']
+                .map((value) => `<option value="${escapeHTML(value)}">${escapeHTML(localizeRecipeCategoryLabel(value))}</option>`)
+                .join('');
+            const mealTypeButtonsMarkup = mealTypeOptions
+                .map((option) => `<button type="button" onclick="toggleMealTypeBtn(this)" data-meal-type="${escapeHTML(option)}" data-selected="false" class="meal-type-btn inline-flex items-center rounded-xl border border-sage border-opacity-20 bg-white px-4 text-xs font-bold text-sage transition-all hover:border-gold hover:text-forest">${escapeHTML(localizeRecipeMealTypeLabel(option))}</button>`)
+                .join('');
 
             contentDiv.innerHTML = `
                 <div class="editor-sheet">
@@ -25174,70 +25298,69 @@
 
                     <form id="add-recipe-form" class="editor-layout" onsubmit="saveRecipe(event)">
                         <section class="editor-panel">
-                            <p class="editor-panel-kicker">Presentation</p>
+                            <p class="editor-panel-kicker">${uiText('Presentation', 'Presentatie')}</p>
                             <div class="flex flex-col items-center">
-                                <label class="block text-xs font-semibold text-sage mb-4">Meal presentation photo</label>
+                                <label class="block text-xs font-semibold text-sage mb-4">${uiText('Meal presentation photo', 'Presentatiefoto van het gerecht')}</label>
                                 <label class="custom-file-upload">
                                     <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-preview', 'draftProfile', false)">
                                     <div id="profile-preview" class="w-40 h-40 border-2 border-dashed border-sage rounded-2xl flex flex-col items-center justify-center bg-white hover:bg-accent transition-colors bg-cover bg-center text-sage shadow-inner">
-                                        <i data-lucide="camera" class="w-8 h-8 mb-2"></i><span class="text-xs font-bold uppercase tracking-wider">Upload</span>
+                                        <i data-lucide="camera" class="w-8 h-8 mb-2"></i><span class="text-xs font-bold uppercase tracking-wider">${uiText('Upload', 'Uploaden')}</span>
                                     </div>
                                 </label>
                             </div>
                         </section>
 
                         <section class="editor-panel">
-                            <p class="editor-panel-kicker">Basics</p>
+                            <p class="editor-panel-kicker">${uiText('Basics', 'Basis')}</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div class="md:col-span-2"><label class="block text-xs font-semibold text-sage mb-2">Recipe title</label><input type="text" id="r-title" required class="${inputClass}"></div>
-                                <div><label class="block text-xs font-semibold text-sage mb-2">Author</label><input type="text" id="r-author" value="${userSettings.name}" class="${inputClass}"></div>
+                                <div class="md:col-span-2"><label class="block text-xs font-semibold text-sage mb-2">${uiText('Recipe title', 'Recepttitel')}</label><input type="text" id="r-title" required class="${inputClass}"></div>
+                                <div><label class="block text-xs font-semibold text-sage mb-2">${uiText('Author', 'Auteur')}</label><input type="text" id="r-author" value="${escapeHTML(userSettings.name || '')}" class="${inputClass}"></div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-sage mb-2">Category</label>
+                                    <label class="block text-xs font-semibold text-sage mb-2">${uiText('Category', 'Categorie')}</label>
                                     <select id="r-category" required class="${inputClass}">
-                                        <option value="Cooking">Cooking</option><option value="Baking">Baking</option>
-                                        <option value="Dessert">Dessert</option><option value="Drink">Drink</option>
+                                        ${categoryOptionsMarkup}
                                     </select>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs font-semibold text-sage mb-2">Country / Origin</label>
-                                    <input type="text" id="r-country" list="countries-list" placeholder="Typ of selecteer een land..." value="${userSettings.country}" class="${inputClass}">
+                                    <label class="block text-xs font-semibold text-sage mb-2">${uiText('Country / Origin', 'Land / Herkomst')}</label>
+                                    <input type="text" id="r-country" list="countries-list" placeholder="${escapeHTML(uiText('Type or select a country…', 'Typ of selecteer een land…'))}" value="${escapeHTML(userSettings.country || '')}" class="${inputClass}">
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs font-semibold text-sage mb-2">Meal type (max 2)</label>
+                                    <label class="block text-xs font-semibold text-sage mb-2">${uiText('Meal type (max 2)', 'Maaltijdtype (max. 2)')}</label>
                                     <div class="flex flex-wrap gap-2">
-                                        ${mealTypeOptions.map(option => `<button type="button" onclick="toggleMealTypeBtn(this)" data-meal-type="${option}" data-selected="false" class="meal-type-btn inline-flex items-center rounded-xl border border-sage border-opacity-20 bg-white px-4 text-xs font-bold text-sage transition-all hover:border-gold hover:text-forest">${option}</button>`).join('')}
+                                        ${mealTypeButtonsMarkup}
                                     </div>
-                                    <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">Select up to 2 meal moments.</p>
+                                    <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">${uiText('Select up to 2 meal moments.', 'Kies maximaal 2 maaltijdmomenten.')}</p>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs font-semibold text-sage mb-2">Assign to family book</label>
+                                    <label class="block text-xs font-semibold text-sage mb-2">${uiText('Assign to family book', 'Toewijzen aan familieboek')}</label>
                                     <select id="r-family-book" class="${inputClass}">
                                         ${familyOptionsMarkup}
                                     </select>
                                     <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">${familyHelperText}</p>
-                                    <p class="mt-2 text-xs font-semibold text-forest opacity-80">This assignment is saved with the recipe and drives the family label, color, and shared-book placement.</p>
-                                    ${recipeFamily && !activeFamilies.some(family => family.id === recipeFamily.id) ? `<p class="mt-2 text-xs font-semibold text-coral">This recipe currently references ${escapeHTML(recipeFamily.label)}. Save it again after choosing a new family if you want to move it.</p>` : ''}
+                                    <p class="mt-2 text-xs font-semibold text-forest opacity-80">${uiText('This assignment is saved with the recipe and drives the family label, color, and shared-book placement.', 'Deze toewijzing wordt met het recept opgeslagen en bepaalt het familielabel, de kleur en de plaatsing in het gedeelde boek.')}</p>
+                                    ${recipeFamily && !activeFamilies.some(family => family.id === recipeFamily.id) ? `<p class="mt-2 text-xs font-semibold text-coral">${uiText('This recipe currently references', 'Dit recept verwijst nu naar')} ${escapeHTML(recipeFamily.label)}. ${uiText('Save it again after choosing a new family if you want to move it.', 'Sla opnieuw op na een nieuw familieboek te kiezen als je het wilt verplaatsen.')}</p>` : ''}
                                 </div>
                             </div>
                         </section>
 
                         <section class="editor-panel">
-                            <p class="editor-panel-kicker">Method</p>
+                            <p class="editor-panel-kicker">${uiText('Method', 'Bereiding')}</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block text-xs font-semibold text-sage mb-3 flex items-center gap-2 border-b border-parchmentDark/60 pb-2"><i data-lucide="shopping-basket" class="w-4 h-4"></i> Ingredients</label>
+                                    <label class="block text-xs font-semibold text-sage mb-3 flex items-center gap-2 border-b border-parchmentDark/60 pb-2"><i data-lucide="shopping-basket" class="w-4 h-4"></i> ${uiText('Ingredients', 'Ingrediënten')}</label>
                                     <ul id="draft-ingredients-list" class="mb-3 space-y-2"></ul>
                                     <div class="flex gap-2">
-                                        <input type="text" id="new-ingredient" placeholder="e.g. 500g Flour" onkeypress="if(event.key === 'Enter') { event.preventDefault(); addDraftIngredient(); }" class="${inputClass} flex-1">
+                                        <input type="text" id="new-ingredient" placeholder="${escapeHTML(uiText('e.g. 500g flour', 'bijv. 500 g bloem'))}" onkeypress="if(event.key === 'Enter') { event.preventDefault(); addDraftIngredient(); }" class="${inputClass} flex-1">
                                         <button type="button" onclick="addDraftIngredient()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="${uiText('Add ingredient', 'Ingrediënt toevoegen')}" title="${uiText('Add ingredient', 'Ingrediënt toevoegen')}"><i data-lucide="plus" class="w-5 h-5"></i></button>
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-sage mb-3 flex items-center gap-2 border-b border-parchmentDark/60 pb-2"><i data-lucide="list-ordered" class="w-4 h-4"></i> Instructions</label>
+                                    <label class="block text-xs font-semibold text-sage mb-3 flex items-center gap-2 border-b border-parchmentDark/60 pb-2"><i data-lucide="list-ordered" class="w-4 h-4"></i> ${uiText('Instructions', 'Instructies')}</label>
                                     <ul id="draft-steps-list" class="mb-3 space-y-2"></ul>
                                     <div class="flex gap-2 items-start">
-                                        <textarea id="new-step" placeholder="Describe the next step..." class="${textareaClass} flex-1 !min-h-[48px] !h-12 py-3"></textarea>
-                                        <input type="number" id="new-step-minutes" min="1" max="240" value="1" inputmode="numeric" aria-label="Minutes for this step" class="${inputClass} !w-20">
+                                        <textarea id="new-step" placeholder="${escapeHTML(uiText('Describe the next step…', 'Beschrijf de volgende stap…'))}" class="${textareaClass} flex-1 !min-h-[48px] !h-12 py-3"></textarea>
+                                        <input type="number" id="new-step-minutes" min="1" max="240" value="1" inputmode="numeric" aria-label="${escapeHTML(uiText('Minutes for this step', 'Minuten voor deze stap'))}" class="${inputClass} !w-20">
                                         <button type="button" onclick="addDraftStep()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="${uiText('Add step', 'Stap toevoegen')}" title="${uiText('Add step', 'Stap toevoegen')}"><i data-lucide="plus" class="w-5 h-5"></i></button>
                                     </div>
                                 </div>
@@ -25247,8 +25370,8 @@
                         <section class="editor-panel overflow-hidden">
                             <button type="button" onclick="toggleRecipeDetails()" class="w-full flex min-h-11 items-center justify-between gap-4 py-2 text-left">
                                 <div>
-                                    <p id="recipe-details-toggle-label" class="editor-panel-kicker" style="margin:0;">Optional details</p>
-                                    <p id="recipe-details-toggle-hint" class="mt-1 text-sm font-semibold text-forest opacity-80">Open this for prep time, servings, cuisine, diet, and chef's notes.</p>
+                                    <p id="recipe-details-toggle-label" class="editor-panel-kicker" style="margin:0;">${uiText('Optional details', 'Optionele details')}</p>
+                                    <p id="recipe-details-toggle-hint" class="mt-1 text-sm font-semibold text-forest opacity-80">${uiText('Open this for prep time, servings, cuisine, diet, and chef\'s notes.', 'Open dit voor bereidingstijd, porties, keuken, dieet en tip van de kok.')}</p>
                                 </div>
                                 <div class="flex items-center gap-3 text-sage">
                                     <span class="hidden md:inline text-xs font-bold uppercase tracking-[0.24em] opacity-70">Same in every mode</span>
@@ -25358,8 +25481,14 @@
                 && recipeDraftHasMeaningfulContent(storedDraft)
                 && fingerprintRecipeDraft(storedDraft) !== recipeDraftBaselineFingerprint
             ) {
-                applyRecipeEditorDraft(storedDraft);
-                showRecipeDraftRestoredNotice();
+                // If the saved recipe is newer than the draft, discard the stale draft silently.
+                if (recipeToEdit && isRecipeEditorDraftStale(storedDraft, recipeToEdit)) {
+                    clearRecipeEditorDraft(editingRecipeId);
+                    hideRecipeDraftRestoredNotice();
+                } else {
+                    applyRecipeEditorDraft(storedDraft);
+                    showRecipeDraftRestoredNotice();
+                }
             } else {
                 hideRecipeDraftRestoredNotice();
             }
@@ -26175,17 +26304,17 @@
                             <span class="bg-sage text-white w-6 h-6 flex items-center justify-center rounded-sm text-xs font-bold flex-shrink-0 mt-0.5">${i + 1}</span>
                             <div class="flex-1 pt-0.5">
                                 <p class="leading-relaxed">${escapeHTML(stepText)}</p>
-                                ${safeSrc ? `<div class="mt-3 overflow-hidden rounded-md border border-parchmentDark bg-parchment"><img src="${safeSrc}" alt="Draft step ${i + 1}" class="h-40 w-full object-cover"></div>` : ''}
-                                <label class="mt-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-sage">
-                                    Minutes
-                                    <input type="number" min="1" max="240" inputmode="numeric" value="${stepMinutes}" aria-label="Minutes for step ${i + 1}" class="${inputClass} !h-9 !w-20" onchange="setDraftStepMinutes(${i}, this.value)">
+                                ${safeSrc ? `<div class="mt-3 overflow-hidden rounded-md border border-parchmentDark bg-parchment"><img src="${safeSrc}" alt="${escapeHTML(uiText(`Draft step ${i + 1}`, `Conceptstap ${i + 1}`))}" class="h-40 w-full object-cover"></div>` : ''}
+                                <label class="mt-3 inline-flex items-center gap-2 text-[10px] font-semibold text-sage">
+                                    ${uiText('Minutes', 'Minuten')}
+                                    <input type="number" min="1" max="240" inputmode="numeric" value="${stepMinutes}" aria-label="${escapeHTML(uiText(`Minutes for step ${i + 1}`, `Minuten voor stap ${i + 1}`))}" class="${inputClass} !h-9 !w-20" onchange="setDraftStepMinutes(${i}, this.value)">
                                 </label>
                                 <div class="mt-3 flex flex-wrap gap-2">
-                                    <label class="inline-flex h-9 items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-sage shadow-sm transition-all hover:border-gold hover:text-forest cursor-pointer">
+                                    <label class="inline-flex h-9 items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-3 text-[10px] font-semibold text-sage shadow-sm transition-all hover:border-gold hover:text-forest cursor-pointer">
                                         <input type="file" accept="image/*" class="hidden" onchange="handleDraftStepImageUpload(event, ${i})">
-                                        <i data-lucide="image-plus" class="h-4 w-4 text-gold"></i>${stepImage ? 'Change photo' : 'Add photo'}
+                                        <i data-lucide="image-plus" class="h-4 w-4 text-gold"></i>${stepImage ? uiText('Change photo', 'Foto wijzigen') : uiText('Add photo', 'Foto toevoegen')}
                                     </label>
-                                    ${stepImage ? `<button type="button" onclick="clearDraftStepImage(${i})" class="inline-flex h-9 items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-sage shadow-sm transition-all hover:border-red-400 hover:text-red-500"><i data-lucide="image-off" class="h-4 w-4"></i>Remove photo</button>` : ''}
+                                    ${stepImage ? `<button type="button" onclick="clearDraftStepImage(${i})" class="inline-flex h-9 items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-3 text-[10px] font-semibold text-sage shadow-sm transition-all hover:border-red-400 hover:text-red-500"><i data-lucide="image-off" class="h-4 w-4"></i>${uiText('Remove photo', 'Foto verwijderen')}</button>` : ''}
                                 </div>
                             </div>
                             <button type="button" onclick="removeDraftStep(${i})" class="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-red-400 hover:text-red-600" aria-label="${uiText('Remove step', 'Stap verwijderen')}" title="${uiText('Remove step', 'Stap verwijderen')}"><i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i></button>
@@ -26268,6 +26397,7 @@
                 ingredients: [...draftIngredients],
                 instructions: normalizeRecipeInstructions(draftSteps),
                 tips: notesValue,
+                updatedAt: Date.now(),
                 lastOpened: existingRecipe?.lastOpened || Date.now(),
                 checkedIngredients: existingRecipe?.checkedIngredients || [],
                 checkedSteps: existingRecipe?.checkedSteps || [],

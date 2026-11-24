@@ -217,6 +217,56 @@ try {
     JSON.stringify(savedOk)
   );
 
+
+  // --- Follow-up 1: logout flushes draft then detaches listeners/state ---
+  await page.evaluate(() => {
+    clearRecipeEditorDraft('new');
+    renderAddForm();
+  });
+  await sleep(300);
+  await fillEditorBasics(page, {
+    title: 'Logout Flush Soup',
+    ingredient: '1 prei',
+    step: 'Was de prei'
+  });
+  const logoutFlush = await page.evaluate(async () => {
+    const keyBefore = getRecipeDraftStorageKey('new');
+    persistRecipeEditorDraftNow();
+    const rawBefore = localStorage.getItem(keyBefore);
+    let parsedTitle = '';
+    try { parsedTitle = JSON.parse(rawBefore || '{}').title || ''; } catch (_e) { /* ignore */ }
+    await signOut();
+    const rawAfterSameKey = localStorage.getItem(keyBefore);
+    let parsedAfter = '';
+    try { parsedAfter = JSON.parse(rawAfterSameKey || '{}').title || ''; } catch (_e) { /* ignore */ }
+    const memoryCleared = (draftIngredients || []).length === 0
+      && (draftSteps || []).length === 0
+      && editingRecipeId == null;
+    const unbound = window.recipeDraftAutosaveBound === false;
+    return {
+      keyBefore,
+      hadRawBefore: Boolean(rawBefore),
+      rawAfterFlush: Boolean(rawAfterSameKey),
+      titleFlushed: parsedTitle,
+      titleStillOnDisk: parsedAfter,
+      memoryCleared,
+      unbound
+    };
+  });
+  log(
+    'draft: logout flushes then detaches memory',
+    logoutFlush.hadRawBefore
+      && logoutFlush.rawAfterFlush
+      && logoutFlush.titleFlushed === 'Logout Flush Soup'
+      && logoutFlush.titleStillOnDisk === 'Logout Flush Soup'
+      && logoutFlush.memoryCleared
+      && logoutFlush.unbound,
+    JSON.stringify(logoutFlush)
+  );
+
+  // Re-enter app for remaining follow-up tests after signOut tore down the bypass session.
+  await enterApp(page);
+
   // Security: step image must not enter innerHTML unsanitized.
   const xss = await page.evaluate(() => {
     const malicious = '" onerror=alert(1) x="';
@@ -247,6 +297,57 @@ try {
       && xss.allowsData
       && xss.blocksJavascript,
     JSON.stringify(xss)
+  );
+
+
+  // --- Follow-up 3: stale draft discarded when recipe updatedAt is newer ---
+  const stale = await page.evaluate(() => {
+    const recipeId = 424242;
+    clearRecipeEditorDraft(recipeId);
+    const staleDraft = sanitizeRecipeDraftForStorage({
+      recipeId,
+      savedAt: Date.now() - 60_000,
+      updatedAt: Date.now() - 60_000,
+      title: 'Stale Draft Title',
+      author: 'Test',
+      category: 'Cooking',
+      ingredients: ['1 ui'],
+      steps: [{ text: 'Oude stap', minutes: 1, image: '' }]
+    });
+    localStorage.setItem(getRecipeDraftStorageKey(recipeId), JSON.stringify(staleDraft));
+    const recipe = {
+      id: recipeId,
+      source: 'local',
+      title: 'Saved Recipe Title',
+      author: 'Test',
+      category: 'Cooking',
+      country: '',
+      ingredients: ['2 uien'],
+      instructions: [{ text: 'Nieuwe stap', minutes: 2, image: '' }],
+      tips: '',
+      updatedAt: Date.now(),
+      profile: null
+    };
+    recipes = [recipe, ...(recipes || []).filter((r) => r.id !== recipeId)];
+    const isStale = isRecipeEditorDraftStale(staleDraft, recipe);
+    renderAddForm(recipeId);
+    const notice = document.getElementById('recipe-draft-restored-notice');
+    const title = document.getElementById('r-title')?.value || '';
+    const remaining = localStorage.getItem(getRecipeDraftStorageKey(recipeId));
+    return {
+      isStale,
+      title,
+      noticePresent: Boolean(notice),
+      remainingCleared: remaining === null
+    };
+  });
+  log(
+    'draft: stale draft discarded when recipe newer',
+    stale.isStale
+      && stale.title === 'Saved Recipe Title'
+      && !stale.noticePresent
+      && stale.remainingCleared,
+    JSON.stringify(stale)
   );
 
   await page.close();
