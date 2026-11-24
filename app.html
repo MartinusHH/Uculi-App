@@ -22956,11 +22956,11 @@
                             <div class="detail-hero-portrait" style="background-image: ${cssUrl(recipe.profile || defaultPlaceholderProfile)}"></div>
                             <div class="detail-hero-copy">
                                 <p class="detail-hero-kicker">${owned ? 'Published by you' : 'Community recipe'}${versionLabel ? ` · ${versionLabel}` : ''}</p>
-                                <h2 class="detail-hero-title">${recipe.title}</h2>
+                                <h2 class="detail-hero-title">${escapeHTML(recipe.title || '')}</h2>
                                 <div class="detail-hero-meta">
-                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${recipe.authorName || recipe.author || 'Chef'}</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="user" class="w-4 h-4"></i> ${escapeHTML(recipe.authorName || recipe.author || 'Chef')}</span>
                                     <span>|</span>
-                                    <span class="flex items-center gap-1"><i data-lucide="map-pinned" class="w-4 h-4"></i> ${recipe.country || 'Community'}</span>
+                                    <span class="flex items-center gap-1"><i data-lucide="map-pinned" class="w-4 h-4"></i> ${escapeHTML(recipe.country || 'Community')}</span>
                                 </div>
                             </div>
                         </div>
@@ -22989,7 +22989,7 @@
                                 <p class="detail-panel-kicker">${uiText('Ingredients', 'Ingrediënten')}</p>
                                 <h3 class="font-bold font-fantasy text-2xl flex items-center text-forest mb-5"><i data-lucide="shopping-basket" class="w-6 h-6 mr-2 text-gold"></i> ${uiText('Shopping list', 'Boodschappenlijst')}</h3>
                                 <ul class="text-sm space-y-2">
-                                    ${(recipe.ingredients || []).map(ing => `<li class="detail-ingredient-row"><span class="text-forest font-semibold text-sm leading-snug">${applyMeasurementSystem(ing)}</span></li>`).join('')}
+                                    ${(recipe.ingredients || []).map(ing => `<li class="detail-ingredient-row"><span class="text-forest font-semibold text-sm leading-snug">${escapeHTML(applyMeasurementSystem(ing))}</span></li>`).join('')}
                                 </ul>
                             </div>
 
@@ -23003,7 +23003,7 @@
                                             <li class="detail-step">
                                                 <span class="detail-step-num">${index + 1}</span>
                                                 <div class="flex-1 min-w-0">
-                                                    <p class="text-forest font-medium text-base leading-relaxed pt-1">${applyMeasurementSystem(getRecipeInstructionText(step))}</p>
+                                                    <p class="text-forest font-medium text-base leading-relaxed pt-1">${escapeHTML(applyMeasurementSystem(getRecipeInstructionText(step)))}</p>
                                                     ${(() => { const safeStepImage = sanitizeRecipeStepImageUrl(stepImage); return safeStepImage ? `<div class="mt-4 overflow-hidden rounded-xl border border-parchmentDark bg-parchment"><img src="${escapeHTML(safeStepImage)}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''; })()}
                                                 </div>
                                             </li>
@@ -23017,7 +23017,7 @@
                             <div class="detail-secondary-section detail-panel detail-notes-callout">
                                 <p class="detail-panel-kicker">Chef notes</p>
                                 <h3 class="font-bold font-fantasy text-2xl mb-3 flex items-center text-forest"><i data-lucide="lightbulb" class="w-6 h-6 mr-2 text-gold"></i> Chef's Notes</h3>
-                                <p class="text-base font-semibold text-forest leading-relaxed">${applyMeasurementSystem(recipe.tips)}</p>
+                                <p class="text-base font-semibold text-forest leading-relaxed">${escapeHTML(applyMeasurementSystem(recipe.tips))}</p>
                             </div>
                         ` : ''}
                     </div>
@@ -24274,7 +24274,9 @@
             }
             const notesSection = document.getElementById(`notes-section-${recipeId}`);
             if (notesSection) {
-                notesSection.innerHTML = recipe.personalNotes ? `<p class="text-sm text-forest mb-2"><strong>Your notes:</strong> ${recipe.personalNotes}</p>` : '';
+                notesSection.innerHTML = recipe.personalNotes
+                    ? `<p class="text-sm text-forest mb-2"><strong>Your notes:</strong> ${escapeHTML(recipe.personalNotes)}</p>`
+                    : '';
             }
         }
 
@@ -24574,7 +24576,7 @@
                                                     <div class="absolute -top-1 -right-1 bg-gold rounded-full p-0.5 text-white shadow-sm check-icon transition-opacity ${iconClass}"><i data-lucide="check" class="w-3 h-3"></i></div>
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <p onclick="toggleItemCheck(${recipe.id}, 'step', ${index}, this.closest('li'))" class="text-forest font-medium text-base leading-relaxed pt-1 cursor-pointer">${finalStep}</p>
+                                                    <p onclick="toggleItemCheck(${recipe.id}, 'step', ${index}, this.closest('li'))" class="text-forest font-medium text-base leading-relaxed pt-1 cursor-pointer">${escapeHTML(finalStep)}</p>
                                                     ${(() => { const safeStepImage = sanitizeRecipeStepImageUrl(stepImage); return safeStepImage ? `<div class="mt-4 overflow-hidden rounded-xl border border-parchmentDark bg-parchment"><img src="${escapeHTML(safeStepImage)}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''; })()}
                                                 </div>
                                             </li>
@@ -24588,7 +24590,7 @@
                             <div class="detail-secondary-section detail-panel detail-notes-callout">
                                 <p class="detail-panel-kicker">${uiText('Chef notes', 'Chefsnotities')}</p>
                                 <h3 class="font-bold font-fantasy text-2xl mb-3 flex items-center text-forest"><i data-lucide="lightbulb" class="w-6 h-6 mr-2 text-gold"></i> ${uiText("Chef's Notes & Secrets", 'Chefsnotities & geheimen')}</h3>
-                                <p class="text-base font-semibold text-forest leading-relaxed">${applyMeasurementSystem(recipe.tips)}</p>
+                                <p class="text-base font-semibold text-forest leading-relaxed">${escapeHTML(applyMeasurementSystem(recipe.tips))}</p>
                             </div>
                         ` : ''}
 
@@ -24603,7 +24605,7 @@
                                 </button>
                             </div>
                             <div id="notes-section-${recipe.id}">
-                                ${recipe.personalNotes ? `<p class="text-sm text-forest">${recipe.personalNotes}</p>` : `<p class="text-xs text-sage italic">${uiText('Click edit to add your personal notes and modifications...', 'Tik op bewerken om persoonlijke notities toe te voegen…')}</p>`}
+                                ${recipe.personalNotes ? `<p class="text-sm text-forest">${escapeHTML(recipe.personalNotes)}</p>` : `<p class="text-xs text-sage italic">${uiText('Click edit to add your personal notes and modifications...', 'Tik op bewerken om persoonlijke notities toe te voegen…')}</p>`}
                             </div>
                         </div>
                     </div>
@@ -24787,7 +24789,7 @@
                         <div class="w-6 h-6 rounded-md border-2 border-gold flex items-center justify-center flex-shrink-0 text-gold transition-colors bg-white">
                             <i data-lucide="check" class="check-icon w-4 h-4 transition-opacity ${iconClass}"></i>
                         </div>
-                        <span class="${textColorClass} font-semibold text-sm leading-snug">${finalIng}</span>
+                        <span class="${textColorClass} font-semibold text-sm leading-snug">${escapeHTML(finalIng)}</span>
                     </li>
                 `;
             }).join('');
