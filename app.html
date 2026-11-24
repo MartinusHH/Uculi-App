@@ -4020,11 +4020,22 @@
         .source-filter-row > .source-filter-btn > svg,
         .source-filter-row > button > i[data-lucide],
         .source-filter-row > button > svg {
-            flex-shrink: 0;
-            width: 1rem;
-            height: 1rem;
-            min-width: 1rem;
-            min-height: 1rem;
+            flex-shrink: 0 !important;
+            width: 1rem !important;
+            height: 1rem !important;
+            min-width: 1rem !important;
+            min-height: 1rem !important;
+        }
+
+        @media (max-width: 420px) {
+            .source-filter-row > .source-filter-btn,
+            .source-filter-row > button {
+                gap: 0.35rem;
+                letter-spacing: 0.04em;
+                font-size: 0.68rem;
+                padding-left: 0.45rem;
+                padding-right: 0.45rem;
+            }
         }
 
         .profile-sheet > .browse-hero {
