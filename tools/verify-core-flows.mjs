@@ -237,6 +237,76 @@ const browser = await puppeteer.launch({
 });
 
 try {
+  // ---------- LANGUAGE PICKER (soft-launch: nl + en only) ----------
+  const langPage = await browser.newPage();
+  await langPage.setViewport({ width: 1280, height: 900 });
+  await langPage.goto(`${APP}&auth=login&lang=en`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await sleep(900);
+  await dismissGates(langPage);
+  const langCheck = await langPage.evaluate(() => {
+    const flagOff = window.EXTRA_LANGUAGES_ENABLED === false;
+    const selectable = typeof getSelectableAppLanguages === 'function'
+      ? getSelectableAppLanguages()
+      : [];
+    const resolveFr = typeof resolveSupportedLanguage === 'function'
+      ? resolveSupportedLanguage('fr')
+      : null;
+    const resolveNl = typeof resolveSupportedLanguage === 'function'
+      ? resolveSupportedLanguage('nl')
+      : null;
+    const resolveDe = typeof resolveSupportedLanguage === 'function'
+      ? resolveSupportedLanguage('de')
+      : null;
+    const resolveEs = typeof resolveSupportedLanguage === 'function'
+      ? resolveSupportedLanguage('es')
+      : null;
+    const authOptions = Array.from(document.querySelectorAll('#auth-language option')).map((o) => o.value);
+    const htmlLang = document.documentElement.lang;
+    return {
+      flagOff,
+      selectable,
+      resolveFr,
+      resolveNl,
+      resolveDe,
+      resolveEs,
+      authOptions,
+      htmlLang
+    };
+  });
+  const pickerExact = Array.isArray(langCheck.selectable)
+    && langCheck.selectable.length === 2
+    && langCheck.selectable.includes('nl')
+    && langCheck.selectable.includes('en')
+    && !langCheck.selectable.some((code) => ['fr', 'de', 'es'].includes(code));
+  log(
+    'language: picker lists exactly nl and en while EXTRA_LANGUAGES_ENABLED=false',
+    Boolean(langCheck.flagOff && pickerExact),
+    JSON.stringify(langCheck)
+  );
+  log(
+    'language: auth gate select shows only nl/en',
+    Array.isArray(langCheck.authOptions)
+      && langCheck.authOptions.length === 2
+      && langCheck.authOptions.includes('nl')
+      && langCheck.authOptions.includes('en'),
+    JSON.stringify(langCheck.authOptions)
+  );
+  log(
+    'language: saved fr/de/es fall back to en; nl stays nl',
+    langCheck.resolveFr === 'en'
+      && langCheck.resolveDe === 'en'
+      && langCheck.resolveEs === 'en'
+      && langCheck.resolveNl === 'nl',
+    JSON.stringify({
+      fr: langCheck.resolveFr,
+      de: langCheck.resolveDe,
+      es: langCheck.resolveEs,
+      nl: langCheck.resolveNl
+    })
+  );
+  log('language: html lang matches active language', langCheck.htmlLang === 'en', `lang=${langCheck.htmlLang}`);
+  await langPage.close();
+
   // ---------- LOGIN ----------
   const loginPage = await browser.newPage();
   loginPage.__errors = [];

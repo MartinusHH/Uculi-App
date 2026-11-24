@@ -7077,7 +7077,7 @@
         <main id="app-content" class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 transition-all relative"></main>
 
         <!-- Auth loading screen: visible until Firebase resolves session -->
-        <div id="auth-loading-screen" class="fixed inset-0 z-[160] flex flex-col items-center justify-center bg-[#FBF8F1]" role="status" aria-live="polite" aria-busy="true" aria-label="Laden">
+        <div id="auth-loading-screen" class="fixed inset-0 z-[160] flex flex-col items-center justify-center bg-[#FBF8F1]" role="status" aria-live="polite" aria-busy="true" aria-label="Loading">
             <div class="flex flex-col items-center gap-5">
                 <div class="h-14 w-14 overflow-hidden rounded-2xl bg-paper shadow-lg">
                     <img src="assets/uculi-boekje.jpg" alt="" class="brand-boekje" />
@@ -7086,12 +7086,37 @@
                 <div class="auth-loading-dots" aria-hidden="true">
                     <span></span><span></span><span></span>
                 </div>
+                <p id="auth-loading-status" class="text-sm font-semibold text-sage">Loading…</p>
                 <div class="mt-1 flex w-40 flex-col items-center gap-2" aria-hidden="true">
                     <div class="skeleton-block skeleton-line" style="width:100%;height:0.4rem;"></div>
                     <div class="skeleton-block skeleton-line short" style="height:0.35rem;"></div>
                 </div>
             </div>
         </div>
+        <script>
+            // Early splash + html lang for NL browsers before the main bundle runs.
+            (function () {
+                try {
+                    const params = new URLSearchParams(window.location.search || '');
+                    const langParam = String(params.get('lang') || '').toLowerCase().split(/[-_]/)[0];
+                    let preferNl = langParam === 'nl'
+                        || (!langParam && String(navigator.language || '').toLowerCase().startsWith('nl'));
+                    try {
+                        if (localStorage.getItem('uculiUiLanguageChosen') === '1') {
+                            const stored = String(localStorage.getItem('uculiPreferredUiLanguage') || '').toLowerCase().split(/[-_]/)[0];
+                            if (stored === 'nl') preferNl = true;
+                            if (stored === 'en') preferNl = false;
+                        }
+                    } catch (_) { /* ignore */ }
+                    if (!preferNl) return;
+                    document.documentElement.lang = 'nl';
+                    const screen = document.getElementById('auth-loading-screen');
+                    if (screen) screen.setAttribute('aria-label', 'Laden');
+                    const status = document.getElementById('auth-loading-status');
+                    if (status) status.textContent = 'Bezig met laden…';
+                } catch (_) { /* ignore */ }
+            })();
+        </script>
 
         <nav id="main-nav" class="sticky bottom-0 w-full text-sage z-20 transition-all duration-300">
             <div class="app-nav-inner">
@@ -7834,7 +7859,18 @@
         window.PREMIUM_ENABLED = false;
         // One-time plan stays unpublished until this is true.
         window.LIFETIME_ENABLED = false;
-        const supportedAppLanguages = ['en', 'nl', 'fr', 'de', 'es'];
+        // FR/DE/ES dictionaries stay in-repo; pickers and active UI stay nl/en until this is true.
+        window.EXTRA_LANGUAGES_ENABLED = false;
+        const coreAppLanguages = ['en', 'nl'];
+        const extraAppLanguages = ['fr', 'de', 'es'];
+        const supportedAppLanguages = [...coreAppLanguages, ...extraAppLanguages];
+        const languagePickerLabels = {
+            en: 'English',
+            nl: 'Nederlands',
+            fr: 'Français',
+            de: 'Deutsch',
+            es: 'Español'
+        };
         const globalUiLanguageStorageKey = 'uculiPreferredUiLanguage';
         const uiLanguageChosenStorageKey = 'uculiUiLanguageChosen';
         const uiLanguageQueryParam = 'lang';
@@ -7843,11 +7879,35 @@
             return window.PREMIUM_ENABLED === true;
         }
 
+        function areExtraLanguagesEnabled() {
+            return window.EXTRA_LANGUAGES_ENABLED === true;
+        }
+
+        function getSelectableAppLanguages() {
+            return areExtraLanguagesEnabled()
+                ? [...supportedAppLanguages]
+                : [...coreAppLanguages];
+        }
+        window.getSelectableAppLanguages = getSelectableAppLanguages;
+
         function resolveSupportedLanguage(languageCode = '') {
             const normalized = String(languageCode || '').trim().toLowerCase();
             if (!normalized) return '';
             const primaryCode = normalized.split(/[-_]/)[0];
-            return supportedAppLanguages.includes(primaryCode) ? primaryCode : '';
+            if (!supportedAppLanguages.includes(primaryCode)) return '';
+            // Saved or detected fr/de/es fall back to English while extras are disabled.
+            if (extraAppLanguages.includes(primaryCode) && !areExtraLanguagesEnabled()) {
+                return 'en';
+            }
+            return primaryCode;
+        }
+        window.resolveSupportedLanguage = resolveSupportedLanguage;
+
+        function getLanguagePickerOptionsHtml(selectedLang = '') {
+            const selected = resolveSupportedLanguage(selectedLang) || getActiveUiLanguage() || 'en';
+            return getSelectableAppLanguages().map((code) => (
+                `<option value="${code}" ${selected === code ? 'selected' : ''}>${languagePickerLabels[code] || code}</option>`
+            )).join('');
         }
 
         function detectPreferredSupportedLanguage() {
@@ -7919,11 +7979,29 @@
             return detectGuestBrowserUiLanguage();
         }
 
+        function syncDocumentLang(language = '') {
+            const resolved = resolveSupportedLanguage(language) || getActiveUiLanguage() || 'en';
+            document.documentElement.lang = resolved;
+            return resolved;
+        }
+
+        function syncAuthLoadingSplash(language = '') {
+            const lang = resolveSupportedLanguage(language) || getActiveUiLanguage() || 'en';
+            const nl = lang === 'nl';
+            const el = document.getElementById('auth-loading-screen');
+            if (!el) return lang;
+            el.setAttribute('aria-label', nl ? 'Laden' : 'Loading');
+            const status = document.getElementById('auth-loading-status');
+            if (status) status.textContent = nl ? 'Bezig met laden…' : 'Loading…';
+            return lang;
+        }
+
         function ensureUiLanguagePreference() {
             const requested = getRequestedUiLanguage();
             if (requested) {
                 userSettings.language = requested;
-                document.documentElement.lang = requested;
+                syncDocumentLang(requested);
+                syncAuthLoadingSplash(requested);
                 localStorage.setItem(globalUiLanguageStorageKey, requested);
                 markExplicitUiLanguageChoice();
                 return requested;
@@ -7931,11 +8009,18 @@
 
             const language = getActiveUiLanguage() || 'en';
             userSettings.language = language;
-            document.documentElement.lang = language;
+            syncDocumentLang(language);
+            syncAuthLoadingSplash(language);
 
             // Persist only after sign-in or an explicit choice — never lock browser detection.
+            // Also rewrite any saved fr/de/es preference to English while extras are off.
             if (isSignedInUiSession() || hasExplicitUiLanguageChoice()) {
                 localStorage.setItem(globalUiLanguageStorageKey, language);
+            } else {
+                const stored = String(localStorage.getItem(globalUiLanguageStorageKey) || '').toLowerCase();
+                if (extraAppLanguages.includes(stored.split(/[-_]/)[0]) && !areExtraLanguagesEnabled()) {
+                    localStorage.setItem(globalUiLanguageStorageKey, 'en');
+                }
             }
 
             return language;
@@ -8291,6 +8376,10 @@
                 }
             };
 
+            // Keep fr/de/es dictionaries in-repo; only serve them when extras are enabled.
+            if (extraAppLanguages.includes(lang) && !areExtraLanguagesEnabled()) {
+                return dictionary.en;
+            }
             return dictionary[lang] || dictionary.en;
         }
 
@@ -9180,7 +9269,8 @@
             const normalizedLanguage = resolveSupportedLanguage(langCode) || 'en';
 
             userSettings.language = normalizedLanguage;
-            document.documentElement.lang = normalizedLanguage;
+            syncDocumentLang(normalizedLanguage);
+            syncAuthLoadingSplash(normalizedLanguage);
             localStorage.setItem(globalUiLanguageStorageKey, normalizedLanguage);
             markExplicitUiLanguageChoice();
             regionDisplayNameCache = null;
@@ -9190,6 +9280,9 @@
             if (typeof syncHeaderPageTitle === 'function') syncHeaderPageTitle();
             if (refreshView && typeof refreshCurrentViewAfterBillingChange === 'function') {
                 refreshCurrentViewAfterBillingChange();
+            }
+            if (currentView === 'auth' && typeof renderAuthGate === 'function') {
+                renderAuthGate();
             }
 
             if (!silent) {
@@ -10970,19 +11063,22 @@
             document.getElementById('body')?.classList.remove('theme-dark');
             applyUserModeClasses();
             document.documentElement.style.colorScheme = 'light';
-            document.documentElement.lang = userSettings.language || 'en';
+            // Fall back any saved fr/de/es preference to English while extras are off.
+            const resolvedSettingsLanguage = resolveSupportedLanguage(userSettings.language)
+                || getRequestedUiLanguage()
+                || resolveSupportedLanguage(localStorage.getItem(globalUiLanguageStorageKey))
+                || detectPreferredSupportedLanguage()
+                || 'en';
+            if (userSettings.language !== resolvedSettingsLanguage) {
+                userSettings.language = resolvedSettingsLanguage;
+                shouldResaveSettings = true;
+            }
+            syncDocumentLang(userSettings.language);
+            localStorage.setItem(globalUiLanguageStorageKey, userSettings.language);
             indexViewMode = ['cards', 'list', 'book'].includes(userSettings.indexViewMode) ? userSettings.indexViewMode : 'cards';
             if (!hasPremiumAccess() && indexViewMode === 'book') {
                 indexViewMode = 'cards';
                 userSettings.indexViewMode = 'cards';
-                shouldResaveSettings = true;
-            }
-
-            if (!resolveSupportedLanguage(userSettings.language)) {
-                userSettings.language = getRequestedUiLanguage()
-                    || resolveSupportedLanguage(localStorage.getItem(globalUiLanguageStorageKey))
-                    || detectPreferredSupportedLanguage();
-                localStorage.setItem(globalUiLanguageStorageKey, userSettings.language);
                 shouldResaveSettings = true;
             }
 
@@ -13120,6 +13216,12 @@
 
                         <section class="auth-gate-form-wrap">
                             <div class="mx-auto flex w-full max-w-md flex-col">
+                                <label class="mb-4 flex items-center justify-between gap-3 text-xs font-bold uppercase tracking-[0.18em] text-sage">
+                                    <span>${getActiveUiLanguage() === 'nl' ? 'Taal' : 'Language'}</span>
+                                    <select id="auth-language" class="${inputClass} max-w-[11rem] normal-case tracking-normal" onchange="changeGlobalLanguage(this.value)">
+                                        ${getLanguagePickerOptionsHtml(getActiveUiLanguage())}
+                                    </select>
+                                </label>
                                 <div class="inline-flex rounded-2xl border border-parchmentDark bg-parchment p-1">
                                     <button type="button" onclick="setAuthViewMode('login')" class="flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${showRegister ? 'text-sage hover:text-forest' : 'bg-white text-forest shadow-sm'}">${authText.tabLogin}</button>
                                     <button type="button" onclick="setAuthViewMode('register')" class="flex-1 rounded-xl px-4 py-3 text-sm font-bold transition-all ${showRegister ? 'bg-white text-forest shadow-sm' : 'text-sage hover:text-forest'}">${authText.tabRegister}</button>
@@ -16208,13 +16310,16 @@
                         <!-- Hero Section -->
                         <div class="mx-auto w-full max-w-5xl text-center mb-20 md:mb-32">
                             <div class="inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-4 py-1.5 mb-8 text-[10px] font-bold uppercase tracking-[0.25em] text-forest">
-                                <i data-lucide="sparkles" class="h-3 w-3 text-gold"></i> Your Culinary Archive
+                                <i data-lucide="sparkles" class="h-3 w-3 text-gold"></i> ${landingNl ? 'Jouw culinaire archief' : 'Your Culinary Archive'}
                             </div>
                             <h1 class="mx-auto max-w-4xl font-fantasy text-5xl font-bold leading-[1.05] tracking-tight text-forest md:text-7xl lg:text-[5.5rem]">
-                                Your recipe book. For your family. Forever.
+                                ${landingNl ? 'Jouw receptenboek. Voor je familie. Voor altijd.' : 'Your recipe book. For your family. Forever.'}
+
                             </h1>
                             <p class="mx-auto mt-8 max-w-2xl text-lg font-semibold leading-relaxed text-sage md:text-xl">
-                                A notebook for the recipes that would otherwise disappear into a chat or a drawer. Share it with the people who matter, when you want to.
+                                ${landingNl
+                                    ? 'Een schrift voor de recepten die anders verdwijnen in een chat of een lade. Deel het met de mensen die ertoe doen, wanneer jij dat wilt.'
+                                    : 'A notebook for the recipes that would otherwise disappear into a chat or a drawer. Share it with the people who matter, when you want to.'}
                             </p>
                             <div class="landing-auth-row">
                                 <button type="button" onclick="enterAppFromLanding('hero-enter')" class="landing-auth-btn landing-auth-btn--primary">
@@ -17309,7 +17414,7 @@
         }
 
         function getProfileI18n() {
-            const lang = supportedAppLanguages.includes(userSettings.language) ? userSettings.language : 'en';
+            const lang = resolveSupportedLanguage(userSettings.language) || 'en';
             const dictionary = {
                 en: {
                     yourProfile: 'Your Profile',
@@ -18062,13 +18167,9 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Display Language</label>
+                            <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">${settingsNl ? 'Weergavetaal' : 'Display Language'}</label>
                             <select id="settings-language" class="${inputClass}">
-                                <option value="en" ${userSettings.language === 'en' ? 'selected' : ''}>English</option>
-                                <option value="nl" ${userSettings.language === 'nl' ? 'selected' : ''}>Nederlands</option>
-                                <option value="fr" ${userSettings.language === 'fr' ? 'selected' : ''}>Français</option>
-                                <option value="de" ${userSettings.language === 'de' ? 'selected' : ''}>Deutsch</option>
-                                <option value="es" ${userSettings.language === 'es' ? 'selected' : ''}>Español</option>
+                                ${getLanguagePickerOptionsHtml(userSettings.language)}
                             </select>
                         </div>
                         <div class="md:col-span-2">
@@ -18197,11 +18298,7 @@
                                             <label class="settings-field">
                                                 <span>${settingsNl ? 'Taal' : 'Language'}</span>
                                                 <select id="settings-language" class="settings-control settings-select">
-                                                    <option value="en" ${userSettings.language === 'en' ? 'selected' : ''}>English</option>
-                                                    <option value="nl" ${userSettings.language === 'nl' ? 'selected' : ''}>Nederlands</option>
-                                                    <option value="fr" ${userSettings.language === 'fr' ? 'selected' : ''}>Français</option>
-                                                    <option value="de" ${userSettings.language === 'de' ? 'selected' : ''}>Deutsch</option>
-                                                    <option value="es" ${userSettings.language === 'es' ? 'selected' : ''}>Español</option>
+                                                    ${getLanguagePickerOptionsHtml(userSettings.language)}
                                                 </select>
                                             </label>
                                         </div>
