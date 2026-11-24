@@ -1527,15 +1527,33 @@
             background: rgba(246, 241, 232, 0.96);
         }
 
-        /* Filteren is not a universal icon — keep the word visible. */
+        /* Filteren matches Zoeken: square icon control + optional count badge. */
         .index-tool-btn--filter {
-            width: auto;
+            position: relative;
+            width: 2.75rem;
             min-width: 2.75rem;
-            padding: 0 0.7rem;
+            padding: 0;
         }
 
-        .index-tool-btn--filter .index-tool-label {
-            display: inline;
+        .index-tool-filter-badge {
+            position: absolute;
+            top: -0.2rem;
+            right: -0.2rem;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.15rem;
+            height: 1.15rem;
+            padding: 0 0.28rem;
+            border-radius: 999px;
+            background: #c8972a;
+            color: #fffdf9;
+            font-family: Outfit, sans-serif;
+            font-size: 0.65rem;
+            font-weight: 800;
+            line-height: 1;
+            pointer-events: none;
         }
 
         .index-tool-btn.is-active,
@@ -3489,18 +3507,8 @@
                 padding: 0;
             }
 
-            #app-content .index-tool-btn--filter {
-                width: auto;
-                min-width: 2.75rem;
-                padding: 0 0.65rem;
-            }
-
             #app-content .index-tool-label {
                 display: none;
-            }
-
-            #app-content .index-tool-btn--filter .index-tool-label {
-                display: inline;
             }
 
             #app-content .settings-actions.button-pair {
@@ -19434,6 +19442,7 @@
                         <p>${settingsNl ? 'Plan, account en archiefvoorkeuren op één plek.' : 'Plan, account, and archive preferences in one place.'}</p>
                     </header>
                     <form id="settings-form" onsubmit="saveSettings(event)" class="settings-grid">
+                        ${(isPremiumEnforced() || billingMeta.state === 'preview') ? `
                         <section class="settings-panel">
                             <p class="settings-panel-kicker">Plan</p>
                             <div class="settings-row">
@@ -19451,6 +19460,7 @@
                                     : (isPremiumEnforced() ? `<button type="button" onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${purchaseRestoreLabel}" title="${purchaseRestoreLabel}"><i data-lucide="shield-check" class="w-4 h-4"></i>${purchaseRestoreLabel}</button>` : '')}
                             </div>
                         </section>
+                        ` : ''}
 
                         <section class="settings-panel">
                             <p class="settings-panel-kicker">Backup</p>
@@ -22063,9 +22073,10 @@
                             <i data-lucide="search" class="h-4 w-4"></i>
                             <span class="index-tool-label">${uiText('Search', 'Zoeken')}</span>
                         </button>
-                        <button type="button" onclick="toggleListFiltersVisibility()" class="index-tool-btn index-tool-btn--ghost index-tool-btn--filter ${isFilterVisible ? 'is-active' : ''}" title="${isNotebookMode ? uiText('Switch to card view and open filters', 'Ga naar kaarten en open filters') : uiText('Toggle filters', 'Filters tonen of verbergen')}" aria-label="${uiText('Filters', 'Filteren')}" aria-pressed="${isFilterVisible}">
+                        <button type="button" onclick="toggleListFiltersVisibility()" class="index-tool-btn index-tool-btn--ghost index-tool-btn--filter ${isFilterVisible ? 'is-active' : ''}" title="${uiText('Filters', 'Filteren')}" aria-label="${uiText('Filters', 'Filteren')}" aria-pressed="${isFilterVisible}">
                             <i data-lucide="sliders-horizontal" class="h-4 w-4" aria-hidden="true"></i>
                             <span class="index-tool-label">${uiText('Filters', 'Filteren')}</span>
+                            ${activeFilters.length > 0 ? `<span class="index-tool-filter-badge" aria-hidden="true">${activeFilters.length}</span>` : ''}
                         </button>
                     </div>
                 </div>
