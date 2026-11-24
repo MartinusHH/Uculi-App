@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="assets/mholt-apple.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Outfit:wght@400;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
         <!-- Firebase -->
         <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js" defer></script>
@@ -322,7 +322,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            font-family: 'Playfair Display', Georgia, serif;
+            font-family: var(--font-display);
             font-size: 1.15rem;
             font-weight: 700;
             line-height: 1.15;
@@ -404,7 +404,7 @@
             border-radius: var(--radius-control);
             background: transparent;
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.84rem;
             font-weight: 700;
             text-align: left;
@@ -1194,7 +1194,7 @@
 
             .header-icon-label {
                 display: inline;
-                font-family: Outfit, sans-serif;
+                font-family: var(--font-ui);
                 font-size: 0.72rem;
                 font-weight: 800;
                 letter-spacing: 0.1em;
@@ -1514,7 +1514,7 @@
             border: 1px solid transparent;
             background: transparent;
             color: var(--text-muted);
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.78rem;
             font-weight: 700;
             letter-spacing: 0.01em;
@@ -1549,7 +1549,7 @@
             border-radius: 999px;
             background: #c8972a;
             color: #fffdf9;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.65rem;
             font-weight: 800;
             line-height: 1;
@@ -1835,7 +1835,7 @@
         .index-list-body h3 {
             margin: 0;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(1.15rem, 2vw, 1.4rem);
             font-weight: 700;
             line-height: 1.15;
@@ -1922,7 +1922,7 @@
             border-radius: 0.75rem;
             background: #929D75;
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.72rem;
             font-weight: 800;
             letter-spacing: 0.1em;
@@ -2067,7 +2067,7 @@
         .sheet-empty h3 {
             margin: 0;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(1.45rem, 2.6vw, 1.9rem);
             font-weight: 700;
             line-height: 1.15;
@@ -2239,7 +2239,7 @@
         .browse-card-body h3 {
             margin: 0;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(1.25rem, 2.2vw, 1.55rem);
             font-weight: 700;
             line-height: 1.2;
@@ -2459,7 +2459,7 @@
 
         .profile-stat strong {
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(1.55rem, 4vw, 2rem);
             font-weight: 700;
             line-height: 1;
@@ -2669,7 +2669,7 @@
             gap: 0.4rem;
             margin: 0;
             color: var(--text-muted);
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.875rem;
             font-weight: 600;
             line-height: 1.2;
@@ -2695,7 +2695,7 @@
         #app-landing a.landing-legal-link:visited,
         #app-landing a.landing-legal-link:hover {
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.875rem;
             font-weight: 650;
             letter-spacing: 0;
@@ -2764,7 +2764,7 @@
         .auth-gate-brand-name {
             margin: 1.35rem 0 0;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(3rem, 6vw, 4.5rem);
             font-weight: 700;
             line-height: 0.95;
@@ -2798,7 +2798,7 @@
             border-radius: 0;
             background: transparent;
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.875rem;
             font-weight: 600;
             line-height: 1.4;
@@ -2862,7 +2862,7 @@
         .auth-agreement-intro {
             margin: 0 0 0.55rem;
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.875rem;
             font-weight: 500;
             line-height: 1.45;
@@ -2893,7 +2893,7 @@
             overflow-y: auto;
             background: #f6f1e8;
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
         }
 
         .legal-page a,
@@ -2955,7 +2955,7 @@
         .legal-page-title {
             margin: 0;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: 2rem;
             font-weight: 700;
             line-height: 1.15;
@@ -2987,7 +2987,7 @@
 
         .legal-page-section h2 {
             margin: 0;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: 1.15rem;
             font-weight: 700;
             line-height: 1.3;
@@ -3040,7 +3040,7 @@
             border-radius: var(--radius-control);
             background: #929D75;
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.82rem;
             font-weight: 700;
             line-height: 1;
@@ -3939,7 +3939,7 @@
             margin: 0;
             max-width: 18ch;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(1.85rem, 4.5vw, 2.75rem);
             font-weight: 700;
             line-height: 1.05;
@@ -4561,7 +4561,7 @@
         .notebook-sticky-note__text {
             margin: 0;
             color: var(--sticky-note-ink, #5d4516);
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.82rem;
             font-weight: 700;
             line-height: 1.35;
@@ -4573,7 +4573,7 @@
         .notebook-sticky-note__placeholder {
             margin: 0;
             color: var(--sticky-note-ink, #5d4516);
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.78rem;
             font-weight: 600;
             line-height: 1.35;
@@ -4918,7 +4918,7 @@
             border-radius: 0.7rem;
             background: transparent;
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.84rem;
             font-weight: 700;
             text-align: left;
@@ -5001,7 +5001,7 @@
             min-height: 2.55rem;
             padding: 0;
             border-radius: 0.8rem;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.68rem;
             font-weight: 800;
             letter-spacing: 0.1em;
@@ -6387,10 +6387,21 @@
             margin: 0 0 var(--space-3);
             color: var(--text-muted);
             font-family: var(--font-ui);
-            font-size: var(--type-label);
-            font-weight: 800;
-            letter-spacing: var(--tracking-label);
-            text-transform: uppercase;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0;
+            text-transform: none;
+        }
+
+        /* Editor field labels: sentence case, Outfit 600 — no uppercase / tracking. */
+        .editor-sheet label.block,
+        .editor-sheet .editor-panel > label,
+        .editor-sheet .editor-panel label.block,
+        .editor-sheet .editor-panel label.inline-flex {
+            font-family: var(--font-ui) !important;
+            font-weight: 600 !important;
+            letter-spacing: 0 !important;
+            text-transform: none !important;
         }
 
         .detail-content-shell {
@@ -6664,7 +6675,7 @@
         .detail-hero-title {
             margin: 0 0 0.45rem;
             color: #fbf8f3;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(1.7rem, 7.2vw, 2.35rem);
             font-weight: 700;
             line-height: 1.08;
@@ -6826,7 +6837,7 @@
             border: 1px solid rgba(28, 20, 16, 0.12);
             background: #fffdf9;
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.875rem;
             font-weight: 700;
             letter-spacing: 0.01em;
@@ -6839,7 +6850,7 @@
             flex: 1 1 auto;
             overflow: hidden;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(1.1rem, 2.8vw, 1.75rem);
             font-weight: 700;
             line-height: 1.15;
@@ -6920,7 +6931,7 @@
         }
 
         .cooking-mode-active .detail-instructions-panel p {
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: clamp(1.55rem, 4.8vw, 2.05rem);
             line-height: 1.4;
             font-weight: 600;
@@ -6995,7 +7006,7 @@
         .cook-kicker {
             margin: 0;
             color: #7a6b60;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.74rem;
             font-weight: 800;
             letter-spacing: 0.16em;
@@ -7005,7 +7016,7 @@
         .cook-instruction {
             margin: 0;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(1.7rem, 3.8vw, 2.55rem);
             font-weight: 700;
             line-height: 1.18;
@@ -7014,7 +7025,7 @@
         .cook-prepare-lead {
             margin: 0;
             color: #5c5148;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 1rem;
             font-weight: 600;
             line-height: 1.45;
@@ -7032,7 +7043,7 @@
         .cook-clock {
             margin: 0;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(3.4rem, 9vw, 5.6rem);
             font-weight: 700;
             letter-spacing: -0.04em;
@@ -7043,7 +7054,7 @@
         .cook-clock-label {
             margin: 0;
             color: #7a6b60;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.72rem;
             font-weight: 800;
             letter-spacing: 0.14em;
@@ -7070,7 +7081,7 @@
             border-radius: 999px;
             background: rgba(146, 157, 117, 0.12);
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: clamp(0.95rem, 2vw, 1.1rem);
             font-weight: 700;
             line-height: 1.25;
@@ -7104,7 +7115,7 @@
         .cook-peek-kicker {
             margin: 0;
             color: #7a6b60;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.72rem;
             font-weight: 800;
             letter-spacing: 0.16em;
@@ -7114,7 +7125,7 @@
         .cook-peek-text {
             margin: 0.4rem 0 0;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: clamp(1.25rem, 2.8vw, 1.65rem);
             font-weight: 700;
             line-height: 1.25;
@@ -7137,7 +7148,7 @@
             border: 0;
             background: transparent;
             color: #6d5f55;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.92rem;
             font-weight: 700;
             text-decoration: underline;
@@ -7161,7 +7172,7 @@
             border: 1px solid rgba(28, 20, 16, 0.1);
             background: #fffdf9;
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 1.05rem;
             font-weight: 800;
             transition: background 160ms ease, transform 160ms ease;
@@ -7214,7 +7225,7 @@
             border-radius: 0.7rem;
             background: rgba(146, 157, 117, 0.18);
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.95rem;
             font-weight: 800;
             line-height: 1;
@@ -7227,7 +7238,7 @@
         .cook-prep-copy p {
             margin: 0;
             color: #1c1410;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 1.02rem;
             font-weight: 700;
             line-height: 1.35;
@@ -7269,7 +7280,7 @@
             min-width: 3.4rem;
             padding: 0 0.15rem;
             color: #1c1410;
-            font-family: Fraunces, serif;
+            font-family: var(--font-display);
             font-size: 1.45rem;
             font-weight: 700;
             line-height: 1;
@@ -7280,7 +7291,7 @@
         .cook-stepper-unit {
             margin-top: 0.15rem;
             color: #7a6b60;
-            font-family: Outfit, sans-serif;
+            font-family: var(--font-ui);
             font-size: 0.62rem;
             font-weight: 800;
             letter-spacing: 0.12em;
@@ -10659,6 +10670,39 @@
             };
         }
 
+        // Cover/kaft extras (Cormorant, Libre Baskerville, Playfair) stay off the critical path.
+        // Inject once when the cover editor opens or a saved cover uses one of them.
+        const COVER_FONTS_STYLESHEET_ID = 'uculi-cover-fonts';
+        const COVER_FONTS_STYLESHEET_HREF = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap';
+        const COVER_LAZY_TITLE_FONTS = new Set(['cormorant', 'baskerville', 'playfair']);
+
+        function ensureCoverFontsLoaded() {
+            if (typeof document === 'undefined') return false;
+            if (document.getElementById(COVER_FONTS_STYLESHEET_ID)) return true;
+            const link = document.createElement('link');
+            link.id = COVER_FONTS_STYLESHEET_ID;
+            link.rel = 'stylesheet';
+            link.href = COVER_FONTS_STYLESHEET_HREF;
+            document.head.appendChild(link);
+            return true;
+        }
+
+        function coverUsesLazyTitleFont(cover) {
+            const font = String((cover && cover.titleFont) || 'fraunces').trim().toLowerCase();
+            return COVER_LAZY_TITLE_FONTS.has(font);
+        }
+
+        function ensureFontsForNotebookCover(cover) {
+            const safe = cover && typeof cover === 'object' ? cover : null;
+            if (safe && coverUsesLazyTitleFont(safe)) {
+                ensureCoverFontsLoaded();
+            }
+        }
+        window.ensureCoverFontsLoaded = ensureCoverFontsLoaded;
+        window.ensureFontsForNotebookCover = ensureFontsForNotebookCover;
+        window.COVER_FONTS_STYLESHEET_ID = COVER_FONTS_STYLESHEET_ID;
+        window.COVER_FONTS_STYLESHEET_HREF = COVER_FONTS_STYLESHEET_HREF;
+
         function clampNotebookCoverNumber(value, min, max, fallback) {
             const number = Number(value);
             if (!Number.isFinite(number)) return fallback;
@@ -11411,6 +11455,7 @@
 
         function renderNotebookCoverFrontInner(cover, isEditorPreview = false) {
             const safeCover = normalizeNotebookCover(cover);
+            ensureFontsForNotebookCover(safeCover);
             const title = escapeHTML((safeCover.title || '').trim());
             const subtitle = escapeHTML((safeCover.subtitle || '').trim());
             const spineLabel = escapeHTML((safeCover.spineLabel || '').trim());
@@ -11445,6 +11490,7 @@
 
         function renderNotebookCoverBackInner(cover, isEditorPreview = false) {
             const safeCover = normalizeNotebookCover(cover);
+            ensureFontsForNotebookCover(safeCover);
             const spineLabel = escapeHTML((safeCover.spineLabel || '').trim());
             const backStickers = (safeCover.stickers || []).filter(sticker => normalizeNotebookCoverSticker(sticker).face === 'back');
 
@@ -11637,6 +11683,7 @@
 
         function openCoverEditor() { if(requireAccountPlan('notebookCovers')) return;
             closeCompetingSheets();
+            ensureCoverFontsLoaded();
             draftNotebookCover = JSON.parse(JSON.stringify(normalizeNotebookCover(userSettings.notebookCover)));
             draftCoverPreviewFace = 'front';
             const modal = document.getElementById('cover-editor-modal');
@@ -19915,7 +19962,7 @@
                         <div style="position:fixed;${tooltipPosStyle}pointer-events:auto;width:min(340px,calc(100vw - 16px));background:#fff;border:1px solid #E5DDD0;border-radius:20px;box-shadow:0 24px 48px rgba(0,0,0,0.18);overflow:hidden;z-index:302;">
                             <div style="background:#F7F1E8;padding:14px 16px;border-bottom:1px solid #E5DDD0;display:flex;align-items:center;gap:10px;">
                                 <i data-lucide="${current.icon}" style="width:20px;height:20px;color:#C8972A;flex-shrink:0;"></i>
-                                <span style="font-family:serif;font-weight:700;font-size:17px;color:#1c1410;flex:1;">${current.title}</span>
+                                <span style="font-family:var(--font-display);font-weight:700;font-size:17px;color:#1c1410;flex:1;">${current.title}</span>
                                 <span style="font-size:11px;font-weight:700;color:#7A8C6E;white-space:nowrap;">${safeStep + 1} / ${numSteps}</span>
                             </div>
                             <div style="padding:14px 16px;">
@@ -25129,7 +25176,7 @@
                         <section class="editor-panel">
                             <p class="editor-panel-kicker">Presentation</p>
                             <div class="flex flex-col items-center">
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-4">Meal Presentation Photo</label>
+                                <label class="block text-xs font-semibold text-sage mb-4">Meal presentation photo</label>
                                 <label class="custom-file-upload">
                                     <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-preview', 'draftProfile', false)">
                                     <div id="profile-preview" class="w-40 h-40 border-2 border-dashed border-sage rounded-2xl flex flex-col items-center justify-center bg-white hover:bg-accent transition-colors bg-cover bg-center text-sage shadow-inner">
@@ -25142,28 +25189,28 @@
                         <section class="editor-panel">
                             <p class="editor-panel-kicker">Basics</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div class="md:col-span-2"><label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Recipe Title</label><input type="text" id="r-title" required class="${inputClass}"></div>
-                                <div><label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Author</label><input type="text" id="r-author" value="${userSettings.name}" class="${inputClass}"></div>
+                                <div class="md:col-span-2"><label class="block text-xs font-semibold text-sage mb-2">Recipe title</label><input type="text" id="r-title" required class="${inputClass}"></div>
+                                <div><label class="block text-xs font-semibold text-sage mb-2">Author</label><input type="text" id="r-author" value="${userSettings.name}" class="${inputClass}"></div>
                                 <div>
-                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Category</label>
+                                    <label class="block text-xs font-semibold text-sage mb-2">Category</label>
                                     <select id="r-category" required class="${inputClass}">
                                         <option value="Cooking">Cooking</option><option value="Baking">Baking</option>
                                         <option value="Dessert">Dessert</option><option value="Drink">Drink</option>
                                     </select>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Country / Origin</label>
+                                    <label class="block text-xs font-semibold text-sage mb-2">Country / Origin</label>
                                     <input type="text" id="r-country" list="countries-list" placeholder="Typ of selecteer een land..." value="${userSettings.country}" class="${inputClass}">
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Meal Type (max 2)</label>
+                                    <label class="block text-xs font-semibold text-sage mb-2">Meal type (max 2)</label>
                                     <div class="flex flex-wrap gap-2">
                                         ${mealTypeOptions.map(option => `<button type="button" onclick="toggleMealTypeBtn(this)" data-meal-type="${option}" data-selected="false" class="meal-type-btn inline-flex items-center rounded-xl border border-sage border-opacity-20 bg-white px-4 text-xs font-bold text-sage transition-all hover:border-gold hover:text-forest">${option}</button>`).join('')}
                                     </div>
                                     <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">Select up to 2 meal moments.</p>
                                 </div>
                                 <div class="md:col-span-2">
-                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Assign to Family Book</label>
+                                    <label class="block text-xs font-semibold text-sage mb-2">Assign to family book</label>
                                     <select id="r-family-book" class="${inputClass}">
                                         ${familyOptionsMarkup}
                                     </select>
@@ -25178,7 +25225,7 @@
                             <p class="editor-panel-kicker">Method</p>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-3 flex items-center gap-2 border-b border-parchmentDark/60 pb-2"><i data-lucide="shopping-basket" class="w-4 h-4"></i> Ingredients</label>
+                                    <label class="block text-xs font-semibold text-sage mb-3 flex items-center gap-2 border-b border-parchmentDark/60 pb-2"><i data-lucide="shopping-basket" class="w-4 h-4"></i> Ingredients</label>
                                     <ul id="draft-ingredients-list" class="mb-3 space-y-2"></ul>
                                     <div class="flex gap-2">
                                         <input type="text" id="new-ingredient" placeholder="e.g. 500g Flour" onkeypress="if(event.key === 'Enter') { event.preventDefault(); addDraftIngredient(); }" class="${inputClass} flex-1">
@@ -25186,7 +25233,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-3 flex items-center gap-2 border-b border-parchmentDark/60 pb-2"><i data-lucide="list-ordered" class="w-4 h-4"></i> Instructions</label>
+                                    <label class="block text-xs font-semibold text-sage mb-3 flex items-center gap-2 border-b border-parchmentDark/60 pb-2"><i data-lucide="list-ordered" class="w-4 h-4"></i> Instructions</label>
                                     <ul id="draft-steps-list" class="mb-3 space-y-2"></ul>
                                     <div class="flex gap-2 items-start">
                                         <textarea id="new-step" placeholder="Describe the next step..." class="${textareaClass} flex-1 !min-h-[48px] !h-12 py-3"></textarea>
@@ -25200,7 +25247,7 @@
                         <section class="editor-panel overflow-hidden">
                             <button type="button" onclick="toggleRecipeDetails()" class="w-full flex min-h-11 items-center justify-between gap-4 py-2 text-left">
                                 <div>
-                                    <p id="recipe-details-toggle-label" class="editor-panel-kicker" style="margin:0;">Optional Details</p>
+                                    <p id="recipe-details-toggle-label" class="editor-panel-kicker" style="margin:0;">Optional details</p>
                                     <p id="recipe-details-toggle-hint" class="mt-1 text-sm font-semibold text-forest opacity-80">Open this for prep time, servings, cuisine, diet, and chef's notes.</p>
                                 </div>
                                 <div class="flex items-center gap-3 text-sage">
@@ -25216,7 +25263,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2 flex items-center gap-2"><i data-lucide="lightbulb" class="w-4 h-4"></i> Chef's Notes</label>
+                                    <label class="block text-xs font-semibold text-sage mb-2 flex items-center gap-2"><i data-lucide="lightbulb" class="w-4 h-4"></i> Chef's Notes</label>
                                     <textarea id="r-tips" placeholder="Secret ingredient..." class="${textareaClass}"></textarea>
                                 </div>
 
@@ -25227,19 +25274,19 @@
                                         </button>
                                     </div>
                                     <div>
-                                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Prep Time (min)</label>
+                                        <label class="block text-xs font-semibold text-sage mb-2">Prep Time (min)</label>
                                         <input type="number" id="r-prepTime" min="0" max="1440" placeholder="15" class="${inputClass}">
                                     </div>
                                     <div>
-                                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Cook Time (min)</label>
+                                        <label class="block text-xs font-semibold text-sage mb-2">Cook Time (min)</label>
                                         <input type="number" id="r-cookTime" min="0" max="1440" placeholder="30" class="${inputClass}">
                                     </div>
                                     <div>
-                                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Servings</label>
+                                        <label class="block text-xs font-semibold text-sage mb-2">Servings</label>
                                         <input type="number" id="r-servings" min="1" max="20" value="4" class="${inputClass}">
                                     </div>
                                     <div>
-                                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Difficulty</label>
+                                        <label class="block text-xs font-semibold text-sage mb-2">Difficulty</label>
                                         <select id="r-difficulty" class="${inputClass}">
                                             <option value="">Select</option>
                                             <option value="Easy">Easy</option>
@@ -25251,11 +25298,11 @@
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Cuisine Type</label>
+                                        <label class="block text-xs font-semibold text-sage mb-2">Cuisine Type</label>
                                         <input type="text" id="r-cuisine" placeholder="e.g. Italian, Asian..." class="${inputClass}">
                                     </div>
                                     <div>
-                                        <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Diet Options</label>
+                                        <label class="block text-xs font-semibold text-sage mb-2">Diet Options</label>
                                         <div class="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
                                             ${dietOptionsMarkup}
                                         </div>
