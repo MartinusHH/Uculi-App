@@ -26,14 +26,18 @@
         }
         .frame {
             width: min(36rem, calc(100% - 2rem));
+            max-width: 100%;
             margin: 0 auto;
             padding: 2rem 0 3rem;
+            overflow-x: hidden;
         }
         .card {
             background: var(--paper);
             border: 1px solid var(--border);
             border-radius: 1.5rem;
             padding: 1.5rem;
+            max-width: 100%;
+            overflow-x: hidden;
         }
         h1 {
             font-family: Fraunces, serif;
@@ -71,13 +75,35 @@
         .footer {
             margin-top: 1.5rem;
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: flex-start;
+            column-gap: 0.5rem;
+            row-gap: 0.35rem;
+            max-width: 100%;
+            overflow-x: hidden;
             font-size: 0.875rem;
             font-weight: 600;
             color: var(--sage);
         }
-        .footer img { width: 1rem; height: 1rem; border-radius: 999px; object-fit: cover; }
+        .footer img {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 999px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .footer > span,
+        .footer > a {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .footer > a {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 0.15em;
+            max-width: 100%;
+        }
     </style>
 </head>
 <body>
