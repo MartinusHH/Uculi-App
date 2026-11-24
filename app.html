@@ -86,8 +86,8 @@
 
             /* Control sizes on the 8px grid */
             --control-h-sm: 2.75rem;  /* 44 — minimum touch */
-            --control-h-md: 3rem;     /* 48 */
-            --control-h-lg: 3.5rem;   /* 56 */
+            --control-h-md: 2.75rem;  /* 44 — unified with sm */
+            --control-h-lg: 2.75rem;  /* 44 — unified with sm */
             --radius-control: 0.75rem; /* 12 */
             --radius-panel: 1rem;      /* 16 */
 
@@ -183,19 +183,40 @@
             background-color: #fff !important;
         }
 
+        /* Accent retired: gold is brand only. Legacy accent class maps to primary sage. */
         button.app-btn-accent,
-        label.app-btn-accent {
-            background-color: var(--brand-gold) !important;
-            border-color: var(--brand-gold) !important;
-            color: #fff !important;
-            box-shadow: 0 8px 16px rgba(200, 144, 80, 0.28);
+        label.app-btn-accent,
+        a.app-btn-accent {
+            background-color: var(--brand-olive) !important;
+            border-color: var(--brand-olive) !important;
+            color: var(--brand-ink) !important;
+            box-shadow: 0 8px 16px rgba(146, 157, 117, 0.28);
         }
 
         button.app-btn-accent:hover,
-        label.app-btn-accent:hover {
-            background-color: #b87f3f !important;
-            border-color: #b87f3f !important;
-            color: #fff !important;
+        label.app-btn-accent:hover,
+        a.app-btn-accent:hover {
+            background-color: #929D75 !important;
+            border-color: #929D75 !important;
+            color: var(--brand-ink) !important;
+            filter: none;
+        }
+
+        button.app-btn-quiet,
+        label.app-btn-quiet,
+        a.app-btn-quiet {
+            background-color: transparent !important;
+            border-color: transparent !important;
+            color: var(--brand-ink) !important;
+            box-shadow: none;
+        }
+
+        button.app-btn-quiet:hover,
+        label.app-btn-quiet:hover,
+        a.app-btn-quiet:hover {
+            background-color: rgba(146, 157, 117, 0.12) !important;
+            border-color: transparent !important;
+            color: var(--brand-ink) !important;
         }
 
         body {
@@ -356,10 +377,10 @@
             align-items: center;
             gap: 0.65rem;
             width: 100%;
-            min-height: 2.55rem;
+            min-height: 2.75rem;
             padding: 0.55rem 0.7rem;
             border: 0;
-            border-radius: 0.7rem;
+            border-radius: var(--radius-control);
             background: transparent;
             color: #1c1410;
             font-family: Outfit, sans-serif;
@@ -470,12 +491,12 @@
             position: absolute;
             left: 1rem;
             bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
-            width: 3rem;
-            height: 3rem;
+            width: 2.75rem;
+            height: 2.75rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 0.9rem;
+            border-radius: var(--radius-control);
             border: 1px solid rgba(144, 152, 112, 0.28);
             background: rgba(255, 255, 255, 0.96);
             color: #1c1410;
@@ -589,7 +610,7 @@
             width: 2.75rem;
             height: 2.75rem;
             flex: 0 0 2.75rem;
-            border-radius: 0.85rem;
+            border-radius: var(--radius-control);
             border: 1px solid rgba(144, 152, 112, 0.28);
             background: #fbf8f3;
             color: #1c1410;
@@ -1394,6 +1415,19 @@
             justify-content: center;
         }
 
+        /* Paired CTAs stay equal width at every viewport (incl. 390px). */
+        .button-pair > button.phone-save-icon,
+        .button-pair > label.phone-save-icon,
+        .settings-actions.button-pair > button.phone-save-icon,
+        .settings-actions.button-pair > label.phone-save-icon {
+            flex: 1 1 0 !important;
+            width: auto !important;
+            min-width: 0 !important;
+            max-width: none !important;
+            padding-left: var(--space-3) !important;
+            padding-right: var(--space-3) !important;
+        }
+
         .index-toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -1433,7 +1467,7 @@
             height: 2.75rem;
             min-height: 2.75rem;
             padding: 0 0.75rem;
-            border-radius: 0.8rem;
+            border-radius: var(--radius-control);
             border: 1px solid transparent;
             background: transparent;
             color: var(--text-muted);
@@ -2924,7 +2958,7 @@
             gap: 0.4rem;
             height: 2.75rem;
             padding: 0 0.9rem;
-            border-radius: 0.85rem;
+            border-radius: var(--radius-control);
             background: #929D75;
             color: #1c1410;
             font-family: Outfit, sans-serif;
@@ -3346,6 +3380,32 @@
                 gap: 0;
                 padding-left: 0;
                 padding-right: 0;
+            }
+
+            #app-content .settings-actions.button-pair > button.phone-save-icon,
+            #app-content .settings-actions.button-pair > label.phone-save-icon {
+                flex: 1 1 0;
+                width: auto;
+                min-width: 0;
+                max-width: none;
+                gap: 0.4rem;
+                padding-left: var(--space-3);
+                padding-right: var(--space-3);
+            }
+
+            #app-content .settings-actions.button-pair {
+                display: flex;
+                width: 100%;
+                gap: 0.5rem;
+            }
+
+            #app-content .settings-actions.button-pair > button,
+            #app-content .settings-actions.button-pair > label {
+                flex: 1 1 0;
+                width: auto;
+                min-width: 0;
+                max-width: none;
+                justify-content: center;
             }
 
             #app-content .profile-identity {
@@ -6364,8 +6424,16 @@
 
         .meal-type-btn {
             min-height: var(--touch-min);
-            padding-top: 0.65rem;
-            padding-bottom: 0.65rem;
+            height: var(--touch-min);
+            padding-top: 0;
+            padding-bottom: 0;
+            border-radius: var(--radius-control);
+        }
+
+        .meal-type-btn[data-selected="true"] {
+            background-color: #929D75 !important;
+            border-color: #929D75 !important;
+            color: #1c1410 !important;
         }
 
         .detail-scale-control button:hover {
@@ -6640,11 +6708,12 @@
             justify-content: center;
             transform: none;
             width: auto;
-            min-width: 2.85rem;
-            height: 2.85rem;
+            min-width: 2.75rem;
+            height: 2.75rem;
+            min-height: 2.75rem;
             padding: 0 0.9rem;
             gap: 0.4rem;
-            border-radius: 0.9rem;
+            border-radius: var(--radius-control);
             border: 1px solid rgba(28, 20, 16, 0.12);
             background: #fffdf9;
             color: #1c1410;
@@ -6971,13 +7040,14 @@
             color: #1c1410;
         }
 
+        /* Cooking mode nav/begin: keep ~62px (decided) — not the chrome 44px rule. */
         .cook-nav-btn,
         .cook-begin {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.45rem;
-            min-height: 3.85rem;
+            min-height: 3.85rem; /* ~62px — stay */
             border-radius: 1rem;
             border: 1px solid rgba(28, 20, 16, 0.1);
             background: #fffdf9;
@@ -7461,7 +7531,7 @@
                 <h1 id="header-page-title" class="app-header-page-title">Uculi</h1>
             </div>
             <div class="app-header-actions">
-                <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="header-primary-action flex h-11 items-center gap-2 rounded-xl bg-forest px-4 text-sm font-bold text-white shadow-sm transition-all hover:bg-gold hover:text-forest">
+                <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="header-primary-action flex h-11 items-center gap-2 rounded-xl bg-[#929D75] px-4 text-sm font-bold text-forest shadow-sm transition-all hover:bg-gold hover:text-forest">
                     <i data-lucide="plus" class="w-4 h-4"></i> <span class="header-add-label">Add Recipe</span>
                 </button>
                 <div class="header-more" id="header-more" hidden>
@@ -7523,7 +7593,7 @@
                                 <button onclick="closeNotesEditor()" data-app-button="secondary" data-app-button-size="lg" data-app-button-full-width="true">
                                     Annuleren
                                 </button>
-                                <button id="notes-save-btn" data-app-button="accent" data-app-button-size="lg" data-app-button-full-width="true" data-app-button-extra="phone-save-icon" aria-label="Notities opslaan" title="Notities opslaan">
+                                <button id="notes-save-btn" data-app-button="primary" data-app-button-size="lg" data-app-button-full-width="true" data-app-button-extra="phone-save-icon" aria-label="Notities opslaan" title="Notities opslaan">
                                     <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Notities opslaan</span>
                                 </button>
                             </div>
@@ -15645,17 +15715,22 @@
         function getAppButtonClasses(variant = 'secondary', options = {}) {
             const { fullWidth = false, iconOnly = false, size = 'md' } = options;
             const baseClasses = 'inline-flex items-center justify-center gap-2 border font-bold uppercase transition-all disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:filter-none';
+            // One chrome height (44) + radius (12 / rounded-xl). size sm|md|lg kept for call-site compat.
             const sizeMap = {
                 sm: iconOnly ? 'h-11 w-11 rounded-xl text-xs' : 'h-11 rounded-xl px-4 text-xs tracking-[0.08em]',
-                md: iconOnly ? 'h-12 w-12 rounded-xl text-sm' : 'h-12 rounded-xl px-4 text-xs tracking-[0.08em]',
-                lg: iconOnly ? 'h-14 w-14 rounded-xl text-base' : 'h-14 rounded-xl px-6 text-sm tracking-[0.08em]'
+                md: iconOnly ? 'h-11 w-11 rounded-xl text-sm' : 'h-11 rounded-xl px-4 text-xs tracking-[0.08em]',
+                lg: iconOnly ? 'h-11 w-11 rounded-xl text-base' : 'h-11 rounded-xl px-5 text-sm tracking-[0.08em]'
             };
             const sizeClasses = sizeMap[size] || sizeMap.md;
             const widthClass = fullWidth ? ' w-full' : '';
+            // Three public variants: primary (sage), secondary (cream), quiet (text-only).
+            // accent → primary (gold is brand, not a button fill). Other keys kept for legacy call sites.
             const variantClasses = {
                 primary: 'app-btn-primary',
-                accent: 'app-btn-accent',
+                accent: 'app-btn-primary',
                 secondary: 'app-btn-secondary',
+                quiet: 'app-btn-quiet',
+                text: 'app-btn-quiet',
                 subtle: 'border-sage border-opacity-20 bg-accent bg-opacity-60 text-forest hover:border-gold hover:bg-white hover:text-sage shadow-sm',
                 warning: 'border-gold bg-white text-gold hover:border-forest hover:text-forest shadow-sm',
                 muted: 'border-parchmentDark bg-parchment text-sage hover:border-gold hover:text-forest shadow-sm',
@@ -17967,8 +18042,8 @@
                         </div>
                         ${canVote ? `
                             <div class="mt-3 flex items-center gap-2">
-                                <button type="button" onclick="respondToFamilyVote('${notification.id}', 'approve')" class="inline-flex h-10 items-center justify-center rounded-lg border border-forest bg-white px-4 text-sm font-bold text-forest shadow-sm transition-all hover:bg-forest hover:text-white">Approve</button>
-                                <button type="button" onclick="respondToFamilyVote('${notification.id}', 'reject')" class="inline-flex h-10 items-center justify-center rounded-lg border border-red-300 bg-white px-4 text-sm font-bold text-red-500 shadow-sm transition-all hover:border-red-500 hover:text-red-600">Reject</button>
+                                <button type="button" onclick="respondToFamilyVote('${notification.id}', 'approve')" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-[#929D75] bg-white px-4 text-sm font-bold text-forest shadow-sm transition-all hover:bg-[#929D75] hover:text-forest">Approve</button>
+                                <button type="button" onclick="respondToFamilyVote('${notification.id}', 'reject')" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-red-300 bg-white px-4 text-sm font-bold text-red-500 shadow-sm transition-all hover:border-red-500 hover:text-red-600">Reject</button>
                             </div>
                         ` : actorVote ? `<p class="mt-3 text-xs font-bold uppercase tracking-[0.16em] ${actorVote === 'approve' ? 'text-forest' : 'text-red-500'}">Your vote: ${userVoteLabel}</p>` : ''}
                     ` : ''}
@@ -18967,7 +19042,7 @@
             const backupContent = `
                 <p class="mb-4 text-sm font-semibold text-sage">${backupDownloadLocked ? 'Backup tools unlock with paid access.' : 'Download or restore your archive here.'}</p>
                 <div class="${settingsActionGridClass}">
-                    <button onclick="${backupDownloadLocked ? "showPremiumModal('backupDownload')" : 'exportAllAsJSON()'}" class="${backupDownloadLocked ? getAppButtonClasses('locked', { fullWidth: true, size: 'lg' }) : getAppButtonClasses('accent', { fullWidth: true, size: 'lg' })}">
+                    <button onclick="${backupDownloadLocked ? "showPremiumModal('backupDownload')" : 'exportAllAsJSON()'}" class="${backupDownloadLocked ? getAppButtonClasses('locked', { fullWidth: true, size: 'lg' }) : getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
                         <i data-lucide="${backupDownloadLocked ? 'lock' : 'download'}" class="w-4 h-4"></i> ${backupDownloadLocked ? 'Premium Backup Download' : 'Download Backup'}
                     </button>
                     ${backupRestoreLocked
@@ -19025,7 +19100,7 @@
                         </div>
                         <div class="grid w-full gap-3 md:w-auto md:grid-cols-2">
                             ${isPremiumEnforced() ? `
-                            <button onclick="showPlansModal()" class="${getAppButtonClasses('accent', { fullWidth: true, size: 'lg' })}">
+                            <button onclick="showPlansModal()" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
                                 <i data-lucide="crown" class="w-4 h-4"></i> View Plans
                             </button>
                             ` : ''}
@@ -19230,7 +19305,7 @@
                             </div>
                             <div class="settings-actions button-pair">
                                 ${isPremiumEnforced() ? `
-                                <button type="button" onclick="showPlansModal()" class="${getAppButtonClasses('accent', { size: 'sm' })}">
+                                <button type="button" onclick="showPlansModal()" class="${getAppButtonClasses('primary', { size: 'sm' })}">
                                     <i data-lucide="crown" class="w-4 h-4"></i>${settingsNl ? 'Bekijk plannen' : 'View Plans'}
                                 </button>
                                 ` : ''}
@@ -19613,10 +19688,10 @@
                 ).join('');
 
                 const nextBtn = isLast
-                    ? `<button type="button" onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;background:#1c1410;color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
+                    ? `<button type="button" onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;background:#929D75;color:#1c1410;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
                             <i data-lucide="check" style="width:16px;height:16px;"></i> Klaar
                        </button>`
-                    : `<button type="button" onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;background:#1c1410;color:#fff;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
+                    : `<button type="button" onclick="showInteractiveTutorial(${safeStep + 1}, ${manualOpen})" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;background:#929D75;color:#1c1410;border:none;border-radius:12px;padding:8px 18px;font-size:14px;font-weight:700;cursor:pointer;">
                             Volgende <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
                        </button>`;
 
@@ -21691,7 +21766,7 @@
             const dietFilterButtonsMarkup = dietOptions.map(option => {
                 const isActive = dietFilter.includes(option);
                 const desc = dietDescriptions[option] || '';
-                return `<button type="button" onclick="toggleDietFilterOption('${option}')" aria-label="${option}: ${desc}" class="rounded-full border px-4 py-2 text-sm font-bold transition-all ${isActive ? 'border-forest bg-forest text-white shadow-sm' : 'border-sage border-opacity-20 bg-white text-sage hover:border-gold hover:text-forest'}">${option}</button>`;
+                return `<button type="button" onclick="toggleDietFilterOption('${option}')" aria-label="${option}: ${desc}" class="inline-flex h-11 items-center rounded-xl border px-4 text-sm font-bold transition-all ${isActive ? 'border-[#929D75] bg-[#929D75] text-forest shadow-sm' : 'border-sage border-opacity-20 bg-white text-sage hover:border-gold hover:text-forest'}">${option}</button>`;
             }).join('');
             const dietGuideMarkup = dietOptions.map(option => `<div class="rounded-xl border border-sage border-opacity-10 bg-white p-3 shadow-sm">
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-forest">${option}</p>
@@ -21764,7 +21839,7 @@
 
                         <div class="space-y-2">
                             <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Quick view', 'Snelbeeld')}</label>
-                            <button onclick="showFavoritesOnly = !showFavoritesOnly; renderList()" class="flex h-11 w-full items-center justify-between rounded-xl border px-4 text-sm font-semibold shadow-sm transition-all ${showFavoritesOnly ? 'border-forest bg-forest text-white shadow-md' : 'border-sage border-opacity-20 bg-white text-forest hover:border-gold hover:shadow-md'}">
+                            <button onclick="showFavoritesOnly = !showFavoritesOnly; renderList()" class="flex h-11 w-full items-center justify-between rounded-xl border px-4 text-sm font-semibold shadow-sm transition-all ${showFavoritesOnly ? 'border-[#929D75] bg-[#929D75] text-forest shadow-md' : 'border-sage border-opacity-20 bg-white text-forest hover:border-gold hover:shadow-md'}">
                                 <span class="flex items-center gap-2">
                                     <i data-lucide="heart" class="h-4 w-4 ${showFavoritesOnly ? 'fill-current' : ''}"></i>
                                     ${showFavoritesOnly ? uiText('Favorites only', 'Alleen favorieten') : uiText('Show favorites', 'Toon favorieten')}
@@ -21908,7 +21983,7 @@
                     const totalMinutes = Number(recipe.prepTime || 0) + Number(recipe.cookTime || 0);
                     html += `
                         <article onclick="renderDetail(${recipe.id})" class="index-list-card relative" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();renderDetail(${recipe.id});}">
-                            ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-gold bg-white text-gold shadow-sm"><i data-lucide="alert-circle" class="h-4 w-4"></i></button>` : ''}
+                            ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-gold bg-white text-gold shadow-sm"><i data-lucide="alert-circle" class="h-4 w-4"></i></button>` : ''}
                             <div class="index-list-media" style="background-image: ${cssUrl(recipe.profile || defaultPlaceholderProfile)}"></div>
                             <div class="index-list-body">
                                 <h3 class="truncate">${escapeHTML(recipe.title || 'Untitled')}</h3>
@@ -21936,7 +22011,7 @@
                     const familyChipMarkup = getRecipeFamilyChipMarkup(recipe, 'index-card-tag');
                     html += `
                         <article onclick="renderDetail(${recipe.id})" class="index-card relative" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();renderDetail(${recipe.id});}">
-                            ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-gold bg-white text-gold shadow-sm"><i data-lucide="alert-circle" class="h-5 w-5"></i></button>` : ''}
+                            ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-gold bg-white text-gold shadow-sm"><i data-lucide="alert-circle" class="h-5 w-5"></i></button>` : ''}
                             <div class="index-card-media" style="background-image: ${cssUrl(recipe.profile || defaultPlaceholderProfile)}"></div>
                             <div class="index-card-body">
                                 <h3>${escapeHTML(recipe.title || 'Untitled')}</h3>
@@ -24127,7 +24202,7 @@
                                             const hasIngredientsInList = userSettings.shoppingList.items.some(item => 
                                                 !item.checked && (item.sourceRecipeIds || []).includes(recipe.id)
                                             );
-                                            return `<button type="button" onclick="toggleRecipeIngredientsInShoppingList(${recipe.id}, false); renderDetail(${recipe.id});" class="mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border shadow-sm transition-all ${hasIngredientsInList ? 'bg-forest border-forest text-white hover:bg-coral hover:border-coral' : 'bg-white border-parchmentDark text-gold hover:shadow-md hover:text-forest'}" title="${hasIngredientsInList ? uiText('Remove ingredients from list', 'Ingrediënten van de lijst halen') : uiText('Add all ingredients to shopping list', 'Alle ingrediënten op de boodschappenlijst')}" aria-label="${hasIngredientsInList ? uiText('Remove ingredients from list', 'Ingrediënten van de lijst halen') : uiText('Add all ingredients to shopping list', 'Alle ingrediënten op de boodschappenlijst')}"><i data-lucide="shopping-basket" class="h-5 w-5"></i></button>`;
+                                            return `<button type="button" onclick="toggleRecipeIngredientsInShoppingList(${recipe.id}, false); renderDetail(${recipe.id});" class="mt-1 inline-flex h-11 min-w-[2.75rem] flex-shrink-0 items-center justify-center gap-1.5 rounded-xl border px-2 shadow-sm transition-all ${hasIngredientsInList ? 'bg-[#929D75] border-[#929D75] text-forest hover:bg-coral hover:border-coral hover:text-white' : 'bg-white border-parchmentDark text-gold hover:shadow-md hover:text-forest'}" title="${hasIngredientsInList ? uiText('Remove ingredients from list', 'Ingrediënten van de lijst halen') : uiText('Add all ingredients to shopping list', 'Alle ingrediënten op de boodschappenlijst')}" aria-label="${hasIngredientsInList ? uiText('Remove ingredients from list', 'Ingrediënten van de lijst halen') : uiText('Add all ingredients to shopping list', 'Alle ingrediënten op de boodschappenlijst')}"><i data-lucide="shopping-basket" class="h-5 w-5"></i></button>`;
                                         })()}
                                     </div>
                                     <div class="detail-scale-control" translate="no">
@@ -24471,7 +24546,7 @@
                                 <div class="md:col-span-2">
                                     <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">Meal Type (max 2)</label>
                                     <div class="flex flex-wrap gap-2">
-                                        ${mealTypeOptions.map(option => `<button type="button" onclick="toggleMealTypeBtn(this)" data-meal-type="${option}" data-selected="false" class="meal-type-btn rounded-full border border-sage border-opacity-20 bg-white px-4 py-2 text-xs font-bold text-sage transition-all hover:border-gold hover:text-forest">${option}</button>`).join('')}
+                                        ${mealTypeOptions.map(option => `<button type="button" onclick="toggleMealTypeBtn(this)" data-meal-type="${option}" data-selected="false" class="meal-type-btn inline-flex items-center rounded-xl border border-sage border-opacity-20 bg-white px-4 text-xs font-bold text-sage transition-all hover:border-gold hover:text-forest">${option}</button>`).join('')}
                                     </div>
                                     <p class="mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-sage">Select up to 2 meal moments.</p>
                                 </div>
@@ -24583,7 +24658,7 @@
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                 <button type="button" onclick="cancelRecipeEditor()" class="${getAppButtonClasses('secondary', { size: 'lg' })}" translate="no">Cancel</button>
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-                                    <button type="submit" onclick="recipeSubmitAction = 'save'" class="${getAppButtonClasses('accent', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="${escapeHTML(submitLabel)}" title="${escapeHTML(submitLabel)}" translate="no"><i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">${submitLabel}</span></button>
+                                    <button type="submit" onclick="recipeSubmitAction = 'save'" class="${getAppButtonClasses('primary', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="${escapeHTML(submitLabel)}" title="${escapeHTML(submitLabel)}" translate="no"><i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">${submitLabel}</span></button>
                                     <button type="submit" onclick="recipeSubmitAction = 'publish'" class="${getAppButtonClasses('primary', { size: 'lg' })} min-w-[180px]" translate="no"><i data-lucide="cloud-upload" class="w-4 h-4"></i> ${publishSubmitLabel}</button>
                                 </div>
                             </div>
@@ -24620,9 +24695,7 @@
         function setMealTypeButtonVisualState(button, isSelected) {
             if (!(button instanceof HTMLElement)) return;
             button.dataset.selected = isSelected ? 'true' : 'false';
-            button.classList.toggle('!bg-forest', isSelected);
-            button.classList.toggle('!text-white', isSelected);
-            button.classList.toggle('!border-forest', isSelected);
+            // Selected fill comes from .meal-type-btn[data-selected="true"] (sage olive).
         }
 
         function hydrateMealTypeButtons(selectedMealTypes = []) {
