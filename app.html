@@ -3815,11 +3815,186 @@
         }
 
         .notebook-landing-action-row {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: stretch;
+            justify-content: stretch;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 28rem;
+        }
+
+        .notebook-landing-action-row > button {
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+            justify-content: center;
+            white-space: nowrap;
+            padding-left: 0.65rem;
+            padding-right: 0.65rem;
+        }
+
+        .measurement-system-switch {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 0.65rem;
+            width: 100%;
+            min-height: 2.75rem;
+            padding: 0.4rem 0.85rem;
+            border-radius: 0.9rem;
+            border: 1px solid rgba(28, 20, 16, 0.14);
+            background: #fffdf9;
+            box-shadow: 0 4px 8px rgba(28, 20, 16, 0.04);
+            color: var(--brand-ink);
+            cursor: pointer;
+            transition: border-color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .measurement-system-switch:hover {
+            border-color: #929D75;
+            box-shadow: 0 6px 12px rgba(146, 157, 117, 0.18);
+        }
+
+        .measurement-system-switch:focus-visible {
+            outline: 2px solid #929D75;
+            outline-offset: 2px;
+        }
+
+        .measurement-system-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #6d5f55;
+            transition: color 160ms ease;
+        }
+
+        .measurement-system-label.is-active {
+            color: #1c1410;
+        }
+
+        .measurement-system-label:first-child {
+            text-align: right;
+        }
+
+        .measurement-system-label:last-child {
+            text-align: left;
+        }
+
+        .measurement-system-track {
+            position: relative;
+            width: 2.75rem;
+            height: 1.5rem;
+            border-radius: 999px;
+            background: #e4dfd4;
+            flex-shrink: 0;
+            transition: background-color 180ms ease;
+        }
+
+        .measurement-system-switch[aria-checked="true"] .measurement-system-track {
+            background: #929D75;
+        }
+
+        .measurement-system-thumb {
+            position: absolute;
+            top: 0.15rem;
+            left: 0.15rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            border-radius: 999px;
+            background: #fff;
+            box-shadow: 0 2px 6px rgba(28, 20, 16, 0.18);
+            transition: transform 180ms ease;
+        }
+
+        .measurement-system-switch[aria-checked="true"] .measurement-system-thumb {
+            transform: translateX(1.25rem);
+        }
+
+        .shop-line-check {
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+            min-height: 44px;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 0.75rem;
+        }
+
+        .shop-line-check:focus-visible {
+            outline: 2px solid #929D75;
+            outline-offset: 2px;
+        }
+
+        .shop-line-check-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.35rem;
+            height: 1.35rem;
+            border-radius: 0.35rem;
+            border: 2px solid rgba(28, 20, 16, 0.28);
+            background: #fff;
+            color: #fff;
+            transition: background-color 140ms ease, border-color 140ms ease;
+        }
+
+        .shop-line-check-box.is-checked {
+            background: #929D75;
+            border-color: #929D75;
+        }
+
+        .shop-line-check-box svg,
+        .shop-line-check-box i {
+            width: 0.85rem;
+            height: 0.85rem;
+        }
+
+        .profile-editor-banner-wrap {
+            position: relative;
+            margin-bottom: 2.5rem;
+        }
+
+        .profile-editor-avatar-upload {
+            position: absolute;
+            left: 50%;
+            bottom: -1.5rem;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .profile-editor-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 0.75rem;
+            padding-top: 0.5rem;
+        }
+
+        .profile-editor-actions > button {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .source-filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .source-filter-row > .source-filter-btn,
+        .source-filter-row > button {
+            width: 100%;
+            min-width: 0;
+            max-width: none;
+            justify-content: center;
         }
 
         .notebook-landing-hint {
@@ -12690,6 +12865,24 @@
             return mark.charAt(0).toUpperCase() + mark.slice(1);
         }
 
+        function shoppingListShortName(name) {
+            const trimmed = String(name || '').trim();
+            if (!trimmed) return '';
+            if (trimmed.toLowerCase() === shoppingListSelfName.toLowerCase()) {
+                return uiText('You', 'Jij');
+            }
+            return trimmed.split(/\s+/)[0];
+        }
+
+        function shoppingListAssigneeDisplayName(name) {
+            const trimmed = String(name || '').trim();
+            if (!trimmed) return '';
+            if (trimmed.toLowerCase() === shoppingListSelfName.toLowerCase()) {
+                return uiText('You', 'Jij');
+            }
+            return trimmed;
+        }
+
         function shoppingListAssigneeGroups(items, collaborators) {
             const you = [];
             const buckets = (collaborators || []).map(collaborator => ({ name: collaborator.name, items: [] }));
@@ -12709,11 +12902,11 @@
                 else open.push(item);
             });
             const groups = [];
-            if (you.length) groups.push({ title: shoppingListSelfName, items: you });
+            if (you.length) groups.push({ title: uiText('You', 'Jij'), items: you });
             buckets.forEach(bucket => {
                 if (bucket.items.length) groups.push({ title: bucket.name, items: bucket.items });
             });
-            if (open.length) groups.push({ title: 'Not assigned', items: open });
+            if (open.length) groups.push({ title: uiText('Not assigned', 'Niet toegewezen'), items: open });
             return groups;
         }
 
@@ -12740,31 +12933,59 @@
 
         function renderShoppingListItem(item) {
             const shoppingList = normalizeShoppingListState(userSettings.shoppingList);
+            const kindLabel = item.kind === 'custom'
+                ? uiText('Custom', 'Eigen')
+                : uiText('Recipe', 'Recept');
+            const moreLabel = (count) => uiText(`+${count} more`, `+${count} meer`);
             const itemMetaBadges = [
-                `<span class="inline-flex items-center rounded-full border border-parchmentDark bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-sage shadow-sm">${item.kind === 'custom' ? 'Custom' : 'Recipe'}</span>`,
+                `<span class="inline-flex items-center rounded-full border border-parchmentDark bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-sage shadow-sm">${kindLabel}</span>`,
                 ...(item.sourceRecipeTitles || []).slice(0, 2).map(title => `<span class="inline-flex items-center rounded-full border border-gold border-opacity-30 bg-gold bg-opacity-10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-forest">${escapeHTML(title)}</span>`),
-                ((item.sourceRecipeTitles || []).length > 2) ? `<span class="inline-flex items-center rounded-full border border-parchmentDark bg-parchment px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-sage">+${item.sourceRecipeTitles.length - 2} more</span>` : ''
+                ((item.sourceRecipeTitles || []).length > 2) ? `<span class="inline-flex items-center rounded-full border border-parchmentDark bg-parchment px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.16em] text-sage">${moreLabel(item.sourceRecipeTitles.length - 2)}</span>` : ''
             ].join('');
 
-            const assigneeNames = [shoppingListSelfName, ...shoppingList.collaborators.map(collaborator => collaborator.name)];
-            const assignees = assigneeNames.map(name => ({
-                value: name,
-                label: shoppingListAssigneeMark(name, assigneeNames)
-            }));
+            const assignedTo = normalizeShoppingListLabel(item.assignedTo);
+            const hasCollaborators = (shoppingList.collaborators || []).length > 0;
+            let assigneesHtml = '';
 
-            const assigneesHtml = assignees.map(assignee => `
-                <button type="button" onclick="assignShoppingListItem('${item.id}', '${item.assignedTo === assignee.value ? '' : encodeURIComponent(assignee.value)}')"
-                    class="inline-flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full px-2 text-[11px] font-bold leading-none transition-all ${item.assignedTo === assignee.value ? 'bg-forest text-white shadow-sm ring-2 ring-forest/20' : 'bg-parchment text-sage border border-parchmentDark hover:border-gold hover:text-forest'}"
-                    title="Assign to ${escapeHTML(assignee.value)}" aria-label="Assign to ${escapeHTML(assignee.value)}">
-                    ${escapeHTML(assignee.label)}
-                </button>
-            `).join('');
+            if (assignedTo) {
+                const displayName = shoppingListAssigneeDisplayName(assignedTo);
+                const shortName = shoppingListShortName(assignedTo);
+                const assignedLabel = uiText(`Assigned to ${displayName}`, `Toegewezen aan ${displayName}`);
+                assigneesHtml = `
+                    <button type="button" onclick="assignShoppingListItem('${item.id}', '')"
+                        class="inline-flex h-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full bg-forest px-2.5 text-[11px] font-bold leading-none text-white shadow-sm ring-2 ring-forest/20 transition-all"
+                        title="${escapeHTML(assignedLabel)}" aria-label="${escapeHTML(assignedLabel)}">
+                        ${escapeHTML(shortName)}
+                    </button>
+                `;
+            } else if (hasCollaborators) {
+                const assigneeNames = [shoppingListSelfName, ...shoppingList.collaborators.map(collaborator => collaborator.name)];
+                assigneesHtml = assigneeNames.map(name => {
+                    const displayName = shoppingListAssigneeDisplayName(name);
+                    const shortName = shoppingListShortName(name);
+                    const assignLabel = uiText(`Assign to ${displayName}`, `Toewijzen aan ${displayName}`);
+                    return `
+                        <button type="button" onclick="assignShoppingListItem('${item.id}', '${encodeURIComponent(name)}')"
+                            class="inline-flex h-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full border border-parchmentDark bg-parchment px-2.5 text-[11px] font-bold leading-none text-sage transition-all hover:border-gold hover:text-forest"
+                            title="${escapeHTML(assignLabel)}" aria-label="${escapeHTML(assignLabel)}">
+                            ${escapeHTML(shortName)}
+                        </button>
+                    `;
+                }).join('');
+            }
+
+            const checkLabel = item.checked
+                ? uiText('Reopen item', 'Item heropenen')
+                : uiText('Mark item done', 'Item afvinken');
+            const removeLabel = uiText('Remove', 'Verwijderen');
 
             return `
                 <article class="shop-line rounded-xl border border-parchmentDark bg-white p-3 shadow-sm transition-all ${item.checked ? 'opacity-70' : ''}">
                     <div class="shop-line-row flex items-center gap-3">
-                        <button type="button" onclick="toggleShoppingListItemChecked('${item.id}')" class="${getAppButtonClasses(item.checked ? 'accent' : 'secondary', { iconOnly: true, size: 'sm' })} flex-shrink-0" title="${item.checked ? 'Reopen item' : 'Mark item done'}" aria-label="${item.checked ? 'Reopen item' : 'Mark item done'}">
-                            <i data-lucide="${item.checked ? 'check-check' : 'circle'}" class="h-4 w-4"></i>
+                        <button type="button" onclick="toggleShoppingListItemChecked('${item.id}')" class="shop-line-check" title="${checkLabel}" aria-label="${checkLabel}" aria-pressed="${item.checked ? 'true' : 'false'}">
+                            <span class="shop-line-check-box ${item.checked ? 'is-checked' : ''}">
+                                ${item.checked ? '<i data-lucide="check"></i>' : ''}
+                            </span>
                         </button>
 
                         <div class="shop-line-copy min-w-0 flex-1 flex flex-col justify-center">
@@ -12778,8 +12999,8 @@
                         </div>
 
                         <div class="shop-line-actions flex items-center gap-2 pl-2 border-l border-parchmentDark">
-                            ${assignees.length > 0 ? `<div class="shop-line-assignees flex max-w-[9.5rem] flex-wrap items-center justify-end gap-1.5">${assigneesHtml}</div>` : ''}
-                            <button type="button" onclick="removeShoppingListItem('${item.id}')" class="shop-line-remove flex h-11 w-11 items-center justify-center rounded-xl text-sage hover:bg-coral hover:text-white transition-colors" title="Remove" aria-label="Remove">
+                            ${assigneesHtml ? `<div class="shop-line-assignees flex max-w-[9.5rem] flex-wrap items-center justify-end gap-1.5">${assigneesHtml}</div>` : ''}
+                            <button type="button" onclick="removeShoppingListItem('${item.id}')" class="shop-line-remove flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-sage hover:bg-coral hover:text-white transition-colors" title="${removeLabel}" aria-label="${removeLabel}">
                                 <i data-lucide="trash-2" class="h-4 w-4"></i>
                             </button>
                         </div>
@@ -18492,62 +18713,56 @@
 
             const bannerBg = userSettings.bannerPic || defaultPlaceholderBanner;
             const profileBg = userSettings.profilePic || defaultPlaceholderProfile;
-            const nl = userSettings.language === 'nl';
 
             contentDiv.innerHTML = `
                 <div class="profile-sheet">
                     <div class="browse-hero" style="margin-bottom:1rem;">
                         <div class="browse-hero-copy">
-                            <h2>${nl ? 'Profiel bewerken' : 'Edit profile'}</h2>
-                            <p>${nl ? 'Pas banner, avatar, bio en zichtbaarheid aan. Op desktop blijft dit breed naast je families overzicht voelen.' : 'Update your banner, avatar, bio, and visibility. Desktop keeps the same wide sheet language as the rest of the app.'}</p>
-                        </div>
-                        <div class="browse-stat-row">
-                            <button type="button" onclick="renderProfile()" class="${getAppButtonClasses('secondary')}">
-                                <i data-lucide="arrow-left" class="h-4 w-4"></i>${nl ? 'Terug' : 'Back'}
-                            </button>
+                            <h2>${uiText('Edit profile', 'Profiel bewerken')}</h2>
+                            <p>${uiText('Update your banner, avatar, bio, and visibility.', 'Pas banner, avatar, bio en zichtbaarheid aan.')}</p>
                         </div>
                     </div>
 
                     <form onsubmit="saveProfile(event)" class="profile-editor-panel space-y-6">
-                        <div class="relative mb-8">
+                        <div class="profile-editor-banner-wrap">
                             <label class="custom-file-upload w-full block">
-                                <span class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">${nl ? 'Banner' : 'Profile banner'}</span>
+                                <span class="block text-xs uppercase tracking-wide font-bold text-sage mb-2">${uiText('Profile banner', 'Banner')}</span>
                                 <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-banner-preview', 'bannerPic', true)">
                                     <div id="profile-banner-preview" class="w-full h-36 md:h-44 rounded-2xl bg-cover bg-center border border-parchmentDark flex items-center justify-center group" style="background-image: ${cssUrl(bannerBg)}">
                                         <div class="bg-white/90 px-3 py-1.5 rounded-lg opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center gap-2 text-xs font-bold text-forest">
-                                            <i data-lucide="upload" class="w-4 h-4"></i> ${nl ? 'Banner wijzigen' : 'Change banner'}
+                                            <i data-lucide="upload" class="w-4 h-4"></i> ${uiText('Change banner', 'Banner wijzigen')}
                                         </div>
                                     </div>
                                 </label>
 
-                            <label class="custom-file-upload absolute -bottom-6 left-5 z-10 block">
+                            <label class="custom-file-upload profile-editor-avatar-upload block">
                                 <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-avatar-preview', 'profilePic', true)">
                                 <div id="profile-avatar-preview" class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-cover bg-center border-4 border-white shadow-md flex items-center justify-center group" style="background-image: ${cssUrl(profileBg)}">
-                                    <div class="bg-white/90 p-1.5 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity"><i data-lucide="camera" class="w-5 h-5 text-forest"></i></div>
+                                    <div class="bg-white/90 p-1.5 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center"><i data-lucide="camera" class="w-5 h-5 text-forest"></i></div>
                                 </div>
                             </label>
                         </div>
 
                         <div class="pt-4 grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div>
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2" for="profile-name">${nl ? 'Chefnaam' : 'Chef name'}</label>
+                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2" for="profile-name">${uiText('Chef name', 'Chefnaam')}</label>
                                 <input type="text" id="profile-name" value="${escapeHTML(userSettings.name || '')}" placeholder="Gordon Ramsay" class="${inputClass}">
                             </div>
                             <div>
-                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2" for="profile-country">${nl ? 'Land' : 'Country'}</label>
-                                <input type="text" id="profile-country" value="${escapeHTML(userSettings.country || '')}" list="countries-list" placeholder="${nl ? 'bijv. Nederland' : 'e.g. Italy'}" class="${inputClass}">
+                                <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2" for="profile-country">${uiText('Country', 'Land')}</label>
+                                <input type="text" id="profile-country" value="${escapeHTML(userSettings.country || '')}" list="countries-list" placeholder="${uiText('e.g. Italy', 'bijv. Nederland')}" class="${inputClass}">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2" for="profile-bio">${nl ? 'Korte bio' : 'Short bio'}</label>
-                            <textarea id="profile-bio" placeholder="${nl ? 'Vertel iets over jouw kookstijl…' : 'Tell us about your cooking style…'}" class="${textareaClass}">${escapeHTML(userSettings.bio || '')}</textarea>
+                            <label class="block text-xs uppercase tracking-wide font-bold text-sage mb-2" for="profile-bio">${uiText('Short bio', 'Korte bio')}</label>
+                            <textarea id="profile-bio" placeholder="${uiText('Tell us about your cooking style…', 'Vertel iets over jouw kookstijl…')}" class="${textareaClass}">${escapeHTML(userSettings.bio || '')}</textarea>
                         </div>
 
                         <div class="flex justify-between items-center gap-4 rounded-2xl border border-parchmentDark bg-white/70 p-4">
                             <div>
-                                <h4 class="font-bold text-forest flex items-center gap-2"><i data-lucide="globe" class="w-4 h-4"></i>${nl ? 'Publiek profiel' : 'Public profile'}</h4>
-                                <p class="text-xs text-sage mt-1 font-semibold">${nl ? 'Laat anderen je profiel bezoeken vanuit Browse.' : 'Allow other cooks to visit your profile from Browse.'}</p>
+                                <h4 class="font-bold text-forest flex items-center gap-2"><i data-lucide="globe" class="w-4 h-4"></i>${uiText('Public profile', 'Publiek profiel')}</h4>
+                                <p class="text-xs text-sage mt-1 font-semibold">${uiText('Allow other cooks to visit your profile from Browse.', 'Laat anderen je profiel bezoeken vanuit Browse.')}</p>
                             </div>
                             <label class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="profile-public" class="sr-only peer" ${userSettings.isPublic ? 'checked' : ''}>
@@ -18555,12 +18770,12 @@
                             </label>
                         </div>
 
-                        <div class="pt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="profile-editor-actions">
                             <button type="button" onclick="renderProfile()" class="${getAppButtonClasses('secondary')}">
-                                <i data-lucide="arrow-left" class="h-4 w-4"></i>${nl ? 'Annuleren' : 'Cancel'}
+                                ${uiText('Cancel', 'Annuleren')}
                             </button>
-                            <button type="submit" class="${getAppButtonClasses('primary', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="${nl ? 'Profiel opslaan' : 'Save profile'}" title="${nl ? 'Profiel opslaan' : 'Save profile'}">
-                                <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">${nl ? 'Opslaan' : 'Save profile'}</span>
+                            <button type="submit" class="${getAppButtonClasses('primary')}" aria-label="${uiText('Save', 'Opslaan')}" title="${uiText('Save', 'Opslaan')}">
+                                <i data-lucide="save" class="w-4 h-4"></i>${uiText('Save', 'Opslaan')}
                             </button>
                         </div>
                     </form>
@@ -21328,7 +21543,7 @@
             ].map(scope => {
                 const isActive = collectionScopeFilter === scope.value;
                 const nextScope = isActive ? 'all' : scope.value;
-                return `<button type="button" onclick="collectionScopeFilter='${nextScope}'; renderList()" class="${getAppButtonClasses(isActive ? 'primary' : 'secondary')}"><i data-lucide="${scope.icon}" class="h-4 w-4"></i>${scope.label} <span class="rounded-full ${isActive ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'} px-2 py-0.5 text-[10px]">${scope.count}</span></button>`;
+                return `<button type="button" onclick="collectionScopeFilter='${nextScope}'; renderList()" class="${getAppButtonClasses(isActive ? 'primary' : 'secondary', { fullWidth: true })} source-filter-btn"><i data-lucide="${scope.icon}" class="h-4 w-4"></i>${scope.label} <span class="rounded-full ${isActive ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'} px-2 py-0.5 text-[10px]">${scope.count}</span></button>`;
             }).join('');
             const selectedDietSummary = dietFilter.length === 0
                 ? uiText('Optional', 'Optioneel')
@@ -21347,7 +21562,7 @@
                     <div>
                         <p class="index-hero-kicker">${uiText('Source', 'Bron')}</p>
                         <p class="mt-1 text-sm font-semibold text-sage">${uiText('Toggle between recipes you wrote and recipes you saved from Browse.', 'Wissel tussen recepten die je schreef en recepten die je uit Bladeren bewaarde.')}</p>
-                        <div class="mt-4 flex flex-wrap gap-2">
+                        <div class="mt-4 grid grid-cols-2 gap-2 source-filter-row">
                             ${sourceFilterButtonsMarkup}
                         </div>
                     </div>
@@ -23782,12 +23997,18 @@
                                         <span id="scale-display">${formatScaleLabel(recipe)}</span>
                                         <button type="button" onclick="updateScale(0.5, ${recipe.id})" aria-label="${uiText('Increase scale', 'Schaal verhogen')}">+</button>
                                     </div>
-                                    <button onclick="toggleMeasurementSystem(${recipe.id})" title="${uiText('Toggle Metric / Imperial', 'Wissel Metriek / Imperiaal')}" class="${getAppButtonClasses((userSettings.measurementSystem || 'Metric') === 'Imperial' ? 'primary' : 'secondary', { fullWidth: true, size: 'md' })}">
-                                        <i data-lucide="ruler" class="h-4 w-4"></i>
-                                        ${(userSettings.measurementSystem || 'Metric') === 'Imperial'
-                                            ? uiText('Imperial — switch to Metric', 'Imperiaal — wissel naar metriek')
-                                            : uiText('Metric — switch to Imperial', 'Metriek — wissel naar imperiaal')}
-                                    </button>
+                                    ${(() => {
+                                        const isImperial = (userSettings.measurementSystem || 'Metric') === 'Imperial';
+                                        const switchLabel = uiText('Measurement system', 'Meetsysteem');
+                                        const metricLabel = uiText('Metric', 'Metriek');
+                                        const imperialLabel = uiText('Imperial', 'Imperiaal');
+                                        return `
+                                    <button type="button" role="switch" aria-checked="${isImperial ? 'true' : 'false'}" onclick="toggleMeasurementSystem(${recipe.id})" title="${switchLabel}" aria-label="${switchLabel}: ${isImperial ? imperialLabel : metricLabel}" class="measurement-system-switch">
+                                        <span class="measurement-system-label ${isImperial ? '' : 'is-active'}">${metricLabel}</span>
+                                        <span class="measurement-system-track" aria-hidden="true"><span class="measurement-system-thumb"></span></span>
+                                        <span class="measurement-system-label ${isImperial ? 'is-active' : ''}">${imperialLabel}</span>
+                                    </button>`;
+                                    })()}
                                 </div>
                                 <ul id="ingredients-list" class="text-sm space-y-2">
                                     ${generateIngredientsHTML(recipe)}
