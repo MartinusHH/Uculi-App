@@ -749,6 +749,211 @@
             width: 100%;
         }
 
+        .family-code-intro {
+            margin: 0 0 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.45;
+        }
+
+        .family-code-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.55rem;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .family-code-row {
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: center;
+            }
+        }
+
+        .family-code-input {
+            width: 100%;
+            min-height: var(--touch-min);
+            border: 1px solid rgba(144, 152, 112, 0.3);
+            border-radius: 0.75rem;
+            background: #fff;
+            padding: 0 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .beheer-sheet .beheer-create-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 0.75rem;
+        }
+
+        @media (min-width: 900px) {
+            .beheer-sheet .beheer-create-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                align-items: start;
+            }
+        }
+
+        .beheer-field-hint {
+            display: block;
+            margin-top: 0.35rem;
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 600;
+            line-height: 1.35;
+        }
+
+        .beheer-field-hint.is-error {
+            color: #9a3412;
+        }
+
+        .beheer-code-list {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .beheer-code-card {
+            border: 1px solid rgba(28, 20, 16, 0.08);
+            border-radius: 1rem;
+            background: rgba(255, 253, 249, 0.92);
+            padding: 0.9rem 1rem;
+        }
+
+        .beheer-code-head {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.65rem 1rem;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .beheer-code-label {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .beheer-code-value {
+            margin: 0.2rem 0 0;
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            overflow-wrap: anywhere;
+        }
+
+        .beheer-code-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+        }
+
+        .beheer-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 1.6rem;
+            padding: 0 0.55rem;
+            border-radius: 999px;
+            background: rgba(146, 157, 117, 0.16);
+            color: var(--text-primary);
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+
+        .beheer-pill.is-off {
+            background: rgba(154, 52, 18, 0.12);
+        }
+
+        .beheer-code-actions {
+            margin-top: 0.7rem;
+        }
+
+        .beheer-subtitle {
+            margin: 0.85rem 0 0.45rem;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .beheer-redeemer-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.65rem;
+            min-height: var(--touch-min);
+            padding: 0.25rem 0;
+            border-top: 1px solid rgba(28, 20, 16, 0.06);
+        }
+
+        .beheer-redeemer-meta {
+            min-width: 0;
+            display: grid;
+            gap: 0.1rem;
+        }
+
+        .beheer-redeemer-name {
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 700;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .beheer-redeemer-status {
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .beheer-redeemer-row.is-revoked .beheer-redeemer-name {
+            opacity: 0.55;
+        }
+
+        .beheer-revoke-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--touch-min);
+            height: var(--touch-min);
+            border: 1px solid rgba(28, 20, 16, 0.1);
+            border-radius: 0.75rem;
+            background: #fff;
+            color: #9a3412;
+            cursor: pointer;
+        }
+
+        .beheer-revoke-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .beheer-empty {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
         /* Toegang beheren: equal-height add row + ellipsis list rows */
         .access-add-row {
             display: grid;
@@ -8588,11 +8793,466 @@
             return currentUserAccessGrant === true;
         }
 
+        // ===== Uculi familiecode: plakken in app.html, direct na hasCachedAccessGrant() (rond regel 8590) =====
+        // Gebruikt de bestaande compat-SDK (firebase.firestore()) en isAccessSuperuser().
+        // Geen echte code in de repo. Betaalschakelaar PREMIUM_ENABLED blijft false.
+
+        let currentUserCodeGrant = false;
+        let codeAccessListCache = [];
+
+        function normalizeAccessCode(input = '') {
+            const code = String(input).replace(/\s+/g, '').toUpperCase();
+            return /^[A-Z0-9_-]{1,32}$/.test(code) ? code : null;
+        }
+
+        function hasCachedCodeGrant() {
+            return currentUserCodeGrant === true;
+        }
+
+        // Eigen codeAccess/{uid} lezen. Telt alleen als revoked niet true is. Geen einddatum.
+        async function refreshCurrentUserCodeGrant() {
+            currentUserCodeGrant = false;
+            if (!firebaseInitialized || !isAuthenticated || !currentUser?.uid) return false;
+            if (isDeveloperBypassSession()) return false;
+            try {
+                const snap = await firebase.firestore().collection('codeAccess').doc(currentUser.uid).get();
+                currentUserCodeGrant = snap.exists === true && snap.data()?.revoked !== true;
+            } catch (error) {
+                console.error('Code grant load failed:', error);
+                currentUserCodeGrant = false;
+            }
+            return currentUserCodeGrant;
+        }
+
+        // Code inwisselen: één batch, precies de velden code, type, createdAt + used +1.
+        // Eén melding voor elke fout, zodat niemand ziet welke codes bestaan.
+        async function redeemAccessCode(rawInput) {
+            const code = normalizeAccessCode(rawInput);
+            if (!code || !firebaseInitialized || !isAuthenticated || !currentUser?.uid) return 'refused';
+            const db = firebase.firestore();
+            const batch = db.batch();
+            batch.set(db.collection('codeAccess').doc(currentUser.uid), {
+                code,
+                type: 'familyPremium',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            batch.update(db.collection('accessCodes').doc(code), {
+                used: firebase.firestore.FieldValue.increment(1)
+            });
+            try {
+                await batch.commit();
+                currentUserCodeGrant = true;
+                refreshCurrentViewAfterBillingChange();
+                return 'ok';
+            } catch (error) {
+                return 'refused'; // UI-tekst (Eurie): "Deze code werkt niet (meer)."
+            }
+        }
+
+        // /beheer (alleen superuser): intrekken = revoked + used -1 + lastRevokedUid in één batch.
+        // Bestaat de code niet meer, dan alleen het intrekken.
+        async function revokeCodeAccess(uid) {
+            if (!isAccessSuperuser()) return false;
+            const db = firebase.firestore();
+            const grantRef = db.collection('codeAccess').doc(uid);
+            const grantSnap = await grantRef.get();
+            if (!grantSnap.exists || grantSnap.data().revoked === true) return false;
+            const codeRef = db.collection('accessCodes').doc(grantSnap.data().code);
+            const codeSnap = await codeRef.get();
+            const batch = db.batch();
+            batch.update(grantRef, {
+                revoked: true,
+                revokedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            if (codeSnap.exists) {
+                batch.update(codeRef, {
+                    used: firebase.firestore.FieldValue.increment(-1),
+                    lastRevokedUid: uid
+                });
+            }
+            await batch.commit();
+            return true;
+        }
+
+        // /beheer (alleen superuser): code aanmaken. used start op 0, maxUses 1-15.
+        async function createAccessCode(rawCode, { maxUses = 15, days = 60 } = {}) {
+            if (!isAccessSuperuser()) return false;
+            const code = normalizeAccessCode(rawCode);
+            if (!code) return false;
+            await firebase.firestore().collection('accessCodes').doc(code).set({
+                type: 'familyPremium',
+                expiresAt: firebase.firestore.Timestamp.fromMillis(Date.now() + days * 24 * 60 * 60 * 1000),
+                active: true,
+                used: 0,
+                maxUses
+            });
+            return true;
+        }
+
+        // /beheer (alleen superuser): lijsten voor het paneel ("x van 15 gebruikt").
+        async function loadAccessCodesForSuperuser() {
+            if (!isAccessSuperuser()) return [];
+            const snap = await firebase.firestore().collection('accessCodes').get();
+            return snap.docs.map(d => ({ code: d.id, ...d.data() }));
+        }
+
+        async function loadCodeAccessListForSuperuser() {
+            codeAccessListCache = [];
+            if (!isAccessSuperuser()) return [];
+            const snap = await firebase.firestore().collection('codeAccess').get();
+            codeAccessListCache = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+            return codeAccessListCache;
+        }
+        // ===== einde familiecode-snippet =====
+
+        const DEFAULT_CODE_MAX_USES = 15;
+
+        function familyCodeUiCopy() {
+            const nl = getActiveUiLanguage() === 'nl';
+            return nl ? {
+                intro: 'Er komt een betaalde versie met extra mogelijkheden. Heb je een code gekregen? Vul hem hier in.',
+                button: 'Vraag de betaalde versie aan',
+                success: 'Gelukt! Je hebt nu de volledige versie.',
+                error: 'Deze code werkt niet (meer).',
+                label: 'Toegangscode',
+                placeholder: 'Code'
+            } : {
+                intro: 'A paid version with extra features is coming. Have a code? Enter it here.',
+                button: 'Request the paid version',
+                success: 'Success! You now have the full version.',
+                error: 'This code no longer works.',
+                label: 'Access code',
+                placeholder: 'Code'
+            };
+        }
+
+        function wantsBeheerView() {
+            try {
+                const params = new URLSearchParams(window.location.search || '');
+                if (String(params.get('view') || '').toLowerCase() === 'beheer') return true;
+                const path = String(window.location.pathname || '').replace(/\/+$/, '') || '/';
+                return path === '/beheer' || path.endsWith('/beheer');
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function getBeheerHref() {
+            const host = String(window.location.hostname || '').toLowerCase();
+            if (window.location.protocol === 'file:' || host === 'localhost' || host === '127.0.0.1') {
+                return 'app.html?view=beheer';
+            }
+            return '/beheer';
+        }
+
+        function openBeheerPanel() {
+            if (!isAccessSuperuser()) {
+                showToast(uiText('Superuser access required.', 'Alleen de superuser mag dit.'), 'alert-circle');
+                return;
+            }
+            try {
+                if (!wantsBeheerView()) history.pushState({ uculiView: 'beheer' }, '', getBeheerHref());
+            } catch (_) { /* ignore */ }
+            renderBeheerPanel();
+        }
+
+        function validateCodeMaxUses(raw) {
+            const n = Number.parseInt(String(raw ?? ''), 10);
+            if (!Number.isFinite(n) || String(raw).trim() === '') {
+                return { ok: false, value: DEFAULT_CODE_MAX_USES, message: uiText('Enter a number from 1 to 15.', 'Vul een getal van 1 tot 15 in.') };
+            }
+            if (n < 1 || n > DEFAULT_CODE_MAX_USES) {
+                return { ok: false, value: Math.min(DEFAULT_CODE_MAX_USES, Math.max(1, n)), message: uiText('Maximum must be between 1 and 15.', 'Maximum moet tussen 1 en 15 liggen.') };
+            }
+            return { ok: true, value: n, message: '' };
+        }
+
+        function syncBeheerMaxUsesHint() {
+            const input = document.getElementById('beheer-code-max');
+            const hint = document.getElementById('beheer-code-max-hint');
+            if (!input) return validateCodeMaxUses(DEFAULT_CODE_MAX_USES);
+            const result = validateCodeMaxUses(input.value);
+            input.setAttribute('aria-invalid', result.ok ? 'false' : 'true');
+            if (hint) {
+                hint.textContent = result.message || uiText(
+                    `Default ${DEFAULT_CODE_MAX_USES}. Rules reject anything above ${DEFAULT_CODE_MAX_USES}.`,
+                    `Standaard ${DEFAULT_CODE_MAX_USES}. Regels weigeren alles boven ${DEFAULT_CODE_MAX_USES}.`
+                );
+                hint.classList.toggle('is-error', !result.ok);
+            }
+            return result;
+        }
+
+        async function submitFamilyCodeRedeem() {
+            const copy = familyCodeUiCopy();
+            const input = document.getElementById('settings-family-code');
+            const result = await redeemAccessCode(input?.value || '');
+            if (result === 'ok') {
+                showToast(copy.success, 'check-circle');
+                if (typeof renderSettings === 'function') renderSettings();
+                return true;
+            }
+            showToast(copy.error, 'alert-circle');
+            return false;
+        }
+
+        async function setAccessCodeActive(codeId, active) {
+            if (!isAccessSuperuser() || !firebaseInitialized) return false;
+            const code = normalizeAccessCode(codeId);
+            if (!code) return false;
+            try {
+                await firebase.firestore().collection('accessCodes').doc(code).update({
+                    active: active === true
+                });
+                await renderBeheerPanel();
+                return true;
+            } catch (error) {
+                console.error('Toggle access code failed:', error);
+                showToast(uiText('Could not update code.', 'Code bijwerken mislukt.'), 'alert-circle');
+                return false;
+            }
+        }
+
+        async function createAccessCodeFromBeheer() {
+            if (!isAccessSuperuser()) return false;
+            const maxCheck = syncBeheerMaxUsesHint();
+            if (!maxCheck.ok) {
+                showToast(maxCheck.message, 'alert-circle');
+                return false;
+            }
+            const rawCode = document.getElementById('beheer-code-value')?.value || '';
+            const expiresRaw = String(document.getElementById('beheer-code-expires')?.value || '').trim();
+            const expiresAt = expiresRaw ? new Date(`${expiresRaw}T23:59:59`) : null;
+            if (!expiresAt || Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() <= Date.now()) {
+                showToast(uiText('Pick a future end date.', 'Kies een einddatum in de toekomst.'), 'alert-circle');
+                return false;
+            }
+            const days = Math.max(1, Math.ceil((expiresAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000)));
+            try {
+                const ok = await createAccessCode(rawCode, { maxUses: maxCheck.value, days });
+                if (!ok) {
+                    showToast(uiText('Enter a valid code (A–Z, 0–9, _ or -).', 'Vul een geldige code in (A–Z, 0–9, _ of -).'), 'alert-circle');
+                    return false;
+                }
+                // Align expiresAt exactly to the chosen calendar date.
+                const code = normalizeAccessCode(rawCode);
+                await firebase.firestore().collection('accessCodes').doc(code).update({
+                    expiresAt: firebase.firestore.Timestamp.fromDate(expiresAt)
+                });
+                showToast(uiText('Code created.', 'Code aangemaakt.'), 'check');
+                const input = document.getElementById('beheer-code-value');
+                if (input) input.value = '';
+                await renderBeheerPanel();
+                return true;
+            } catch (error) {
+                console.error('Create access code failed:', error);
+                showToast(uiText('Could not create code.', 'Code aanmaken mislukt.'), 'alert-circle');
+                return false;
+            }
+        }
+
+        async function revokeCodeAccessFromBeheer(uid) {
+            const nl = getActiveUiLanguage() === 'nl';
+            try {
+                const ok = await revokeCodeAccess(uid);
+                if (!ok) {
+                    showToast(nl ? 'Intrekken mislukt.' : 'Could not revoke.', 'alert-circle');
+                    return false;
+                }
+                showToast(nl ? 'Toegang ingetrokken.' : 'Access revoked.', 'user-minus');
+                await renderBeheerPanel();
+                return true;
+            } catch (error) {
+                console.error('Revoke failed:', error);
+                showToast(nl ? 'Intrekken mislukt.' : 'Could not revoke.', 'alert-circle');
+                return false;
+            }
+        }
+
+        function formatBeheerDate(value) {
+            if (!value) return '—';
+            try {
+                const date = value?.toDate?.() || (value instanceof Date ? value : new Date(value));
+                return new Intl.DateTimeFormat(getActiveUiLanguage() === 'nl' ? 'nl-NL' : 'en-GB', {
+                    year: 'numeric', month: 'short', day: 'numeric'
+                }).format(date);
+            } catch (_) {
+                return '—';
+            }
+        }
+
+        function familyCodeRedeemFieldMarkup() {
+            if (!isAuthenticated || !currentUser || isAccessSuperuser()) return '';
+            if (hasCachedCodeGrant()) return '';
+            const copy = familyCodeUiCopy();
+            const nl = getActiveUiLanguage() === 'nl';
+            return `
+                <section class="settings-panel settings-panel--wide family-code-panel">
+                    <p class="settings-panel-kicker">${nl ? 'Code' : 'Code'}</p>
+                    <p class="family-code-intro">${escapeHTML(copy.intro)}</p>
+                    <div class="family-code-row">
+                        <label class="sr-only" for="settings-family-code">${escapeHTML(copy.label)}</label>
+                        <input id="settings-family-code" class="settings-control family-code-input" type="text" maxlength="32" autocomplete="off" spellcheck="false" placeholder="${escapeHTML(copy.placeholder)}" aria-label="${escapeHTML(copy.label)}" />
+                        <button type="button" onclick="submitFamilyCodeRedeem()" class="${getAppButtonClasses('primary', { size: 'sm' })}" aria-label="${escapeHTML(copy.button)}" title="${escapeHTML(copy.button)}">
+                            <i data-lucide="ticket" class="w-4 h-4" aria-hidden="true"></i><span>${escapeHTML(copy.button)}</span>
+                        </button>
+                    </div>
+                </section>
+            `;
+        }
+
+        async function renderBeheerPanel() {
+            if (!ensureAuthenticatedAccess()) return;
+            if (!isAccessSuperuser()) {
+                showToast(uiText('Superuser access required.', 'Alleen de superuser mag dit.'), 'shield-off');
+                renderList();
+                return;
+            }
+
+            chromeBackAction = 'settings';
+            activeDetailRecipeId = null;
+            setActiveNav('settings');
+            currentView = 'beheer';
+
+            const nl = getActiveUiLanguage() === 'nl';
+            const [codes, grants] = await Promise.all([
+                loadAccessCodesForSuperuser(),
+                loadCodeAccessListForSuperuser()
+            ]);
+            const defaultExpires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 60);
+            const defaultExpiresValue = defaultExpires.toISOString().slice(0, 10);
+
+            const cards = codes.length
+                ? codes.map((row) => {
+                    const code = String(row.code || '');
+                    const safeCode = escapeHTML(code);
+                    const maxUses = Number(row.maxUses) || DEFAULT_CODE_MAX_USES;
+                    const used = Number(row.used) || 0;
+                    const active = row.active === true;
+                    const redeemers = (grants || []).filter((g) => String(g.code || '') === code);
+                    const toggleLabel = active ? (nl ? 'Zet uit' : 'Turn off') : (nl ? 'Zet aan' : 'Turn on');
+                    const onOff = active ? (nl ? 'Aan' : 'On') : (nl ? 'Uit' : 'Off');
+                    const redeemerRows = redeemers.length
+                        ? redeemers.map((person) => {
+                            const label = escapeHTML(person.email || person.uid);
+                            const revoked = person.revoked === true;
+                            const status = revoked ? (nl ? 'Ingetrokken' : 'Revoked') : (nl ? 'Actief' : 'Active');
+                            const revokeTitle = nl ? 'Toegang intrekken' : 'Revoke access';
+                            return `
+                                <div class="beheer-redeemer-row ${revoked ? 'is-revoked' : ''}">
+                                    <div class="beheer-redeemer-meta">
+                                        <span class="beheer-redeemer-name" title="${label}">${label}</span>
+                                        <span class="beheer-redeemer-status">${status}</span>
+                                    </div>
+                                    <button type="button" class="beheer-revoke-btn" ${revoked ? 'disabled' : ''}
+                                        onclick="revokeCodeAccessFromBeheer('${escapeHTML(person.uid)}')"
+                                        aria-label="${revokeTitle}" title="${revokeTitle}">
+                                        <i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i>
+                                    </button>
+                                </div>`;
+                        }).join('')
+                        : `<p class="beheer-empty">${nl ? 'Nog niemand heeft deze code gebruikt.' : 'Nobody has redeemed this code yet.'}</p>`;
+                    return `
+                        <article class="beheer-code-card">
+                            <header class="beheer-code-head">
+                                <div>
+                                    <p class="beheer-code-label">${nl ? 'Code' : 'Code'}</p>
+                                    <h3 class="beheer-code-value">${safeCode}</h3>
+                                </div>
+                                <div class="beheer-code-stats">
+                                    <span class="beheer-pill" title="${nl ? 'Gebruikt / maximum' : 'Used / maximum'}">${used}/${maxUses}</span>
+                                    <span class="beheer-pill">${formatBeheerDate(row.expiresAt)}</span>
+                                    <span class="beheer-pill ${active ? 'is-on' : 'is-off'}">${onOff}</span>
+                                </div>
+                            </header>
+                            <div class="beheer-code-actions">
+                                <button type="button" class="${getAppButtonClasses('secondary', { size: 'sm' })}"
+                                    onclick="setAccessCodeActive('${safeCode}', ${active ? 'false' : 'true'})"
+                                    aria-label="${toggleLabel}" title="${toggleLabel}">
+                                    <i data-lucide="${active ? 'toggle-right' : 'toggle-left'}" class="w-4 h-4" aria-hidden="true"></i>
+                                    <span>${toggleLabel}</span>
+                                </button>
+                            </div>
+                            <div class="beheer-redeemer-list">
+                                <p class="beheer-subtitle">${nl ? 'Ingewisseld door' : 'Redeemed by'}</p>
+                                ${redeemerRows}
+                            </div>
+                        </article>`;
+                }).join('')
+                : `<p class="beheer-empty">${nl ? 'Nog geen codes. Maak er hierboven een aan.' : 'No codes yet. Create one above.'}</p>`;
+
+            contentDiv.innerHTML = `
+                <div class="settings-sheet push-sheet beheer-sheet" id="beheer-panel">
+                    <header class="settings-hero">
+                        <h2>${nl ? 'Beheer' : 'Admin'}</h2>
+                        <p>${nl
+                            ? 'Maak family-codes (max. 15 gebruiken), zet ze aan of uit, en trek toegang per gebruiker in.'
+                            : 'Create family codes (max 15 uses), turn them on or off, and revoke access per user.'}</p>
+                    </header>
+                    <div class="settings-grid">
+                        <section class="settings-panel settings-panel--wide">
+                            <p class="settings-panel-kicker">${nl ? 'Nieuwe code' : 'New code'}</p>
+                            <div class="beheer-create-grid">
+                                <label class="settings-field">
+                                    <span>${nl ? 'Code' : 'Code'}</span>
+                                    <input id="beheer-code-value" class="settings-control" type="text" maxlength="32" autocomplete="off" spellcheck="false" placeholder="FAMILY-XXXX" aria-label="${nl ? 'Code' : 'Code'}" />
+                                </label>
+                                <label class="settings-field">
+                                    <span>${nl ? 'Einddatum' : 'End date'}</span>
+                                    <input id="beheer-code-expires" class="settings-control" type="date" value="${defaultExpiresValue}" aria-label="${nl ? 'Einddatum' : 'End date'}" />
+                                </label>
+                                <label class="settings-field">
+                                    <span>${nl ? 'Maximum' : 'Maximum'}</span>
+                                    <input id="beheer-code-max" class="settings-control" type="number" min="1" max="${DEFAULT_CODE_MAX_USES}" step="1" value="${DEFAULT_CODE_MAX_USES}" inputmode="numeric" aria-describedby="beheer-code-max-hint" aria-label="${nl ? 'Maximum gebruiken' : 'Maximum uses'}" oninput="syncBeheerMaxUsesHint()" />
+                                    <span id="beheer-code-max-hint" class="beheer-field-hint">${nl ? `Standaard ${DEFAULT_CODE_MAX_USES}. Regels weigeren alles boven ${DEFAULT_CODE_MAX_USES}.` : `Default ${DEFAULT_CODE_MAX_USES}. Rules reject anything above ${DEFAULT_CODE_MAX_USES}.`}</span>
+                                </label>
+                            </div>
+                            <div class="settings-actions" style="margin-top:0.75rem;">
+                                <button type="button" onclick="createAccessCodeFromBeheer()" class="${getAppButtonClasses('primary', { size: 'sm' })}" aria-label="${nl ? 'Code aanmaken' : 'Create code'}" title="${nl ? 'Code aanmaken' : 'Create code'}">
+                                    <i data-lucide="plus" class="w-4 h-4" aria-hidden="true"></i>
+                                    <span>${nl ? 'Code aanmaken' : 'Create code'}</span>
+                                </button>
+                            </div>
+                        </section>
+                        <section class="settings-panel settings-panel--wide">
+                            <p class="settings-panel-kicker">${nl ? 'Codes' : 'Codes'}</p>
+                            <div class="beheer-code-list">${cards}</div>
+                        </section>
+                        <section class="settings-panel settings-panel--wide">
+                            <div class="settings-actions">
+                                <button type="button" onclick="renderSettings()" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${nl ? 'Terug naar Opties' : 'Back to Options'}" title="${nl ? 'Terug naar Opties' : 'Back to Options'}">
+                                    <i data-lucide="arrow-left" class="w-4 h-4" aria-hidden="true"></i>
+                                    <span>${nl ? 'Terug naar Opties' : 'Back to Options'}</span>
+                                </button>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+            syncBeheerMaxUsesHint();
+            markViewEnter();
+            if (typeof syncHeaderBackButton === 'function') syncHeaderBackButton();
+            if (typeof syncTopBackButton === 'function') syncTopBackButton();
+            if (typeof syncHeaderPageTitle === 'function') syncHeaderPageTitle();
+        }
+
+        window.submitFamilyCodeRedeem = submitFamilyCodeRedeem;
+        window.createAccessCodeFromBeheer = createAccessCodeFromBeheer;
+        window.setAccessCodeActive = setAccessCodeActive;
+        window.revokeCodeAccessFromBeheer = revokeCodeAccessFromBeheer;
+        window.openBeheerPanel = openBeheerPanel;
+        window.renderBeheerPanel = renderBeheerPanel;
+        window.syncBeheerMaxUsesHint = syncBeheerMaxUsesHint;
+        window.hasCachedCodeGrant = hasCachedCodeGrant;
+        window.redeemAccessCode = redeemAccessCode;
+
         // Single entitlement helper for paid/full features.
         // Superuser always has full access without an access/{email} grant doc.
         function hasFullAccess() {
             if (isAccessSuperuser()) return true;
             if (hasCachedAccessGrant()) return true;
+            if (hasCachedCodeGrant()) return true;
             if (!isPremiumEnforced()) return true;
             if (isLocalTestPremiumSession()) return true;
             return hasPremiumBillingStatus(getAccountPlan().status);
@@ -8973,6 +9633,12 @@
         }
 
         function refreshCurrentViewAfterBillingChange() {
+            if (currentView === 'beheer' || (typeof wantsBeheerView === 'function' && wantsBeheerView())) {
+                if (isAccessSuperuser()) renderBeheerPanel();
+                else renderSettings();
+                return;
+            }
+
             if (currentView === 'access') {
                 if (isAccessSuperuser()) renderAccessManagement();
                 else renderSettings();
@@ -12978,6 +13644,8 @@
             userFamilies = [];
             currentUserModerationStatus = getDefaultModerationStatus();
             currentUserAccessGrant = false;
+            currentUserCodeGrant = false;
+            codeAccessListCache = [];
             accessGrantListCache = [];
             accessGrantLoadPromise = null;
             indexViewMode = 'cards';
@@ -13705,14 +14373,23 @@
                         loadAccountPlanFromFirestore()
                             .then(() => refreshCurrentViewAfterBillingChange())
                             .catch(error => console.error('Account plan refresh error:', error));
-                        accessGrantLoadPromise = refreshCurrentUserAccessGrant()
+                        accessGrantLoadPromise = Promise.all([refreshCurrentUserAccessGrant(), refreshCurrentUserCodeGrant()])
                             .then(() => {
                                 if (isAccessSuperuser()) {
-                                    return loadAccessGrantListForSuperuser();
+                                    return Promise.all([loadAccessGrantListForSuperuser(), loadCodeAccessListForSuperuser()]);
                                 }
                                 return null;
                             })
-                            .then(() => refreshCurrentViewAfterBillingChange())
+                            .then(() => {
+                                if (typeof wantsBeheerView === 'function' && wantsBeheerView()) {
+                                    if (isAccessSuperuser() && typeof renderBeheerPanel === 'function') {
+                                        renderBeheerPanel();
+                                        return null;
+                                    }
+                                }
+                                refreshCurrentViewAfterBillingChange();
+                                return null;
+                            })
                             .catch(error => console.error('Access grant refresh error:', error));
                         loadFamiliesFromFirestore();
                         setTimeout(() => checkFamilyRemovals(), 1000);
@@ -15851,6 +16528,7 @@
             const nl = getActiveUiLanguage() === 'nl';
             if (currentView === 'settings') return nl ? 'Opties' : 'Options';
             if (currentView === 'access') return nl ? 'Toegang beheren' : 'Manage access';
+            if (currentView === 'beheer') return nl ? 'Beheer' : 'Admin';
             if (currentView === 'add') return nl ? 'Recept' : 'Recipe';
             if (currentView === 'shopping') return nl ? 'Boodschappen' : 'Shopping';
             if (currentView === 'browse') return nl ? 'Bladeren' : 'Browse';
@@ -15892,8 +16570,8 @@
             const nl = userSettings.language === 'nl';
             const addLabel = nl ? 'Recept' : 'Add Recipe';
             const canShowPrimary = currentView === 'index' && activeDetailRecipeId == null && chromeBackAction == null;
-            const showGear = !(currentView === 'settings' || currentView === 'access');
-            const showHelp = currentView === 'settings' || currentView === 'access';
+            const showGear = !(currentView === 'settings' || currentView === 'access' || currentView === 'beheer');
+            const showHelp = currentView === 'settings' || currentView === 'access' || currentView === 'beheer';
             const showNotifications = Boolean(moreNotifications && moreNotifications.dataset.available === '1');
             const showUndo = Boolean(moreUndo && moreUndo.dataset.available === '1');
             const overflowExtras = showHelp || showNotifications || showUndo;
@@ -18325,15 +19003,20 @@
                             </div>
                         </section>
 
+                        ${familyCodeRedeemFieldMarkup()}
+
                         ${isAccessSuperuser() ? `
                         <section class="settings-panel settings-panel--wide">
                             <p class="settings-panel-kicker">${settingsNl ? 'Toegang' : 'Access'}</p>
                             <p class="text-sm font-semibold text-sage mb-3">${settingsNl
-                                ? 'Beheer welke e-mailadressen volledige (betaalde) functies krijgen.'
-                                : 'Manage which emails receive full (paid) features.'}</p>
-                            <div class="settings-actions">
-                                <button type="button" onclick="renderAccessManagement()" class="${getAppButtonClasses('primary', { size: 'sm' })}">
-                                    <i data-lucide="key-round" class="w-4 h-4"></i>${settingsNl ? 'Toegang beheren' : 'Manage access'}
+                                ? 'Beheer e-mailtoegang of open family-codes op /beheer.'
+                                : 'Manage email access or open family codes on /beheer.'}</p>
+                            <div class="settings-actions button-pair">
+                                <button type="button" onclick="renderAccessManagement()" class="${getAppButtonClasses('primary', { size: 'sm' })}" aria-label="${settingsNl ? 'Toegang beheren' : 'Manage access'}" title="${settingsNl ? 'Toegang beheren' : 'Manage access'}">
+                                    <i data-lucide="key-round" class="w-4 h-4" aria-hidden="true"></i>${settingsNl ? 'Toegang beheren' : 'Manage access'}
+                                </button>
+                                <button type="button" onclick="openBeheerPanel()" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${settingsNl ? 'Beheer' : 'Admin'}" title="${settingsNl ? 'Beheer (/beheer)' : 'Admin (/beheer)'}">
+                                    <i data-lucide="shield" class="w-4 h-4" aria-hidden="true"></i>${settingsNl ? 'Beheer' : 'Admin'}
                                 </button>
                             </div>
                         </section>
