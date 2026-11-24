@@ -21668,7 +21668,7 @@
             ` : '';
             const sourceFilterButtonsMarkup = [
                 { value: 'mine', label: uiText('Mine', 'Van mij'), icon: 'notebook-pen', count: collectionScopeCounts.mine },
-                { value: 'saved', label: uiText('Saved', 'Opgeslagen'), icon: 'heart-handshake', count: collectionScopeCounts.saved }
+                { value: 'saved', label: uiText('Saved', 'Opgeslagen'), icon: 'heart', count: collectionScopeCounts.saved }
             ].map(scope => {
                 const isActive = collectionScopeFilter === scope.value;
                 const nextScope = isActive ? 'all' : scope.value;
