@@ -15,7 +15,9 @@
                     colors: {
                         forest:       '#1c1410',
                         forestLight:  '#c89050',
-                        sage:         '#929D75',
+                        // Brand olive token (accents). Muted body/label text uses sage for WCAG contrast.
+                        olive:        '#929D75',
+                        sage:         '#6b5f57',
                         gold:         '#c89050',
                         goldLight:    '#c89050',
                         parchment:    '#f6f1e8',
@@ -43,6 +45,24 @@
     </script>
     <style>
         html { scroll-behavior: smooth; }
+        body {
+            overflow-wrap: break-word;
+            word-break: normal;
+            hyphens: manual;
+        }
+        h1, h2, h3, .font-serif, .hero-headline {
+            overflow-wrap: break-word;
+            word-break: normal;
+            hyphens: none;
+        }
+        footer a, footer p, #footer-credit {
+            overflow-wrap: normal;
+            word-break: keep-all;
+            hyphens: none;
+            white-space: normal;
+        }
+        .text-balance { text-wrap: balance; }
+        .text-pretty { text-wrap: pretty; }
 
         .hero-grain {
             background-image:
@@ -251,7 +271,7 @@
 
             <!-- Pillar 3 -->
             <div class="card-hover rounded-2xl border border-parchmentDark bg-parchment p-6">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sage text-white">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-olive text-forest">
                     <i data-lucide="globe" class="h-6 w-6"></i>
                 </div>
                 <h3 class="font-serif text-lg font-bold text-forest mb-2">Social when you want it</h3>
@@ -428,20 +448,19 @@
     <div class="mx-auto max-w-5xl px-5">
 
         <div class="mb-4 text-center">
-            <p class="section-label text-sage mb-2">Plans & pricing</p>
-            <h2 class="font-serif text-3xl font-bold text-forest md:text-4xl">Simple and honest</h2>
-            <p class="mx-auto mt-3 max-w-md text-sm font-medium text-sage leading-relaxed">
+            <p id="pricing-kicker" class="section-label text-sage mb-2">Plans & pricing</p>
+            <h2 id="pricing-title" class="font-serif text-3xl font-bold text-forest md:text-4xl text-balance">Simple and honest</h2>
+            <p id="pricing-intro" class="mx-auto mt-3 max-w-md text-sm font-medium text-sage leading-relaxed text-pretty">
                 The core of Uculi is free and will stay that way. Premium unlocks extra features
-                for people who want more — once billing goes live.
+                for people who want more.
             </p>
         </div>
 
-        <!-- Honest note -->
+        <!-- VAT note (no developer flags in visitor copy) -->
         <div class="mx-auto mb-10 max-w-2xl rounded-xl border border-gold border-opacity-30 bg-gold bg-opacity-5 p-4 text-center">
-            <p class="text-xs font-semibold text-forest">
+            <p id="pricing-note" class="text-xs font-semibold text-forest text-pretty">
                 <i data-lucide="info" class="inline h-3.5 w-3.5 text-gold mr-1"></i>
-                Billing is not live yet (PREMIUM_ENABLED=false). Published prices include VAT.
-                Lifetime stays behind LIFETIME_ENABLED=false until offered.
+                Published prices include VAT.
             </p>
         </div>
 
@@ -450,7 +469,7 @@
             <!-- Free -->
             <div class="card-hover rounded-2xl border border-parchmentDark bg-[#fbf8f3] p-6 flex flex-col">
                 <p class="section-label text-sage mb-2">Free</p>
-                <p class="font-serif text-3xl font-bold text-forest">€0 <span class="text-base font-normal text-sage">/ forever</span></p>
+                <p class="font-serif text-3xl font-bold text-forest">€0 <span id="price-free-period" class="text-base font-normal text-sage">/ forever</span></p>
                 <p class="mt-2 mb-5 text-xs font-semibold text-sage">Everything you need to get started.</p>
                 <ul class="space-y-2.5 flex-1">
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Up to 3 recipes</li>
@@ -469,12 +488,12 @@
             <!-- Premium Monthly -->
             <div class="card-hover rounded-2xl border-2 border-gold bg-[#fbf8f3] p-6 flex flex-col shadow-lg relative">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span class="pill bg-gold text-white shadow">Most popular</span>
+                    <span id="price-month-badge" class="pill bg-gold text-forest shadow">Most popular</span>
                 </div>
-                <p class="section-label text-gold mb-2">Premium Monthly</p>
-                <p class="font-serif text-3xl font-bold text-forest">€4,49 <span class="text-base font-normal text-sage">/ month</span></p>
-                <p class="mt-1 text-xs font-semibold text-sage">incl. VAT</p>
-                <p class="mt-2 mb-5 text-xs font-semibold text-sage">All paid features, billed monthly.</p>
+                <p id="price-month-label" class="section-label text-gold mb-2">Premium Monthly</p>
+                <p class="font-serif text-3xl font-bold text-forest">€4,49 <span id="price-month-period" class="text-base font-normal text-sage">/ month</span></p>
+                <p id="price-month-vat" class="mt-1 text-xs font-semibold text-sage">incl. VAT</p>
+                <p id="price-month-blurb" class="mt-2 mb-5 text-xs font-semibold text-sage">All paid features, billed monthly.</p>
                 <ul class="space-y-2.5 flex-1">
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Everything in Free</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Unlimited recipes</li>
@@ -483,32 +502,31 @@
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>PDF export &amp; print</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Backup &amp; restore</li>
                 </ul>
-                <button disabled class="mt-6 flex items-center justify-center gap-2 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-white opacity-60 cursor-not-allowed">
+                <button id="price-month-cta" disabled class="mt-6 flex items-center justify-center gap-2 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-forest opacity-70 cursor-not-allowed">
                     <i data-lucide="clock" class="h-4 w-4"></i>
-                    Checkout opens at launch
+                    Coming soon
                 </button>
             </div>
 
             <!-- Premium Yearly -->
-            <div class="card-hover rounded-2xl border border-sage bg-[#fbf8f3] p-6 flex flex-col">
-                <p class="section-label text-sage mb-2">Premium Yearly</p>
-                <p class="font-serif text-3xl font-bold text-forest">€27,99 <span class="text-base font-normal text-sage">/ year</span></p>
-                <p class="mt-1 text-xs font-semibold text-sage">incl. VAT</p>
-                <p class="mt-2 mb-5 text-xs font-semibold text-sage">Same Premium access, billed yearly.</p>
+            <div class="card-hover rounded-2xl border border-olive bg-[#fbf8f3] p-6 flex flex-col">
+                <p id="price-year-label" class="section-label text-olive mb-2">Premium Yearly</p>
+                <p class="font-serif text-3xl font-bold text-forest">€27,99 <span id="price-year-period" class="text-base font-normal text-sage">/ year</span></p>
+                <p id="price-year-vat" class="mt-1 text-xs font-semibold text-sage">incl. VAT</p>
+                <p id="price-year-blurb" class="mt-2 mb-5 text-xs font-semibold text-sage">Same Premium access, billed yearly.</p>
                 <ul class="space-y-2.5 flex-1">
-                    <li class="check-row"><div class="icon-wrap bg-sage bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-sage"></i></div>Everything in Premium Monthly</li>
-                    <li class="check-row"><div class="icon-wrap bg-sage bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-sage"></i></div>Better value per month</li>
-                    <li class="check-row"><div class="icon-wrap bg-sage bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-sage"></i></div>Family sharing</li>
-                    <li class="check-row"><div class="icon-wrap bg-sage bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-sage"></i></div>PDF export &amp; backup</li>
+                    <li class="check-row"><div class="icon-wrap bg-olive bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-olive"></i></div>Everything in Premium Monthly</li>
+                    <li class="check-row"><div class="icon-wrap bg-olive bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-olive"></i></div>Better value per month</li>
+                    <li class="check-row"><div class="icon-wrap bg-olive bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-olive"></i></div>Family sharing</li>
+                    <li class="check-row"><div class="icon-wrap bg-olive bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-olive"></i></div>PDF export &amp; backup</li>
                 </ul>
-                <button disabled class="mt-6 flex items-center justify-center gap-2 rounded-xl border-2 border-sage px-4 py-2.5 text-sm font-bold text-forest opacity-60 cursor-not-allowed">
+                <button id="price-year-cta" disabled class="mt-6 flex items-center justify-center gap-2 rounded-xl border-2 border-olive px-4 py-2.5 text-sm font-bold text-forest opacity-70 cursor-not-allowed">
                     <i data-lucide="clock" class="h-4 w-4"></i>
-                    Checkout opens at launch
+                    Coming soon
                 </button>
             </div>
 
         </div>
-        <p class="mt-6 text-center text-xs font-semibold text-sage">Lifetime (€74,99 one-time, incl. VAT) stays unpublished while LIFETIME_ENABLED=false.</p>
 
         <p class="mt-8 text-center text-xs font-semibold text-sage">
             Your support keeps the app running and allows us to keep improving it.
@@ -566,8 +584,10 @@
                 <span class="opacity-30">·</span>
                 <a href="install.html" class="hover:text-forest transition-colors">Install</a>
             </div>
-            <p class="inline-flex items-center gap-1.5 text-xs font-semibold text-sage opacity-80">
-                © 2026 Uculi · <img src="assets/mholt-apple.png" alt="" class="h-4 w-4 rounded-full object-cover" />Created by Mholt
+            <p id="footer-credit" class="inline-flex flex-wrap items-center justify-center gap-1.5 text-xs font-semibold text-sage opacity-80">
+                <img src="assets/mholt-apple.png" alt="" class="h-4 w-4 rounded-full object-cover" /><span id="footer-by">Mholt · KvK 42175873</span>
+                <span class="opacity-30">·</span>
+                <a id="footer-email" href="mailto:mholt.apps@gmail.com" class="hover:text-forest transition-colors">mholt.apps@gmail.com</a>
             </p>
         </div>
     </div>
@@ -575,6 +595,54 @@
 
 <script>
     lucide.createIcons();
+
+    (function localizeMarketingPage() {
+        const params = new URLSearchParams(window.location.search || '');
+        const langParam = String(params.get('lang') || '').toLowerCase();
+        const preferNl = langParam === 'nl'
+            || (!langParam && String(navigator.language || '').toLowerCase().startsWith('nl'));
+        if (!preferNl) return;
+
+        document.documentElement.lang = 'nl';
+        document.title = 'Uculi — Jouw receptenboek, voor altijd';
+
+        const set = (id, text) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        };
+
+        set('pricing-kicker', 'Abonnementen & prijzen');
+        set('pricing-title', 'Eenvoudig en eerlijk');
+        set('pricing-intro', 'De kern van Uculi is gratis en blijft dat. Premium opent extra functies voor wie meer wil.');
+        const note = document.getElementById('pricing-note');
+        if (note) {
+            const icon = note.querySelector('[data-lucide], svg');
+            note.replaceChildren();
+            if (icon) note.appendChild(icon);
+            note.append(' Getoonde prijzen zijn inclusief btw.');
+        }
+        set('price-free-period', '/ voor altijd');
+        set('price-month-badge', 'Meest gekozen');
+        set('price-month-label', 'Premium maandelijks');
+        set('price-month-period', '/ maand');
+        set('price-month-vat', 'incl. btw');
+        set('price-month-blurb', 'Alle betaalde functies, per maand.');
+        set('price-year-label', 'Premium jaarlijks');
+        set('price-year-period', '/ jaar');
+        set('price-year-vat', 'incl. btw');
+        set('price-year-blurb', 'Zelfde Premium-toegang, per jaar.');
+        const setCta = (id, text) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const icon = el.querySelector('[data-lucide], svg');
+            el.replaceChildren();
+            if (icon) el.appendChild(icon);
+            el.append(' ' + text);
+        };
+        setCta('price-month-cta', 'Binnenkort');
+        setCta('price-year-cta', 'Binnenkort');
+        set('footer-by', 'Mholt · KvK 42175873');
+    })();
 </script>
 </body>
 </html>

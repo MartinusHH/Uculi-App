@@ -6977,7 +6977,7 @@
                     </div>
                     <div class="app-header-copy">
                         <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
-                        <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
+                        <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Mholt · KvK 42175873</p>
                     </div>
                 </div>
                 <h1 id="header-page-title" class="app-header-page-title">Uculi</h1>
@@ -7830,9 +7830,9 @@
         const publicationRetractionDelayMs = 24 * 60 * 60 * 1000;
         const recipeDeleteUndoWindowMs = 5 * 60 * 1000;
         const freeLocalRecipeLimit = 3;
-        // Soft launch: Stripe is not live — keep all premium locks off until this is true.
+        // Soft launch: Stripe checkout is not live — keep all premium locks off until this is true.
         window.PREMIUM_ENABLED = false;
-        // Lifetime plan is priced but not offered until this flag is true.
+        // One-time plan stays unpublished until this is true.
         window.LIFETIME_ENABLED = false;
         const supportedAppLanguages = ['en', 'nl', 'fr', 'de', 'es'];
         const globalUiLanguageStorageKey = 'uculiPreferredUiLanguage';
@@ -15737,7 +15737,7 @@
                 const apple = createdBy.querySelector('img.brand-apple');
                 createdBy.replaceChildren();
                 if (apple) createdBy.appendChild(apple);
-                createdBy.append(nl ? 'Gemaakt door Mholt' : 'Created by Mholt');
+                createdBy.append('Mholt · KvK 42175873');
             }
             if (typeof lucide?.createIcons === 'function') lucide.createIcons();
         }
@@ -16195,7 +16195,7 @@
                                 </div>
                                 <div class="landing-brand-copy">
                                     <span class="font-fantasy text-2xl font-bold tracking-wide text-forest leading-none">Uculi</span>
-                                    <p class="landing-brand-credit"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
+                                    <p class="landing-brand-credit"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Mholt · KvK 42175873</p>
                                 </div>
                             </div>
                             <button type="button" onclick="signInFromLanding()" class="landing-header-login hidden md:flex h-10 items-center gap-2 rounded-xl border border-parchmentDark bg-white px-5 text-sm font-bold text-forest shadow-sm transition-all hover:border-gold hover:text-gold">
@@ -17859,7 +17859,7 @@
             const billingReady = isBillingCheckoutReady();
             const restoreReady = isBillingRestoreReady();
             const settingsNl = userSettings.language === 'nl';
-            // Soft launch (PREMIUM_ENABLED=false): never lock backup/cloud UI.
+            // Soft launch: never lock backup/cloud UI while premium is not enforced.
             const backupDownloadLocked = isPremiumEnforced() && !premiumActive;
             const backupRestoreLocked = isPremiumEnforced() && !premiumActive;
             const cloudSyncLocked = isPremiumEnforced() && !premiumActive;
@@ -18324,7 +18324,8 @@
                 <div class="guide-modal space-y-4 text-inkDark p-2 max-h-[70vh] overflow-y-auto">
                     <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
                         <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${nl ? 'Merk' : 'Brand'}</p>
-                        <h3 class="mt-2 flex items-center gap-2 font-serif text-lg font-bold text-forest"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</h3>
+                        <h3 class="mt-2 flex items-center gap-2 font-serif text-lg font-bold text-forest"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Mholt · KvK 42175873</h3>
+                        <p class="mt-1 text-sm font-semibold text-sage"><a href="mailto:mholt.apps@gmail.com" class="hover:text-forest">mholt.apps@gmail.com</a></p>
                         <p class="mt-2 text-sm font-semibold text-sage">${nl
                             ? 'Uculi is een rustig receptenschrift: bewaren, koken en later delen zonder rommel.'
                             : 'Uculi is a calm recipe notebook: keep, cook, and later share without clutter.'}</p>
@@ -18623,7 +18624,7 @@
                     accept: 'Akkoord en verder',
                     acceptIntro: 'Lees het privacybeleid en de gebruiksvoorwaarden en vink beide vakjes aan voordat je verdergaat.',
                     updated: 'Laatst bijgewerkt: 21 november 2026',
-                    createdBy: 'Created by Mholt',
+                    createdBy: 'Mholt · KvK 42175873',
                     controller: 'Mholt · KvK 42175873 · mholt.apps@gmail.com'
                 }
                 : {
@@ -18634,7 +18635,7 @@
                     accept: 'Agree and continue',
                     acceptIntro: 'Read the privacy policy and terms of use and tick both boxes before you continue.',
                     updated: 'Last updated: 21 November 2026',
-                    createdBy: 'Created by Mholt',
+                    createdBy: 'Mholt · KvK 42175873',
                     controller: 'Mholt · KvK 42175873 · mholt.apps@gmail.com'
                 };
         }
@@ -21730,7 +21731,7 @@
         });
 
         function showPlansModal() {
-            // Plans & pricing stay viewable during soft launch (PREMIUM_ENABLED=false).
+            // Plans & pricing stay viewable during soft launch.
             trackLaunchEvent('plansModalOpened');
             const planCardBase = 'rounded-2xl border p-5 flex flex-col gap-3';
             const checkIcon = `<i data-lucide="check" class="w-4 h-4 text-gold flex-shrink-0"></i>`;
@@ -21739,13 +21740,15 @@
                 return `<li class="flex items-center gap-2 text-sm font-semibold text-forest">${icon}<span>${label}</span></li>`;
             }
             const nl = getActiveUiLanguage() === 'nl';
-            const vatNote = nl ? 'inclusief btw' : 'incl. VAT';
+            const vatNote = nl ? 'incl. btw' : 'incl. VAT';
+            const comingSoon = nl ? 'Binnenkort' : 'Coming soon';
+            const premiumReady = isPremiumEnforced();
             const lifetimeEnabled = window.LIFETIME_ENABLED === true;
             const lifetimeCard = lifetimeEnabled ? `
                     <div class="${planCardBase} border-forest bg-[#fbf8f3] shadow-md">
                         <div class="flex items-start justify-between gap-3">
                             <div>
-                                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-forest">${nl ? 'Premium Lifetime' : 'Premium Lifetime'}</p>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-forest">Premium Lifetime</p>
                                 <p class="font-fantasy text-2xl font-bold text-forest mt-1">€74,99 <span class="text-base font-normal text-sage">${nl ? '/ eenmalig' : '/ once'}</span></p>
                                 <p class="mt-1 text-xs font-semibold text-sage">${vatNote}</p>
                             </div>
@@ -21757,6 +21760,9 @@
                             ${featureRow(checkIcon, nl ? 'Alle toekomstige updates' : 'All future updates included')}
                         </ul>
                     </div>` : '';
+            const premiumCta = premiumReady
+                ? ''
+                : `<p class="text-xs font-bold text-forest mt-1 inline-flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5"></i>${comingSoon}</p>`;
             createModal(nl ? 'Abonnementen & prijzen' : 'Plans & Pricing', `
                 <div class="space-y-4 p-2">
                     <div class="${planCardBase} border-parchmentDark bg-[#fbf8f3]">
@@ -21793,7 +21799,7 @@
                             ${featureRow(checkIcon, nl ? 'Publiceren & families' : 'Publish & families')}
                             ${featureRow(checkIcon, nl ? 'Backup & herstel' : 'Backup & restore')}
                         </ul>
-                        <p class="text-xs text-sage font-semibold">${nl ? 'Betalen gaat open zodra checkout live is. Alles betaald blijft achter Premium.' : 'Checkout opens when billing goes live. All paid features stay behind Premium.'}</p>
+                        ${premiumCta}
                     </div>
                     <div class="${planCardBase} border-[#929D75] bg-[#fbf8f3] shadow-md">
                         <div class="flex items-start justify-between gap-3">
@@ -21808,10 +21814,10 @@
                             ${featureRow(checkIcon, nl ? 'Alles in Premium maandelijks' : 'Everything in Premium Monthly')}
                             ${featureRow(checkIcon, nl ? 'Voordeliger per maand' : 'Better value per month')}
                         </ul>
-                        <p class="text-xs text-sage font-semibold">${vatNote}</p>
+                        ${premiumCta}
                     </div>
                     ${lifetimeCard}
-                    <p class="text-center text-xs text-sage font-semibold pt-1">${nl ? 'Tijdens soft launch staan functies open via PREMIUM_ENABLED=false. Prijzen zijn inclusief btw.' : 'During soft launch features stay open via PREMIUM_ENABLED=false. Prices include VAT.'}</p>
+                    <p class="text-center text-xs text-sage font-semibold pt-1">${nl ? 'Prijzen zijn inclusief btw.' : 'Prices include VAT.'}</p>
                 </div>
             `);
         }

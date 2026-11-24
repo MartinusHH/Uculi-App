@@ -93,12 +93,15 @@
                 <li>Confirm — Uculi appears on your home screen.</li>
             </ol>
             <a class="cta" href="app.html" id="open-app">Open Uculi</a>
-            <p class="footer"><img src="assets/mholt-apple.png" alt="" />Created by Mholt · KvK 42175873</p>
+            <p class="footer"><img src="assets/mholt-apple.png" alt="" />Mholt · KvK 42175873 · <a href="mailto:mholt.apps@gmail.com">mholt.apps@gmail.com</a></p>
         </article>
     </main>
     <script>
         (function () {
-            const preferNl = String(navigator.language || '').toLowerCase().startsWith('nl');
+            const params = new URLSearchParams(window.location.search || '');
+            const langParam = String(params.get('lang') || '').toLowerCase();
+            const preferNl = langParam === 'nl'
+                || (!langParam && String(navigator.language || '').toLowerCase().startsWith('nl'));
             if (!preferNl) return;
             document.documentElement.lang = 'nl';
             document.title = 'Uculi installeren';
