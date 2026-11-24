@@ -3,8 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tools/verify-core-flows.mjs",
+    "test": "node tools/verify-core-flows.mjs && node tools/verify-recipe-draft.mjs",
     "test:core": "node tools/verify-core-flows.mjs",
+    "test:recipe-draft": "node tools/verify-recipe-draft.mjs",
     "test:rules": "npx -y firebase-tools@latest emulators:exec --only firestore --project demo-uculi-rules \"node --test tests/firestore-rules-familiecode.test.mjs\"",
     "test:plan": "node tools/verify-plan-check.mjs",
     "test:shopping-share": "node tools/verify-shopping-share.mjs",
