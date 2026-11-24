@@ -24823,7 +24823,7 @@
 
                         <section class="editor-panel editor-actions-panel">
                             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                                <button type="button" onclick="cancelRecipeEditor()" class="${getAppButtonClasses('secondary', { size: 'lg' })}" translate="no">Cancel</button>
+                                <button type="button" onclick="cancelRecipeEditor()" class="${getAppButtonClasses('secondary', { size: 'lg' })}" translate="no" aria-label="${uiText('Cancel', 'Annuleren')}" title="${uiText('Cancel', 'Annuleren')}">${uiText('Cancel', 'Annuleren')}</button>
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
                                     <button type="submit" onclick="recipeSubmitAction = 'save'" class="${getAppButtonClasses('primary', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="${escapeHTML(submitLabel)}" title="${escapeHTML(submitLabel)}" translate="no"><i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">${submitLabel}</span></button>
                                     <button type="submit" onclick="recipeSubmitAction = 'publish'" class="${getAppButtonClasses('primary', { size: 'lg' })} min-w-[180px]" translate="no"><i data-lucide="cloud-upload" class="w-4 h-4"></i> ${publishSubmitLabel}</button>
