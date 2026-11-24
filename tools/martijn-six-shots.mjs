@@ -25,7 +25,7 @@ async function dismissOverlays(page) {
         node.remove();
       }
     });
-    document.querySelectorAll('[class*="toast"], .app-toast, #app-toast').forEach((n) => n.remove());
+    document.querySelectorAll('.app-toast, #app-toast, [data-toast]').forEach((n) => n.remove());
     if (typeof userSettings !== 'undefined') {
       userSettings.termsAccepted = true;
       userSettings.language = 'nl';
@@ -125,22 +125,24 @@ async function shot(page, width, name) {
   console.log('wrote', file);
 }
 
-async function probe(page, label) {
-  const info = await page.evaluate(() => ({
-    view: typeof currentView !== 'undefined' ? currentView : null,
-    indexViewMode: typeof indexViewMode !== 'undefined' ? indexViewMode : null,
-    notebookCoverOpen: typeof notebookCoverOpen !== 'undefined' ? notebookCoverOpen : null,
-    showListFilters: typeof showListFilters !== 'undefined' ? showListFilters : null,
-    hasSwitch: Boolean(document.querySelector('.measurement-system-switch, button[onclick*="toggleMeasurementSystem"]')),
-    hasBron: Boolean(document.querySelector('.index-filters-panel, .index-filter-controls')),
-    hasShop: Boolean(document.querySelector('.shop-line, #app-content h2')),
-    hasProfileActions: Boolean(document.querySelector('.profile-editor-actions')),
-    hasCover: Boolean(document.querySelector('.notebook-landing-invite, .notebook-landing-action-row')),
-    h2: document.querySelector('#app-content h2, .browse-hero-copy h2, .notebook-landing-invite h2')?.textContent?.trim()?.slice(0, 60) || '',
-    bodySnippet: (document.getElementById('app-content')?.innerText || '').slice(0, 120).replace(/\s+/g, ' ')
-  }));
-  console.log(label, JSON.stringify(info));
-  return info;
+async function measureRow(page, selector) {
+  return page.evaluate((sel) => {
+    const row = document.querySelector(sel);
+    if (!row) return null;
+    const buttons = [...row.querySelectorAll('button')];
+    const rowBox = row.getBoundingClientRect();
+    return {
+      rowWidth: Math.round(rowBox.width),
+      buttons: buttons.map((b) => {
+        const box = b.getBoundingClientRect();
+        return {
+          text: (b.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40),
+          width: Math.round(box.width),
+          pct: rowBox.width ? Math.round((box.width / rowBox.width) * 100) : 0
+        };
+      })
+    };
+  }, selector);
 }
 
 async function runWidth(browser, width) {
@@ -151,40 +153,35 @@ async function runWidth(browser, width) {
   await seed(page);
   await dismissOverlays(page);
 
-  // 1) Cover landing (notebook book mode, cover closed)
+  // 1) Cover landing
   await page.evaluate(() => {
-    notebookCoverOpen = false;
-    showListFilters = false;
     indexViewMode = 'book';
     userSettings.indexViewMode = 'book';
-    if (typeof setIndexViewMode === 'function') setIndexViewMode('book');
-    else if (typeof renderList === 'function') renderList();
-  });
-  await sleep(900);
-  await dismissOverlays(page);
-  await page.evaluate(() => {
     notebookCoverOpen = false;
-    if (typeof renderList === 'function') renderList();
-  });
-  await sleep(700);
-  await dismissOverlays(page);
-  await probe(page, `cover@${width}`);
-  await shot(page, width, 'cover');
-
-  // 2) Measurement switch on classic detail
-  await page.evaluate(() => {
-    indexViewMode = 'cards';
-    userSettings.indexViewMode = 'cards';
-    if (typeof renderDetail === 'function') renderDetail(recipes[0].id);
+    showListFilters = false;
+    renderList();
   });
   await sleep(800);
   await dismissOverlays(page);
+  const coverRow = await measureRow(page, '.notebook-landing-action-row');
+  console.log(`cover-row@${width}`, JSON.stringify(coverRow));
+  await shot(page, width, 'cover');
+
+  // 2) Measurement switch
   await page.evaluate(() => {
-    const el = document.querySelector('.measurement-system-switch, button[onclick*="toggleMeasurementSystem"], .detail-scale-control');
-    el?.scrollIntoView({ block: 'center' });
+    indexViewMode = 'cards';
+    userSettings.indexViewMode = 'cards';
+    renderDetail(recipes[0].id);
   });
-  await sleep(400);
-  await probe(page, `metric@${width}`);
+  await sleep(700);
+  await dismissOverlays(page);
+  await page.evaluate(() => {
+    document.querySelector('.measurement-system-switch, button[onclick*="toggleMeasurementSystem"], .detail-scale-control')
+      ?.scrollIntoView({ block: 'center' });
+  });
+  await sleep(300);
+  const hasSwitch = await page.evaluate(() => Boolean(document.querySelector('.measurement-system-switch')));
+  console.log(`metric@${width} hasSwitch=${hasSwitch}`);
   await shot(page, width, 'metric');
 
   // 3) Bron filters
@@ -192,46 +189,64 @@ async function runWidth(browser, width) {
     indexViewMode = 'cards';
     userSettings.indexViewMode = 'cards';
     showListFilters = true;
-    if (typeof renderList === 'function') renderList();
+    renderList();
   });
   await sleep(700);
   await dismissOverlays(page);
   await page.evaluate(() => {
-    const el = document.querySelector('.index-filters-panel, .index-filter-controls');
-    el?.scrollIntoView({ block: 'start' });
+    document.querySelector('.source-filter-row, .index-filters-panel')?.scrollIntoView({ block: 'start' });
   });
-  await sleep(350);
-  await probe(page, `bron@${width}`);
+  await sleep(300);
+  const bronRow = await measureRow(page, '.source-filter-row');
+  console.log(`bron-row@${width}`, JSON.stringify(bronRow));
   await shot(page, width, 'bron');
 
-  // 4) Shopping list
-  await page.evaluate(() => {
-    if (typeof renderShoppingList === 'function') renderShoppingList();
-  });
-  await sleep(800);
+  // 4) Shopping
+  await page.evaluate(() => renderShoppingList());
+  await sleep(700);
   await dismissOverlays(page);
-  await probe(page, `shop@${width}`);
+  const shopInfo = await page.evaluate(() => {
+    const check = document.querySelector('.shop-line-check, button[onclick*="toggleShoppingListItemChecked"]');
+    const box = check?.getBoundingClientRect();
+    const text = (document.getElementById('app-content')?.innerText || '').slice(0, 400);
+    return {
+      checkW: box ? Math.round(box.width) : null,
+      checkH: box ? Math.round(box.height) : null,
+      hasEigen: /Eigen/i.test(text),
+      hasRecept: /Recept/i.test(text),
+      hasNiet: /Niet toegewezen/i.test(text),
+      hasCustom: /\bCUSTOM\b/.test(text),
+      hasJij: /\bJij\b/.test(text),
+      hasY: /\bY\b/.test(text)
+    };
+  });
+  console.log(`shop@${width}`, JSON.stringify(shopInfo));
   await shot(page, width, 'shop');
 
-  // 5) Profile editor top
-  await page.evaluate(() => {
-    if (typeof renderProfileEditor === 'function') renderProfileEditor();
-  });
-  await sleep(700);
+  // 5) Profile top
+  await page.evaluate(() => renderProfileEditor());
+  await sleep(600);
   await dismissOverlays(page);
   await page.evaluate(() => window.scrollTo(0, 0));
   await sleep(200);
-  await probe(page, `profile-top@${width}`);
+  const profileTop = await page.evaluate(() => {
+    const text = document.getElementById('app-content')?.innerText || '';
+    return {
+      hasBuilder: /Op desktop blijft|wide sheet language|families overzicht/i.test(text),
+      hasTerugBtn: [...document.querySelectorAll('button')].some((b) => /^Terug$|^Back$/i.test((b.textContent || '').trim())),
+      hasCenteredAvatar: Boolean(document.querySelector('.profile-editor-avatar-upload'))
+    };
+  });
+  console.log(`profile-top@${width}`, JSON.stringify(profileTop));
   await shot(page, width, 'profile-top');
 
-  // 6) Profile editor footer
+  // 6) Profile footer
   await page.evaluate(() => {
-    const actions = document.querySelector('.profile-editor-actions');
-    if (actions) actions.scrollIntoView({ block: 'center' });
-    else window.scrollTo(0, document.body.scrollHeight);
+    document.querySelector('.profile-editor-actions')?.scrollIntoView({ block: 'center' });
   });
-  await sleep(300);
-  await probe(page, `profile-footer@${width}`);
+  await sleep(250);
+  const footerRow = await measureRow(page, '.profile-editor-actions');
+  console.log(`profile-footer@${width}`, JSON.stringify(footerRow));
   await shot(page, width, 'profile-footer');
 
   await page.close();
