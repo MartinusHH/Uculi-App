@@ -291,6 +291,143 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ===== BEGIN familiecode (accessCodes + codeAccess) =====
+    // accessCodes/{CODE}: document id is the code itself (trimmed, uppercase,
+    // [A-Z0-9_-], 1-32). Created and edited only by the access superuser
+    // (isAccessSuperuser, e.g. from /beheer). Real codes are never in the repo.
+    //   type: "familyPremium"   expiresAt: timestamp   active: bool
+    //   used: int (>= 0)        maxUses: int (1-15)
+    //   lastRevokedUid: string (optional, only set in a revoke batch)
+    // Clients can never get or list codes; only the superuser can.
+    //
+    // codeAccess/{uid}: fields exactly code, type, createdAt (+ revoked,
+    // revokedAt set by the superuser). Created only by the signed-in owner, in
+    // one batch with accessCodes/{code}.used + 1. The owner may read it.
+    // No client update or delete. Revocation keeps the document, so the same
+    // account cannot redeem again, and lowers used by exactly 1 in the same
+    // batch (superuser only), so the place becomes free again.
+
+    function famCodePath(code) {
+      return /databases/$(database)/documents/accessCodes/$(code);
+    }
+
+    function famGrantPath(grantUid) {
+      return /databases/$(database)/documents/codeAccess/$(grantUid);
+    }
+
+    function famIsCodeId(code) {
+      return code is string && code.matches('[A-Z0-9_-]{1,32}');
+    }
+
+    function famIsValidCodeDoc() {
+      let data = request.resource.data;
+      return data.keys().hasOnly(['type', 'expiresAt', 'active', 'used', 'maxUses', 'lastRevokedUid'])
+        && data.keys().hasAll(['type', 'expiresAt', 'active', 'used', 'maxUses'])
+        && data.type in ['familyPremium']
+        && data.expiresAt is timestamp
+        && data.active is bool
+        && data.used is int
+        && data.used >= 0
+        && data.maxUses is int
+        && data.maxUses >= 1
+        && data.maxUses <= 15
+        && data.used <= data.maxUses;
+    }
+
+    // Superuser edits a code (end date, active, maxUses, type) but never
+    // touches used or lastRevokedUid outside a revoke batch.
+    function famIsSuperuserEdit() {
+      return isAccessSuperuser()
+        && famIsValidCodeDoc()
+        && request.resource.data.used == resource.data.used
+        && request.resource.data.get('lastRevokedUid', null) == resource.data.get('lastRevokedUid', null);
+    }
+
+    // Superuser revoke step: used - 1 (never below 0), lastRevokedUid names the
+    // person, whose codeAccess for this code was not revoked before this batch
+    // and is revoked after it.
+    function famIsRevokeStep(code) {
+      let next = request.resource.data;
+      return isAccessSuperuser()
+        && next.diff(resource.data).affectedKeys().hasOnly(['used', 'lastRevokedUid'])
+        && next.used == resource.data.used - 1
+        && next.used >= 0
+        && next.lastRevokedUid is string
+        && exists(famGrantPath(next.lastRevokedUid))
+        && get(famGrantPath(next.lastRevokedUid)).data.code == code
+        && get(famGrantPath(next.lastRevokedUid)).data.get('revoked', false) != true
+        && getAfter(famGrantPath(next.lastRevokedUid)).data.get('revoked', false) == true;
+    }
+
+    // The one step a signed-in user may take on a code: used + 1, only in
+    // the same batch that creates their own codeAccess for exactly this code.
+    function famIsRedeemStep(code) {
+      return signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used'])
+        && request.resource.data.used == resource.data.used + 1
+        && request.resource.data.used <= resource.data.maxUses
+        && resource.data.active == true
+        && request.time < resource.data.expiresAt
+        && !exists(famGrantPath(request.auth.uid))
+        && existsAfter(famGrantPath(request.auth.uid))
+        && getAfter(famGrantPath(request.auth.uid)).data.code == code;
+    }
+
+    function famIsValidGrant(data) {
+      return data.keys().hasOnly(['code', 'type', 'createdAt'])
+        && data.keys().hasAll(['code', 'type', 'createdAt'])
+        && famIsCodeId(data.code)
+        && data.createdAt == request.time
+        && exists(famCodePath(data.code))
+        && famIsRedeemableCode(data, get(famCodePath(data.code)).data, getAfter(famCodePath(data.code)).data);
+    }
+
+    function famIsRedeemableCode(data, before, after) {
+      return before.active == true
+        && request.time < before.expiresAt
+        && data.type == before.type
+        && before.used < before.maxUses
+        && after.used == before.used + 1;
+    }
+
+    // Revoke: superuser sets revoked + revokedAt once. If the code still
+    // exists, the same batch must lower its used by 1 for this uid.
+    function famIsRevoke(uid) {
+      let code = resource.data.code;
+      return isAccessSuperuser()
+        && resource.data.get('revoked', false) != true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['revoked', 'revokedAt'])
+        && request.resource.data.revoked == true
+        && request.resource.data.revokedAt == request.time
+        && (
+          !exists(famCodePath(code))
+          || (
+            getAfter(famCodePath(code)).data.used == get(famCodePath(code)).data.used - 1
+            && getAfter(famCodePath(code)).data.get('lastRevokedUid', null) == uid
+          )
+        );
+    }
+
+    match /accessCodes/{code} {
+      allow get, list: if isAccessSuperuser();
+      allow create: if isAccessSuperuser()
+        && famIsCodeId(code)
+        && famIsValidCodeDoc()
+        && request.resource.data.used == 0
+        && !('lastRevokedUid' in request.resource.data);
+      allow update: if famIsSuperuserEdit() || famIsRevokeStep(code) || famIsRedeemStep(code);
+      allow delete: if isAccessSuperuser();
+    }
+
+    match /codeAccess/{uid} {
+      allow get: if isAccessSuperuser() || isSelf(uid);
+      allow list: if isAccessSuperuser();
+      allow create: if isSelf(uid) && famIsValidGrant(request.resource.data);
+      allow update: if famIsRevoke(uid);
+      allow delete: if isAccessSuperuser();
+    }
+    // ===== END familiecode =====
+
     match /{document=**} {
       allow read, write: if false;
     }
