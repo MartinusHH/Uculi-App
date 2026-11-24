@@ -188,16 +188,36 @@ async function runWidth(browser, width) {
     showListFilters = true;
     showDietFilters = true;
     showFavoritesOnly = true;
-    activeDietFilters = new Set(['Vegetarisch']);
+    dietFilter = ['Vegetarian'];
+    collectionScopeFilter = 'mine';
     renderList();
   });
   await sleep(700);
   await dismissOverlays(page);
   await page.evaluate(() => {
-    document.querySelector('.index-filters-panel, .source-filter-row')?.scrollIntoView({ block: 'start' });
+    document.querySelector('.index-filters-panel, .source-filter-row, .filter-diet-actions')?.scrollIntoView({ block: 'start' });
   });
   await sleep(250);
-  console.log(`filters@${width}`, JSON.stringify(await measureButtons(page, '.index-filters-panel') || await measureButtons(page, '#app-content')));
+  const filterInfo = await page.evaluate(() => {
+    const casing = [...document.querySelectorAll('.source-filter-btn, .filter-diet-actions button, .index-clear-filters-btn, .index-filters-panel button')]
+      .slice(0, 12)
+      .map((b) => {
+        const style = getComputedStyle(b);
+        return {
+          text: (b.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40),
+          transform: style.textTransform
+        };
+      });
+    const chips = [...document.querySelectorAll('.index-card-tag, .index-active-filters span')]
+      .map((n) => (n.textContent || '').trim())
+      .filter(Boolean)
+      .slice(0, 8);
+    const explainer = [...document.querySelectorAll('.index-filters-panel p')]
+      .map((p) => (p.textContent || '').trim())
+      .find((t) => /dieet|diet|voldoen|satisfy/i.test(t)) || '';
+    return { casing, chips, explainer: explainer.slice(0, 120) };
+  });
+  console.log(`filters@${width}`, JSON.stringify(filterInfo));
   await shot(page, width, 'filters');
 
   // 2) Recipe detail (basket, scale, cook CTA)
@@ -213,10 +233,26 @@ async function runWidth(browser, width) {
       ?.scrollIntoView({ block: 'center' });
   });
   await sleep(250);
-  console.log(`detail@${width}`, JSON.stringify(await measureButtons(page, '#app-content')));
+  const detailInfo = await page.evaluate(() => {
+    const buttons = [...document.querySelectorAll('#app-content button')].map((b) => {
+      const box = b.getBoundingClientRect();
+      if (box.width < 1 || box.height < 1) return null;
+      return {
+        text: (b.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 48),
+        w: Math.round(box.width),
+        h: Math.round(box.height),
+        aria: b.getAttribute('aria-label') || ''
+      };
+    }).filter(Boolean);
+    const basket = buttons.find((b) => /lijst|list|basket/i.test(b.text + b.aria));
+    const pdf = buttons.find((b) => /^PDF$/i.test(b.text) || /\bPDF\b/i.test(b.text));
+    const del = buttons.find((b) => /Verwijderen|Delete/i.test(b.text));
+    return { basket, pdf, del, sample: buttons.slice(0, 12) };
+  });
+  console.log(`detail@${width}`, JSON.stringify(detailInfo));
   await shot(page, width, 'detail');
 
-  // 3) Cooking mode (prove ~62px stay)
+  // 3) Cooking mode (prove top bar fully visible + ~62px stay)
   await page.evaluate(() => {
     if (typeof toggleCookingMode === 'function') {
       if (!isCookingMode) toggleCookingMode();
@@ -227,10 +263,13 @@ async function runWidth(browser, width) {
   });
   await sleep(900);
   await dismissOverlays(page);
+  // Stay at scroll 0 — scrollIntoView(start) pins the bar flush and fakes a cut-off.
   await page.evaluate(() => {
-    document.querySelector('.cook-begin, .cook-nav, .cook-prepare, #cook-sheet')?.scrollIntoView({ block: 'center' });
+    window.scrollTo(0, 0);
+    document.getElementById('app-content')?.scrollTo?.(0, 0);
+    document.getElementById('app-shell')?.scrollTo?.(0, 0);
   });
-  await sleep(300);
+  await sleep(350);
   const cookSizes = await page.evaluate(() => {
     const pick = (sel) => {
       const el = document.querySelector(sel);
@@ -238,12 +277,32 @@ async function runWidth(browser, width) {
       const box = el.getBoundingClientRect();
       return { h: Math.round(box.height), text: (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40) };
     };
+    const bar = document.querySelector('.cook-mode-bar');
+    const title = document.querySelector('.cook-mode-title');
+    const shell = document.getElementById('app-shell');
+    let barGeo = null;
+    if (bar) {
+      const b = bar.getBoundingClientRect();
+      const t = title?.getBoundingClientRect();
+      const s = shell?.getBoundingClientRect();
+      barGeo = {
+        top: Math.round(b.top),
+        h: Math.round(b.height),
+        w: Math.round(b.width),
+        clearance: s ? Math.round(b.top - s.top) : null,
+        titleInside: !!(t && t.top >= b.top - 1 && t.bottom <= b.bottom + 1),
+        looksCutOff: s ? b.top <= s.top + 1 : b.top <= 1,
+        position: getComputedStyle(bar).position,
+        transform: getComputedStyle(bar).textTransform
+      };
+    }
     return {
       begin: pick('.cook-begin'),
       next: pick('.cook-nav-btn--next'),
       prev: pick('.cook-nav-btn:not(.cook-nav-btn--next)'),
       exit: pick('.cooking-mode-exit-btn'),
-      phase: typeof cookSession !== 'undefined' ? cookSession?.phase : null
+      phase: typeof cookSession !== 'undefined' ? cookSession?.phase : null,
+      bar: barGeo
     };
   });
   console.log(`cook@${width}`, JSON.stringify(cookSizes));
@@ -260,7 +319,7 @@ async function runWidth(browser, width) {
   });
   await sleep(400);
 
-  // 4) Settings — Opslaan/Uitloggen pair (equal width at 390)
+  // 4) Settings — Backup pair first (equal width + one-line label at 390), then Opslaan metrics
   await page.evaluate(() => renderSettings());
   await sleep(700);
   await dismissOverlays(page);
@@ -276,33 +335,73 @@ async function runWidth(browser, width) {
       }
     });
     const pairs = [...document.querySelectorAll('.settings-actions.button-pair')];
-    const target = pairs.find((row) => row.querySelectorAll('button').length >= 2) || pairs[0];
+    const backup = pairs.find((row) => /Backup|backup/i.test(row.textContent || ''));
+    const save = pairs.find((row) => /Opslaan|Save|Uitloggen|Sign Out/i.test(row.textContent || ''));
+    const target = backup || save || pairs.find((row) => row.querySelectorAll('button,label').length >= 2) || pairs[0];
     target?.scrollIntoView({ block: 'center' });
     if (target) target.dataset.shotPair = '1';
+    if (backup) backup.dataset.shotBackup = '1';
   });
   await sleep(250);
   const pair = await page.evaluate(() => {
-    const row = document.querySelector('.settings-actions.button-pair[data-shot-pair="1"]')
-      || [...document.querySelectorAll('.settings-actions.button-pair')].find((el) => el.querySelectorAll('button').length >= 2);
-    if (!row) return null;
-    const rowBox = row.getBoundingClientRect();
-    return {
-      rowW: Math.round(rowBox.width),
-      buttons: [...row.querySelectorAll('button')].map((b) => {
-        const box = b.getBoundingClientRect();
-        const style = getComputedStyle(b);
-        return {
-          text: (b.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40),
-          w: Math.round(box.width),
-          h: Math.round(box.height),
-          radius: style.borderRadius,
-          bg: style.backgroundColor
-        };
-      })
+    const measure = (row) => {
+      if (!row) return null;
+      const rowBox = row.getBoundingClientRect();
+      return {
+        rowW: Math.round(rowBox.width),
+        buttons: [...row.querySelectorAll('button, label')].map((b) => {
+          const box = b.getBoundingClientRect();
+          const style = getComputedStyle(b);
+          const span = b.querySelector('span');
+          let wraps = null;
+          if (span) {
+            const range = document.createRange();
+            range.selectNodeContents(span);
+            const tb = range.getBoundingClientRect();
+            const lh = parseFloat(style.lineHeight) || 20;
+            wraps = tb.height > lh * 1.35;
+          }
+          return {
+            text: (b.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 40),
+            w: Math.round(box.width),
+            h: Math.round(box.height),
+            radius: style.borderRadius,
+            bg: style.backgroundColor,
+            wraps
+          };
+        })
+      };
     };
+    const backup = document.querySelector('.settings-actions.button-pair[data-shot-backup="1"]')
+      || [...document.querySelectorAll('.settings-actions.button-pair')].find((el) => /Backup|backup/i.test(el.textContent || ''));
+    const row = document.querySelector('.settings-actions.button-pair[data-shot-pair="1"]')
+      || backup
+      || [...document.querySelectorAll('.settings-actions.button-pair')].find((el) => el.querySelectorAll('button,label').length >= 2);
+    return { backup: measure(backup), pair: measure(row) };
   });
   console.log(`settings-pair@${width}`, JSON.stringify(pair));
   await shot(page, width, 'settings-pair');
+
+  // Settings cloud link spacing before Voorkeuren
+  await page.evaluate(() => {
+    document.querySelector('.settings-actions--cloud-link, .settings-prefs-block')?.scrollIntoView({ block: 'center' });
+  });
+  await sleep(250);
+  const cloudGap = await page.evaluate(() => {
+    const cloud = document.querySelector('.settings-actions--cloud-link');
+    const prefs = document.querySelector('.settings-prefs-block .settings-panel-kicker');
+    if (!cloud || !prefs) return null;
+    const a = cloud.getBoundingClientRect();
+    const b = prefs.getBoundingClientRect();
+    return {
+      cloudBottom: Math.round(a.bottom),
+      prefsTop: Math.round(b.top),
+      gap: Math.round(b.top - a.bottom),
+      prefsText: (prefs.textContent || '').trim()
+    };
+  });
+  console.log(`settings-cloud@${width}`, JSON.stringify(cloudGap));
+  await shot(page, width, 'settings-cloud');
 
   // 5) Header + index cards (chrome radius/height)
   await page.evaluate(() => {
