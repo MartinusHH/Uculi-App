@@ -1,0 +1,230 @@
+/**
+ * Recipe editor draft persistence: unit + browser reload flows.
+ * Uses puppeteer-core (same stack as the shot harness).
+ *
+ * Usage: node tools/verify-recipe-draft.mjs
+ */
+import puppeteer from 'puppeteer-core';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+
+const ART = process.env.UCULI_TEST_ARTIFACTS
+  || (fs.existsSync('/opt/cursor/artifacts') ? '/opt/cursor/artifacts' : path.join(os.tmpdir(), 'uculi-test-artifacts'));
+fs.mkdirSync(ART, { recursive: true });
+const CHROME = fs.existsSync('/usr/bin/google-chrome-stable')
+  ? '/usr/bin/google-chrome-stable'
+  : '/usr/local/bin/google-chrome';
+const APP = 'http://127.0.0.1:5173/app.html?dev-bypass=1&lang=nl';
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+const results = [];
+const log = (name, ok, detail = '') => {
+  results.push({ name, ok, detail: String(detail).slice(0, 280) });
+  console.log(`${ok ? 'PASS' : 'FAIL'} | ${name}${detail ? ' — ' + String(detail).slice(0, 180) : ''}`);
+};
+
+async function enterApp(page) {
+  await page.goto(APP, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await sleep(700);
+  await page.evaluate(() => {
+    document.getElementById('uculi-tour')?.remove();
+    document.getElementById('terms-accept-modal')?.remove();
+    if (typeof showToast === 'function' && !window.__draftTestToastMuted) {
+      window.__draftTestToastMuted = true;
+      window.showToast = function mutedToast() {};
+    }
+    localStorage.setItem('uculiDeveloperBypass', '1');
+    if (typeof activateDeveloperBypassSession === 'function') activateDeveloperBypassSession();
+    if (typeof startLocalTestModeFromGate === 'function') startLocalTestModeFromGate();
+    if (typeof enterAppFromLanding === 'function' && document.getElementById('auth-gate')) {
+      enterAppFromLanding('local-test-mode');
+    }
+    userSettings.language = 'nl';
+    userSettings.termsAccepted = true;
+    if (typeof saveData === 'function') saveData();
+  });
+  await sleep(900);
+  await page.evaluate(() => {
+    document.getElementById('uculi-tour')?.remove();
+  });
+}
+
+async function fillEditorBasics(page, { title, ingredient, step }) {
+  await page.evaluate(({ title, ingredient, step }) => {
+    const titleEl = document.getElementById('r-title');
+    if (titleEl) {
+      titleEl.value = title;
+      titleEl.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    const ing = document.getElementById('new-ingredient');
+    if (ing) {
+      ing.value = ingredient;
+      addDraftIngredient();
+    }
+    const st = document.getElementById('new-step');
+    if (st) {
+      st.value = step;
+      addDraftStep();
+    }
+    if (typeof persistRecipeEditorDraftNow === 'function') persistRecipeEditorDraftNow();
+  }, { title, ingredient, step });
+  await sleep(200);
+}
+
+const browser = await puppeteer.launch({
+  executablePath: CHROME,
+  headless: true,
+  args: ['--no-sandbox', '--disable-dev-shm-usage', '--window-size=1280,900']
+});
+
+try {
+  const page = await browser.newPage();
+  page.setDefaultTimeout(60000);
+  await page.setViewport({ width: 390, height: 844 });
+  page.on('dialog', async (dialog) => {
+    try { await dialog.accept(); } catch (_error) { /* ignore */ }
+  });
+  await enterApp(page);
+
+  // --- Unit: save / restore / clear ---
+  const unit = await page.evaluate(() => {
+    clearRecipeEditorDraft('new');
+    renderAddForm();
+    const titleEl = document.getElementById('r-title');
+    titleEl.value = 'Draft Unit Soup';
+    titleEl.dispatchEvent(new Event('input', { bubbles: true }));
+    draftIngredients = ['1 ui'];
+    draftSteps = [{ text: 'Fruit de ui', image: '', minutes: 2 }];
+    renderDraftIngredients();
+    renderDraftSteps();
+    const saved = persistRecipeEditorDraftNow();
+    const key = getRecipeDraftStorageKey('new');
+    const raw = localStorage.getItem(key);
+    const loaded = loadRecipeEditorDraft('new');
+    clearRecipeEditorDraft('new');
+    const afterClear = localStorage.getItem(key);
+    return {
+      saved,
+      hasRaw: Boolean(raw),
+      loadedTitle: loaded?.title || '',
+      loadedIng: loaded?.ingredients || [],
+      loadedSteps: (loaded?.steps || []).map((s) => s.text),
+      afterClear,
+      hasFns: typeof persistRecipeEditorDraftNow === 'function'
+        && typeof loadRecipeEditorDraft === 'function'
+        && typeof clearRecipeEditorDraft === 'function'
+    };
+  });
+  log('draft: helpers exposed', unit.hasFns);
+  log('draft: persist writes localStorage', unit.saved && unit.hasRaw, JSON.stringify({ saved: unit.saved, hasRaw: unit.hasRaw }));
+  log(
+    'draft: load restores title/ingredients/steps',
+    unit.loadedTitle === 'Draft Unit Soup' && unit.loadedIng[0] === '1 ui' && unit.loadedSteps[0] === 'Fruit de ui',
+    JSON.stringify({ title: unit.loadedTitle, ing: unit.loadedIng, steps: unit.loadedSteps })
+  );
+  log('draft: clear removes localStorage', unit.afterClear === null, `afterClear=${unit.afterClear}`);
+
+  // --- Browser: type → reload → reopen restores ---
+  await page.evaluate(() => {
+    clearRecipeEditorDraft('new');
+    renderAddForm();
+  });
+  await sleep(400);
+  await fillEditorBasics(page, {
+    title: 'Reload Stew',
+    ingredient: '200 g champignons',
+    step: 'Snijd de champignons'
+  });
+  const keyedBeforeReload = await page.evaluate(() => ({
+    key: getRecipeDraftStorageKey('new'),
+    raw: localStorage.getItem(getRecipeDraftStorageKey('new'))
+  }));
+  log('draft: browser filled draft before reload', Boolean(keyedBeforeReload.raw), `bytes=${keyedBeforeReload.raw?.length || 0}`);
+
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+  await page.waitForFunction(() => typeof renderAddForm === 'function', { timeout: 90000 });
+  await sleep(500);
+  await page.evaluate(() => {
+    document.getElementById('uculi-tour')?.remove();
+    document.getElementById('terms-accept-modal')?.remove();
+    if (typeof showToast === 'function') window.showToast = function mutedToast() {};
+    localStorage.setItem('uculiDeveloperBypass', '1');
+    if (typeof activateDeveloperBypassSession === 'function') activateDeveloperBypassSession();
+    if (typeof startLocalTestModeFromGate === 'function') startLocalTestModeFromGate();
+    if (typeof enterAppFromLanding === 'function' && document.getElementById('auth-gate')) {
+      enterAppFromLanding('local-test-mode');
+    }
+    if (typeof userSettings !== 'undefined') {
+      userSettings.language = 'nl';
+      userSettings.termsAccepted = true;
+    }
+  });
+  await sleep(900);
+  await page.evaluate(() => {
+    document.getElementById('uculi-tour')?.remove();
+    renderAddForm();
+  });
+  await sleep(800);
+  const afterReload = await page.evaluate(() => {
+    const notice = document.getElementById('recipe-draft-restored-notice');
+    return {
+      title: document.getElementById('r-title')?.value || '',
+      ingredients: [...(draftIngredients || [])],
+      steps: (draftSteps || []).map((s) => (typeof getRecipeInstructionText === 'function' ? getRecipeInstructionText(s) : (s.text || s))),
+      noticeText: notice?.querySelector('p')?.textContent?.trim() || '',
+      discardLabel: notice?.querySelector('button')?.textContent?.trim() || ''
+    };
+  });
+  log(
+    'draft: reload restores fields + notice',
+    afterReload.title === 'Reload Stew'
+      && afterReload.ingredients.includes('200 g champignons')
+      && afterReload.steps.some((s) => /Snijd de champignons/i.test(s))
+      && afterReload.noticeText === 'Concept hersteld'
+      && afterReload.discardLabel === 'Weggooien',
+    JSON.stringify(afterReload)
+  );
+  await page.screenshot({ path: path.join(ART, 'draft-reload-restore-390.png'), fullPage: false });
+
+  // --- Browser: save clears draft ---
+  await page.evaluate(() => {
+    clearRecipeEditorDraft('new');
+    renderAddForm();
+  });
+  await sleep(400);
+  await fillEditorBasics(page, {
+    title: 'Saved Clears Draft',
+    ingredient: '1 tomaat',
+    step: 'Snijd de tomaat'
+  });
+  const savedOk = await page.evaluate(async () => {
+    const form = document.getElementById('add-recipe-form');
+    if (!form) return { ok: false, reason: 'no-form' };
+    recipeSubmitAction = 'save';
+    const event = new Event('submit', { bubbles: true, cancelable: true });
+    // saveRecipe is async and uses preventDefault
+    await saveRecipe(event);
+    return {
+      ok: localStorage.getItem(getRecipeDraftStorageKey('new')) === null,
+      recipesHave: (recipes || []).some((r) => r.title === 'Saved Clears Draft'),
+      remaining: localStorage.getItem(getRecipeDraftStorageKey('new'))
+    };
+  });
+  log(
+    'draft: successful save clears draft',
+    savedOk.ok && savedOk.recipesHave,
+    JSON.stringify(savedOk)
+  );
+
+  await page.close();
+} catch (error) {
+  log('fatal', false, error?.stack || error);
+} finally {
+  await browser.close();
+}
+
+fs.writeFileSync(path.join(ART, 'recipe-draft-verify.json'), JSON.stringify(results, null, 2));
+const failed = results.filter((r) => !r.ok);
+console.log(`\n${results.length - failed.length}/${results.length} passed`);
+process.exit(failed.length ? 1 : 0);

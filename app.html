@@ -6342,6 +6342,32 @@
             max-width: 48ch;
         }
 
+        .recipe-draft-restored-notice {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem 1rem;
+            margin-top: 0.85rem;
+            padding: 0.85rem 1rem;
+            border: 1px solid rgba(28, 20, 16, 0.1);
+            border-radius: 1rem;
+            background: rgba(255, 253, 249, 0.96);
+            box-shadow: 0 10px 22px rgba(28, 20, 16, 0.05);
+        }
+
+        .recipe-draft-restored-notice p {
+            margin: 0;
+            max-width: none;
+            color: #1c1410;
+            font-size: 0.92rem;
+            font-weight: 700;
+        }
+
+        .recipe-draft-restored-notice button {
+            flex: 0 0 auto;
+        }
+
         .editor-layout {
             display: grid;
             gap: var(--space-4);
@@ -7912,6 +7938,9 @@
         const adminConfigStorageKey = 'recipeArchiveAdminConfig';
         const moderationLogStorageKey = 'recipeArchiveModerationLog';
         const accountStorageMigrationPrefix = 'recipeArchiveMigrated';
+        const recipeDraftStorageKeyPrefix = 'uculiRecipeDraft';
+        const RECIPE_DRAFT_MAX_BYTES = 200 * 1024;
+        const RECIPE_DRAFT_DEBOUNCE_MS = 500;
 
         const harmfulContentPatterns = [
             { label: 'Violence', pattern: /\b(kill|murder|stab|behead|torture|suicide|explode|bomb)\b/i },
@@ -8469,6 +8498,10 @@
         var draftProfile = null; 
         let editingRecipeId = null;
         let recipeSubmitAction = 'save';
+        let recipeDraftPersistTimer = null;
+        let recipeDraftAutosaveBound = false;
+        let recipeDraftBaselineFingerprint = '';
+        let recipeDraftRestoredActive = false;
         let hasLoadedPublishedRecipesCache = false;
         let isLoadingPublishedRecipesCache = false;
         let activeSavedRecipeUpdateNoticeId = null;
@@ -18547,8 +18580,18 @@
         }
 
         function cancelRecipeEditor() {
+            if (recipeEditorHasUnsavedChanges()) {
+                const confirmed = window.confirm(
+                    uiText('Discard unsaved changes?', 'Niet-opgeslagen wijzigingen weggooien?')
+                );
+                if (!confirmed) return;
+            }
             const recipeId = editingRecipeId;
+            clearRecipeEditorDraft(recipeId);
+            hideRecipeDraftRestoredNotice();
+            unbindRecipeEditorDraftAutosave();
             editingRecipeId = null;
+            recipeDraftBaselineFingerprint = '';
 
             if (recipeId) {
                 renderDetail(recipeId);
@@ -18593,6 +18636,9 @@
                         document.getElementById(targetElementId).innerHTML = ''; 
                         if(isUserSetting) userSettings[targetVarName] = base64;
                         else window[targetVarName] = base64;
+                        if (!isUserSetting && targetVarName === 'draftProfile') {
+                            scheduleRecipeEditorDraftPersist();
+                        }
                     };
                     img.src = e.target.result;
                 }
@@ -24630,6 +24676,383 @@
             }).join('');
         }
 
+        function getRecipeDraftKeyId(recipeId = editingRecipeId) {
+            return recipeId == null || recipeId === '' ? 'new' : String(recipeId);
+        }
+
+        function getRecipeDraftStorageKey(recipeId = editingRecipeId) {
+            return getScopedStorageKey(`${recipeDraftStorageKeyPrefix}:${getRecipeDraftKeyId(recipeId)}`);
+        }
+
+        function isLargeDataUrl(value = '') {
+            const text = String(value || '');
+            return text.startsWith('data:') && text.length > 4000;
+        }
+
+        function sanitizeRecipeDraftForStorage(snapshot) {
+            const copy = {
+                version: 1,
+                recipeId: getRecipeDraftKeyId(snapshot?.recipeId),
+                updatedAt: Number(snapshot?.updatedAt) || Date.now(),
+                title: String(snapshot?.title || ''),
+                author: String(snapshot?.author || ''),
+                category: String(snapshot?.category || ''),
+                country: String(snapshot?.country || ''),
+                familyId: String(snapshot?.familyId || ''),
+                tips: String(snapshot?.tips || ''),
+                prepTime: String(snapshot?.prepTime ?? ''),
+                cookTime: String(snapshot?.cookTime ?? ''),
+                servings: String(snapshot?.servings ?? ''),
+                difficulty: String(snapshot?.difficulty || ''),
+                cuisine: String(snapshot?.cuisine || ''),
+                mealType: Array.isArray(snapshot?.mealType) ? snapshot.mealType.map(String) : [],
+                diet: Array.isArray(snapshot?.diet) ? snapshot.diet.map(String) : [],
+                ingredients: Array.isArray(snapshot?.ingredients) ? snapshot.ingredients.map(String) : [],
+                steps: normalizeRecipeInstructions(snapshot?.steps || []).map((step) => ({
+                    text: step.text,
+                    minutes: step.minutes,
+                    image: isLargeDataUrl(step.image) ? '' : (step.image || '')
+                })),
+                profile: isLargeDataUrl(snapshot?.profile) ? null : (snapshot?.profile || null),
+                detailsOpen: Boolean(snapshot?.detailsOpen)
+            };
+            return copy;
+        }
+
+        function fingerprintRecipeDraft(snapshot) {
+            const clean = sanitizeRecipeDraftForStorage(snapshot || {});
+            return JSON.stringify({
+                title: clean.title,
+                author: clean.author,
+                category: clean.category,
+                country: clean.country,
+                familyId: clean.familyId,
+                tips: clean.tips,
+                prepTime: clean.prepTime,
+                cookTime: clean.cookTime,
+                servings: clean.servings,
+                difficulty: clean.difficulty,
+                cuisine: clean.cuisine,
+                mealType: clean.mealType,
+                diet: clean.diet,
+                ingredients: clean.ingredients,
+                steps: clean.steps,
+                profile: clean.profile
+            });
+        }
+
+        function collectRecipeEditorDraftSnapshot() {
+            const form = document.getElementById('add-recipe-form');
+            if (!form) return null;
+            const mealType = Array.from(document.querySelectorAll('.meal-type-btn[data-selected="true"]'))
+                .map((btn) => btn.dataset.mealType)
+                .filter(Boolean);
+            const diet = Array.from(document.querySelectorAll('.diet-checkbox:checked')).map((cb) => cb.value);
+            const detailsPanel = document.getElementById('recipe-details-panel');
+            return sanitizeRecipeDraftForStorage({
+                recipeId: getRecipeDraftKeyId(editingRecipeId),
+                updatedAt: Date.now(),
+                title: document.getElementById('r-title')?.value || '',
+                author: document.getElementById('r-author')?.value || '',
+                category: document.getElementById('r-category')?.value || '',
+                country: document.getElementById('r-country')?.value || '',
+                familyId: document.getElementById('r-family-book')?.value || '',
+                tips: document.getElementById('r-tips')?.value || '',
+                prepTime: document.getElementById('r-prepTime')?.value || '',
+                cookTime: document.getElementById('r-cookTime')?.value || '',
+                servings: document.getElementById('r-servings')?.value || '',
+                difficulty: document.getElementById('r-difficulty')?.value || '',
+                cuisine: document.getElementById('r-cuisine')?.value || '',
+                mealType,
+                diet,
+                ingredients: [...draftIngredients],
+                steps: normalizeRecipeInstructions(draftSteps),
+                profile: draftProfile || null,
+                detailsOpen: detailsPanel ? !detailsPanel.classList.contains('hidden') : false
+            });
+        }
+
+        function recipeDraftHasMeaningfulContent(snapshot) {
+            if (!snapshot) return false;
+            const clean = sanitizeRecipeDraftForStorage(snapshot);
+            return Boolean(
+                clean.title.trim()
+                || clean.tips.trim()
+                || clean.cuisine.trim()
+                || clean.ingredients.length
+                || clean.steps.length
+                || clean.mealType.length
+                || clean.diet.length
+                || (clean.prepTime && clean.prepTime !== '0')
+                || (clean.cookTime && clean.cookTime !== '0')
+                || (clean.difficulty && clean.difficulty !== '')
+                || (clean.profile && clean.profile !== defaultPlaceholderProfile)
+            );
+        }
+
+        function buildRecipeBaselineSnapshot(recipeToEdit) {
+            if (!recipeToEdit) {
+                return sanitizeRecipeDraftForStorage({
+                    recipeId: 'new',
+                    title: '',
+                    author: userSettings.name || '',
+                    category: 'Cooking',
+                    country: userSettings.country || '',
+                    familyId: '',
+                    tips: '',
+                    prepTime: '',
+                    cookTime: '',
+                    servings: '4',
+                    difficulty: '',
+                    cuisine: '',
+                    mealType: [],
+                    diet: [],
+                    ingredients: [],
+                    steps: [],
+                    profile: null,
+                    detailsOpen: false
+                });
+            }
+            return sanitizeRecipeDraftForStorage({
+                recipeId: recipeToEdit.id,
+                title: recipeToEdit.title || '',
+                author: recipeToEdit.author || '',
+                category: recipeToEdit.category || '',
+                country: recipeToEdit.country || '',
+                familyId: recipeToEdit.familyId || '',
+                tips: recipeToEdit.tips || '',
+                prepTime: recipeToEdit.prepTime ?? '',
+                cookTime: recipeToEdit.cookTime ?? '',
+                servings: recipeToEdit.servings ?? 4,
+                difficulty: recipeToEdit.difficulty || '',
+                cuisine: recipeToEdit.cuisine || '',
+                mealType: recipeToEdit.mealType || [],
+                diet: recipeToEdit.diet || [],
+                ingredients: recipeToEdit.ingredients || [],
+                steps: normalizeRecipeInstructions(recipeToEdit.instructions),
+                profile: recipeToEdit.profile && recipeToEdit.profile !== defaultPlaceholderProfile ? recipeToEdit.profile : null,
+                detailsOpen: true
+            });
+        }
+
+        function recipeEditorHasUnsavedChanges() {
+            if (currentView !== 'add' || !document.getElementById('add-recipe-form')) return false;
+            const snapshot = collectRecipeEditorDraftSnapshot();
+            if (!snapshot) return false;
+            return fingerprintRecipeDraft(snapshot) !== recipeDraftBaselineFingerprint;
+        }
+
+        function persistRecipeEditorDraftNow() {
+            try {
+                if (currentView !== 'add' || !document.getElementById('add-recipe-form')) return false;
+                const snapshot = collectRecipeEditorDraftSnapshot();
+                if (!snapshot) return false;
+                if (!recipeDraftHasMeaningfulContent(snapshot) && fingerprintRecipeDraft(snapshot) === recipeDraftBaselineFingerprint) {
+                    clearRecipeEditorDraft(snapshot.recipeId);
+                    return false;
+                }
+                const payload = JSON.stringify(snapshot);
+                if (payload.length > RECIPE_DRAFT_MAX_BYTES) return false;
+                localStorage.setItem(getRecipeDraftStorageKey(snapshot.recipeId), payload);
+                return true;
+            } catch (_error) {
+                return false;
+            }
+        }
+
+        function scheduleRecipeEditorDraftPersist() {
+            if (recipeDraftPersistTimer) clearTimeout(recipeDraftPersistTimer);
+            recipeDraftPersistTimer = setTimeout(() => {
+                recipeDraftPersistTimer = null;
+                persistRecipeEditorDraftNow();
+            }, RECIPE_DRAFT_DEBOUNCE_MS);
+        }
+
+        function loadRecipeEditorDraft(recipeId = editingRecipeId) {
+            try {
+                const raw = localStorage.getItem(getRecipeDraftStorageKey(recipeId));
+                if (!raw || raw.length > RECIPE_DRAFT_MAX_BYTES) return null;
+                const parsed = JSON.parse(raw);
+                if (!parsed || typeof parsed !== 'object') return null;
+                return sanitizeRecipeDraftForStorage(parsed);
+            } catch (_error) {
+                return null;
+            }
+        }
+
+        function clearRecipeEditorDraft(recipeId = editingRecipeId) {
+            try {
+                localStorage.removeItem(getRecipeDraftStorageKey(recipeId));
+            } catch (_error) {
+                /* fail silently */
+            }
+            if (recipeDraftPersistTimer) {
+                clearTimeout(recipeDraftPersistTimer);
+                recipeDraftPersistTimer = null;
+            }
+        }
+
+        function applyRecipeEditorDraft(snapshot) {
+            if (!snapshot || !document.getElementById('add-recipe-form')) return;
+            const clean = sanitizeRecipeDraftForStorage(snapshot);
+            const titleEl = document.getElementById('r-title');
+            const authorEl = document.getElementById('r-author');
+            const categoryEl = document.getElementById('r-category');
+            const countryEl = document.getElementById('r-country');
+            const familyEl = document.getElementById('r-family-book');
+            const tipsEl = document.getElementById('r-tips');
+            if (titleEl) titleEl.value = clean.title;
+            if (authorEl) authorEl.value = clean.author || userSettings.name || '';
+            if (categoryEl && clean.category) categoryEl.value = clean.category;
+            if (countryEl) countryEl.value = clean.country;
+            if (familyEl) familyEl.value = clean.familyId;
+            if (tipsEl) tipsEl.value = clean.tips;
+            applyRecipeDetailFields({
+                prepTime: clean.prepTime === '' ? undefined : clean.prepTime,
+                cookTime: clean.cookTime === '' ? undefined : clean.cookTime,
+                servings: clean.servings === '' ? undefined : clean.servings,
+                difficulty: clean.difficulty,
+                cuisine: clean.cuisine,
+                diet: clean.diet
+            });
+            if (clean.servings !== '') {
+                const servingsEl = document.getElementById('r-servings');
+                if (servingsEl) servingsEl.value = clean.servings;
+            }
+            hydrateMealTypeButtons(clean.mealType);
+            draftIngredients = [...clean.ingredients];
+            draftSteps = normalizeRecipeInstructions(clean.steps);
+            draftProfile = clean.profile || null;
+            const profilePreview = document.getElementById('profile-preview');
+            if (profilePreview) {
+                if (draftProfile) {
+                    profilePreview.style.backgroundImage = `url(${draftProfile})`;
+                    profilePreview.innerHTML = '';
+                }
+            }
+            renderDraftIngredients();
+            renderDraftSteps();
+            setRecipeDetailsVisibility(Boolean(clean.detailsOpen || clean.tips || clean.cuisine || clean.difficulty || clean.diet.length));
+        }
+
+        function showRecipeDraftRestoredNotice() {
+            const hero = document.querySelector('.editor-hero');
+            if (!hero) return;
+            document.getElementById('recipe-draft-restored-notice')?.remove();
+            const notice = document.createElement('div');
+            notice.id = 'recipe-draft-restored-notice';
+            notice.className = 'recipe-draft-restored-notice';
+            notice.setAttribute('role', 'status');
+            notice.innerHTML = `
+                <p>${uiText('Draft restored', 'Concept hersteld')}</p>
+                <button type="button" onclick="discardRestoredRecipeDraft()" class="${getAppButtonClasses('secondary', { size: 'sm' })}" aria-label="${uiText('Discard', 'Weggooien')}" title="${uiText('Discard', 'Weggooien')}">${uiText('Discard', 'Weggooien')}</button>
+            `;
+            hero.appendChild(notice);
+            recipeDraftRestoredActive = true;
+            try { lucide.createIcons(); } catch (_error) { /* ignore */ }
+        }
+
+        function hideRecipeDraftRestoredNotice() {
+            document.getElementById('recipe-draft-restored-notice')?.remove();
+            recipeDraftRestoredActive = false;
+        }
+
+        function discardRestoredRecipeDraft() {
+            const recipeId = editingRecipeId;
+            clearRecipeEditorDraft(recipeId);
+            hideRecipeDraftRestoredNotice();
+            const recipeToEdit = recipeId ? recipes.find((recipe) => recipe.id === recipeId && recipe.source === 'local') : null;
+            draftIngredients = recipeToEdit ? [...(recipeToEdit.ingredients || [])] : [];
+            draftSteps = recipeToEdit ? normalizeRecipeInstructions(recipeToEdit.instructions) : [];
+            draftProfile = recipeToEdit?.profile && recipeToEdit.profile !== defaultPlaceholderProfile ? recipeToEdit.profile : null;
+            const baseline = buildRecipeBaselineSnapshot(recipeToEdit);
+            recipeDraftBaselineFingerprint = fingerprintRecipeDraft(baseline);
+            applyRecipeEditorDraft(baseline);
+            if (!recipeToEdit) {
+                const authorEl = document.getElementById('r-author');
+                const countryEl = document.getElementById('r-country');
+                if (authorEl && !authorEl.value) authorEl.value = userSettings.name || '';
+                if (countryEl && !countryEl.value) countryEl.value = userSettings.country || '';
+                const profilePreview = document.getElementById('profile-preview');
+                if (profilePreview && !draftProfile) {
+                    profilePreview.style.backgroundImage = '';
+                    profilePreview.innerHTML = `<i data-lucide="camera" class="w-8 h-8 mb-2"></i><span class="text-xs font-bold uppercase tracking-wider">Upload</span>`;
+                    try { lucide.createIcons(); } catch (_error) { /* ignore */ }
+                }
+            } else {
+                const profilePreview = document.getElementById('profile-preview');
+                if (profilePreview) {
+                    profilePreview.style.backgroundImage = `url(${recipeToEdit.profile || defaultPlaceholderProfile})`;
+                    profilePreview.innerHTML = '';
+                }
+            }
+        }
+
+        function onRecipeEditorDraftDomEvent(event) {
+            if (!(event?.target instanceof Element)) return;
+            if (!event.target.closest('#add-recipe-form')) return;
+            scheduleRecipeEditorDraftPersist();
+        }
+
+        function flushRecipeEditorDraftOnHide() {
+            if (currentView !== 'add') return;
+            if (recipeDraftPersistTimer) {
+                clearTimeout(recipeDraftPersistTimer);
+                recipeDraftPersistTimer = null;
+            }
+            persistRecipeEditorDraftNow();
+        }
+
+        function handleRecipeEditorVisibilityChange() {
+            if (document.visibilityState === 'hidden') flushRecipeEditorDraftOnHide();
+        }
+
+        function handleRecipeEditorPageHide() {
+            flushRecipeEditorDraftOnHide();
+        }
+
+        function handleRecipeEditorBeforeUnload(event) {
+            if (!recipeEditorHasUnsavedChanges()) return;
+            flushRecipeEditorDraftOnHide();
+            event.preventDefault();
+            event.returnValue = '';
+        }
+
+        function bindRecipeEditorDraftAutosave() {
+            if (recipeDraftAutosaveBound) return;
+            document.addEventListener('input', onRecipeEditorDraftDomEvent, true);
+            document.addEventListener('change', onRecipeEditorDraftDomEvent, true);
+            document.addEventListener('visibilitychange', handleRecipeEditorVisibilityChange);
+            window.addEventListener('pagehide', handleRecipeEditorPageHide);
+            window.addEventListener('beforeunload', handleRecipeEditorBeforeUnload);
+            recipeDraftAutosaveBound = true;
+        }
+
+        function unbindRecipeEditorDraftAutosave() {
+            if (!recipeDraftAutosaveBound) return;
+            document.removeEventListener('input', onRecipeEditorDraftDomEvent, true);
+            document.removeEventListener('change', onRecipeEditorDraftDomEvent, true);
+            document.removeEventListener('visibilitychange', handleRecipeEditorVisibilityChange);
+            window.removeEventListener('pagehide', handleRecipeEditorPageHide);
+            window.removeEventListener('beforeunload', handleRecipeEditorBeforeUnload);
+            recipeDraftAutosaveBound = false;
+            if (recipeDraftPersistTimer) {
+                clearTimeout(recipeDraftPersistTimer);
+                recipeDraftPersistTimer = null;
+            }
+        }
+
+        window.persistRecipeEditorDraftNow = persistRecipeEditorDraftNow;
+        window.loadRecipeEditorDraft = loadRecipeEditorDraft;
+        window.clearRecipeEditorDraft = clearRecipeEditorDraft;
+        window.discardRestoredRecipeDraft = discardRestoredRecipeDraft;
+        window.recipeEditorHasUnsavedChanges = recipeEditorHasUnsavedChanges;
+        window.collectRecipeEditorDraftSnapshot = collectRecipeEditorDraftSnapshot;
+        window.fingerprintRecipeDraft = fingerprintRecipeDraft;
+        window.buildRecipeBaselineSnapshot = buildRecipeBaselineSnapshot;
+        window.sanitizeRecipeDraftForStorage = sanitizeRecipeDraftForStorage;
+        window.getRecipeDraftStorageKey = getRecipeDraftStorageKey;
+
         function renderAddForm(recipeId = null) {
             activeDetailRecipeId = null;
             if (!recipeId && requireFreeRecipeSlot()) {
@@ -24644,6 +25067,7 @@
             const recipeToEdit = recipeId ? recipes.find(recipe => recipe.id === recipeId && recipe.source === 'local') : null;
             editingRecipeId = recipeToEdit ? recipeToEdit.id : null;
             recipeSubmitAction = 'save';
+            recipeDraftRestoredActive = false;
             draftIngredients = recipeToEdit ? [...(recipeToEdit.ingredients || [])] : [];
             draftSteps = recipeToEdit ? normalizeRecipeInstructions(recipeToEdit.instructions) : [];
             draftProfile = recipeToEdit?.profile && recipeToEdit.profile !== defaultPlaceholderProfile ? recipeToEdit.profile : null;
@@ -24857,6 +25281,21 @@
             renderDraftIngredients();
             renderDraftSteps();
             setRecipeDetailsVisibility(Boolean(recipeToEdit));
+
+            const baselineSnapshot = buildRecipeBaselineSnapshot(recipeToEdit);
+            recipeDraftBaselineFingerprint = fingerprintRecipeDraft(baselineSnapshot);
+            const storedDraft = loadRecipeEditorDraft(editingRecipeId);
+            if (
+                storedDraft
+                && recipeDraftHasMeaningfulContent(storedDraft)
+                && fingerprintRecipeDraft(storedDraft) !== recipeDraftBaselineFingerprint
+            ) {
+                applyRecipeEditorDraft(storedDraft);
+                showRecipeDraftRestoredNotice();
+            } else {
+                hideRecipeDraftRestoredNotice();
+            }
+            bindRecipeEditorDraftAutosave();
         }
 
         function setMealTypeButtonVisualState(button, isSelected) {
@@ -24884,6 +25323,7 @@
                 }
             }
             setMealTypeButtonVisualState(button, !currentlySelected);
+            scheduleRecipeEditorDraftPersist();
         }
 
         function addDraftIngredient() {
@@ -24892,9 +25332,14 @@
             draftIngredients.push(input.value.trim());
             input.value = '';
             renderDraftIngredients();
+            scheduleRecipeEditorDraftPersist();
         }
 
-        function removeDraftIngredient(index) { draftIngredients.splice(index, 1); renderDraftIngredients(); }
+        function removeDraftIngredient(index) {
+            draftIngredients.splice(index, 1);
+            renderDraftIngredients();
+            scheduleRecipeEditorDraftPersist();
+        }
 
         function renderDraftIngredients() {
             const list = document.getElementById('draft-ingredients-list');
@@ -25599,6 +26044,7 @@
             input.value = '';
             if (minutesInput) minutesInput.value = '1';
             renderDraftSteps();
+            scheduleRecipeEditorDraftPersist();
         }
 
         function setDraftStepMinutes(index, value) {
@@ -25608,9 +26054,14 @@
                 ...normalized,
                 minutes: Math.max(1, Math.min(240, Number.parseInt(value, 10) || 1))
             };
+            scheduleRecipeEditorDraftPersist();
         }
 
-        function removeDraftStep(index) { draftSteps.splice(index, 1); renderDraftSteps(); }
+        function removeDraftStep(index) {
+            draftSteps.splice(index, 1);
+            renderDraftSteps();
+            scheduleRecipeEditorDraftPersist();
+        }
 
         function handleDraftStepImageUpload(event, index) {
             const file = event.target.files[0];
@@ -25624,6 +26075,7 @@
                     image: loadEvent.target.result
                 };
                 renderDraftSteps();
+                scheduleRecipeEditorDraftPersist();
             };
             reader.readAsDataURL(file);
         }
@@ -25637,6 +26089,7 @@
                 image: ''
             };
             renderDraftSteps();
+            scheduleRecipeEditorDraftPersist();
         }
 
         function renderDraftSteps() {
@@ -25795,7 +26248,13 @@
 
             saveData();
             const savedRecipeId = recipePayload.id;
+            clearRecipeEditorDraft(existingRecipe?.id || 'new');
+            // Also clear the new-key draft when creating a recipe.
+            if (!existingRecipe) clearRecipeEditorDraft('new');
+            hideRecipeDraftRestoredNotice();
+            unbindRecipeEditorDraftAutosave();
             editingRecipeId = null;
+            recipeDraftBaselineFingerprint = '';
 
             if (shouldPublishAfterSave) {
                 await publishRecipe(savedRecipeId);
