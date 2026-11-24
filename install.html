@@ -93,7 +93,16 @@
                 <li>Confirm — Uculi appears on your home screen.</li>
             </ol>
             <a class="cta" href="app.html" id="open-app">Open Uculi</a>
-            <p class="footer"><img src="assets/mholt-apple.png" alt="" />Mholt · KvK 42175873 · <a href="mailto:mholt.apps@gmail.com">mholt.apps@gmail.com</a></p>
+            <p class="footer" id="install-footer">
+                <img src="assets/mholt-apple.png" alt="" />
+                <span id="install-footer-copy">© 2026 Uculi</span>
+                <span aria-hidden="true">·</span>
+                <span id="install-footer-by">Created by Mholt</span>
+                <span aria-hidden="true">·</span>
+                <span id="install-footer-kvk">Mholt · KvK 42175873</span>
+                <span aria-hidden="true">·</span>
+                <a href="mailto:mholt.apps@gmail.com">mholt.apps@gmail.com</a>
+            </p>
         </article>
     </main>
     <script>
@@ -115,6 +124,7 @@
                 'Bevestig — Uculi staat op je beginscherm.'
             ].map((t) => `<li>${t}</li>`).join('');
             document.getElementById('open-app').textContent = 'Open Uculi';
+            document.getElementById('install-footer-by').textContent = 'Gemaakt door Mholt';
         })();
     </script>
 </body>

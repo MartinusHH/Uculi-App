@@ -61,6 +61,17 @@
             hyphens: none;
             white-space: normal;
         }
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            column-gap: 1.25rem;
+            row-gap: 0.5rem;
+        }
+        .footer-nav a {
+            white-space: nowrap;
+        }
         .text-balance { text-wrap: balance; }
         .text-pretty { text-wrap: pretty; }
 
@@ -571,21 +582,22 @@
             <div class="flex items-center gap-2.5">
                 <img src="assets/uculi-boekje.jpg" alt="" class="h-7 w-7 rounded-lg object-cover" />
                 <span class="font-serif text-base font-bold text-forest">Uculi</span>
-                <span class="text-xs font-semibold text-sage">— Recipe Notebook</span>
+                <span id="footer-tagline" class="text-xs font-semibold text-sage">— Recipe Notebook</span>
             </div>
-            <div class="flex items-center gap-5 text-xs font-semibold text-sage">
+            <div class="footer-nav text-xs font-semibold text-sage">
                 <a href="app.html?auth=login" class="hover:text-forest transition-colors">Open app</a>
-                <span class="opacity-30">·</span>
                 <a href="app.html?legal=privacy" class="hover:text-forest transition-colors">Privacy policy</a>
-                <span class="opacity-30">·</span>
                 <a href="app.html?legal=terms" class="hover:text-forest transition-colors">Terms of use</a>
-                <span class="opacity-30">·</span>
                 <a href="app.html?legal=cookies" class="hover:text-forest transition-colors">Cookies</a>
-                <span class="opacity-30">·</span>
                 <a href="install.html" class="hover:text-forest transition-colors">Install</a>
             </div>
             <p id="footer-credit" class="inline-flex flex-wrap items-center justify-center gap-1.5 text-xs font-semibold text-sage opacity-80">
-                <img src="assets/mholt-apple.png" alt="" class="h-4 w-4 rounded-full object-cover" /><span id="footer-by">Mholt · KvK 42175873</span>
+                <span id="footer-copy">© 2026 Uculi</span>
+                <span class="opacity-30">·</span>
+                <img src="assets/mholt-apple.png" alt="" class="h-4 w-4 rounded-full object-cover" />
+                <span id="footer-by">Created by Mholt</span>
+                <span class="opacity-30">·</span>
+                <span id="footer-kvk">Mholt · KvK 42175873</span>
                 <span class="opacity-30">·</span>
                 <a id="footer-email" href="mailto:mholt.apps@gmail.com" class="hover:text-forest transition-colors">mholt.apps@gmail.com</a>
             </p>
@@ -606,42 +618,163 @@
         document.documentElement.lang = 'nl';
         document.title = 'Uculi — Jouw receptenboek, voor altijd';
 
-        const set = (id, text) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = text;
+        const map = {
+            'Features': 'Functies',
+            'Families': 'Families',
+            'Pricing': 'Prijzen',
+            'Open the app': 'Open de app',
+            'Now available · Free to use': 'Nu beschikbaar · Gratis te gebruiken',
+            'Your recipe book.': 'Jouw receptenboek.',
+            'For your family. Forever.': 'Voor je familie. Voor altijd.',
+            "Uculi is the place where your recipes live — and where grandma's apple pie will never get lost again. A personal notebook that you share with the people who matter, when you want to.":
+                'Uculi is de plek waar je recepten wonen — en waar oma’s appeltaart nooit meer zoekraakt. Een persoonlijk schrift dat je deelt met de mensen die ertoe doen, wanneer jij dat wilt.',
+            'Start for free': 'Gratis beginnen',
+            'See how it works': 'Bekijk hoe het werkt',
+            'No credit card required · Free plan available forever': 'Geen creditcard nodig · Gratis plan voor altijd',
+            "Grandma's Apple Pie": 'Oma’s appeltaart',
+            'Saved by Maria · Family recipe': 'Opgeslagen door Maria · Familiarecept',
+            '500g flour · 200g cold butter': '500 g bloem · 200 g koude boter',
+            '1 kg tart apples · 120g sugar': '1 kg zure appels · 120 g suiker',
+            '2 tsp cinnamon · pinch of salt': '2 tl kaneel · snufje zout',
+            'Step 1 of 5': 'Stap 1 van 5',
+            'Preheat oven to 180 °C': 'Verwarm de oven voor op 180 °C',
+            'The recipe your family will always have with them.': 'Het recept dat je familie altijd bij zich heeft.',
+            'What makes it different': 'Wat het anders maakt',
+            'Built around how you actually cook': 'Gebouwd rond hoe jij echt kookt',
+            "Not a calorie tracker. Not a meal planner. Not an algorithm. Just your recipes — exactly as you'd write them down.":
+                'Geen calorieteller. Geen mealplanner. Geen algoritme. Gewoon jouw recepten — precies zoals je ze zou opschrijven.',
+            'Your personal notebook': 'Jouw persoonlijke schrift',
+            "Add recipes the way you'd write them: a name, ingredients, steps, a photo. No mandatory fields, no endless forms. While cooking, the recipe stays in front of you. While shopping, your ingredient list is right there.":
+                'Voeg recepten toe zoals je ze zou opschrijven: een naam, ingrediënten, stappen, een foto. Geen verplichte velden, geen eindeloze formulieren. Tijdens het koken blijft het recept voor je. Tijdens het boodschappen doen staat je ingrediëntenlijst klaar.',
+            'Shared with your family': 'Gedeeld met je familie',
+            "Create a family space, invite people via a link or tag, and everyone's recipes live in one shared notebook. Grandma's recipe stays in the family — not buried in a WhatsApp message or a yellowed scrap of paper.":
+                'Maak een familieruimte, nodig mensen uit via een link of tag, en ieders recepten leven in één gedeeld schrift. Oma’s recept blijft in de familie — niet begraven in een WhatsApp-bericht of een vergeeld briefje.',
+            'Social when you want it': 'Sociaal wanneer jij dat wilt',
+            'Publish a recipe and let others discover it. Like and save what inspires you. Or keep everything private — it\'s entirely your choice. No pressure to post. No feed to scroll.':
+                'Publiceer een recept en laat anderen het ontdekken. Like en bewaar wat je inspireert. Of houd alles privé — helemaal jouw keuze. Geen druk om te posten. Geen feed om te scrollen.',
+            'The recipes that belong': 'De recepten die van',
+            'to all of you': 'jullie allemaal zijn',
+            "A family in Uculi is a shared recipe space with a name and a PIN. Invite anyone via WhatsApp or a link. Every member sees the full collection — and everyone can contribute.":
+                'Een familie in Uculi is een gedeelde receptenruimte met een naam en een pincode. Nodig iedereen uit via WhatsApp of een link. Elk lid ziet de hele collectie — en iedereen kan bijdragen.',
+            "Families are not mandatory. You don't have to be social if you don't want to. But the infrastructure is there the moment you do.":
+                'Families zijn niet verplicht. Je hoeft niet sociaal te zijn als je dat niet wilt. Maar de infrastructuur staat klaar zodra je dat wel wilt.',
+            'Invite via WhatsApp, link or tag': 'Uitnodigen via WhatsApp, link of tag',
+            'Everyone can add and view recipes': 'Iedereen kan recepten toevoegen en bekijken',
+            'Works across languages — NL, EN, FR, DE, ES': 'Werkt in meerdere talen — NL, EN, FR, DE, ES',
+            'Preserved forever — no expiry, no data loss': 'Voor altijd bewaard — geen verloop, geen dataverlies',
+            '8 members · 34 recipes': '8 leden · 34 recepten',
+            '4 members · 21 recipes': '4 leden · 21 recepten',
+            '6 members · 17 recipes': '6 leden · 17 recepten',
+            'Every family has a story. Now they have a place to keep it.': 'Elke familie heeft een verhaal. Nu hebben ze een plek om het te bewaren.',
+            'Recipes are not data.': 'Recepten zijn geen data.',
+            'They are memories.': 'Het zijn herinneringen.',
+            'The smell of a dish calls up a memory that words cannot. But the words — the ingredients, the steps, the small note "don\'t bake too long or it dries out" — those words are all that remains when someone is no longer here.':
+                'De geur van een gerecht roept een herinnering op die woorden niet kunnen. Maar de woorden — de ingrediënten, de stappen, het kleine briefje “niet te lang bakken of het droogt uit” — die woorden blijven over wanneer iemand er niet meer is.',
+            'Uculi wants to be the place where those words are kept. Not in a drawer. Not on an anonymous server. In a notebook that belongs to you and your family — that goes where you go and is never lost.':
+                'Uculi wil de plek zijn waar die woorden bewaard blijven. Niet in een lade. Niet op een anonieme server. In een schrift dat van jou en je familie is — dat meegaat waar jij gaat en nooit zoekraakt.',
+            'That is not a marketing line. That is why this app exists.': 'Dat is geen marketingzin. Daarom bestaat deze app.',
+            'How it works': 'Hoe het werkt',
+            'Up and running in minutes': 'Binnen enkele minuten klaar',
+            'Sign in': 'Inloggen',
+            'Sign in with your Google account. No separate password to remember.': 'Log in met je Google-account. Geen apart wachtwoord om te onthouden.',
+            'Add your first recipe': 'Voeg je eerste recept toe',
+            "Type it in the way you'd write it. Name, ingredients, steps — done.": 'Typ het in zoals je het zou opschrijven. Naam, ingrediënten, stappen — klaar.',
+            'Invite your family': 'Nodig je familie uit',
+            'Create a family space and share the link. Everyone joins in seconds.': 'Maak een familieruimte en deel de link. Iedereen doet in seconden mee.',
+            "Open Uculi — it's free": 'Open Uculi — het is gratis',
+            'Plans & pricing': 'Abonnementen & prijzen',
+            'Simple and honest': 'Eenvoudig en eerlijk',
+            'The core of Uculi is free and will stay that way. Premium unlocks extra features for people who want more.':
+                'De kern van Uculi is gratis en blijft dat. Premium opent extra functies voor wie meer wil.',
+            'Published prices include VAT.': 'Getoonde prijzen zijn incl. btw.',
+            'Free': 'Gratis',
+            '/ forever': '/ voor altijd',
+            'Everything you need to get started.': 'Alles wat je nodig hebt om te beginnen.',
+            'Up to 3 recipes': 'Tot 3 recepten',
+            'Notebook mode': 'Notebookmodus',
+            'Cloud sync': 'Cloud-sync',
+            '5 display languages': '5 weergavetalen',
+            'Unlimited recipes': 'Onbeperkt recepten',
+            'Family sharing': 'Familiedelen',
+            'PDF export': 'PDF-export',
+            'Get started free': 'Gratis starten',
+            'Most popular': 'Meest gekozen',
+            'Premium Monthly': 'Premium maandelijks',
+            '/ month': '/ maand',
+            'incl. VAT': 'incl. btw',
+            'All paid features, billed monthly.': 'Alle betaalde functies, per maand.',
+            'Everything in Free': 'Alles in Gratis',
+            'Publish & share recipes': 'Recepten publiceren & delen',
+            'PDF export & print': 'PDF-export & printen',
+            'Backup & restore': 'Backup & herstel',
+            'Coming soon': 'Binnenkort',
+            'Premium Yearly': 'Premium jaarlijks',
+            '/ year': '/ jaar',
+            'Same Premium access, billed yearly.': 'Zelfde Premium-toegang, per jaar.',
+            'Everything in Premium Monthly': 'Alles in Premium maandelijks',
+            'Better value per month': 'Voordeliger per maand',
+            'PDF export & backup': 'PDF-export & backup',
+            'Your support keeps the app running and allows us to keep improving it. If you find value in Uculi — thank you.':
+                'Jouw steun houdt de app draaiende en laat ons blijven verbeteren. Als Uculi waarde heeft voor jou — dank je wel.',
+            "Start today — it's free": 'Begin vandaag — het is gratis',
+            'Add your first recipe. Invite your family. Let Uculi take care of the rest. Recipes saved today are recipes your grandchildren will have tomorrow.':
+                'Voeg je eerste recept toe. Nodig je familie uit. Laat Uculi de rest doen. Recepten die je vandaag bewaart, heeft je kleinkinderen morgen nog.',
+            'Open Uculi': 'Open Uculi',
+            'Free forever · No card required · Available now': 'Voor altijd gratis · Geen kaart nodig · Nu beschikbaar',
+            '— Recipe Notebook': '— Receptenschrift',
+            'Open app': 'Open de app',
+            'Privacy policy': 'Privacybeleid',
+            'Terms of use': 'Gebruiksvoorwaarden',
+            'Cookies': 'Cookies',
+            'Install': 'Installeren',
+            'Created by Mholt': 'Gemaakt door Mholt',
+            'Weekend Dinner Club': 'Weekend Dinner Club',
+            'Recetas de la Abuela': 'Recetas de la Abuela',
+            'De Bakker Familieboek': 'De Bakker Familieboek'
         };
 
-        set('pricing-kicker', 'Abonnementen & prijzen');
-        set('pricing-title', 'Eenvoudig en eerlijk');
-        set('pricing-intro', 'De kern van Uculi is gratis en blijft dat. Premium opent extra functies voor wie meer wil.');
-        const note = document.getElementById('pricing-note');
-        if (note) {
-            const icon = note.querySelector('[data-lucide], svg');
-            note.replaceChildren();
-            if (icon) note.appendChild(icon);
-            note.append(' Getoonde prijzen zijn inclusief btw.');
-        }
-        set('price-free-period', '/ voor altijd');
-        set('price-month-badge', 'Meest gekozen');
-        set('price-month-label', 'Premium maandelijks');
-        set('price-month-period', '/ maand');
-        set('price-month-vat', 'incl. btw');
-        set('price-month-blurb', 'Alle betaalde functies, per maand.');
-        set('price-year-label', 'Premium jaarlijks');
-        set('price-year-period', '/ jaar');
-        set('price-year-vat', 'incl. btw');
-        set('price-year-blurb', 'Zelfde Premium-toegang, per jaar.');
-        const setCta = (id, text) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            const icon = el.querySelector('[data-lucide], svg');
-            el.replaceChildren();
-            if (icon) el.appendChild(icon);
-            el.append(' ' + text);
+        const normalize = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+
+        const walk = (node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const raw = node.textContent;
+                const key = normalize(raw);
+                if (!key) return;
+                if (Object.prototype.hasOwnProperty.call(map, key)) {
+                    const leading = raw.match(/^\s*/)?.[0] || '';
+                    const trailing = raw.match(/\s*$/)?.[0] || '';
+                    node.textContent = leading + map[key] + trailing;
+                }
+                return;
+            }
+            if (node.nodeType !== Node.ELEMENT_NODE) return;
+            if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE') return;
+            for (const child of [...node.childNodes]) walk(child);
         };
-        setCta('price-month-cta', 'Binnenkort');
-        setCta('price-year-cta', 'Binnenkort');
-        set('footer-by', 'Mholt · KvK 42175873');
+        walk(document.body);
+
+        // Mixed-content vision paragraph (contains <em>) — replace as a unit.
+        const visionParas = [...document.querySelectorAll('section.bg-forest p')];
+        for (const p of visionParas) {
+            const key = normalize(p.textContent);
+            if (key.startsWith('The smell of a dish') || key.startsWith('De geur van een gerecht')) {
+                p.replaceChildren();
+                p.append(
+                    'De geur van een gerecht roept een herinnering op die woorden niet kunnen. Maar de woorden — de ingrediënten, de stappen, het kleine briefje ',
+                );
+                const em = document.createElement('em');
+                em.textContent = '“niet te lang bakken of het droogt uit”';
+                p.append(em);
+                p.append(' — die woorden blijven over wanneer iemand er niet meer is.');
+            }
+        }
+
+        const by = document.getElementById('footer-by');
+        if (by) by.textContent = 'Gemaakt door Mholt';
+        const kvk = document.getElementById('footer-kvk');
+        if (kvk) kvk.textContent = 'Mholt · KvK 42175873';
+        const copy = document.getElementById('footer-copy');
+        if (copy) copy.textContent = '© 2026 Uculi';
     })();
 </script>
 </body>
