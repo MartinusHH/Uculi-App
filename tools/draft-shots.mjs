@@ -81,52 +81,50 @@ try {
     await page.setViewport({ width, height: width <= 420 ? 844 : 900, deviceScaleFactor: 1 });
     await enterApp(page);
 
-    if (PHASE === 'after') {
-      await page.evaluate(() => {
-        if (typeof clearRecipeEditorDraft === 'function') clearRecipeEditorDraft('new');
-        // Seed a draft that differs from the empty baseline so restore notice appears.
-        const snapshot = {
-          version: 1,
-          recipeId: 'new',
-          updatedAt: Date.now(),
-          title: 'Concept paddenstoelenstoof',
-          author: 'Miems H.',
-          category: 'Cooking',
-          country: '',
-          familyId: '',
-          tips: '',
-          prepTime: '15',
-          cookTime: '30',
-          servings: '4',
-          difficulty: 'Easy',
-          cuisine: '',
-          mealType: [],
-          diet: [],
-          ingredients: ['200 g champignons', '1 ui'],
-          steps: [
-            { text: 'Snijd de champignons', image: '', minutes: 1 },
-            { text: 'Fruit de ui', image: '', minutes: 1 }
-          ],
-          profile: null,
-          detailsOpen: false
-        };
-        const key = typeof getRecipeDraftStorageKey === 'function'
-          ? getRecipeDraftStorageKey('new')
-          : 'uculiRecipeDraft:new';
-        localStorage.setItem(key, JSON.stringify(snapshot));
-        renderAddForm();
-      });
-    } else {
-      await page.evaluate(() => {
-        renderAddForm();
-      });
-    }
+    // Seed a restore notice for both before/after so spacing + NL can be compared.
+    await page.evaluate(() => {
+      if (typeof clearRecipeEditorDraft === 'function') clearRecipeEditorDraft('new');
+      const snapshot = {
+        version: 1,
+        recipeId: 'new',
+        savedAt: Date.now(),
+        updatedAt: Date.now(),
+        title: 'Concept paddenstoelenstoof',
+        author: 'Miems H.',
+        category: 'Cooking',
+        country: '',
+        familyId: '',
+        tips: '',
+        prepTime: '15',
+        cookTime: '30',
+        servings: '4',
+        difficulty: 'Easy',
+        cuisine: '',
+        mealType: [],
+        diet: [],
+        ingredients: ['200 g champignons', '1 ui'],
+        steps: [
+          { text: 'Snijd de champignons', image: '', minutes: 1 },
+          { text: 'Fruit de ui', image: '', minutes: 1 }
+        ],
+        profile: null,
+        detailsOpen: false
+      };
+      const key = typeof getRecipeDraftStorageKey === 'function'
+        ? getRecipeDraftStorageKey('new')
+        : 'uculiRecipeDraft:new';
+      localStorage.setItem(key, JSON.stringify(snapshot));
+      renderAddForm();
+    });
     await sleep(900);
     await dismissOverlays(page);
     await page.evaluate(() => {
       window.scrollTo(0, 0);
       document.getElementById('app-content')?.scrollTo?.(0, 0);
-      document.querySelector('.editor-hero, #recipe-draft-restored-notice')?.scrollIntoView({ block: 'start' });
+      // Prefer scroll-margin-aware positioning so the notice does not sit under sticky header.
+      const notice = document.getElementById('recipe-draft-restored-notice');
+      if (notice) notice.scrollIntoView({ block: 'nearest' });
+      else document.querySelector('.editor-hero')?.scrollIntoView({ block: 'nearest' });
     });
     await sleep(250);
     const info = await page.evaluate(() => {
@@ -142,6 +140,38 @@ try {
     const file = path.join(ART, `${PREFIX}-${PHASE}-editor-${width}.png`);
     await page.screenshot({ path: file, fullPage: false });
     console.log('wrote', file);
+
+    // Extra regression shots: index + Opties at 390 and 1280.
+    if (width === 390 || width === 1280) {
+      await page.evaluate(() => {
+        if (typeof renderList === 'function') renderList();
+      });
+      await sleep(700);
+      await dismissOverlays(page);
+      await page.evaluate(() => {
+        window.scrollTo(0, 0);
+        document.getElementById('app-content')?.scrollTo?.(0, 0);
+      });
+      await sleep(200);
+      const indexFile = path.join(ART, `${PREFIX}-${PHASE}-index-${width}.png`);
+      await page.screenshot({ path: indexFile, fullPage: false });
+      console.log('wrote', indexFile);
+
+      await page.evaluate(() => {
+        if (typeof renderSettings === 'function') renderSettings();
+      });
+      await sleep(700);
+      await dismissOverlays(page);
+      await page.evaluate(() => {
+        window.scrollTo(0, 0);
+        document.getElementById('app-content')?.scrollTo?.(0, 0);
+      });
+      await sleep(200);
+      const settingsFile = path.join(ART, `${PREFIX}-${PHASE}-opties-${width}.png`);
+      await page.screenshot({ path: settingsFile, fullPage: false });
+      console.log('wrote', settingsFile);
+    }
+
     await page.close();
   }
 } finally {
