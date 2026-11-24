@@ -219,6 +219,27 @@
             color: var(--brand-ink) !important;
         }
 
+        /* Buttons: one casing style app-wide (sentence case). Section kickers may stay uppercase. */
+        button.app-btn-primary,
+        button.app-btn-secondary,
+        button.app-btn-accent,
+        button.app-btn-quiet,
+        label.app-btn-primary,
+        label.app-btn-secondary,
+        label.app-btn-accent,
+        label.app-btn-quiet,
+        a.app-btn-primary,
+        a.app-btn-secondary,
+        a.app-btn-quiet,
+        .source-filter-row > button,
+        .filter-diet-actions > button,
+        .profile-editor-actions > button,
+        #app-content .settings-actions > button,
+        #app-content .settings-actions > label {
+            text-transform: none !important;
+            letter-spacing: 0.01em;
+        }
+
         body {
             background-color: var(--body-bg);
             background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
@@ -768,6 +789,28 @@
 
         .settings-actions.button-pair {
             width: 100%;
+        }
+
+        /* Match panel-to-panel breathing room before Voorkeuren when stacked at 390. */
+        .settings-actions--cloud-link {
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-2);
+        }
+
+        .settings-wide-split > .settings-prefs-block > .settings-panel-kicker {
+            margin-top: 0;
+        }
+
+        @media (max-width: 899px) {
+            .settings-wide-split > .settings-prefs-block {
+                margin-top: var(--space-4);
+                padding-top: var(--space-2);
+            }
+
+            .settings-actions--cloud-link {
+                margin-bottom: var(--space-5);
+                padding-bottom: var(--space-3);
+            }
         }
 
         .family-code-intro {
@@ -1713,6 +1756,13 @@
             font-weight: 800;
             letter-spacing: 0.08em;
             text-transform: uppercase;
+        }
+
+        /* Active filter chips follow button sentence case (not forced caps). */
+        .index-active-filters .index-card-tag {
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            text-transform: none;
         }
 
         .index-card-footer {
@@ -3378,8 +3428,9 @@
                 height: var(--control-h-md);
                 padding-left: var(--space-3);
                 padding-right: var(--space-3);
-                letter-spacing: var(--tracking-button);
-                font-size: var(--type-label);
+                letter-spacing: 0.01em;
+                font-size: 0.875rem;
+                text-transform: none;
             }
 
             #app-content .settings-actions > button.phone-save-icon,
@@ -4070,10 +4121,10 @@
             min-height: var(--touch-min);
             height: var(--touch-min);
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.875rem;
             font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
+            letter-spacing: 0.01em;
+            text-transform: none;
         }
 
         .source-filter-row {
@@ -4091,10 +4142,10 @@
             min-height: var(--touch-min);
             height: var(--touch-min);
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.875rem;
             font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
+            letter-spacing: 0.01em;
+            text-transform: none;
         }
 
         .source-filter-row > .source-filter-btn > i,
@@ -4138,10 +4189,10 @@
             min-height: var(--touch-min);
             height: var(--touch-min);
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.875rem;
             font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
+            letter-spacing: 0.01em;
+            text-transform: none;
         }
 
         .cover-edit-icon-btn {
@@ -6653,7 +6704,7 @@
 
         .cooking-mode-active #app-content {
             font-size: 1.1rem;
-            padding-top: calc(4.85rem + env(safe-area-inset-top, 0px));
+            padding-top: calc(0.5rem + env(safe-area-inset-top, 0px));
             padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
             max-width: min(72rem, 100%);
             margin-left: auto;
@@ -6690,15 +6741,17 @@
         }
 
         .cooking-mode-active .cook-mode-bar {
-            position: fixed;
-            top: calc(0.55rem + env(safe-area-inset-top, 0px));
-            left: 50%;
+            /* Sticky in-flow: avoids fixed+overflow clipping inside #app-shell / #app-content. */
+            position: sticky;
+            top: calc(0.65rem + env(safe-area-inset-top, 0px));
+            left: auto;
             z-index: 120;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            width: min(72rem, calc(100% - 1.25rem));
-            margin: 0;
+            width: calc(100% - 1.25rem);
+            max-width: min(72rem, calc(100% - 1.25rem));
+            margin: 0.35rem auto 0.85rem;
             padding: 0.6rem 0.7rem;
             border: 1px solid rgba(28, 20, 16, 0.1);
             border-radius: 1.1rem;
@@ -6706,7 +6759,8 @@
             box-shadow: 0 14px 32px rgba(28, 20, 16, 0.12);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            transform: translateX(-50%);
+            transform: none;
+            box-sizing: border-box;
         }
 
         .cooking-mode-exit-btn {
@@ -6739,10 +6793,10 @@
             background: #fffdf9;
             color: #1c1410;
             font-family: Outfit, sans-serif;
-            font-size: 0.76rem;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
+            font-size: 0.875rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            text-transform: none;
         }
 
         .cook-mode-title {
@@ -7306,8 +7360,9 @@
         }
 
         @media (max-width: 767px) {
+            /* Cook bar is in-flow/sticky now — do not reserve fixed-bar padding. */
             body.chrome-push.cooking-mode-active #app-content {
-                padding-top: calc(4.85rem + env(safe-area-inset-top, 0px));
+                padding-top: calc(0.5rem + env(safe-area-inset-top, 0px));
                 scroll-padding-top: calc(5.25rem + env(safe-area-inset-top, 0px));
             }
 
@@ -8991,21 +9046,77 @@
         const initialPublishedVersionCode = 100;
         const dietOptions = ['Vegan', 'Vegetarian', 'Pescatarian', 'Gluten-free', 'Dairy-free', 'Nut-free', 'Egg-free', 'Soy-free', 'Halal', 'Kosher', 'Low-carb', 'Keto', 'Paleo'];
         const mealTypeOptions = ['Breakfast', 'Brunch', 'Lunch', 'Dinner', 'Snack', 'Other'];
-        const dietDescriptions = {
-            'Vegan': 'No animal products whatsoever — excludes meat, fish, dairy, eggs, and honey.',
-            'Vegetarian': 'No meat or fish, but may include dairy and eggs.',
-            'Pescatarian': 'No meat, but fish and seafood are allowed alongside plant-based foods.',
-            'Gluten-free': 'Contains no gluten — safe for people with coeliac disease or gluten sensitivity.',
-            'Dairy-free': 'Contains no milk, cheese, butter, cream, or other dairy products.',
-            'Nut-free': 'Contains no tree nuts or peanuts — suitable for those with nut allergies.',
-            'Egg-free': 'Contains no eggs or egg-derived ingredients.',
-            'Soy-free': 'Contains no soy or soy-derived ingredients such as tofu or edamame.',
-            'Halal': 'Prepared according to Islamic dietary law — no pork or alcohol.',
-            'Kosher': 'Prepared according to Jewish dietary law — no mixing of meat and dairy.',
-            'Low-carb': 'Significantly reduced carbohydrate content, typically under 100g of carbs per day.',
-            'Keto': 'Very low carb and high fat diet designed to induce a state of ketosis.',
-            'Paleo': 'Based on foods presumed to be available to pre-agricultural humans — no grains, legumes, or processed foods.',
+        const dietDescriptionCopy = {
+            'Vegan': {
+                en: 'No animal products whatsoever — excludes meat, fish, dairy, eggs, and honey.',
+                nl: 'Geen dierlijke producten — zonder vlees, vis, zuivel, ei en honing.'
+            },
+            'Vegetarian': {
+                en: 'No meat or fish, but may include dairy and eggs.',
+                nl: 'Geen vlees of vis; zuivel en ei mogen wel.'
+            },
+            'Pescatarian': {
+                en: 'No meat, but fish and seafood are allowed alongside plant-based foods.',
+                nl: 'Geen vlees; vis en zeevruchten mogen naast plantaardig eten.'
+            },
+            'Gluten-free': {
+                en: 'Contains no gluten — safe for people with coeliac disease or gluten sensitivity.',
+                nl: 'Zonder gluten — geschikt bij coeliakie of glutengevoeligheid.'
+            },
+            'Dairy-free': {
+                en: 'Contains no milk, cheese, butter, cream, or other dairy products.',
+                nl: 'Zonder melk, kaas, boter, room of andere zuivel.'
+            },
+            'Nut-free': {
+                en: 'Contains no tree nuts or peanuts — suitable for those with nut allergies.',
+                nl: 'Zonder noten of pinda’s — geschikt bij notenallergie.'
+            },
+            'Egg-free': {
+                en: 'Contains no eggs or egg-derived ingredients.',
+                nl: 'Zonder ei of ingrediënten van ei.'
+            },
+            'Soy-free': {
+                en: 'Contains no soy or soy-derived ingredients such as tofu or edamame.',
+                nl: 'Zonder soja of sojaproducten zoals tofu of edamame.'
+            },
+            'Halal': {
+                en: 'Prepared according to Islamic dietary law — no pork or alcohol.',
+                nl: 'Bereid volgens islamitische dieetregels — zonder varkensvlees of alcohol.'
+            },
+            'Kosher': {
+                en: 'Prepared according to Jewish dietary law — no mixing of meat and dairy.',
+                nl: 'Bereid volgens joodse dieetregels — vlees en zuivel niet gemengd.'
+            },
+            'Low-carb': {
+                en: 'Significantly reduced carbohydrate content, typically under 100g of carbs per day.',
+                nl: 'Duidelijk minder koolhydraten, meestal onder 100 g per dag.'
+            },
+            'Keto': {
+                en: 'Very low carb and high fat diet designed to induce a state of ketosis.',
+                nl: 'Zeer koolhydraatarm en vetrijk dieet, bedoeld voor ketose.'
+            },
+            'Paleo': {
+                en: 'Based on foods presumed to be available to pre-agricultural humans — no grains, legumes, or processed foods.',
+                nl: 'Gebaseerd op voeding van vóór de landbouw — zonder granen, peulvruchten of bewerkt voedsel.'
+            }
         };
+        function getDietDescription(option) {
+            const entry = dietDescriptionCopy[option];
+            if (!entry) return '';
+            return uiText(entry.en, entry.nl);
+        }
+        // Back-compat for any leftover dietDescriptions[option] reads (returns NL/EN via getter proxy).
+        const dietDescriptions = new Proxy({}, {
+            get(_t, prop) {
+                if (prop === Symbol.toStringTag) return 'Object';
+                return getDietDescription(String(prop));
+            },
+            ownKeys() { return Object.keys(dietDescriptionCopy); },
+            getOwnPropertyDescriptor(_t, prop) {
+                if (prop in dietDescriptionCopy) return { configurable: true, enumerable: true, value: getDietDescription(String(prop)) };
+                return undefined;
+            }
+        });
         const dietCompatibilityMap = {
             'Vegan': ['Vegan', 'Vegetarian', 'Pescatarian', 'Dairy-free', 'Egg-free'],
             'Vegetarian': ['Vegetarian', 'Pescatarian'],
@@ -18048,7 +18159,7 @@
             const voteLabel = actionKind === 'publication-vote'
                 ? `Votes: ${approvals}/${required.length} approved (need ${threshold})${vetoes ? `, ${vetoes} reject` : ''}`
                 : `Votes: ${approvals}/${required.length} approved${vetoes ? `, ${vetoes} veto` : ''}`;
-            const userVoteLabel = actorVote === 'approve' ? 'Approved' : 'Rejected';
+            const userVoteLabel = actorVote === 'approve' ? uiText('Approved', 'Goedgekeurd') : uiText('Rejected', 'Afgewezen');
 
             return `
                 <div class="rounded-xl border border-parchmentDark bg-white p-4 shadow-sm">
@@ -19314,7 +19425,7 @@
                 : uiText('Premium', 'Premium');
             const purchaseRestoreLabel = settingsNl ? 'Herstel aankoop' : 'Restore purchase';
             const backupRestoreLabel = settingsNl ? 'Herstel backup' : 'Restore backup';
-            const backupDownloadLabel = settingsNl ? 'Backup downloaden' : 'Download backup';
+            const backupDownloadLabel = settingsNl ? 'Backup maken' : 'Make backup';
             const offerCloudSignIn = !isCloudAccountUid(currentUser?.uid);
             contentDiv.innerHTML = `
                 <div class="settings-sheet push-sheet">
@@ -19374,9 +19485,9 @@
                                             ? `<button type="button" onclick="signOut()" class="${getAppButtonClasses('secondary', { size: 'sm' })}"><i data-lucide="log-out" class="w-4 h-4"></i>${settingsNl ? 'Uitloggen' : 'Sign Out'}</button>`
                                             : `<button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('primary', { size: 'sm' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}"><i data-lucide="log-in" class="w-4 h-4"></i>Google</button>`}
                                     </div>
-                                    ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'sm' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}"><i data-lucide="link" class="w-4 h-4"></i>${settingsNl ? 'Koppel Google' : 'Link Google'}</button></div>` : ''}
+                                    ${offerCloudSignIn && isAuthenticated ? `<div class="settings-actions settings-actions--cloud-link"><button type="button" data-auth-gate-action="google" onclick="signInWithGoogle('settings-cloud')" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'sm' })} auth-gate-social${shouldShowAuthAgreementFields() ? ' auth-gate-action-locked' : ''}"><i data-lucide="link" class="w-4 h-4"></i>${settingsNl ? 'Koppel Google' : 'Link Google'}</button></div>` : ''}
                                 </div>
-                                <div>
+                                <div class="settings-prefs-block">
                                     <p class="settings-panel-kicker">${settingsNl ? 'Voorkeuren' : 'Preferences'}</p>
                                     <div class="settings-prefs">
                                         <div class="settings-prefs-pair">
@@ -20263,11 +20374,11 @@
         function getCollectionScopeLabel(scope = collectionScopeFilter) {
             switch (normalizeCollectionScopeFilter(scope)) {
                 case 'mine':
-                    return 'Mine';
+                    return uiText('Mine', 'Van mij');
                 case 'saved':
-                    return 'Saved';
+                    return uiText('Saved', 'Opgeslagen');
                 default:
-                    return 'All recipes';
+                    return uiText('All recipes', 'Alle recepten');
             }
         }
 
@@ -21721,14 +21832,24 @@
             });
 
             const activeFilters = [
-                collectionScopeFilter !== 'all' ? `Source: ${getCollectionScopeLabel()}` : '',
-                searchQuery.trim() ? `Search: ${searchQuery.trim()}` : '',
-                categoryFilter ? `Category: ${categoryFilter}` : '',
-                difficultyFilter ? `Level: ${difficultyFilter}` : '',
-                cuisineFilter ? `Cuisine: ${cuisineFilter}` : '',
-                ...mealTypeFilter.map(item => `Meal: ${item}`),
-                ...dietFilter.map(item => `Diet: ${item}`),
-                showFavoritesOnly ? 'Favorites only' : ''
+                collectionScopeFilter !== 'all'
+                    ? uiText(`Source: ${getCollectionScopeLabel()}`, `Bron: ${getCollectionScopeLabel()}`)
+                    : '',
+                searchQuery.trim()
+                    ? uiText(`Search: ${searchQuery.trim()}`, `Zoek: ${searchQuery.trim()}`)
+                    : '',
+                categoryFilter
+                    ? uiText(`Category: ${categoryFilter}`, `Categorie: ${localizeRecipeCategoryLabel(categoryFilter)}`)
+                    : '',
+                difficultyFilter
+                    ? uiText(`Level: ${difficultyFilter}`, `Niveau: ${localizeRecipeDifficultyLabel(difficultyFilter)}`)
+                    : '',
+                cuisineFilter
+                    ? uiText(`Cuisine: ${cuisineFilter}`, `Keuken: ${localizeRecipeCuisineLabel(cuisineFilter)}`)
+                    : '',
+                ...mealTypeFilter.map(item => uiText(`Meal: ${item}`, `Maaltijd: ${localizeRecipeCategoryLabel(item) || item}`)),
+                ...dietFilter.map(item => uiText(`Diet: ${item}`, `Dieet: ${localizeRecipeDietLabel(item)}`)),
+                showFavoritesOnly ? uiText('Favorites only', 'Alleen favorieten') : ''
             ].filter(Boolean);
 
             currentIndexRecipeIds = filteredRecipes.map(recipe => recipe.id);
@@ -21791,13 +21912,18 @@
                 : '';
             const dietFilterButtonsMarkup = dietOptions.map(option => {
                 const isActive = dietFilter.includes(option);
-                const desc = dietDescriptions[option] || '';
-                return `<button type="button" onclick="toggleDietFilterOption('${option}')" aria-label="${option}: ${desc}" class="inline-flex h-11 items-center rounded-xl border px-4 text-sm font-bold transition-all ${isActive ? 'border-[#929D75] bg-[#929D75] text-forest shadow-sm' : 'border-sage border-opacity-20 bg-white text-sage hover:border-gold hover:text-forest'}">${option}</button>`;
+                const label = localizeRecipeDietLabel(option);
+                const desc = getDietDescription(option);
+                return `<button type="button" onclick="toggleDietFilterOption('${option}')" aria-label="${escapeHTML(label)}: ${escapeHTML(desc)}" class="inline-flex h-11 items-center rounded-xl border px-4 text-sm font-bold transition-all ${isActive ? 'border-[#929D75] bg-[#929D75] text-forest shadow-sm' : 'border-sage border-opacity-20 bg-white text-sage hover:border-gold hover:text-forest'}">${escapeHTML(label)}</button>`;
             }).join('');
-            const dietGuideMarkup = dietOptions.map(option => `<div class="rounded-xl border border-sage border-opacity-10 bg-white p-3 shadow-sm">
-                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-forest">${option}</p>
-                <p class="mt-2 text-xs font-semibold leading-relaxed text-sage">${dietDescriptions[option] || ''}</p>
-            </div>`).join('');
+            const dietGuideMarkup = dietOptions.map(option => {
+                const label = localizeRecipeDietLabel(option);
+                const desc = getDietDescription(option);
+                return `<div class="rounded-xl border border-sage border-opacity-10 bg-white p-3 shadow-sm">
+                <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-forest">${escapeHTML(label)}</p>
+                <p class="mt-2 text-xs font-semibold leading-relaxed text-sage">${escapeHTML(desc)}</p>
+            </div>`;
+            }).join('');
             const filterControlsMarkup = isFilterVisible ? `
                 <div class="index-filters-panel index-filter-controls space-y-5">
                     <div>
@@ -21894,7 +22020,7 @@
 
                         ${showDietFilters ? `
                             <div class="mt-4 border-t border-sage border-opacity-10 pt-4">
-                                <p class="text-xs font-semibold leading-relaxed text-sage">Recipes must satisfy every selected diet. Stricter tags still count, so Vegan also matches Vegetarian, and Keto also matches Low-carb.</p>
+                                <p class="text-xs font-semibold leading-relaxed text-sage">${uiText('Recipes must satisfy every selected diet. Stricter tags still count, so Vegan also matches Vegetarian, and Keto also matches Low-carb.', 'Recepten moeten aan elk gekozen dieet voldoen. Strengere tags tellen mee: veganistisch past ook bij vegetarisch, en keto past ook bij koolhydraatarm.')}</p>
                                 <div class="mt-4 flex flex-wrap gap-2">
                                     ${dietFilterButtonsMarkup}
                                 </div>
@@ -24142,6 +24268,7 @@
             }
 
             contentDiv.innerHTML = `
+                <div class="detail-view-root">
                 <div class="cook-mode-bar" role="banner" aria-label="${userSettings.language === 'nl' ? 'Kookmodus' : 'Cooking mode controls'}">
                     <button type="button" onclick="exitCookingMode()" id="cooking-mode-exit-btn" class="cooking-mode-exit-btn" aria-label="${userSettings.language === 'nl' ? 'Stop met koken en ga terug naar het recept' : 'Stop cooking and go back to the recipe'}">
                         <i data-lucide="x" class="w-5 h-5" aria-hidden="true"></i>
@@ -24322,6 +24449,7 @@
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
             `;
             lucide.createIcons();
@@ -24523,12 +24651,13 @@
                 ? 'Choose a family book if this recipe belongs in a shared archive. Personal recipes stay private to your account.'
                 : 'This recipe stays in your personal archive until you create or join a family book.';
             const dietOptionsMarkup = dietOptions.map(option => {
-                const desc = dietDescriptions[option] || '';
+                const label = localizeRecipeDietLabel(option);
+                const desc = getDietDescription(option);
                 return `<label class="relative flex items-center gap-2 cursor-pointer rounded-sm border border-parchmentDark bg-white px-3 py-2 font-semibold text-forest shadow-sm transition-all hover:border-gold hover:text-sage group">
-                    <input type="checkbox" class="diet-checkbox" value="${option}"> <span class="flex-1">${option}</span>
-                    <span class="ml-auto flex-shrink-0 text-sage/40 hover:text-gold transition-colors" title="${desc}">
+                    <input type="checkbox" class="diet-checkbox" value="${option}"> <span class="flex-1">${escapeHTML(label)}</span>
+                    <span class="ml-auto flex-shrink-0 text-sage/40 hover:text-gold transition-colors" title="${escapeHTML(desc)}">
                         <i data-lucide="info" class="w-3.5 h-3.5 pointer-events-none"></i>
-                        <span class="pointer-events-none absolute bottom-full right-2 mb-2 w-52 rounded-md border border-parchmentDark bg-white p-2.5 text-xs font-normal text-forest shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-30 leading-relaxed text-left">${desc}</span>
+                        <span class="pointer-events-none absolute bottom-full right-2 mb-2 w-52 rounded-md border border-parchmentDark bg-white p-2.5 text-xs font-normal text-forest shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-30 leading-relaxed text-left">${escapeHTML(desc)}</span>
                     </span>
                 </label>`;
             }).join('');
