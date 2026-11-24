@@ -15,7 +15,10 @@
                     colors: {
                         forest:       '#1c1410',
                         forestLight:  '#c89050',
+                        // Brand sage/olive (#929D75) for accents. Muted body/label text uses muted for WCAG contrast.
+                        olive:        '#929D75',
                         sage:         '#929D75',
+                        muted:        '#6b5f57',
                         gold:         '#c89050',
                         goldLight:    '#c89050',
                         parchment:    '#f6f1e8',
@@ -43,6 +46,35 @@
     </script>
     <style>
         html { scroll-behavior: smooth; }
+        body {
+            overflow-wrap: break-word;
+            word-break: normal;
+            hyphens: manual;
+        }
+        h1, h2, h3, .font-serif, .hero-headline {
+            overflow-wrap: break-word;
+            word-break: normal;
+            hyphens: none;
+        }
+        footer a, footer p, #footer-credit {
+            overflow-wrap: normal;
+            word-break: keep-all;
+            hyphens: none;
+            white-space: normal;
+        }
+        .footer-nav {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            column-gap: 1.25rem;
+            row-gap: 0.5rem;
+        }
+        .footer-nav a {
+            white-space: nowrap;
+        }
+        .text-balance { text-wrap: balance; }
+        .text-pretty { text-wrap: pretty; }
 
         .hero-grain {
             background-image:
@@ -110,7 +142,7 @@
             <img src="assets/uculi-boekje.jpg" alt="" class="h-8 w-8 rounded-lg object-cover" />
             <span class="font-serif text-lg font-bold text-forest tracking-tight">Uculi</span>
         </a>
-        <div class="hidden items-center gap-6 text-sm font-semibold text-sage sm:flex">
+        <div class="hidden items-center gap-6 text-sm font-semibold text-muted sm:flex">
             <a href="#features"  class="hover:text-forest transition-colors">Features</a>
             <a href="#families"  class="hover:text-forest transition-colors">Families</a>
             <a href="#pricing"   class="hover:text-forest transition-colors">Pricing</a>
@@ -139,7 +171,7 @@
             <span class="text-gold">For your family. Forever.</span>
         </h1>
 
-        <p class="mx-auto mt-6 max-w-xl text-base font-medium leading-relaxed text-sage md:text-lg">
+        <p class="mx-auto mt-6 max-w-xl text-base font-medium leading-relaxed text-muted md:text-lg">
             Uculi is the place where your recipes live — and where grandma's apple pie
             will never get lost again. A personal notebook that you share with the people
             who matter, when you want to.
@@ -158,7 +190,7 @@
             </a>
         </div>
 
-        <p class="mt-4 text-xs font-semibold text-sage opacity-70">
+        <p class="mt-4 text-xs font-semibold text-muted opacity-70">
             No credit card required &nbsp;·&nbsp; Free plan available forever
         </p>
     </div>
@@ -172,23 +204,23 @@
                 </div>
                 <div>
                     <p class="font-serif text-base font-bold text-forest">Grandma's Apple Pie</p>
-                    <p class="text-xs font-semibold text-sage">Saved by Maria · Family recipe</p>
+                    <p class="text-xs font-semibold text-muted">Saved by Maria · Family recipe</p>
                 </div>
             </div>
             <div class="space-y-2 text-sm">
-                <div class="check-row text-sage">
+                <div class="check-row text-muted">
                     <div class="icon-wrap bg-gold bg-opacity-15">
                         <i data-lucide="check" class="h-3 w-3 text-gold"></i>
                     </div>
                     <span class="text-forest">500g flour &nbsp;·&nbsp; 200g cold butter</span>
                 </div>
-                <div class="check-row text-sage">
+                <div class="check-row text-muted">
                     <div class="icon-wrap bg-sage bg-opacity-15">
                         <i data-lucide="circle" class="h-3 w-3 text-sage"></i>
                     </div>
                     <span>1 kg tart apples &nbsp;·&nbsp; 120g sugar</span>
                 </div>
-                <div class="check-row text-sage">
+                <div class="check-row text-muted">
                     <div class="icon-wrap bg-sage bg-opacity-15">
                         <i data-lucide="circle" class="h-3 w-3 text-sage"></i>
                     </div>
@@ -196,11 +228,11 @@
                 </div>
             </div>
             <div class="mt-4 flex items-center justify-between rounded-xl bg-parchment p-3">
-                <span class="text-xs font-bold text-sage">Step 1 of 5</span>
+                <span class="text-xs font-bold text-muted">Step 1 of 5</span>
                 <span class="text-xs font-semibold text-forest">Preheat oven to 180 °C</span>
             </div>
         </div>
-        <p class="mt-3 text-center text-xs font-semibold text-sage opacity-60">
+        <p class="mt-3 text-center text-xs font-semibold text-muted opacity-60">
             The recipe your family will always have with them.
         </p>
     </div>
@@ -213,11 +245,11 @@
     <div class="mx-auto max-w-5xl px-5">
 
         <div class="mb-12 text-center">
-            <p class="section-label text-sage mb-2">What makes it different</p>
+            <p class="section-label text-muted mb-2">What makes it different</p>
             <h2 class="font-serif text-3xl font-bold text-forest md:text-4xl">
                 Built around how you actually cook
             </h2>
-            <p class="mx-auto mt-3 max-w-lg text-sm font-medium text-sage leading-relaxed">
+            <p class="mx-auto mt-3 max-w-lg text-sm font-medium text-muted leading-relaxed">
                 Not a calorie tracker. Not a meal planner. Not an algorithm.
                 Just your recipes — exactly as you'd write them down.
             </p>
@@ -229,7 +261,7 @@
             <div class="card-hover rounded-2xl border border-parchmentDark bg-parchment p-6">
                 <img src="assets/uculi-boekje.jpg" alt="" width="48" height="48" class="mb-4 h-12 w-12 rounded-xl object-cover" />
                 <h3 class="font-serif text-lg font-bold text-forest mb-2">Your personal notebook</h3>
-                <p class="text-sm font-medium text-sage leading-relaxed">
+                <p class="text-sm font-medium text-muted leading-relaxed">
                     Add recipes the way you'd write them: a name, ingredients, steps, a photo.
                     No mandatory fields, no endless forms. While cooking, the recipe stays in
                     front of you. While shopping, your ingredient list is right there.
@@ -242,7 +274,7 @@
                     <i data-lucide="users" class="h-6 w-6"></i>
                 </div>
                 <h3 class="font-serif text-lg font-bold text-forest mb-2">Shared with your family</h3>
-                <p class="text-sm font-medium text-sage leading-relaxed">
+                <p class="text-sm font-medium text-muted leading-relaxed">
                     Create a family space, invite people via a link or tag, and everyone's
                     recipes live in one shared notebook. Grandma's recipe stays in the family —
                     not buried in a WhatsApp message or a yellowed scrap of paper.
@@ -251,11 +283,11 @@
 
             <!-- Pillar 3 -->
             <div class="card-hover rounded-2xl border border-parchmentDark bg-parchment p-6">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sage text-white">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-olive text-forest">
                     <i data-lucide="globe" class="h-6 w-6"></i>
                 </div>
                 <h3 class="font-serif text-lg font-bold text-forest mb-2">Social when you want it</h3>
-                <p class="text-sm font-medium text-sage leading-relaxed">
+                <p class="text-sm font-medium text-muted leading-relaxed">
                     Publish a recipe and let others discover it. Like and save what inspires you.
                     Or keep everything private — it's entirely your choice. No pressure to post.
                     No feed to scroll.
@@ -280,12 +312,12 @@
                     The recipes that belong
                     <span class="text-gold"> to all of you</span>
                 </h2>
-                <p class="mt-4 text-sm font-medium text-sage leading-relaxed">
+                <p class="mt-4 text-sm font-medium text-muted leading-relaxed">
                     A family in Uculi is a shared recipe space with a name and a PIN. Invite
                     anyone via WhatsApp or a link. Every member sees the full collection —
                     and everyone can contribute.
                 </p>
-                <p class="mt-3 text-sm font-medium text-sage leading-relaxed">
+                <p class="mt-3 text-sm font-medium text-muted leading-relaxed">
                     Families are not mandatory. You don't have to be social if you don't want
                     to. But the infrastructure is there the moment you do.
                 </p>
@@ -325,7 +357,7 @@
                         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gold bg-opacity-15 font-serif text-base font-bold text-gold">#1</div>
                         <div>
                             <p class="font-serif text-sm font-bold text-forest">De Bakker Familieboek</p>
-                            <p class="text-xs font-semibold text-sage">8 members · 34 recipes</p>
+                            <p class="text-xs font-semibold text-muted">8 members · 34 recipes</p>
                         </div>
                     </div>
                 </div>
@@ -334,7 +366,7 @@
                         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-sage bg-opacity-15 font-serif text-base font-bold text-sage">#2</div>
                         <div>
                             <p class="font-serif text-sm font-bold text-forest">Weekend Dinner Club</p>
-                            <p class="text-xs font-semibold text-sage">4 members · 21 recipes</p>
+                            <p class="text-xs font-semibold text-muted">4 members · 21 recipes</p>
                         </div>
                     </div>
                 </div>
@@ -343,11 +375,11 @@
                         <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-forest bg-opacity-10 font-serif text-base font-bold text-forest">#3</div>
                         <div>
                             <p class="font-serif text-sm font-bold text-forest">Recetas de la Abuela</p>
-                            <p class="text-xs font-semibold text-sage">6 members · 17 recipes</p>
+                            <p class="text-xs font-semibold text-muted">6 members · 17 recipes</p>
                         </div>
                     </div>
                 </div>
-                <p class="pt-1 text-center text-xs font-semibold text-sage opacity-60">
+                <p class="pt-1 text-center text-xs font-semibold text-muted opacity-60">
                     Every family has a story. Now they have a place to keep it.
                 </p>
             </div>
@@ -389,7 +421,7 @@
     <div class="mx-auto max-w-5xl px-5">
 
         <div class="mb-12 text-center">
-            <p class="section-label text-sage mb-2">How it works</p>
+            <p class="section-label text-muted mb-2">How it works</p>
             <h2 class="font-serif text-3xl font-bold text-forest md:text-4xl">Up and running in minutes</h2>
         </div>
 
@@ -397,17 +429,17 @@
             <div class="flex flex-col items-center text-center gap-3">
                 <div class="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gold bg-gold bg-opacity-10 font-serif text-xl font-bold text-gold">1</div>
                 <h3 class="font-serif text-base font-bold text-forest">Sign in</h3>
-                <p class="text-sm font-medium text-sage leading-relaxed">Sign in with your Google account. No separate password to remember.</p>
+                <p class="text-sm font-medium text-muted leading-relaxed">Sign in with your Google account. No separate password to remember.</p>
             </div>
             <div class="flex flex-col items-center text-center gap-3">
                 <div class="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gold bg-gold bg-opacity-10 font-serif text-xl font-bold text-gold">2</div>
                 <h3 class="font-serif text-base font-bold text-forest">Add your first recipe</h3>
-                <p class="text-sm font-medium text-sage leading-relaxed">Type it in the way you'd write it. Name, ingredients, steps — done.</p>
+                <p class="text-sm font-medium text-muted leading-relaxed">Type it in the way you'd write it. Name, ingredients, steps — done.</p>
             </div>
             <div class="flex flex-col items-center text-center gap-3">
                 <div class="flex h-12 w-12 items-center justify-center rounded-full border-2 border-gold bg-gold bg-opacity-10 font-serif text-xl font-bold text-gold">3</div>
                 <h3 class="font-serif text-base font-bold text-forest">Invite your family</h3>
-                <p class="text-sm font-medium text-sage leading-relaxed">Create a family space and share the link. Everyone joins in seconds.</p>
+                <p class="text-sm font-medium text-muted leading-relaxed">Create a family space and share the link. Everyone joins in seconds.</p>
             </div>
         </div>
 
@@ -428,20 +460,19 @@
     <div class="mx-auto max-w-5xl px-5">
 
         <div class="mb-4 text-center">
-            <p class="section-label text-sage mb-2">Plans & pricing</p>
-            <h2 class="font-serif text-3xl font-bold text-forest md:text-4xl">Simple and honest</h2>
-            <p class="mx-auto mt-3 max-w-md text-sm font-medium text-sage leading-relaxed">
+            <p id="pricing-kicker" class="section-label text-muted mb-2">Plans & pricing</p>
+            <h2 id="pricing-title" class="font-serif text-3xl font-bold text-forest md:text-4xl text-balance">Simple and honest</h2>
+            <p id="pricing-intro" class="mx-auto mt-3 max-w-md text-sm font-medium text-muted leading-relaxed text-pretty">
                 The core of Uculi is free and will stay that way. Premium unlocks extra features
-                for people who want more — once billing goes live.
+                for people who want more.
             </p>
         </div>
 
-        <!-- Honest note -->
+        <!-- VAT note (no developer flags in visitor copy) -->
         <div class="mx-auto mb-10 max-w-2xl rounded-xl border border-gold border-opacity-30 bg-gold bg-opacity-5 p-4 text-center">
-            <p class="text-xs font-semibold text-forest">
+            <p id="pricing-note" class="text-xs font-semibold text-forest text-pretty">
                 <i data-lucide="info" class="inline h-3.5 w-3.5 text-gold mr-1"></i>
-                Billing is not live yet (PREMIUM_ENABLED=false). Published prices include VAT.
-                Lifetime stays behind LIFETIME_ENABLED=false until offered.
+                Published prices include VAT.
             </p>
         </div>
 
@@ -449,17 +480,17 @@
 
             <!-- Free -->
             <div class="card-hover rounded-2xl border border-parchmentDark bg-[#fbf8f3] p-6 flex flex-col">
-                <p class="section-label text-sage mb-2">Free</p>
-                <p class="font-serif text-3xl font-bold text-forest">€0 <span class="text-base font-normal text-sage">/ forever</span></p>
-                <p class="mt-2 mb-5 text-xs font-semibold text-sage">Everything you need to get started.</p>
+                <p class="section-label text-muted mb-2">Free</p>
+                <p class="font-serif text-3xl font-bold text-forest">€0 <span id="price-free-period" class="text-base font-normal text-muted">/ forever</span></p>
+                <p class="mt-2 mb-5 text-xs font-semibold text-muted">Everything you need to get started.</p>
                 <ul class="space-y-2.5 flex-1">
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Up to 3 recipes</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Notebook mode</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Cloud sync</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>5 display languages</li>
-                    <li class="check-row text-sage"><div class="icon-wrap bg-parchmentDark"><i data-lucide="lock" class="h-3 w-3 text-sage"></i></div>Unlimited recipes</li>
-                    <li class="check-row text-sage"><div class="icon-wrap bg-parchmentDark"><i data-lucide="lock" class="h-3 w-3 text-sage"></i></div>Family sharing</li>
-                    <li class="check-row text-sage"><div class="icon-wrap bg-parchmentDark"><i data-lucide="lock" class="h-3 w-3 text-sage"></i></div>PDF export</li>
+                    <li class="check-row text-muted"><div class="icon-wrap bg-parchmentDark"><i data-lucide="lock" class="h-3 w-3 text-muted"></i></div>Unlimited recipes</li>
+                    <li class="check-row text-muted"><div class="icon-wrap bg-parchmentDark"><i data-lucide="lock" class="h-3 w-3 text-muted"></i></div>Family sharing</li>
+                    <li class="check-row text-muted"><div class="icon-wrap bg-parchmentDark"><i data-lucide="lock" class="h-3 w-3 text-muted"></i></div>PDF export</li>
                 </ul>
                 <a href="app.html" class="mt-6 flex items-center justify-center gap-2 rounded-xl border border-parchmentDark bg-parchment px-4 py-2.5 text-sm font-bold text-forest transition-all hover:border-sage">
                     Get started free
@@ -469,12 +500,12 @@
             <!-- Premium Monthly -->
             <div class="card-hover rounded-2xl border-2 border-gold bg-[#fbf8f3] p-6 flex flex-col shadow-lg relative">
                 <div class="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span class="pill bg-gold text-white shadow">Most popular</span>
+                    <span id="price-month-badge" class="pill bg-gold text-forest shadow">Most popular</span>
                 </div>
-                <p class="section-label text-gold mb-2">Premium Monthly</p>
-                <p class="font-serif text-3xl font-bold text-forest">€4,49 <span class="text-base font-normal text-sage">/ month</span></p>
-                <p class="mt-1 text-xs font-semibold text-sage">incl. VAT</p>
-                <p class="mt-2 mb-5 text-xs font-semibold text-sage">All paid features, billed monthly.</p>
+                <p id="price-month-label" class="section-label text-gold mb-2">Premium Monthly</p>
+                <p class="font-serif text-3xl font-bold text-forest">€4,49 <span id="price-month-period" class="text-base font-normal text-muted">/ month</span></p>
+                <p id="price-month-vat" class="mt-1 text-xs font-semibold text-muted">incl. VAT</p>
+                <p id="price-month-blurb" class="mt-2 mb-5 text-xs font-semibold text-muted">All paid features, billed monthly.</p>
                 <ul class="space-y-2.5 flex-1">
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Everything in Free</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Unlimited recipes</li>
@@ -483,34 +514,33 @@
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>PDF export &amp; print</li>
                     <li class="check-row"><div class="icon-wrap bg-gold bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-gold"></i></div>Backup &amp; restore</li>
                 </ul>
-                <button disabled class="mt-6 flex items-center justify-center gap-2 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-white opacity-60 cursor-not-allowed">
+                <button id="price-month-cta" disabled class="mt-6 flex items-center justify-center gap-2 rounded-xl bg-gold px-4 py-2.5 text-sm font-bold text-forest opacity-70 cursor-not-allowed">
                     <i data-lucide="clock" class="h-4 w-4"></i>
-                    Checkout opens at launch
+                    Coming soon
                 </button>
             </div>
 
             <!-- Premium Yearly -->
-            <div class="card-hover rounded-2xl border border-sage bg-[#fbf8f3] p-6 flex flex-col">
-                <p class="section-label text-sage mb-2">Premium Yearly</p>
-                <p class="font-serif text-3xl font-bold text-forest">€27,99 <span class="text-base font-normal text-sage">/ year</span></p>
-                <p class="mt-1 text-xs font-semibold text-sage">incl. VAT</p>
-                <p class="mt-2 mb-5 text-xs font-semibold text-sage">Same Premium access, billed yearly.</p>
+            <div class="card-hover rounded-2xl border border-olive bg-[#fbf8f3] p-6 flex flex-col">
+                <p id="price-year-label" class="section-label text-olive mb-2">Premium Yearly</p>
+                <p class="font-serif text-3xl font-bold text-forest">€27,99 <span id="price-year-period" class="text-base font-normal text-muted">/ year</span></p>
+                <p id="price-year-vat" class="mt-1 text-xs font-semibold text-muted">incl. VAT</p>
+                <p id="price-year-blurb" class="mt-2 mb-5 text-xs font-semibold text-muted">Same Premium access, billed yearly.</p>
                 <ul class="space-y-2.5 flex-1">
-                    <li class="check-row"><div class="icon-wrap bg-sage bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-sage"></i></div>Everything in Premium Monthly</li>
-                    <li class="check-row"><div class="icon-wrap bg-sage bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-sage"></i></div>Better value per month</li>
-                    <li class="check-row"><div class="icon-wrap bg-sage bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-sage"></i></div>Family sharing</li>
-                    <li class="check-row"><div class="icon-wrap bg-sage bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-sage"></i></div>PDF export &amp; backup</li>
+                    <li class="check-row"><div class="icon-wrap bg-olive bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-olive"></i></div>Everything in Premium Monthly</li>
+                    <li class="check-row"><div class="icon-wrap bg-olive bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-olive"></i></div>Better value per month</li>
+                    <li class="check-row"><div class="icon-wrap bg-olive bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-olive"></i></div>Family sharing</li>
+                    <li class="check-row"><div class="icon-wrap bg-olive bg-opacity-15"><i data-lucide="check" class="h-3 w-3 text-olive"></i></div>PDF export &amp; backup</li>
                 </ul>
-                <button disabled class="mt-6 flex items-center justify-center gap-2 rounded-xl border-2 border-sage px-4 py-2.5 text-sm font-bold text-forest opacity-60 cursor-not-allowed">
+                <button id="price-year-cta" disabled class="mt-6 flex items-center justify-center gap-2 rounded-xl border-2 border-olive px-4 py-2.5 text-sm font-bold text-forest opacity-70 cursor-not-allowed">
                     <i data-lucide="clock" class="h-4 w-4"></i>
-                    Checkout opens at launch
+                    Coming soon
                 </button>
             </div>
 
         </div>
-        <p class="mt-6 text-center text-xs font-semibold text-sage">Lifetime (€74,99 one-time, incl. VAT) stays unpublished while LIFETIME_ENABLED=false.</p>
 
-        <p class="mt-8 text-center text-xs font-semibold text-sage">
+        <p class="mt-8 text-center text-xs font-semibold text-muted">
             Your support keeps the app running and allows us to keep improving it.
             If you find value in Uculi — thank you.
         </p>
@@ -529,7 +559,7 @@
         <h2 class="font-serif text-3xl font-bold text-forest md:text-4xl">
             Start today — it's free
         </h2>
-        <p class="mx-auto mt-4 max-w-md text-sm font-medium text-sage leading-relaxed">
+        <p class="mx-auto mt-4 max-w-md text-sm font-medium text-muted leading-relaxed">
             Add your first recipe. Invite your family. Let Uculi take care of the rest.
             Recipes saved today are recipes your grandchildren will have tomorrow.
         </p>
@@ -538,7 +568,7 @@
             <img src="assets/uculi-boekje.jpg" alt="" width="20" height="20" class="h-5 w-5 rounded object-cover" />
             Open Uculi
         </a>
-        <p class="mt-4 text-xs font-semibold text-sage opacity-60">
+        <p class="mt-4 text-xs font-semibold text-muted opacity-60">
             Free forever &nbsp;·&nbsp; No card required &nbsp;·&nbsp; Available now
         </p>
     </div>
@@ -553,21 +583,24 @@
             <div class="flex items-center gap-2.5">
                 <img src="assets/uculi-boekje.jpg" alt="" class="h-7 w-7 rounded-lg object-cover" />
                 <span class="font-serif text-base font-bold text-forest">Uculi</span>
-                <span class="text-xs font-semibold text-sage">— Recipe Notebook</span>
+                <span id="footer-tagline" class="text-xs font-semibold text-muted">— Recipe Notebook</span>
             </div>
-            <div class="flex items-center gap-5 text-xs font-semibold text-sage">
+            <div class="footer-nav text-xs font-semibold text-muted">
                 <a href="app.html?auth=login" class="hover:text-forest transition-colors">Open app</a>
-                <span class="opacity-30">·</span>
                 <a href="app.html?legal=privacy" class="hover:text-forest transition-colors">Privacy policy</a>
-                <span class="opacity-30">·</span>
                 <a href="app.html?legal=terms" class="hover:text-forest transition-colors">Terms of use</a>
-                <span class="opacity-30">·</span>
                 <a href="app.html?legal=cookies" class="hover:text-forest transition-colors">Cookies</a>
-                <span class="opacity-30">·</span>
                 <a href="install.html" class="hover:text-forest transition-colors">Install</a>
             </div>
-            <p class="inline-flex items-center gap-1.5 text-xs font-semibold text-sage opacity-80">
-                © 2026 Uculi · <img src="assets/mholt-apple.png" alt="" class="h-4 w-4 rounded-full object-cover" />Created by Mholt
+            <p id="footer-credit" class="inline-flex flex-wrap items-center justify-center gap-1.5 text-xs font-semibold text-muted opacity-80">
+                <span id="footer-copy">© 2026 Uculi</span>
+                <span class="opacity-30">·</span>
+                <img src="assets/mholt-apple.png" alt="" class="h-4 w-4 rounded-full object-cover" />
+                <span id="footer-by">Created by Mholt</span>
+                <span class="opacity-30">·</span>
+                <span id="footer-kvk">KvK 42175873</span>
+                <span class="opacity-30">·</span>
+                <a id="footer-email" href="mailto:mholt.apps@gmail.com" class="hover:text-forest transition-colors">mholt.apps@gmail.com</a>
             </p>
         </div>
     </div>
@@ -575,6 +608,175 @@
 
 <script>
     lucide.createIcons();
+
+    (function localizeMarketingPage() {
+        const params = new URLSearchParams(window.location.search || '');
+        const langParam = String(params.get('lang') || '').toLowerCase();
+        const preferNl = langParam === 'nl'
+            || (!langParam && String(navigator.language || '').toLowerCase().startsWith('nl'));
+        if (!preferNl) return;
+
+        document.documentElement.lang = 'nl';
+        document.title = 'Uculi — Jouw receptenboek, voor altijd';
+
+        const map = {
+            'Features': 'Functies',
+            'Families': 'Families',
+            'Pricing': 'Prijzen',
+            'Open the app': 'Open de app',
+            'Now available · Free to use': 'Nu beschikbaar · Gratis te gebruiken',
+            'Your recipe book.': 'Jouw receptenboek.',
+            'For your family. Forever.': 'Voor je familie. Voor altijd.',
+            "Uculi is the place where your recipes live — and where grandma's apple pie will never get lost again. A personal notebook that you share with the people who matter, when you want to.":
+                'Uculi is de plek waar je recepten wonen — en waar oma’s appeltaart nooit meer zoekraakt. Een persoonlijk schrift dat je deelt met de mensen die ertoe doen, wanneer jij dat wilt.',
+            'Start for free': 'Gratis beginnen',
+            'See how it works': 'Bekijk hoe het werkt',
+            'No credit card required · Free plan available forever': 'Geen creditcard nodig · Gratis plan voor altijd',
+            "Grandma's Apple Pie": 'Oma’s appeltaart',
+            'Saved by Maria · Family recipe': 'Opgeslagen door Maria · Familiarecept',
+            '500g flour · 200g cold butter': '500 g bloem · 200 g koude boter',
+            '1 kg tart apples · 120g sugar': '1 kg zure appels · 120 g suiker',
+            '2 tsp cinnamon · pinch of salt': '2 tl kaneel · snufje zout',
+            'Step 1 of 5': 'Stap 1 van 5',
+            'Preheat oven to 180 °C': 'Verwarm de oven voor op 180 °C',
+            'The recipe your family will always have with them.': 'Het recept dat je familie altijd bij zich heeft.',
+            'What makes it different': 'Wat het anders maakt',
+            'Built around how you actually cook': 'Gebouwd rond hoe jij echt kookt',
+            "Not a calorie tracker. Not a meal planner. Not an algorithm. Just your recipes — exactly as you'd write them down.":
+                'Geen calorieteller. Geen mealplanner. Geen algoritme. Gewoon jouw recepten — precies zoals je ze zou opschrijven.',
+            'Your personal notebook': 'Jouw persoonlijke schrift',
+            "Add recipes the way you'd write them: a name, ingredients, steps, a photo. No mandatory fields, no endless forms. While cooking, the recipe stays in front of you. While shopping, your ingredient list is right there.":
+                'Voeg recepten toe zoals je ze zou opschrijven: een naam, ingrediënten, stappen, een foto. Geen verplichte velden, geen eindeloze formulieren. Tijdens het koken blijft het recept voor je. Tijdens het boodschappen doen staat je ingrediëntenlijst klaar.',
+            'Shared with your family': 'Gedeeld met je familie',
+            "Create a family space, invite people via a link or tag, and everyone's recipes live in one shared notebook. Grandma's recipe stays in the family — not buried in a WhatsApp message or a yellowed scrap of paper.":
+                'Maak een familieruimte, nodig mensen uit via een link of tag, en ieders recepten leven in één gedeeld schrift. Oma’s recept blijft in de familie — niet begraven in een WhatsApp-bericht of een vergeeld briefje.',
+            'Social when you want it': 'Sociaal wanneer jij dat wilt',
+            'Publish a recipe and let others discover it. Like and save what inspires you. Or keep everything private — it\'s entirely your choice. No pressure to post. No feed to scroll.':
+                'Publiceer een recept en laat anderen het ontdekken. Like en bewaar wat je inspireert. Of houd alles privé — helemaal jouw keuze. Geen druk om te posten. Geen feed om te scrollen.',
+            'The recipes that belong': 'De recepten die van',
+            'to all of you': 'jullie allemaal zijn',
+            "A family in Uculi is a shared recipe space with a name and a PIN. Invite anyone via WhatsApp or a link. Every member sees the full collection — and everyone can contribute.":
+                'Een familie in Uculi is een gedeelde receptenruimte met een naam en een pincode. Nodig iedereen uit via WhatsApp of een link. Elk lid ziet de hele collectie — en iedereen kan bijdragen.',
+            "Families are not mandatory. You don't have to be social if you don't want to. But the infrastructure is there the moment you do.":
+                'Families zijn niet verplicht. Je hoeft niet sociaal te zijn als je dat niet wilt. Maar de infrastructuur staat klaar zodra je dat wel wilt.',
+            'Invite via WhatsApp, link or tag': 'Uitnodigen via WhatsApp, link of tag',
+            'Everyone can add and view recipes': 'Iedereen kan recepten toevoegen en bekijken',
+            'Works across languages — NL, EN, FR, DE, ES': 'Werkt in meerdere talen — NL, EN, FR, DE, ES',
+            'Preserved forever — no expiry, no data loss': 'Voor altijd bewaard — geen verloop, geen dataverlies',
+            '8 members · 34 recipes': '8 leden · 34 recepten',
+            '4 members · 21 recipes': '4 leden · 21 recepten',
+            '6 members · 17 recipes': '6 leden · 17 recepten',
+            'Every family has a story. Now they have a place to keep it.': 'Elke familie heeft een verhaal. Nu hebben ze een plek om het te bewaren.',
+            'Recipes are not data.': 'Recepten zijn geen data.',
+            'They are memories.': 'Het zijn herinneringen.',
+            'The smell of a dish calls up a memory that words cannot. But the words — the ingredients, the steps, the small note "don\'t bake too long or it dries out" — those words are all that remains when someone is no longer here.':
+                'De geur van een gerecht roept een herinnering op die woorden niet kunnen. Maar de woorden — de ingrediënten, de stappen, het kleine briefje “niet te lang bakken of het droogt uit” — die woorden blijven over wanneer iemand er niet meer is.',
+            'Uculi wants to be the place where those words are kept. Not in a drawer. Not on an anonymous server. In a notebook that belongs to you and your family — that goes where you go and is never lost.':
+                'Uculi wil de plek zijn waar die woorden bewaard blijven. Niet in een lade. Niet op een anonieme server. In een schrift dat van jou en je familie is — dat meegaat waar jij gaat en nooit zoekraakt.',
+            'That is not a marketing line. That is why this app exists.': 'Dat is geen marketingzin. Daarom bestaat deze app.',
+            'How it works': 'Hoe het werkt',
+            'Up and running in minutes': 'Binnen enkele minuten klaar',
+            'Sign in': 'Inloggen',
+            'Sign in with your Google account. No separate password to remember.': 'Log in met je Google-account. Geen apart wachtwoord om te onthouden.',
+            'Add your first recipe': 'Voeg je eerste recept toe',
+            "Type it in the way you'd write it. Name, ingredients, steps — done.": 'Typ het in zoals je het zou opschrijven. Naam, ingrediënten, stappen — klaar.',
+            'Invite your family': 'Nodig je familie uit',
+            'Create a family space and share the link. Everyone joins in seconds.': 'Maak een familieruimte en deel de link. Iedereen doet in seconden mee.',
+            "Open Uculi — it's free": 'Open Uculi — het is gratis',
+            'Plans & pricing': 'Abonnementen & prijzen',
+            'Simple and honest': 'Eenvoudig en eerlijk',
+            'The core of Uculi is free and will stay that way. Premium unlocks extra features for people who want more.':
+                'De kern van Uculi is gratis en blijft dat. Premium opent extra functies voor wie meer wil.',
+            'Published prices include VAT.': 'Getoonde prijzen zijn incl. btw.',
+            'Free': 'Gratis',
+            '/ forever': '/ voor altijd',
+            'Everything you need to get started.': 'Alles wat je nodig hebt om te beginnen.',
+            'Up to 3 recipes': 'Tot 3 recepten',
+            'Notebook mode': 'Notebookmodus',
+            'Cloud sync': 'Cloud-sync',
+            '5 display languages': '5 weergavetalen',
+            'Unlimited recipes': 'Onbeperkt recepten',
+            'Family sharing': 'Familiedelen',
+            'PDF export': 'PDF-export',
+            'Get started free': 'Gratis starten',
+            'Most popular': 'Meest gekozen',
+            'Premium Monthly': 'Premium maandelijks',
+            '/ month': '/ maand',
+            'incl. VAT': 'incl. btw',
+            'All paid features, billed monthly.': 'Alle betaalde functies, per maand.',
+            'Everything in Free': 'Alles in Gratis',
+            'Publish & share recipes': 'Recepten publiceren & delen',
+            'PDF export & print': 'PDF-export & printen',
+            'Backup & restore': 'Backup & herstel',
+            'Coming soon': 'Binnenkort',
+            'Premium Yearly': 'Premium jaarlijks',
+            '/ year': '/ jaar',
+            'Same Premium access, billed yearly.': 'Zelfde Premium-toegang, per jaar.',
+            'Everything in Premium Monthly': 'Alles in Premium maandelijks',
+            'Better value per month': 'Voordeliger per maand',
+            'PDF export & backup': 'PDF-export & backup',
+            'Your support keeps the app running and allows us to keep improving it. If you find value in Uculi — thank you.':
+                'Jouw steun houdt de app draaiende en laat ons blijven verbeteren. Als Uculi waarde heeft voor jou — dank je wel.',
+            "Start today — it's free": 'Begin vandaag — het is gratis',
+            'Add your first recipe. Invite your family. Let Uculi take care of the rest. Recipes saved today are recipes your grandchildren will have tomorrow.':
+                'Voeg je eerste recept toe. Nodig je familie uit. Laat Uculi de rest doen. Recepten die je vandaag bewaart, heeft je kleinkinderen morgen nog.',
+            'Open Uculi': 'Open Uculi',
+            'Free forever · No card required · Available now': 'Voor altijd gratis · Geen kaart nodig · Nu beschikbaar',
+            '— Recipe Notebook': '— Receptenschrift',
+            'Open app': 'Open de app',
+            'Privacy policy': 'Privacybeleid',
+            'Terms of use': 'Gebruiksvoorwaarden',
+            'Cookies': 'Cookies',
+            'Install': 'Installeren',
+            'Created by Mholt': 'Gemaakt door Mholt',
+            'Weekend Dinner Club': 'Weekend Dinner Club',
+            'Recetas de la Abuela': 'Recetas de la Abuela',
+            'De Bakker Familieboek': 'De Bakker Familieboek'
+        };
+
+        const normalize = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+
+        const walk = (node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const raw = node.textContent;
+                const key = normalize(raw);
+                if (!key) return;
+                if (Object.prototype.hasOwnProperty.call(map, key)) {
+                    const leading = raw.match(/^\s*/)?.[0] || '';
+                    const trailing = raw.match(/\s*$/)?.[0] || '';
+                    node.textContent = leading + map[key] + trailing;
+                }
+                return;
+            }
+            if (node.nodeType !== Node.ELEMENT_NODE) return;
+            if (node.tagName === 'SCRIPT' || node.tagName === 'STYLE') return;
+            for (const child of [...node.childNodes]) walk(child);
+        };
+        walk(document.body);
+
+        // Mixed-content vision paragraph (contains <em>) — replace as a unit.
+        const visionParas = [...document.querySelectorAll('section.bg-forest p')];
+        for (const p of visionParas) {
+            const key = normalize(p.textContent);
+            if (key.startsWith('The smell of a dish') || key.startsWith('De geur van een gerecht')) {
+                p.replaceChildren();
+                p.append(
+                    'De geur van een gerecht roept een herinnering op die woorden niet kunnen. Maar de woorden — de ingrediënten, de stappen, het kleine briefje ',
+                );
+                const em = document.createElement('em');
+                em.textContent = '“niet te lang bakken of het droogt uit”';
+                p.append(em);
+                p.append(' — die woorden blijven over wanneer iemand er niet meer is.');
+            }
+        }
+
+        const by = document.getElementById('footer-by');
+        if (by) by.textContent = 'Gemaakt door Mholt';
+        const kvk = document.getElementById('footer-kvk');
+        if (kvk) kvk.textContent = 'KvK 42175873';
+        const copy = document.getElementById('footer-copy');
+        if (copy) copy.textContent = '© 2026 Uculi';
+    })();
 </script>
 </body>
 </html>

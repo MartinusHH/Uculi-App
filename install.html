@@ -26,14 +26,18 @@
         }
         .frame {
             width: min(36rem, calc(100% - 2rem));
+            max-width: 100%;
             margin: 0 auto;
             padding: 2rem 0 3rem;
+            overflow-x: hidden;
         }
         .card {
             background: var(--paper);
             border: 1px solid var(--border);
             border-radius: 1.5rem;
             padding: 1.5rem;
+            max-width: 100%;
+            overflow-x: hidden;
         }
         h1 {
             font-family: Fraunces, serif;
@@ -71,13 +75,35 @@
         .footer {
             margin-top: 1.5rem;
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: flex-start;
+            column-gap: 0.5rem;
+            row-gap: 0.35rem;
+            max-width: 100%;
+            overflow-x: hidden;
             font-size: 0.875rem;
             font-weight: 600;
             color: var(--sage);
         }
-        .footer img { width: 1rem; height: 1rem; border-radius: 999px; object-fit: cover; }
+        .footer img {
+            width: 1rem;
+            height: 1rem;
+            border-radius: 999px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .footer > span,
+        .footer > a {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .footer > a {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 0.15em;
+            max-width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -93,12 +119,24 @@
                 <li>Confirm — Uculi appears on your home screen.</li>
             </ol>
             <a class="cta" href="app.html" id="open-app">Open Uculi</a>
-            <p class="footer"><img src="assets/mholt-apple.png" alt="" />Created by Mholt · KvK 42175873</p>
+            <p class="footer" id="install-footer">
+                <img src="assets/mholt-apple.png" alt="" />
+                <span id="install-footer-copy">© 2026 Uculi</span>
+                <span aria-hidden="true">·</span>
+                <span id="install-footer-by">Created by Mholt</span>
+                <span aria-hidden="true">·</span>
+                <span id="install-footer-kvk">KvK 42175873</span>
+                <span aria-hidden="true">·</span>
+                <a href="mailto:mholt.apps@gmail.com">mholt.apps@gmail.com</a>
+            </p>
         </article>
     </main>
     <script>
         (function () {
-            const preferNl = String(navigator.language || '').toLowerCase().startsWith('nl');
+            const params = new URLSearchParams(window.location.search || '');
+            const langParam = String(params.get('lang') || '').toLowerCase();
+            const preferNl = langParam === 'nl'
+                || (!langParam && String(navigator.language || '').toLowerCase().startsWith('nl'));
             if (!preferNl) return;
             document.documentElement.lang = 'nl';
             document.title = 'Uculi installeren';
@@ -112,6 +150,7 @@
                 'Bevestig — Uculi staat op je beginscherm.'
             ].map((t) => `<li>${t}</li>`).join('');
             document.getElementById('open-app').textContent = 'Open Uculi';
+            document.getElementById('install-footer-by').textContent = 'Gemaakt door Mholt';
         })();
     </script>
 </body>
