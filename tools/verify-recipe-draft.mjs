@@ -217,6 +217,38 @@ try {
     JSON.stringify(savedOk)
   );
 
+  // Security: step image must not enter innerHTML unsanitized.
+  const xss = await page.evaluate(() => {
+    const malicious = '" onerror=alert(1) x="';
+    const sanitized = sanitizeRecipeStepImageUrl(malicious);
+    clearRecipeEditorDraft('new');
+    renderAddForm();
+    draftSteps = [{ text: 'XSS step', image: malicious, minutes: 1 }];
+    renderDraftSteps();
+    const html = document.getElementById('draft-steps-list')?.innerHTML || '';
+    const img = document.querySelector('#draft-steps-list img');
+    return {
+      sanitizedEmpty: sanitized === '',
+      hasOnerror: /onerror/i.test(html),
+      hasMaliciousRaw: html.includes(malicious),
+      imgPresent: Boolean(img),
+      allowsHttps: sanitizeRecipeStepImageUrl('https://example.com/a.png') === 'https://example.com/a.png',
+      allowsData: sanitizeRecipeStepImageUrl('data:image/png;base64,abc').startsWith('data:image/png'),
+      blocksJavascript: sanitizeRecipeStepImageUrl('javascript:alert(1)') === ''
+    };
+  });
+  log(
+    'draft: step image sanitizes XSS payload',
+    xss.sanitizedEmpty
+      && !xss.hasOnerror
+      && !xss.hasMaliciousRaw
+      && !xss.imgPresent
+      && xss.allowsHttps
+      && xss.allowsData
+      && xss.blocksJavascript,
+    JSON.stringify(xss)
+  );
+
   await page.close();
 } catch (error) {
   log('fatal', false, error?.stack || error);

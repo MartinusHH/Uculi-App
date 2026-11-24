@@ -10485,6 +10485,27 @@
             }[char]));
         }
 
+        // Only allow safe image URLs in step <img src> (http(s), data:image, blob).
+        function sanitizeRecipeStepImageUrl(value = '') {
+            const raw = String(value || '').trim();
+            if (!raw) return '';
+            // Reject attribute breakouts and non-image schemes before parsing.
+            if (/[\s<>"'`]/.test(raw) || /^javascript:/i.test(raw) || /^vbscript:/i.test(raw)) {
+                return '';
+            }
+            if (/^data:image\/[a-z0-9.+-]+[;,]/i.test(raw)) return raw;
+            if (/^blob:/i.test(raw)) return raw;
+            try {
+                const parsed = new URL(raw, typeof window !== 'undefined' ? window.location.href : 'https://uculi.local/');
+                if (parsed.protocol === 'http:' || parsed.protocol === 'https:') return parsed.href;
+                if (parsed.protocol === 'blob:') return raw;
+            } catch (_error) {
+                return '';
+            }
+            return '';
+        }
+        window.sanitizeRecipeStepImageUrl = sanitizeRecipeStepImageUrl;
+
         function cssUrl(value = '') {
             // Prefer single quotes so the value is safe inside style="..." attributes.
             return `url('${String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')`;
@@ -22887,7 +22908,7 @@
                                                 <span class="detail-step-num">${index + 1}</span>
                                                 <div class="flex-1 min-w-0">
                                                     <p class="text-forest font-medium text-base leading-relaxed pt-1">${applyMeasurementSystem(getRecipeInstructionText(step))}</p>
-                                                    ${stepImage ? `<div class="mt-4 overflow-hidden rounded-xl border border-parchmentDark bg-parchment"><img src="${stepImage}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''}
+                                                    ${(() => { const safeStepImage = sanitizeRecipeStepImageUrl(stepImage); return safeStepImage ? `<div class="mt-4 overflow-hidden rounded-xl border border-parchmentDark bg-parchment"><img src="${escapeHTML(safeStepImage)}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''; })()}
                                                 </div>
                                             </li>
                                         `;
@@ -24458,7 +24479,7 @@
                                                 </div>
                                                 <div class="flex-1 min-w-0">
                                                     <p onclick="toggleItemCheck(${recipe.id}, 'step', ${index}, this.closest('li'))" class="text-forest font-medium text-base leading-relaxed pt-1 cursor-pointer">${finalStep}</p>
-                                                    ${stepImage ? `<div class="mt-4 overflow-hidden rounded-xl border border-parchmentDark bg-parchment"><img src="${stepImage}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''}
+                                                    ${(() => { const safeStepImage = sanitizeRecipeStepImageUrl(stepImage); return safeStepImage ? `<div class="mt-4 overflow-hidden rounded-xl border border-parchmentDark bg-parchment"><img src="${escapeHTML(safeStepImage)}" alt="Instruction step ${index + 1}" class="h-48 w-full object-cover"></div>` : ''; })()}
                                                 </div>
                                             </li>
                                         `;
@@ -26097,8 +26118,9 @@
             if (!list) return;
             list.innerHTML = draftSteps.map((step, i) => {
                 const stepText = getRecipeInstructionText(step);
-                const stepImage = getRecipeInstructionImage(step);
+                const stepImage = sanitizeRecipeStepImageUrl(getRecipeInstructionImage(step));
                 const stepMinutes = getRecipeInstructionMinutes(step) || 1;
+                const safeSrc = stepImage ? escapeHTML(stepImage) : '';
 
                 return `
                     <li class="bg-white p-3 rounded-sm border border-parchmentDark shadow-sm text-sm font-medium text-forest">
@@ -26106,7 +26128,7 @@
                             <span class="bg-sage text-white w-6 h-6 flex items-center justify-center rounded-sm text-xs font-bold flex-shrink-0 mt-0.5">${i + 1}</span>
                             <div class="flex-1 pt-0.5">
                                 <p class="leading-relaxed">${escapeHTML(stepText)}</p>
-                                ${stepImage ? `<div class="mt-3 overflow-hidden rounded-md border border-parchmentDark bg-parchment"><img src="${stepImage}" alt="Draft step ${i + 1}" class="h-40 w-full object-cover"></div>` : ''}
+                                ${safeSrc ? `<div class="mt-3 overflow-hidden rounded-md border border-parchmentDark bg-parchment"><img src="${safeSrc}" alt="Draft step ${i + 1}" class="h-40 w-full object-cover"></div>` : ''}
                                 <label class="mt-3 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-sage">
                                     Minutes
                                     <input type="number" min="1" max="240" inputmode="numeric" value="${stepMinutes}" aria-label="Minutes for step ${i + 1}" class="${inputClass} !h-9 !w-20" onchange="setDraftStepMinutes(${i}, this.value)">
