@@ -6977,7 +6977,7 @@
                     </div>
                     <div class="app-header-copy">
                         <h1 class="text-2xl font-fantasy font-bold tracking-wide text-forest leading-none">Uculi</h1>
-                        <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Mholt · KvK 42175873</p>
+                        <p class="app-header-subtitle" id="app-header-created-by"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Created by Mholt</p>
                     </div>
                 </div>
                 <h1 id="header-page-title" class="app-header-page-title">Uculi</h1>
@@ -15737,7 +15737,7 @@
                 const apple = createdBy.querySelector('img.brand-apple');
                 createdBy.replaceChildren();
                 if (apple) createdBy.appendChild(apple);
-                createdBy.append('Mholt · KvK 42175873');
+                createdBy.append(nl ? 'Gemaakt door Mholt' : 'Created by Mholt');
             }
             if (typeof lucide?.createIcons === 'function') lucide.createIcons();
         }
@@ -16180,6 +16180,8 @@
 
             trackLaunchEvent('landingViewed');
             const authText = getAuthI18n();
+            const landingNl = getActiveUiLanguage() === 'nl';
+            const landingCreatedBy = landingNl ? 'Gemaakt door Mholt' : 'Created by Mholt';
             const landingAuthActionLabel = firebaseInitialized ? authText.legacyPrimaryAuth : authText.legacyPrimaryGetStarted;
             const landingAuthActionIcon = firebaseInitialized ? 'log-in' : 'chef-hat';
             document.body.insertAdjacentHTML('beforeend', `
@@ -16195,7 +16197,7 @@
                                 </div>
                                 <div class="landing-brand-copy">
                                     <span class="font-fantasy text-2xl font-bold tracking-wide text-forest leading-none">Uculi</span>
-                                    <p class="landing-brand-credit"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Mholt · KvK 42175873</p>
+                                    <p class="landing-brand-credit"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />${landingCreatedBy}</p>
                                 </div>
                             </div>
                             <button type="button" onclick="signInFromLanding()" class="landing-header-login hidden md:flex h-10 items-center gap-2 rounded-xl border border-parchmentDark bg-white px-5 text-sm font-bold text-forest shadow-sm transition-all hover:border-gold hover:text-gold">
@@ -18324,8 +18326,7 @@
                 <div class="guide-modal space-y-4 text-inkDark p-2 max-h-[70vh] overflow-y-auto">
                     <div class="rounded-2xl border border-parchmentDark bg-parchment p-4">
                         <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-sage">${nl ? 'Merk' : 'Brand'}</p>
-                        <h3 class="mt-2 flex items-center gap-2 font-serif text-lg font-bold text-forest"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />Mholt · KvK 42175873</h3>
-                        <p class="mt-1 text-sm font-semibold text-sage"><a href="mailto:mholt.apps@gmail.com" class="hover:text-forest">mholt.apps@gmail.com</a></p>
+                        <h3 class="mt-2 flex items-center gap-2 font-serif text-lg font-bold text-forest"><img src="assets/mholt-apple.png" alt="" class="brand-apple" />${nl ? 'Gemaakt door Mholt' : 'Created by Mholt'}</h3>
                         <p class="mt-2 text-sm font-semibold text-sage">${nl
                             ? 'Uculi is een rustig receptenschrift: bewaren, koken en later delen zonder rommel.'
                             : 'Uculi is a calm recipe notebook: keep, cook, and later share without clutter.'}</p>
@@ -18624,7 +18625,7 @@
                     accept: 'Akkoord en verder',
                     acceptIntro: 'Lees het privacybeleid en de gebruiksvoorwaarden en vink beide vakjes aan voordat je verdergaat.',
                     updated: 'Laatst bijgewerkt: 21 november 2026',
-                    createdBy: 'Mholt · KvK 42175873',
+                    createdBy: 'Gemaakt door Mholt',
                     controller: 'Mholt · KvK 42175873 · mholt.apps@gmail.com'
                 }
                 : {
@@ -18635,7 +18636,7 @@
                     accept: 'Agree and continue',
                     acceptIntro: 'Read the privacy policy and terms of use and tick both boxes before you continue.',
                     updated: 'Last updated: 21 November 2026',
-                    createdBy: 'Mholt · KvK 42175873',
+                    createdBy: 'Created by Mholt',
                     controller: 'Mholt · KvK 42175873 · mholt.apps@gmail.com'
                 };
         }
