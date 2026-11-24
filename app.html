@@ -1472,16 +1472,27 @@
             background: transparent;
             color: var(--text-muted);
             font-family: Outfit, sans-serif;
-            font-size: 0.72rem;
-            font-weight: 800;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            text-transform: none;
         }
 
         .index-tool-btn:hover,
         .index-tool-btn:focus-visible {
             color: #1c1410;
             background: rgba(246, 241, 232, 0.96);
+        }
+
+        /* Filteren is not a universal icon — keep the word visible. */
+        .index-tool-btn--filter {
+            width: auto;
+            min-width: 2.75rem;
+            padding: 0 0.7rem;
+        }
+
+        .index-tool-btn--filter .index-tool-label {
+            display: inline;
         }
 
         .index-tool-btn.is-active,
@@ -3373,13 +3384,13 @@
 
             #app-content .settings-actions > button.phone-save-icon,
             #app-content .settings-actions > label.phone-save-icon {
-                flex: 0 0 var(--control-h-md);
-                width: var(--control-h-md);
-                min-width: var(--control-h-md);
-                max-width: var(--control-h-md);
-                gap: 0;
-                padding-left: 0;
-                padding-right: 0;
+                flex: 1 1 0;
+                width: auto;
+                min-width: 0;
+                max-width: none;
+                gap: 0.4rem;
+                padding-left: var(--space-3);
+                padding-right: var(--space-3);
             }
 
             #app-content .settings-actions.button-pair > button.phone-save-icon,
@@ -3427,8 +3438,18 @@
                 padding: 0;
             }
 
+            #app-content .index-tool-btn--filter {
+                width: auto;
+                min-width: 2.75rem;
+                padding: 0 0.65rem;
+            }
+
             #app-content .index-tool-label {
                 display: none;
+            }
+
+            #app-content .index-tool-btn--filter .index-tool-label {
+                display: inline;
             }
 
             #app-content .settings-actions.button-pair {
@@ -3682,27 +3703,27 @@
                 height: 2.75rem;
             }
 
+            /* Opslaan keeps visible text at every width (no icon-only collapse). */
             .phone-icon-label {
-                position: absolute;
-                width: 1px;
-                height: 1px;
-                padding: 0;
-                margin: -1px;
-                overflow: hidden;
-                clip: rect(0, 0, 0, 0);
+                display: inline;
+                position: static;
+                width: auto;
+                height: auto;
+                margin: 0;
+                clip: auto;
+                overflow: visible;
                 white-space: nowrap;
-                border: 0;
             }
 
             button.phone-save-icon,
             .app-modal-panel .app-modal-footer > button.phone-save-icon {
-                flex: 0 0 2.75rem;
-                width: 2.75rem;
-                min-width: 2.75rem;
-                max-width: 2.75rem;
-                gap: 0;
-                padding-left: 0;
-                padding-right: 0;
+                flex: 1 1 0;
+                width: auto;
+                min-width: 0;
+                max-width: none;
+                gap: 0.4rem;
+                padding-left: var(--space-3);
+                padding-right: var(--space-3);
             }
 
             #cover-editor-modal h2 {
@@ -7531,8 +7552,8 @@
                 <h1 id="header-page-title" class="app-header-page-title">Uculi</h1>
             </div>
             <div class="app-header-actions">
-                <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Add Recipe" class="header-primary-action flex h-11 items-center gap-2 rounded-xl bg-[#929D75] px-4 text-sm font-bold text-forest shadow-sm transition-all hover:bg-gold hover:text-forest">
-                    <i data-lucide="plus" class="w-4 h-4"></i> <span class="header-add-label">Add Recipe</span>
+                <button id="header-add-recipe" onclick="renderAddForm()" aria-label="Recept toevoegen" title="Recept toevoegen" class="header-primary-action flex h-11 items-center gap-2 rounded-xl bg-[#929D75] px-4 text-sm font-bold text-forest shadow-sm transition-all hover:bg-gold hover:text-forest">
+                    <i data-lucide="plus" class="w-4 h-4" aria-hidden="true"></i> <span class="header-add-label">Recept</span>
                 </button>
                 <div class="header-more" id="header-more" hidden>
                     <button id="header-more-toggle" type="button" class="header-icon-button" aria-label="Meer" title="Meer" aria-haspopup="menu" aria-expanded="false" onclick="toggleHeaderMoreMenu(event)">
@@ -7557,11 +7578,11 @@
                         </button>
                     </div>
                 </div>
-                <button id="notifications-button" onclick="showNotificationsModal()" class="header-icon-button relative hidden" hidden title="Notifications" aria-label="Notifications">
+                <button id="notifications-button" onclick="showNotificationsModal()" class="header-icon-button relative hidden" hidden title="Meldingen" aria-label="Meldingen">
                     <i data-lucide="bell" class="w-5 h-5"></i>
                     <span id="notifications-badge" class="absolute -right-1 -top-1 hidden min-w-[1.15rem] rounded-full bg-coral px-1 text-[10px] font-bold leading-5 text-white"></span>
                 </button>
-                <button id="undo-delete-button" onclick="undoDeletedRecipe()" class="header-icon-button hidden" hidden title="Undo last delete" aria-label="Undo last delete">
+                <button id="undo-delete-button" onclick="undoDeletedRecipe()" class="header-icon-button hidden" hidden title="Laatste verwijdering ongedaan maken" aria-label="Laatste verwijdering ongedaan maken">
                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
                     <span id="undo-delete-label">Undo</span>
                 </button>
@@ -11088,8 +11109,8 @@
                                     <div class="notebook-sticky-note-menu ${menuPlacementClass} ${menuAlignmentClass}" data-notebook-note-menu="true" onpointerdown="event.stopPropagation()">
                                         <div class="flex items-center justify-between gap-3">
                                             <p class="text-[10px] font-bold uppercase tracking-[0.22em] text-sage">Plakbriefje</p>
-                                            <button type="button" onpointerdown="event.stopPropagation()" onclick="closeNotebookStickyNoteMenu()" class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-parchmentDark bg-white text-sage shadow-sm">
-                                                <i data-lucide="x" class="h-4 w-4"></i>
+                                            <button type="button" onpointerdown="event.stopPropagation()" onclick="closeNotebookStickyNoteMenu()" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-parchmentDark bg-white text-sage shadow-sm" aria-label="${uiText('Close sticky note', 'Plakbriefje sluiten')}" title="${uiText('Close sticky note', 'Plakbriefje sluiten')}">
+                                                <i data-lucide="x" class="h-4 w-4" aria-hidden="true"></i>
                                             </button>
                                         </div>
                                         <textarea maxlength="160" data-notebook-note-editor="${recipeId}-${index}" aria-label="Tekst plakbriefje" onpointerdown="event.stopPropagation()" oninput="updateNotebookStickyNoteText(${recipeId}, ${index}, this.value)" class="mt-3 w-full min-h-[6.5rem] rounded-xl border border-sage border-opacity-20 bg-white px-4 py-3 text-sm font-semibold text-forest shadow-sm outline-none focus:border-gold resize-y md:min-h-[7rem]" placeholder="Snel een herinnering…">${escapeHTML(note.text || '')}</textarea>
@@ -11862,8 +11883,8 @@
                                     <div class="rounded-xl border border-parchmentDark bg-accent bg-opacity-25 p-4 space-y-4">
                                         <div class="flex items-center justify-between gap-3">
                                             <p class="text-xs font-bold uppercase tracking-[0.2em] text-sage">Sticker ${index + 1} · ${kindLabels[kind] || kind}</p>
-                                            <button type="button" onclick="removeDraftCoverSticker(${index})" class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full border border-parchmentDark bg-white text-sage flex items-center justify-center shadow-sm">
-                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                            <button type="button" onclick="removeDraftCoverSticker(${index})" class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl border border-parchmentDark bg-white text-sage flex items-center justify-center shadow-sm" aria-label="${uiText('Remove sticker', 'Sticker verwijderen')}" title="${uiText('Remove sticker', 'Sticker verwijderen')}">
+                                                <i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i>
                                             </button>
                                         </div>
 
@@ -15714,12 +15735,12 @@
 
         function getAppButtonClasses(variant = 'secondary', options = {}) {
             const { fullWidth = false, iconOnly = false, size = 'md' } = options;
-            const baseClasses = 'inline-flex items-center justify-center gap-2 border font-bold uppercase transition-all disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:filter-none';
+            const baseClasses = 'inline-flex items-center justify-center gap-2 border font-bold transition-all disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:filter-none';
             // One chrome height (44) + radius (12 / rounded-xl). size sm|md|lg kept for call-site compat.
             const sizeMap = {
-                sm: iconOnly ? 'h-11 w-11 rounded-xl text-xs' : 'h-11 rounded-xl px-4 text-xs tracking-[0.08em]',
-                md: iconOnly ? 'h-11 w-11 rounded-xl text-sm' : 'h-11 rounded-xl px-4 text-xs tracking-[0.08em]',
-                lg: iconOnly ? 'h-11 w-11 rounded-xl text-base' : 'h-11 rounded-xl px-5 text-sm tracking-[0.08em]'
+                sm: iconOnly ? 'h-11 w-11 rounded-xl text-xs' : 'h-11 rounded-xl px-4 text-sm',
+                md: iconOnly ? 'h-11 w-11 rounded-xl text-sm' : 'h-11 rounded-xl px-4 text-sm',
+                lg: iconOnly ? 'h-11 w-11 rounded-xl text-base' : 'h-11 rounded-xl px-5 text-sm'
             };
             const sizeClasses = sizeMap[size] || sizeMap.md;
             const widthClass = fullWidth ? ' w-full' : '';
@@ -15756,11 +15777,15 @@
 
         function renderDetailIconAction(label, iconName, onClick, variant = 'secondary', extraClasses = '', iconOnly = false) {
             const safeLabel = escapeHTML(label);
-            const showDesktopLabel = iconOnly;
+            // iconOnly=true: universal actions may hide the word under 900px (aria+title remain).
+            // PDF / Verwijderen / Opslaan pass iconOnly=false so the word stays at every width.
+            const labelClass = iconOnly
+                ? 'detail-action-label text-sm font-bold'
+                : 'text-sm font-bold';
             return `
                 <div class="flex" translate="no">
-                    <button onclick="${onClick}" aria-label="${safeLabel}" title="${safeLabel}" class="${getAppButtonClasses(variant, { size: 'md', iconOnly: false })}${showDesktopLabel ? '' : ' min-w-[8.75rem]'} ${extraClasses}">
-                        <i data-lucide="${iconName}" class="h-5 w-5"></i><span class="${showDesktopLabel ? 'detail-action-label text-[11px] font-bold uppercase tracking-[0.16em]' : 'text-[11px] font-bold uppercase tracking-[0.16em]'}">${safeLabel}</span>
+                    <button onclick="${onClick}" aria-label="${safeLabel}" title="${safeLabel}" class="${getAppButtonClasses(variant, { size: 'md', iconOnly: false })}${iconOnly ? '' : ' min-w-[8.75rem]'} ${extraClasses}">
+                        <i data-lucide="${iconName}" class="h-5 w-5"></i><span class="${labelClass}">${safeLabel}</span>
                     </button>
                 </div>
             `;
@@ -16838,7 +16863,7 @@
             const moreAddLabel = document.getElementById('header-more-add-label');
             const optionsLabel = nl ? 'Opties' : 'Options';
             const helpLabel = 'Help';
-            const addLabel = nl ? 'Recept' : 'Add Recipe';
+            const addLabel = nl ? 'Recept toevoegen' : 'Add recipe';
             const backLabel = nl ? 'Terug' : 'Back';
             const floatingBack = document.getElementById('floating-back-button');
             const navLabels = {
@@ -16962,7 +16987,7 @@
             const help = document.getElementById('header-help');
             const add = document.getElementById('header-add-recipe');
             const nl = userSettings.language === 'nl';
-            const addLabel = nl ? 'Recept' : 'Add Recipe';
+            const addLabel = nl ? 'Recept toevoegen' : 'Add recipe';
             const canShowPrimary = currentView === 'index' && activeDetailRecipeId == null && chromeBackAction == null;
             const showGear = !(currentView === 'settings' || currentView === 'access' || currentView === 'beheer');
             const showHelp = currentView === 'settings' || currentView === 'access' || currentView === 'beheer';
@@ -18042,8 +18067,8 @@
                         </div>
                         ${canVote ? `
                             <div class="mt-3 flex items-center gap-2">
-                                <button type="button" onclick="respondToFamilyVote('${notification.id}', 'approve')" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-[#929D75] bg-white px-4 text-sm font-bold text-forest shadow-sm transition-all hover:bg-[#929D75] hover:text-forest">Approve</button>
-                                <button type="button" onclick="respondToFamilyVote('${notification.id}', 'reject')" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-red-300 bg-white px-4 text-sm font-bold text-red-500 shadow-sm transition-all hover:border-red-500 hover:text-red-600">Reject</button>
+                                <button type="button" onclick="respondToFamilyVote('${notification.id}', 'approve')" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-[#929D75] bg-white px-4 text-sm font-bold text-forest shadow-sm transition-all hover:bg-[#929D75] hover:text-forest">${uiText('Approve', 'Goedkeuren')}</button>
+                                <button type="button" onclick="respondToFamilyVote('${notification.id}', 'reject')" class="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-red-300 bg-white px-4 text-sm font-bold text-red-500 shadow-sm transition-all hover:border-red-500 hover:text-red-600">${uiText('Reject', 'Afwijzen')}</button>
                             </div>
                         ` : actorVote ? `<p class="mt-3 text-xs font-bold uppercase tracking-[0.16em] ${actorVote === 'approve' ? 'text-forest' : 'text-red-500'}">Your vote: ${userVoteLabel}</p>` : ''}
                     ` : ''}
@@ -18908,10 +18933,11 @@
                                     </div>
                                 </label>
 
-                            <label class="custom-file-upload profile-editor-avatar-upload block">
+                            <label class="custom-file-upload profile-editor-avatar-upload block" aria-label="${uiText('Choose photo', 'Foto kiezen')}" title="${uiText('Choose photo', 'Foto kiezen')}">
+                                <span class="sr-only">${uiText('Choose photo', 'Foto kiezen')}</span>
                                 <input type="file" accept="image/*" onchange="handleImageUpload(event, 'profile-avatar-preview', 'profilePic', true)">
                                 <div id="profile-avatar-preview" class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-cover bg-center border-4 border-white shadow-md flex items-center justify-center group" style="background-image: ${cssUrl(profileBg)}">
-                                    <div class="bg-white/90 p-1.5 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center"><i data-lucide="camera" class="w-5 h-5 text-forest"></i></div>
+                                    <div class="bg-white/90 p-1.5 rounded-full opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex items-center justify-center"><i data-lucide="camera" class="w-5 h-5 text-forest" aria-hidden="true"></i></div>
                                 </div>
                             </label>
                         </div>
@@ -19101,7 +19127,7 @@
                         <div class="grid w-full gap-3 md:w-auto md:grid-cols-2">
                             ${isPremiumEnforced() ? `
                             <button onclick="showPlansModal()" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
-                                <i data-lucide="crown" class="w-4 h-4"></i> View Plans
+                                <i data-lucide="crown" class="w-4 h-4" aria-hidden="true"></i> ${uiText('View plans', 'Bekijk plannen')}
                             </button>
                             ` : ''}
                             ${billingMeta.state === 'preview'
@@ -19203,7 +19229,7 @@
                     <div class="${settingsActionGridClass}">
                         ${isPremiumEnforced() ? `
                         <button onclick="${billingReady ? "startPremiumUpgradeFlow('settings-billing')" : "showPlansModal()"}" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
-                            <i data-lucide="${billingReady ? 'credit-card' : 'crown'}" class="w-4 h-4"></i> ${billingReady ? 'Change Plan' : 'View Plans'}
+                            <i data-lucide="${billingReady ? 'credit-card' : 'crown'}" class="w-4 h-4" aria-hidden="true"></i> ${billingReady ? uiText('Change plan', 'Plan wijzigen') : uiText('View plans', 'Bekijk plannen')}
                         </button>
                         <button onclick="${restoreReady ? 'restorePremiumEntitlement()' : "showBillingRestoreSetupStatusModal('settings-billing')"}" class="${getAppButtonClasses('secondary', { fullWidth: true, size: 'lg' })}">
                             <i data-lucide="shield-check" class="w-4 h-4"></i> Restore Purchase
@@ -19268,8 +19294,8 @@
                     </div>
 
                     <div class="pt-4 border-t border-accent flex justify-end">
-                        <button type="submit" class="${getAppButtonClasses('primary', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="Save Settings" title="Save Settings">
-                            <i data-lucide="save" class="w-4 h-4"></i><span class="phone-icon-label">Save Settings</span>
+                        <button type="submit" class="${getAppButtonClasses('primary', { size: 'lg' })} phone-save-icon min-w-[150px]" aria-label="${uiText('Save settings', 'Instellingen opslaan')}" title="${uiText('Save settings', 'Instellingen opslaan')}">
+                            <i data-lucide="save" class="w-4 h-4" aria-hidden="true"></i><span class="phone-icon-label">${uiText('Save settings', 'Instellingen opslaan')}</span>
                         </button>
                     </div>
                 </form>
@@ -21839,7 +21865,7 @@
 
                         <div class="space-y-2">
                             <label class="block text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Quick view', 'Snelbeeld')}</label>
-                            <button onclick="showFavoritesOnly = !showFavoritesOnly; renderList()" class="flex h-11 w-full items-center justify-between rounded-xl border px-4 text-sm font-semibold shadow-sm transition-all ${showFavoritesOnly ? 'border-[#929D75] bg-[#929D75] text-forest shadow-md' : 'border-sage border-opacity-20 bg-white text-forest hover:border-gold hover:shadow-md'}">
+                            <button type="button" onclick="showFavoritesOnly = !showFavoritesOnly; renderList()" aria-label="${showFavoritesOnly ? uiText('Favorites only', 'Alleen favorieten') : uiText('Show favorites', 'Toon favorieten')}" class="flex h-11 w-full items-center justify-between rounded-xl border px-4 text-sm font-semibold shadow-sm transition-all ${showFavoritesOnly ? 'border-[#929D75] bg-[#929D75] text-forest shadow-md' : 'border-sage border-opacity-20 bg-white text-forest hover:border-gold hover:shadow-md'}">
                                 <span class="flex items-center gap-2">
                                     <i data-lucide="heart" class="h-4 w-4 ${showFavoritesOnly ? 'fill-current' : ''}"></i>
                                     ${showFavoritesOnly ? uiText('Favorites only', 'Alleen favorieten') : uiText('Show favorites', 'Toon favorieten')}
@@ -21911,8 +21937,8 @@
                             <i data-lucide="search" class="h-4 w-4"></i>
                             <span class="index-tool-label">${uiText('Search', 'Zoeken')}</span>
                         </button>
-                        <button type="button" onclick="toggleListFiltersVisibility()" class="index-tool-btn index-tool-btn--ghost ${isFilterVisible ? 'is-active' : ''}" title="${isNotebookMode ? uiText('Switch to card view and open filters', 'Ga naar kaarten en open filters') : uiText('Toggle filters', 'Filters tonen of verbergen')}" aria-label="${uiText('Filters', 'Filteren')}" aria-pressed="${isFilterVisible}">
-                            <i data-lucide="sliders-horizontal" class="h-4 w-4"></i>
+                        <button type="button" onclick="toggleListFiltersVisibility()" class="index-tool-btn index-tool-btn--ghost index-tool-btn--filter ${isFilterVisible ? 'is-active' : ''}" title="${isNotebookMode ? uiText('Switch to card view and open filters', 'Ga naar kaarten en open filters') : uiText('Toggle filters', 'Filters tonen of verbergen')}" aria-label="${uiText('Filters', 'Filteren')}" aria-pressed="${isFilterVisible}">
+                            <i data-lucide="sliders-horizontal" class="h-4 w-4" aria-hidden="true"></i>
                             <span class="index-tool-label">${uiText('Filters', 'Filteren')}</span>
                         </button>
                     </div>
@@ -21983,7 +22009,7 @@
                     const totalMinutes = Number(recipe.prepTime || 0) + Number(recipe.cookTime || 0);
                     html += `
                         <article onclick="renderDetail(${recipe.id})" class="index-list-card relative" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();renderDetail(${recipe.id});}">
-                            ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-gold bg-white text-gold shadow-sm"><i data-lucide="alert-circle" class="h-4 w-4"></i></button>` : ''}
+                            ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="${uiText('Author update available', 'Update van de auteur beschikbaar')}" aria-label="${uiText('Author update available', 'Update van de auteur beschikbaar')}" class="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-gold bg-white text-gold shadow-sm"><i data-lucide="alert-circle" class="h-4 w-4" aria-hidden="true"></i></button>` : ''}
                             <div class="index-list-media" style="background-image: ${cssUrl(recipe.profile || defaultPlaceholderProfile)}"></div>
                             <div class="index-list-body">
                                 <h3 class="truncate">${escapeHTML(recipe.title || 'Untitled')}</h3>
@@ -22011,7 +22037,7 @@
                     const familyChipMarkup = getRecipeFamilyChipMarkup(recipe, 'index-card-tag');
                     html += `
                         <article onclick="renderDetail(${recipe.id})" class="index-card relative" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();renderDetail(${recipe.id});}">
-                            ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="Author update available" class="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-gold bg-white text-gold shadow-sm"><i data-lucide="alert-circle" class="h-5 w-5"></i></button>` : ''}
+                            ${savedRecipeOutdated ? `<button onclick="event.stopPropagation(); renderDetail(${recipe.id})" title="${uiText('Author update available', 'Update van de auteur beschikbaar')}" aria-label="${uiText('Author update available', 'Update van de auteur beschikbaar')}" class="absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-xl border border-gold bg-white text-gold shadow-sm"><i data-lucide="alert-circle" class="h-5 w-5" aria-hidden="true"></i></button>` : ''}
                             <div class="index-card-media" style="background-image: ${cssUrl(recipe.profile || defaultPlaceholderProfile)}"></div>
                             <div class="index-card-body">
                                 <h3>${escapeHTML(recipe.title || 'Untitled')}</h3>
@@ -24101,13 +24127,13 @@
                         ? renderDetailIconAction(uiText('Share', 'Delen'), 'share-2', `shareRecipe(${recipe.id})`, 'secondary', '', true)
                         : renderDetailIconAction(uiText('Share', 'Delen'), 'lock', "showPremiumModal('recipeSharing')", 'muted', '', true)}
                     ${accountHasPremiumPlan()
-                        ? renderDetailIconAction('PDF', 'file-down', `exportRecipeAsPDF(${recipe.id})`, 'secondary', '', true)
-                        : renderDetailIconAction('PDF', 'lock', "showPremiumModal('recipePdfExport')", 'muted', '', true)}
-                    ${isSavedCommunityRecipe ? '' : renderDetailIconAction(publishActionLabel, publishActionIcon, `publishRecipe(${recipe.id})`, publishDetailVariant, '', true)}
+                        ? renderDetailIconAction('PDF', 'file-down', `exportRecipeAsPDF(${recipe.id})`, 'secondary', '', false)
+                        : renderDetailIconAction('PDF', 'lock', "showPremiumModal('recipePdfExport')", 'muted', '', false)}
+                    ${isSavedCommunityRecipe ? '' : renderDetailIconAction(publishActionLabel, publishActionIcon, `publishRecipe(${recipe.id})`, publishDetailVariant, '', false)}
                     ${canAdminForceOffline ? renderDetailIconAction(uiText('Admin: offline now', 'Admin: nu offline'), 'shield-x', `adminForceOfflineRecipe(${recipe.id})`, 'danger', '', true) : ''}
                     ${deletionVoteProgress
                         ? renderDetailIconAction(uiText('Vote pending', 'Stemming open'), 'bell-ring', 'showNotificationsModal()', 'warning', '', true)
-                        : renderDetailIconAction(uiText('Delete', 'Verwijderen'), 'trash-2', `requestRecipeDeletion(${recipe.id})`, 'danger', '', true)}
+                        : renderDetailIconAction(uiText('Delete', 'Verwijderen'), 'trash-2', `requestRecipeDeletion(${recipe.id})`, 'danger', '', false)}
                 </div>
             `;
 
@@ -24202,7 +24228,8 @@
                                             const hasIngredientsInList = userSettings.shoppingList.items.some(item => 
                                                 !item.checked && (item.sourceRecipeIds || []).includes(recipe.id)
                                             );
-                                            return `<button type="button" onclick="toggleRecipeIngredientsInShoppingList(${recipe.id}, false); renderDetail(${recipe.id});" class="mt-1 inline-flex h-11 min-w-[2.75rem] flex-shrink-0 items-center justify-center gap-1.5 rounded-xl border px-2 shadow-sm transition-all ${hasIngredientsInList ? 'bg-[#929D75] border-[#929D75] text-forest hover:bg-coral hover:border-coral hover:text-white' : 'bg-white border-parchmentDark text-gold hover:shadow-md hover:text-forest'}" title="${hasIngredientsInList ? uiText('Remove ingredients from list', 'Ingrediënten van de lijst halen') : uiText('Add all ingredients to shopping list', 'Alle ingrediënten op de boodschappenlijst')}" aria-label="${hasIngredientsInList ? uiText('Remove ingredients from list', 'Ingrediënten van de lijst halen') : uiText('Add all ingredients to shopping list', 'Alle ingrediënten op de boodschappenlijst')}"><i data-lucide="shopping-basket" class="h-5 w-5"></i></button>`;
+                                            const basketWord = hasIngredientsInList ? uiText('On list', 'Op lijst') : uiText('To list', 'Naar lijst');
+                                            return `<button type="button" onclick="toggleRecipeIngredientsInShoppingList(${recipe.id}, false); renderDetail(${recipe.id});" class="mt-1 inline-flex h-11 min-w-[2.75rem] flex-shrink-0 items-center justify-center gap-1.5 rounded-xl border px-2.5 text-xs font-bold shadow-sm transition-all ${hasIngredientsInList ? 'bg-[#929D75] border-[#929D75] text-forest hover:bg-coral hover:border-coral hover:text-white' : 'bg-white border-parchmentDark text-gold hover:shadow-md hover:text-forest'}" title="${hasIngredientsInList ? uiText('Remove ingredients from list', 'Ingrediënten van de lijst halen') : uiText('Add all ingredients to shopping list', 'Alle ingrediënten op de boodschappenlijst')}" aria-label="${hasIngredientsInList ? uiText('Remove ingredients from list', 'Ingrediënten van de lijst halen') : uiText('Add all ingredients to shopping list', 'Alle ingrediënten op de boodschappenlijst')}"><i data-lucide="shopping-basket" class="h-5 w-5"></i><span>${basketWord}</span></button>`;
                                         })()}
                                     </div>
                                     <div class="detail-scale-control" translate="no">
@@ -24290,7 +24317,7 @@
                             </div>
                             <div class="app-modal-footer border-t border-parchmentDark bg-parchment p-5 md:p-6">
                                 <button onclick="closeTimer()" class="${getAppButtonClasses('primary', { fullWidth: true, size: 'lg' })}">
-                                    <i data-lucide="x" class="w-4 h-4 inline mr-2"></i>Close
+                                    <i data-lucide="x" class="w-4 h-4 inline mr-2" aria-hidden="true"></i>${uiText('Close', 'Sluiten')}
                                 </button>
                             </div>
                         </div>
@@ -24570,7 +24597,7 @@
                                     <ul id="draft-ingredients-list" class="mb-3 space-y-2"></ul>
                                     <div class="flex gap-2">
                                         <input type="text" id="new-ingredient" placeholder="e.g. 500g Flour" onkeypress="if(event.key === 'Enter') { event.preventDefault(); addDraftIngredient(); }" class="${inputClass} flex-1">
-                                        <button type="button" onclick="addDraftIngredient()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="Add ingredient"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                        <button type="button" onclick="addDraftIngredient()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="${uiText('Add ingredient', 'Ingrediënt toevoegen')}" title="${uiText('Add ingredient', 'Ingrediënt toevoegen')}"><i data-lucide="plus" class="w-5 h-5"></i></button>
                                     </div>
                                 </div>
                                 <div>
@@ -24579,7 +24606,7 @@
                                     <div class="flex gap-2 items-start">
                                         <textarea id="new-step" placeholder="Describe the next step..." class="${textareaClass} flex-1 !min-h-[48px] !h-12 py-3"></textarea>
                                         <input type="number" id="new-step-minutes" min="1" max="240" value="1" inputmode="numeric" aria-label="Minutes for this step" class="${inputClass} !w-20">
-                                        <button type="button" onclick="addDraftStep()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="Add step"><i data-lucide="plus" class="w-5 h-5"></i></button>
+                                        <button type="button" onclick="addDraftStep()" class="${getAppButtonClasses('primary', { iconOnly: true, size: 'lg' })}" aria-label="${uiText('Add step', 'Stap toevoegen')}" title="${uiText('Add step', 'Stap toevoegen')}"><i data-lucide="plus" class="w-5 h-5"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -24735,7 +24762,7 @@
             list.innerHTML = draftIngredients.map((ing, i) => `
                 <li class="flex justify-between items-center bg-white min-h-[48px] px-4 rounded-sm border border-parchmentDark shadow-sm text-sm font-semibold text-forest">
                     <span class="flex items-center gap-2"><div class="w-1.5 h-1.5 bg-gold rounded-full"></div> ${escapeHTML(ing)}</span>
-                    <button type="button" onclick="removeDraftIngredient(${i})" class="text-red-400 hover:text-red-600 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <button type="button" onclick="removeDraftIngredient(${i})" class="inline-flex h-11 w-11 items-center justify-center rounded-xl text-red-400 hover:text-red-600" aria-label="${uiText('Remove ingredient', 'Ingrediënt verwijderen')}" title="${uiText('Remove ingredient', 'Ingrediënt verwijderen')}"><i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i></button>
                 </li>
             `).join('');
             lucide.createIcons();
@@ -25499,7 +25526,7 @@
                                     ${stepImage ? `<button type="button" onclick="clearDraftStepImage(${i})" class="inline-flex h-9 items-center justify-center gap-2 rounded-full border border-parchmentDark bg-white px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-sage shadow-sm transition-all hover:border-red-400 hover:text-red-500"><i data-lucide="image-off" class="h-4 w-4"></i>Remove photo</button>` : ''}
                                 </div>
                             </div>
-                            <button type="button" onclick="removeDraftStep(${i})" class="text-red-400 hover:text-red-600 p-1 flex-shrink-0"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <button type="button" onclick="removeDraftStep(${i})" class="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl text-red-400 hover:text-red-600" aria-label="${uiText('Remove step', 'Stap verwijderen')}" title="${uiText('Remove step', 'Stap verwijderen')}"><i data-lucide="trash-2" class="w-4 h-4" aria-hidden="true"></i></button>
                         </div>
                     </li>
                 `;

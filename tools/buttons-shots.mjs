@@ -213,7 +213,23 @@ async function runWidth(browser, width) {
       ?.scrollIntoView({ block: 'center' });
   });
   await sleep(250);
-  console.log(`detail@${width}`, JSON.stringify(await measureButtons(page, '#app-content')));
+  const detailInfo = await page.evaluate(() => {
+    const buttons = [...document.querySelectorAll('#app-content button')].map((b) => {
+      const box = b.getBoundingClientRect();
+      if (box.width < 1 || box.height < 1) return null;
+      return {
+        text: (b.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 48),
+        w: Math.round(box.width),
+        h: Math.round(box.height),
+        aria: b.getAttribute('aria-label') || ''
+      };
+    }).filter(Boolean);
+    const basket = buttons.find((b) => /lijst|list|basket/i.test(b.text + b.aria));
+    const pdf = buttons.find((b) => /^PDF$/i.test(b.text) || /\bPDF\b/i.test(b.text));
+    const del = buttons.find((b) => /Verwijderen|Delete/i.test(b.text));
+    return { basket, pdf, del, sample: buttons.slice(0, 12) };
+  });
+  console.log(`detail@${width}`, JSON.stringify(detailInfo));
   await shot(page, width, 'detail');
 
   // 3) Cooking mode (prove ~62px stay)
