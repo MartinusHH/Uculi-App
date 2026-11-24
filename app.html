@@ -4016,6 +4016,15 @@
             text-transform: uppercase;
         }
 
+        .source-filter-row > .source-filter-btn > i,
+        .source-filter-row > button > i[data-lucide] {
+            flex-shrink: 0;
+        }
+
+        .profile-sheet > .browse-hero {
+            margin-inline: 0.85rem;
+        }
+
         .filter-diet-actions {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -13024,7 +13033,7 @@
                 const assignedLabel = uiText(`Assigned to ${displayName}`, `Toegewezen aan ${displayName}`);
                 assigneesHtml = `
                     <button type="button" onclick="assignShoppingListItem('${item.id}', '')"
-                        class="inline-flex h-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full bg-forest px-2.5 text-[11px] font-bold leading-none text-white shadow-sm ring-2 ring-forest/20 transition-all"
+                        class="inline-flex h-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full border border-[#929D75] bg-[#fffdf9] px-2.5 text-[11px] font-bold leading-none text-[#1c1410] shadow-sm ring-2 ring-[#929D75]/25 transition-all"
                         title="${escapeHTML(assignedLabel)}" aria-label="${escapeHTML(assignedLabel)}">
                         ${escapeHTML(shortName)}
                     </button>
@@ -21656,7 +21665,7 @@
             ].map(scope => {
                 const isActive = collectionScopeFilter === scope.value;
                 const nextScope = isActive ? 'all' : scope.value;
-                return `<button type="button" onclick="collectionScopeFilter='${nextScope}'; renderList()" class="${getAppButtonClasses(isActive ? 'primary' : 'secondary', { fullWidth: true })} source-filter-btn"><i data-lucide="${scope.icon}" class="h-4 w-4"></i>${scope.label} <span class="rounded-full ${isActive ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'} px-2 py-0.5 text-[10px]">${scope.count}</span></button>`;
+                return `<button type="button" onclick="collectionScopeFilter='${nextScope}'; renderList()" class="${getAppButtonClasses(isActive ? 'primary' : 'secondary', { fullWidth: true })} source-filter-btn"><i data-lucide="${scope.icon}" class="h-4 w-4 shrink-0" aria-hidden="true"></i><span class="min-w-0 truncate">${scope.label}</span> <span class="shrink-0 rounded-full ${isActive ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'} px-2 py-0.5 text-[10px]">${scope.count}</span></button>`;
             }).join('');
             const dietCountBadge = dietFilter.length > 0
                 ? `<span class="rounded-full px-2 py-0.5 text-[10px] ${showDietFilters ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'}">${dietFilter.length}</span>`
@@ -21758,7 +21767,7 @@
                                     <i data-lucide="leaf" class="h-4 w-4" aria-hidden="true"></i>${uiText('Diets', 'Diëten')}${dietCountBadge}
                                 </button>
                                 <button type="button" onclick="confirmResetRecipeFilters(event)" class="${getAppButtonClasses('secondary', { fullWidth: true })} index-clear-filters-btn" aria-label="${uiText('Clear all filters', 'Alles wissen')}" title="${uiText('Clear all filters', 'Alles wissen')}">
-                                    <i data-lucide="rotate-ccw" class="h-4 w-4" aria-hidden="true"></i>${uiText('Clear all', 'Alles wissen')}
+                                    ${uiText('Clear all', 'Alles wissen')}
                                 </button>
                             </div>
                             ${showDietFilters ? `<button type="button" onclick="toggleDietGuide()" class="${getAppButtonClasses('secondary', { fullWidth: true })}" aria-label="${showDietGuide ? uiText('Hide diet guide', 'Dieetgids verbergen') : uiText('Diet guide', 'Dieetgids')}" title="${showDietGuide ? uiText('Hide diet guide', 'Dieetgids verbergen') : uiText('Diet guide', 'Dieetgids')}"><i data-lucide="info" class="h-4 w-4" aria-hidden="true"></i>${showDietGuide ? uiText('Hide guide', 'Gids verbergen') : uiText('Diet guide', 'Dieetgids')}</button>` : ''}

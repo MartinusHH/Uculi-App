@@ -7,7 +7,11 @@
 import puppeteer from 'puppeteer-core';
 import fs from 'fs';
 
-const ART = '/opt/cursor/artifacts';
+import os from 'os';
+import path from 'path';
+
+const ART = process.env.UCULI_TEST_ARTIFACTS
+  || (fs.existsSync('/opt/cursor/artifacts') ? '/opt/cursor/artifacts' : path.join(os.tmpdir(), 'uculi-test-artifacts'));
 fs.mkdirSync(ART, { recursive: true });
 const CHROME = fs.existsSync('/usr/bin/google-chrome-stable')
   ? '/usr/bin/google-chrome-stable'
