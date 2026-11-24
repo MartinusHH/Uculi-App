@@ -1110,13 +1110,23 @@
         }
 
         .settings-report {
-            margin-top: var(--space-5);
+            margin-top: var(--space-4);
             padding-bottom: var(--space-3);
         }
 
         .settings-report a,
         #app-landing a#report-problem-footer {
             font-family: var(--font-ui);
+        }
+
+        /* Match the paid-version button above: same outer box, label centered. */
+        #report-problem-settings {
+            box-sizing: border-box;
+            justify-content: center;
+            max-width: 100%;
+            min-height: var(--touch-min);
+            /* transition-all would lag the width/left match behind the paid button. */
+            transition: none !important;
         }
 
         button.settings-row {
@@ -7987,9 +7997,40 @@
                 ? uiText('Report a problem', 'Probleem melden')
                 : 'Probleem melden';
             const className = typeof getAppButtonClasses === 'function'
-                ? getAppButtonClasses('secondary')
+                ? getAppButtonClasses('secondary', { size: 'sm' })
                 : 'app-btn-secondary';
             return problemReportSettingsHtml(lang, getProblemReportScreen(), label, className);
+        }
+
+        function alignProblemReportButton() {
+            const report = document.getElementById('report-problem-settings');
+            if (!report) return;
+            const paid = document.querySelector('.family-code-panel .family-code-row > button');
+            if (!paid) {
+                report.style.width = '';
+                report.style.left = '';
+                report.style.position = '';
+                return;
+            }
+            const previousTransition = report.style.transition;
+            report.style.transition = 'none';
+            report.style.position = 'relative';
+            report.style.left = '0px';
+            report.style.boxSizing = 'border-box';
+            const paidBox = paid.getBoundingClientRect();
+            if (paidBox.width < 1) {
+                report.style.transition = previousTransition;
+                return;
+            }
+            report.style.width = `${paidBox.width}px`;
+            const reportBox = report.getBoundingClientRect();
+            report.style.left = `${paidBox.left - reportBox.left}px`;
+            report.style.transition = previousTransition;
+        }
+
+        if (typeof window !== 'undefined' && !window.__problemReportAlignBound) {
+            window.__problemReportAlignBound = true;
+            window.addEventListener('resize', () => alignProblemReportButton());
         }
 
         function problemReportFooterMarkup() {
@@ -19883,6 +19924,7 @@
                 </div>
             `;
             lucide.createIcons();
+            alignProblemReportButton();
             markViewEnter();
             syncAuthGateButtons();
             if (typeof syncHeaderBackButton === 'function') syncHeaderBackButton();
