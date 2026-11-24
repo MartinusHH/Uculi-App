@@ -3828,10 +3828,16 @@
             width: 100%;
             min-width: 0;
             max-width: none;
+            min-height: var(--touch-min);
+            height: var(--touch-min);
             justify-content: center;
             white-space: nowrap;
             padding-left: 0.65rem;
             padding-right: 0.65rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .measurement-system-switch {
@@ -3980,6 +3986,13 @@
         .profile-editor-actions > button {
             width: 100%;
             min-width: 0;
+            min-height: var(--touch-min);
+            height: var(--touch-min);
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .source-filter-row {
@@ -3994,7 +4007,60 @@
             width: 100%;
             min-width: 0;
             max-width: none;
+            min-height: var(--touch-min);
+            height: var(--touch-min);
             justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .filter-diet-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            width: 100%;
+            align-items: stretch;
+        }
+
+        .filter-diet-actions > button {
+            width: 100%;
+            min-width: 0;
+            min-height: var(--touch-min);
+            height: var(--touch-min);
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .cover-edit-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: var(--touch-min);
+            height: var(--touch-min);
+            min-width: var(--touch-min);
+            min-height: var(--touch-min);
+            padding: 0;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.22);
+            color: #1c1410;
+            box-shadow: 0 4px 10px rgba(28, 20, 16, 0.12);
+            backdrop-filter: blur(8px);
+        }
+
+        .cover-edit-icon-btn:hover {
+            border-color: rgba(255, 255, 255, 0.55);
+            background: rgba(255, 255, 255, 0.34);
+        }
+
+        .cover-edit-icon-btn:focus-visible {
+            outline: 2px solid #929D75;
+            outline-offset: 2px;
         }
 
         .notebook-landing-hint {
@@ -6242,13 +6308,15 @@
 
         .detail-scale-control {
             display: flex;
-            height: 3rem;
+            height: var(--touch-min);
+            min-height: var(--touch-min);
             width: 100%;
-            align-items: center;
-            border: 1px solid rgba(28, 20, 16, 0.1);
-            border-radius: 0.95rem;
+            align-items: stretch;
+            border: 1px solid rgba(28, 20, 16, 0.14);
+            border-radius: 0.75rem;
             background: #fffdf9;
-            box-shadow: 0 8px 16px rgba(28, 20, 16, 0.04);
+            box-shadow: 0 4px 8px rgba(28, 20, 16, 0.04);
+            overflow: hidden;
         }
 
         .detail-scale-control button {
@@ -6259,9 +6327,12 @@
             align-items: center;
             justify-content: center;
             color: var(--text-muted);
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 800;
+            letter-spacing: 0.04em;
             background: transparent;
+            border: 0;
+            border-radius: 0;
         }
 
         .meal-type-btn {
@@ -11060,8 +11131,8 @@
                 <div class="ml-10 relative h-full md:ml-12">
                     <div class="relative z-20 flex items-start justify-end gap-4 pt-1">
                         ${!isEditorPreview ? `
-                            <button onclick="event.stopPropagation(); openCoverEditor()" onpointerdown="event.stopPropagation()" class="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-white border-opacity-30 bg-white bg-opacity-20 px-4 text-[10px] font-bold uppercase tracking-[0.18em] shadow-sm backdrop-blur-sm">
-                                <i data-lucide="pencil-ruler" class="h-4 w-4"></i> Bewerken
+                            <button type="button" onclick="event.stopPropagation(); openCoverEditor()" onpointerdown="event.stopPropagation()" class="cover-edit-icon-btn" aria-label="${uiText('Edit cover', 'Kaft bewerken')}" title="${uiText('Edit cover', 'Kaft bewerken')}">
+                                <i data-lucide="pencil" class="h-4 w-4" aria-hidden="true"></i>
                             </button>
                         ` : ''}
                     </div>
@@ -18771,11 +18842,11 @@
                         </div>
 
                         <div class="profile-editor-actions">
-                            <button type="button" onclick="renderProfile()" class="${getAppButtonClasses('secondary')}">
-                                ${uiText('Cancel', 'Annuleren')}
+                            <button type="button" onclick="renderProfile()" class="${getAppButtonClasses('secondary')}" aria-label="${uiText('Cancel', 'Annuleren')}" title="${uiText('Cancel', 'Annuleren')}">
+                                <i data-lucide="x" class="h-4 w-4" aria-hidden="true"></i>${uiText('Cancel', 'Annuleren')}
                             </button>
                             <button type="submit" class="${getAppButtonClasses('primary')}" aria-label="${uiText('Save', 'Opslaan')}" title="${uiText('Save', 'Opslaan')}">
-                                <i data-lucide="save" class="w-4 h-4"></i>${uiText('Save', 'Opslaan')}
+                                <i data-lucide="save" class="h-4 w-4" aria-hidden="true"></i>${uiText('Save', 'Opslaan')}
                             </button>
                         </div>
                     </form>
@@ -19984,6 +20055,19 @@
             return dietFilter.every(selectedDiet => coverage.has(selectedDiet));
         }
 
+        function hasActiveRecipeFilters() {
+            return Boolean(
+                String(searchQuery || '').trim()
+                || categoryFilter
+                || difficultyFilter
+                || cuisineFilter
+                || mealTypeFilter.length
+                || dietFilter.length
+                || showFavoritesOnly
+                || normalizeCollectionScopeFilter(collectionScopeFilter) !== 'all'
+            );
+        }
+
         function resetRecipeFilters(event) {
             if (event) {
                 event.preventDefault?.();
@@ -20003,6 +20087,35 @@
             // Mobile browsers can restore prior <select> values after an innerHTML swap;
             // force every filter control back to the cleared state.
             syncClearedRecipeFilterControls();
+        }
+
+        function confirmResetRecipeFilters(event) {
+            if (event) {
+                event.preventDefault?.();
+                event.stopPropagation?.();
+            }
+            if (!hasActiveRecipeFilters()) {
+                showToast(uiText('No filters to clear.', 'Geen filters om te wissen.'), 'info');
+                return;
+            }
+            const modalId = createModal(
+                uiText('Clear all filters?', 'Alle filters wissen?'),
+                `<p class="text-sm font-semibold leading-relaxed text-sage">${uiText(
+                    'This clears source, category, difficulty, cuisine, meal type, diet, and favorites filters.',
+                    'Dit wist bron-, categorie-, moeilijkheid-, keuken-, maaltijd-, dieet- en favorietenfilters.'
+                )}</p>`,
+                [
+                    { text: uiText('Cancel', 'Annuleren') },
+                    {
+                        text: uiText('Clear all', 'Alles wissen'),
+                        primary: true,
+                        onClick: () => {
+                            closeModal(modalId);
+                            resetRecipeFilters();
+                        }
+                    }
+                ]
+            );
         }
 
         function syncClearedRecipeFilterControls() {
@@ -21256,7 +21369,7 @@
                             <div class="notebook-landing-stage">
                                 <div class="notebook-landing-cover-column">
                                     <div class="notebook-cover-shell notebook-book-cover-frame notebook-landing-cover-frame">
-                                        <div id="notebook-cover-surface" class="notebook-book-cover-surface notebook-cover-panel notebook-landing-cover-surface rounded-[32px] border px-6 py-6 text-[#1c1410] md:px-8 md:py-8" style="${getNotebookCoverPanelStyle(coverConfig)}" role="button" tabindex="0" aria-label="Open schrift" data-cover-openable="true" onclick="openNotebookCover()" onkeydown="if (event.target !== event.currentTarget) return; if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openNotebookCover(); }">
+                                        <div id="notebook-cover-surface" class="notebook-book-cover-surface notebook-cover-panel notebook-landing-cover-surface rounded-[32px] border px-6 py-6 text-[#1c1410] md:px-8 md:py-8" style="${getNotebookCoverPanelStyle(coverConfig)}" role="button" tabindex="0" aria-label="${uiText('Open notebook', 'Open schrift')}" title="${uiText('Open notebook', 'Open schrift')}" data-cover-openable="true" onclick="openNotebookCover()" onkeydown="if (event.target !== event.currentTarget) return; if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openNotebookCover(); }">
                                             ${renderNotebookCoverFace(coverConfig, recipe, totalPages, false)}
                                         </div>
                                     </div>
@@ -21270,11 +21383,11 @@
                                         `${totalIngredients} ingrediënten · ${totalInstructions} stappen. Open het schrift om te koken, notities te maken of bladzijden om te slaan.`
                                     )}</p>
                                     <div class="notebook-landing-action-row">
-                                        <button onclick="openNotebookCover()" class="${getAppButtonClasses('primary', { size: 'lg' })} rounded-2xl shadow-[0_16px_28px_rgba(45,77,52,0.24)]" translate="no">
-                                            <i data-lucide="book-open" class="h-4 w-4"></i>${uiText('Open notebook', 'Open schrift')}
+                                        <button type="button" onclick="openNotebookCover()" class="${getAppButtonClasses('primary', { size: 'lg' })} rounded-2xl shadow-[0_16px_28px_rgba(45,77,52,0.24)]" translate="no" aria-label="${uiText('Open notebook', 'Open schrift')}" title="${uiText('Open notebook', 'Open schrift')}">
+                                            <i data-lucide="book-open" class="h-4 w-4" aria-hidden="true"></i>${uiText('Open notebook', 'Open schrift')}
                                         </button>
                                         <button type="button" onclick="${pdfActions.bookAction}" class="${getAppButtonClasses(accountHasPremiumPlan() ? 'secondary' : 'locked', { size: 'lg' })} rounded-2xl" title="${pdfActions.book}" aria-label="${pdfActions.book}">
-                                            <i data-lucide="${accountHasPremiumPlan() ? 'file-down' : 'lock'}" class="h-4 w-4"></i>${pdfActions.book}
+                                            <i data-lucide="${accountHasPremiumPlan() ? 'file-down' : 'lock'}" class="h-4 w-4" aria-hidden="true"></i>${pdfActions.book}
                                         </button>
                                     </div>
                                     <p class="notebook-landing-hint notebook-landing-hint-desktop">${uiText('Click the cover or button to open the full spread.', 'Klik op de kaft of de knop om de volledige openslag te openen.')}</p>
@@ -21545,9 +21658,9 @@
                 const nextScope = isActive ? 'all' : scope.value;
                 return `<button type="button" onclick="collectionScopeFilter='${nextScope}'; renderList()" class="${getAppButtonClasses(isActive ? 'primary' : 'secondary', { fullWidth: true })} source-filter-btn"><i data-lucide="${scope.icon}" class="h-4 w-4"></i>${scope.label} <span class="rounded-full ${isActive ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'} px-2 py-0.5 text-[10px]">${scope.count}</span></button>`;
             }).join('');
-            const selectedDietSummary = dietFilter.length === 0
-                ? uiText('Optional', 'Optioneel')
-                : (dietFilter.length === 1 ? dietFilter[0] : uiText(`${dietFilter.length} selected`, `${dietFilter.length} geselecteerd`));
+            const dietCountBadge = dietFilter.length > 0
+                ? `<span class="rounded-full px-2 py-0.5 text-[10px] ${showDietFilters ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'}">${dietFilter.length}</span>`
+                : '';
             const dietFilterButtonsMarkup = dietOptions.map(option => {
                 const isActive = dietFilter.includes(option);
                 const desc = dietDescriptions[option] || '';
@@ -21635,22 +21748,20 @@
                     </div>
 
                     <div class="rounded-xl border border-accent bg-accent bg-opacity-40 p-4">
-                        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <div class="flex flex-col gap-3">
                             <div>
                                 <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sage opacity-80">${uiText('Diets', 'Diëten')}</p>
                                 <p class="mt-1 text-sm font-semibold text-sage">${uiText('Use diet tags only when you want to narrow results by dietary fit.', 'Gebruik dieettags alleen om resultaten op dieet te verfijnen.')}</p>
                             </div>
-                            <div class="flex flex-wrap gap-2">
-                                <button onclick="toggleDietFiltersVisibility()" class="${getAppButtonClasses(showDietFilters ? 'primary' : 'secondary')}">
-                                    <i data-lucide="leaf" class="h-4 w-4"></i>${uiText('Diets', 'Diëten')}
-                                    <span class="rounded-full px-2 py-0.5 text-[10px] ${showDietFilters ? 'bg-white bg-opacity-20 text-white' : 'bg-accent text-sage'}">${selectedDietSummary}</span>
-                                    <i data-lucide="${showDietFilters ? 'chevron-up' : 'chevron-down'}" class="h-4 w-4"></i>
+                            <div class="filter-diet-actions">
+                                <button type="button" onclick="toggleDietFiltersVisibility()" class="${getAppButtonClasses(showDietFilters ? 'primary' : 'secondary', { fullWidth: true })}" aria-label="${uiText('Diets', 'Diëten')}" title="${uiText('Diets', 'Diëten')}" aria-expanded="${showDietFilters ? 'true' : 'false'}">
+                                    <i data-lucide="leaf" class="h-4 w-4" aria-hidden="true"></i>${uiText('Diets', 'Diëten')}${dietCountBadge}
                                 </button>
-                                ${showDietFilters ? `<button onclick="toggleDietGuide()" class="${getAppButtonClasses('secondary')}"><i data-lucide="info" class="h-4 w-4"></i>${showDietGuide ? uiText('Hide guide', 'Gids verbergen') : uiText('Diet guide', 'Dieetgids')}</button>` : ''}
-                                <button type="button" onclick="resetRecipeFilters(event)" class="${getAppButtonClasses('secondary')} index-clear-filters-btn" aria-label="${uiText('Reset all filters', 'Alle filters wissen')}">
-                                    <i data-lucide="rotate-ccw" class="h-4 w-4"></i>${uiText('Reset all', 'Alles wissen')}
+                                <button type="button" onclick="confirmResetRecipeFilters(event)" class="${getAppButtonClasses('secondary', { fullWidth: true })} index-clear-filters-btn" aria-label="${uiText('Clear all filters', 'Alles wissen')}" title="${uiText('Clear all filters', 'Alles wissen')}">
+                                    <i data-lucide="rotate-ccw" class="h-4 w-4" aria-hidden="true"></i>${uiText('Clear all', 'Alles wissen')}
                                 </button>
                             </div>
+                            ${showDietFilters ? `<button type="button" onclick="toggleDietGuide()" class="${getAppButtonClasses('secondary', { fullWidth: true })}" aria-label="${showDietGuide ? uiText('Hide diet guide', 'Dieetgids verbergen') : uiText('Diet guide', 'Dieetgids')}" title="${showDietGuide ? uiText('Hide diet guide', 'Dieetgids verbergen') : uiText('Diet guide', 'Dieetgids')}"><i data-lucide="info" class="h-4 w-4" aria-hidden="true"></i>${showDietGuide ? uiText('Hide guide', 'Gids verbergen') : uiText('Diet guide', 'Dieetgids')}</button>` : ''}
                         </div>
 
                         ${showDietFilters ? `
@@ -23993,9 +24104,9 @@
                                         })()}
                                     </div>
                                     <div class="detail-scale-control" translate="no">
-                                        <button type="button" onclick="updateScale(-0.5, ${recipe.id})" aria-label="${uiText('Decrease scale', 'Schaal verlagen')}">-</button>
+                                        <button type="button" onclick="updateScale(-0.5, ${recipe.id})" aria-label="${uiText('Decrease scale', 'Schaal verlagen')}" title="${uiText('Decrease scale', 'Schaal verlagen')}">−</button>
                                         <span id="scale-display">${formatScaleLabel(recipe)}</span>
-                                        <button type="button" onclick="updateScale(0.5, ${recipe.id})" aria-label="${uiText('Increase scale', 'Schaal verhogen')}">+</button>
+                                        <button type="button" onclick="updateScale(0.5, ${recipe.id})" aria-label="${uiText('Increase scale', 'Schaal verhogen')}" title="${uiText('Increase scale', 'Schaal verhogen')}">+</button>
                                     </div>
                                     ${(() => {
                                         const isImperial = (userSettings.measurementSystem || 'Metric') === 'Imperial';

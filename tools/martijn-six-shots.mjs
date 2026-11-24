@@ -25,7 +25,17 @@ async function dismissOverlays(page) {
         node.remove();
       }
     });
-    document.querySelectorAll('.app-toast, #app-toast, [data-toast]').forEach((n) => n.remove());
+    // Hide toasts / Testmodus banners for clean shots
+    const toastRoot = document.getElementById('toast') || document.getElementById('app-toast');
+    if (toastRoot) {
+      toastRoot.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+      toastRoot.style.display = 'none';
+    }
+    document.body.classList.remove('toast-open');
+    document.documentElement.style.removeProperty('--toast-clearance');
+    document.querySelectorAll('.app-toast, [data-toast], #toast-container').forEach((n) => {
+      n.style.display = 'none';
+    });
     if (typeof userSettings !== 'undefined') {
       userSettings.termsAccepted = true;
       userSettings.language = 'nl';
@@ -39,6 +49,12 @@ async function enterApp(page) {
   await sleep(800);
   await dismissOverlays(page);
   await page.evaluate(() => {
+    // Mute Testmodus toast during screenshot runs
+    if (typeof showToast === 'function' && !window.__martijnShotToastMuted) {
+      window.__martijnShotToastMuted = true;
+      window.__martijnOriginalShowToast = showToast;
+      window.showToast = function mutedToast() { /* no-op for shots */ };
+    }
     localStorage.setItem('uculiDeveloperBypass', '1');
     if (typeof activateDeveloperBypassSession === 'function') activateDeveloperBypassSession();
     if (typeof startLocalTestModeFromGate === 'function') startLocalTestModeFromGate();
