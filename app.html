@@ -1109,6 +1109,16 @@
             gap: 0.15rem;
         }
 
+        .settings-report {
+            margin-top: var(--space-5);
+            padding-bottom: var(--space-3);
+        }
+
+        .settings-report a,
+        #app-landing a#report-problem-footer {
+            font-family: var(--font-ui);
+        }
+
         button.settings-row {
             width: 100%;
             background: transparent;
@@ -7844,6 +7854,152 @@
 
     <script>
         // --- 0. LOCAL AI SETUP ---
+        /* problem-report:start */
+        const APP_VERSION = '1.0.0';
+        // Shared Google Form fields. nl/en each have their own form URL.
+        // Leave a url empty to hide the report control for that language.
+        const PROBLEM_REPORT_FORM = {
+            appEntry: 'entry.984342368',
+            techEntry: 'entry.1371737567',
+            nl: { url: 'https://docs.google.com/forms/d/e/1FAIpQLSfUdUosLuN4iEuxw-OT-0-Xwn4iGdjT6Sxxrgkll2Jf8yH3pw/viewform' },
+            en: { url: 'https://docs.google.com/forms/d/e/1FAIpQLSdiCbTVI_mGQSOI7eB7g5nxx10mCH0Pf6reA1TNTGzz8paluQ/viewform' }
+        };
+        const PROBLEM_REPORT_SCREENS = Object.freeze(['index', 'recipe', 'editor', 'cook', 'shopping', 'browse', 'profile', 'settings', 'cover', 'other']);
+        const PROBLEM_REPORT_SCREEN_ALIASES = Object.freeze({
+            index: 'index',
+            list: 'index',
+            recipes: 'index',
+            recipe: 'recipe',
+            detail: 'recipe',
+            editor: 'editor',
+            add: 'editor',
+            cook: 'cook',
+            cooking: 'cook',
+            shopping: 'shopping',
+            shop: 'shopping',
+            browse: 'browse',
+            profile: 'profile',
+            settings: 'settings',
+            options: 'settings',
+            opties: 'settings',
+            cover: 'cover',
+            other: 'other'
+        });
+
+        function problemReportLocale(lang) {
+            return String(lang || '').trim().toLowerCase() === 'en' ? 'en' : 'nl';
+        }
+
+        function normalizeProblemReportScreen(screen) {
+            let raw = '';
+            if (screen && typeof screen === 'object') {
+                raw = String(screen.view || screen.screen || screen.name || '');
+            } else {
+                raw = String(screen ?? '');
+            }
+            raw = raw.trim();
+            if (!raw || raw.includes('://') || raw.includes('@') || /^[a-z][a-z0-9+.-]*:/i.test(raw)) {
+                return 'other';
+            }
+            const pathOnly = raw.split('#')[0].split('?')[0].trim();
+            const segment = (pathOnly.split(/[\/|&=\s]+/).filter(Boolean)[0] || '').toLowerCase();
+            if (!segment || !/^[a-z][a-z0-9_-]{0,31}$/.test(segment)) return 'other';
+            const mapped = PROBLEM_REPORT_SCREEN_ALIASES[segment] || '';
+            return PROBLEM_REPORT_SCREENS.includes(mapped) ? mapped : 'other';
+        }
+
+        function buildProblemReportUrl(lang, screen) {
+            const locale = problemReportLocale(lang);
+            const form = PROBLEM_REPORT_FORM[locale] || PROBLEM_REPORT_FORM.nl;
+            const base = String(form?.url || '').trim();
+            const appEntry = String(PROBLEM_REPORT_FORM.appEntry || '').trim();
+            const techEntry = String(PROBLEM_REPORT_FORM.techEntry || '').trim();
+            if (!base || !appEntry || !techEntry) return '';
+            const tech = `${APP_VERSION} · ${normalizeProblemReportScreen(screen)}`;
+            return `${base}?usp=pp_url&${appEntry}=Uculi&${techEntry}=${encodeURIComponent(tech)}`;
+        }
+
+        function escapeProblemReportAttr(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+
+        function problemReportLifebuoyIcon() {
+            return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-4 w-4"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><path d="M4.93 4.93 9.17 9.17"></path><path d="M14.83 9.17 19.07 4.93"></path><path d="M14.83 14.83 19.07 19.07"></path><path d="M9.17 14.83 4.93 19.07"></path></svg>';
+        }
+
+        function problemReportControlHtml({ lang, screen, label, className, id, icon = false }) {
+            const href = buildProblemReportUrl(lang, screen);
+            if (!href) return '';
+            const safeLabel = escapeProblemReportAttr(label);
+            const iconHtml = icon ? problemReportLifebuoyIcon() : '';
+            const textHtml = icon ? `<span>${safeLabel}</span>` : safeLabel;
+            return `<a id="${escapeProblemReportAttr(id)}" class="${escapeProblemReportAttr(className)}" href="${escapeProblemReportAttr(href)}" target="_blank" rel="noopener noreferrer" aria-label="${safeLabel}" title="${safeLabel}">${iconHtml}${textHtml}</a>`;
+        }
+
+        function problemReportSettingsHtml(lang, screen, label, className) {
+            const anchor = problemReportControlHtml({
+                lang,
+                screen,
+                label,
+                className,
+                id: 'report-problem-settings',
+                icon: true
+            });
+            if (!anchor) return '';
+            return `<div class="settings-report">${anchor}</div>`;
+        }
+
+        function problemReportFooterHtml(lang, screen, label) {
+            return problemReportControlHtml({
+                lang,
+                screen,
+                label,
+                className: 'landing-legal-link',
+                id: 'report-problem-footer',
+                icon: false
+            });
+        }
+        /* problem-report:end */
+
+        function getProblemReportScreen() {
+            try {
+                if (typeof document !== 'undefined' && document.getElementById('app-landing')) return 'other';
+                const cover = typeof document !== 'undefined' ? document.getElementById('cover-editor-modal') : null;
+                if (cover && !cover.classList.contains('hidden')) return 'cover';
+            } catch (_error) { /* ignore */ }
+            if (typeof isCookingMode !== 'undefined' && isCookingMode) return 'cook';
+            const view = typeof currentView === 'string' ? currentView : '';
+            if ((view === 'index' || view === 'detail' || view === 'recipe')
+                && typeof activeDetailRecipeId !== 'undefined'
+                && activeDetailRecipeId != null) {
+                return 'recipe';
+            }
+            return normalizeProblemReportScreen(view);
+        }
+
+        function problemReportSettingsMarkup() {
+            const lang = typeof getActiveUiLanguage === 'function' ? getActiveUiLanguage() : 'nl';
+            const label = typeof uiText === 'function'
+                ? uiText('Report a problem', 'Probleem melden')
+                : 'Probleem melden';
+            const className = typeof getAppButtonClasses === 'function'
+                ? getAppButtonClasses('secondary')
+                : 'app-btn-secondary';
+            return problemReportSettingsHtml(lang, getProblemReportScreen(), label, className);
+        }
+
+        function problemReportFooterMarkup() {
+            const lang = typeof getActiveUiLanguage === 'function' ? getActiveUiLanguage() : 'nl';
+            const label = typeof uiText === 'function'
+                ? uiText('Report a problem', 'Probleem melden')
+                : 'Probleem melden';
+            return problemReportFooterHtml(lang, 'other', label);
+        }
+
         const localAiTranslationPatterns = [
             { pattern: /\b(?:en|y|et|und|e|i|ve)\b/g, replacement: ' and ' },
             { pattern: /\b(?:kip|kipfilet|pollo|poulet|huhn|hahnchen|frango|kurczak|tavuk)\b/g, replacement: 'chicken' },
@@ -17772,6 +17928,7 @@
                                     <a class="landing-legal-link" href="${legalPageHref('privacy')}" onclick="event.preventDefault(); showLegalDocument('privacy');">${getLegalLabels().privacy}</a>
                                     <a class="landing-legal-link" href="${legalPageHref('terms')}" onclick="event.preventDefault(); showLegalDocument('terms');">${getLegalLabels().terms}</a>
                                     <a class="landing-legal-link" href="${legalPageHref('cookies')}" onclick="event.preventDefault(); showLegalDocument('cookies');">${getLegalLabels().cookies}</a>
+                                    ${problemReportFooterMarkup()}
                                     <a href="#" class="text-[10px] font-bold uppercase tracking-[0.2em] text-sage hover:text-gold transition-colors">Instagram</a>
                                 </div>
                             </div>
@@ -19722,6 +19879,7 @@
 
                         ${isCurrentUserAdmin() ? `<section class="settings-panel settings-panel--wide"><p class="settings-panel-kicker">Admin</p>${adminManagementContent}</section>` : ''}
                     </form>
+                    ${problemReportSettingsMarkup()}
                 </div>
             `;
             lucide.createIcons();
@@ -20195,6 +20353,7 @@
                     ['Published recipes', 'Recipes you publish to Browse are publicly readable. Private recipes, notes, and settings stay with your account or this device.'],
                     ['Agreement record', 'When you create an account we also store when you accepted these documents: version and timestamp, kept privately with your user record in Firebase.'],
                     ['Your choices', 'You can edit or delete recipes and sign out. Without an account, clear this browser’s site data. With an account you can ask for access, correction, or deletion of what is stored in Firebase via mholt.apps@gmail.com.'],
+                    ['Problem reports', 'Problem reports go through a Google Form of Mholt. Only what you type is sent, plus the app name, version and screen. An email address is optional and only for a reply.'],
                     ['Controller', controllerLine],
                     ['Updated', labels.updated]
                 ]
@@ -20209,6 +20368,7 @@
                     ['Gepubliceerde recepten', 'Recepten die je in Browse publiceert zijn openbaar leesbaar. Privérecepten, notities en instellingen blijven bij jouw account of dit apparaat.'],
                     ['Akkoordmoment', 'Maak je een account, dan bewaren we ook wanneer je akkoord ging: de voorwaardenversie en het tijdstip, privé bij jouw gebruikersrecord in Firebase.'],
                     ['Jouw keuzes', 'Je kunt recepten bewerken of verwijderen en uitloggen. Zonder account wis je de sitegegevens in deze browser. Met een account kun je inzage, correctie of verwijdering vragen van wat in Firebase staat via mholt.apps@gmail.com.'],
+                    ['Probleemmeldingen', 'Probleemmeldingen gaan via een Google Formulier van Mholt. Alleen wat je zelf typt wordt verstuurd, plus de appnaam, de versie en het scherm. Een e-mailadres is optioneel en alleen bedoeld voor een antwoord.'],
                     ['Verantwoordelijke', controllerLine],
                     ['Bijgewerkt', labels.updated]
                 ]
